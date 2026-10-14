@@ -1512,7 +1512,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 		}
 
-		text_disabled("Once linked, progress counts towards the Steam account.\nIf Steam profile has no progress yet,\nthis key's progress moves there.");
+		text_disabled("Once linked, progress counts towards the Steam account.\nIf the Steam account has no progress yet,\nthis key's progress moves there.");
 	}
 
 	/*

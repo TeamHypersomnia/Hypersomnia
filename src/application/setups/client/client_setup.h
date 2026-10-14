@@ -1063,7 +1063,8 @@ public:
 	*/
 
 	/*
-		"Connect anyway" after a key that did not match the server list: the next attempt takes any key, with no saved password.
+		"Connect anyway" after a key that did not match the one known for the address or the rejoined match's: the next attempt
+		takes any key, with no saved password. A mismatch with the server list has no Connect anyway.
 	*/
 
 	bool wants_connect_anyway() const {

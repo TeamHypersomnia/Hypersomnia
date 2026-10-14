@@ -9,7 +9,7 @@
 /*
 	The accounts of the players without Steam and outside CrazyGames.
 
-	The game keeps an Ed25519 key in KEYS_DIR (account.key - see all_paths.h), created on the first start - "this computer".
+	The game keeps an Ed25519 key in KEYS_DIR (account.key - see all_paths.h), created on the first start (the Steam build keeps none).
 	The account is "key_" followed by the public key in hex - unless the key is linked to a Steam account on hypersomnia.io,
 	in which case the identity broker vouches for that Steam account instead. See identity_session.h.
 

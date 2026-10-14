@@ -13,8 +13,9 @@
 /*
 	The player's identity - see identity_cert.h.
 
-	Every game has its "this computer" key (account.key in KEYS_DIR, the browser's key on the web).
-	It is also the session key: the game signs its connections with it, and a cert names it.
+	Every game has its account key (account.key in KEYS_DIR, the browser's key on the web; the Steam build only a new one
+	in memory each run - its account is the Steam one). It is also the session key: the game signs its connections with it,
+	and a cert names it.
 	With nothing more, the game signs its own cert - the account "key_" and the key in hex - and never asks anyone.
 
 	An account the identity broker on hypersomnia.io vouches for (Steam, CrazyGames) is expected:
@@ -123,7 +124,7 @@ private:
 	bool steam_ticket_wanted = false;
 
 	/*
-		The device the game runs on, sent with every request - shown only on the owner's hypersomnia.io/profile.
+		The device the game runs on, sent with a link - shown only on the owner's hypersomnia.io/profile.
 	*/
 
 	std::string device_name;
@@ -171,7 +172,7 @@ private:
 public:
 	/*
 		"&device=<the device's name>&os=<windows|linux|mac|web>" - what the site shows next to a linked key
-		on its owner's /profile; sent with every cert request and with a link.
+		on its owner's /profile; sent with a link only.
 	*/
 
 	std::string device_query() const;
@@ -201,10 +202,6 @@ public:
 	void retry_now();
 
 	/*
-		The broker answered 401 to a CrazyGames token: the game asks CrazyGames for a new one.
-	*/
-
-	/*
 		A quiet check found the key linked (e.g. linked in another tab): the game uses the Steam name and avatar then,
 		as after linking here.
 	*/
@@ -212,6 +209,10 @@ public:
 	bool take_linked_quietly() {
 		return std::exchange(linked_quietly, false);
 	}
+
+	/*
+		The broker answered 401 to a CrazyGames token: the game asks CrazyGames for a new one.
+	*/
 
 	bool take_crazygames_token_refused() {
 		return std::exchange(crazygames_token_refused, false);

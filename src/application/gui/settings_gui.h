@@ -388,14 +388,15 @@ public:
 	bool avatar_changed = false;
 
 	/*
-		account.key was just replaced or forgotten here - the game reads it again.
-	*/
-
-	/*
 		CrazyGames' "Sign in" in Info - opened by work.cpp, like the leaderboards' one.
 	*/
 
 	bool wants_crazygames_sign_in = false;
+
+	/*
+		account.key was just replaced or forgotten here - the game reads it again.
+	*/
+
 	bool key_file_changed = false;
 
 	/*
@@ -411,7 +412,7 @@ public:
 	bool account_avatar_previewed = false;
 
 	/*
-		The avatar of the Steam account a link code is for, decoded here - the game uploads it as the LINK_AVATAR texture.
+		The avatar of the Steam account just linked, decoded here - the game uploads it as the LINK_AVATAR texture.
 	*/
 
 	std::optional<augs::image> link_avatar_to_upload;

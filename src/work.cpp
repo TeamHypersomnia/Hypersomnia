@@ -1847,7 +1847,8 @@ work_result work(
 #endif
 
 	/*
-		"This computer": the key every game has (.keys/account.key, the browser's key on the web), created on the first start.
+		The account key (.keys/account.key, the browser's key on the web), created on the first start - the Steam build's is only
+		in memory, new each run.
 		Read at the start and after an import or a forget in the Account settings - a forgotten key is replaced by a new one
 		right away, since every connection needs a cert. A file changed outside the game counts from the next start.
 		See identity_session.h.
@@ -2361,7 +2362,7 @@ work_result work(
 		- at start, while the first sign-in is on its way: nothing for a second, then a dimmed "Signing in to your Steam account..."
 		  (a join asked for meanwhile, e.g. --connect, waits for it);
 		- the first time it failed when it matters - in the main menu, or before a connection - one message per run,
-		  with [Connect anyway] [Cancel] before a connection; after it nothing asks again, but the loop keeps trying;
+		  with [Join anyway] [Cancel] before a connection; after it nothing asks again, but the loop keeps trying;
 		- [Retry] (leaderboards, Account settings) tries at once, a failed one shows the message again;
 		- signed in after a failure: a short "Signed in to Steam" in the menu.
 	*/

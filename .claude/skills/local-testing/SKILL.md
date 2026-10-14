@@ -123,13 +123,13 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `ui.sh stop` finds the client by its dir, whatever `BIN` started it.
 - An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
 
-What each state looks like (screenshots of all of them were reviewed on 2026-10-12): an unlinked key never asks the broker and the
-leaderboards say `Account: this computer (key xxxxxxxx...)`; Link first asks /cert (an already linked key is "Successfully linked" at
-once, otherwise the code flow); a valid steam.cert is used at once after a restart; an expired one shows the cached Steam profile and,
+What each state looks like: an unlinked key asks the broker once per start, quietly, and the leaderboards say
+`Account: Key account (key xxxxxxxx...)`; Link first asks /cert (an already linked key is "Successfully linked" at once, otherwise
+the link page in the browser); a valid steam.cert is used at once after a restart; an expired one shows the cached Steam profile and,
 after loading, a dimmed "Signing in to your Steam account..."; a dead broker gives one "Not signed in" message per run (with
-Connect anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
-"Signed in to Steam" at the top; importing shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
-Continue unlinked); a key unlinked elsewhere silently loses its steam.cert.
+Join anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
+"Signed in to Steam" at the top; Restore shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
+Continue unlinked); a key unlinked elsewhere silently loses its steam.cert; a damaged account.key holds Settings on Backup.
 
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
