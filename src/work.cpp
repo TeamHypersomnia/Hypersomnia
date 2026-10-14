@@ -1870,9 +1870,27 @@ work_result work(
 			return;
 		}
 
-		const auto path = KEYS_DIR / identity_key::file_name;
-
 		account_seed_read_once = true;
+
+		/*
+			The Steam build keeps no account.key: its account is the Steam one (a cert by a ticket for every start),
+			so its key is only the session key - a new one in memory each run.
+		*/
+
+		if (is_steam_client) {
+			if (!account_seed.has_value()) {
+				account_seed = augs::ed25519_generate_seed();
+
+				if (account_seed.has_value()) {
+					identity->set_key(*account_seed, KEYS_DIR);
+					identity->on_key_created();
+				}
+			}
+
+			return;
+		}
+
+		const auto path = KEYS_DIR / identity_key::file_name;
 
 		bool existed = augs::exists(path);
 
@@ -1894,7 +1912,7 @@ work_result work(
 #if WEB_CRAZYGAMES || WEB_ITCH
 			const bool key_is_not_the_account = true;
 #else
-			const bool key_is_not_the_account = is_steam_client;
+			const bool key_is_not_the_account = false;
 #endif
 
 			if (key_is_not_the_account && identity_key::forget(path).has_value()) {
@@ -2425,6 +2443,13 @@ work_result work(
 
 	WEBSTATIC auto sync_identity_with_settings = [&]() {
 		maintain_ranked_match_record();
+
+		/*
+			A damaged account.key: Backup - restore the key or start a new account - is the only thing to do,
+			from the main menu, until it reads (see settings_gui.h).
+		*/
+
+		settings_gui.key_damaged = account_seed_read_once && !account_seed.has_value();
 
 		if (key_unreadable_shown_wanted && main_menu != nullptr) {
 			key_unreadable_shown_wanted = false;
@@ -5403,7 +5428,17 @@ work_result work(
 
 		const auto steam_cli = steam_get_launch_command_line_string();
 
-		if (steam_cli.length() > 0) {
+		/*
+			A damaged account.key: the main menu only, whatever was to start - see sync_identity_with_settings.
+		*/
+
+		refresh_account_seed();
+
+		if (!account_seed.has_value()) {
+			LOG("account.key does not read - only the main menu until it is restored or replaced.");
+			launch_setup(activity_type::MAIN_MENU);
+		}
+		else if (steam_cli.length() > 0) {
 			LOG("Detected Steam CLI (length: %x): %x", steam_cli.length(), steam_cli);
 			connect_to(steam_cli);
 		}
@@ -5612,6 +5647,13 @@ work_result work(
 			auto& game_gui_renderer = write_buffer.renderers.all[renderer_type::GAME_GUI];
 			auto& post_game_gui_renderer = write_buffer.renderers.all[renderer_type::POST_GAME_GUI];
 			auto& debug_details_renderer = write_buffer.renderers.all[renderer_type::DEBUG_DETAILS];
+
+#if !PLATFORM_WEB
+			if (std::exchange(settings_gui.quit_requested, false)) {
+				LOG("Quitting due to Quit pressed with a damaged account.key.");
+				request_quit();
+			}
+#endif
 
 			/* Logic lambdas */
 
@@ -5964,7 +6006,7 @@ work_result work(
 					{
 						auto control_main_menu = [&]() {
 							if (has_main_menu() && !has_current_setup()) {
-								if (main_menu_gui.show) {
+								if (main_menu_gui.show && !settings_gui.key_damaged) {
 									main_menu_gui.control(create_menu_context(main_menu_gui), e, do_main_menu_option);
 								}
 

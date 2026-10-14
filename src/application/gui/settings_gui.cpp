@@ -965,10 +965,16 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #if PLATFORM_WEB
 			text_color("Your account key in this browser is damaged.\nRestore from your private key file, or start a new account.", red);
 #else
-			text_color("Your account.key file is damaged. Put back a copy you backed up, restore from your private key file,\nor start a new account (the damaged file is kept as a backup).", red);
+			text_color("Your account.key file is damaged.\nPut back a copy you backed up, restore from your private key file,\nor start a new account (the damaged file is kept as a backup).", red);
 
 			if (ImGui::Button("Show key file in folder##Damaged")) {
 				window.reveal_in_explorer(key_path);
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Quit the game##Damaged")) {
+				quit_requested = true;
 			}
 #endif
 		}
@@ -1967,6 +1973,12 @@ void settings_gui_state::perform(
 
 	centered_size_mult = vec2::square(0.65f);
 	
+	if (key_damaged) {
+		show = true;
+		active_pane = settings_pane::ACCOUNT;
+		active_account_pane = account_settings_pane::BACKUP;
+	}
+
 	auto settings = make_scoped_window(ImGuiWindowFlags_NoDocking);
 
 	if (!settings) {
@@ -1979,9 +1991,11 @@ void settings_gui_state::perform(
 
 		int field_id = 0;
 
-		do_pretty_tabs(active_pane, [](const settings_pane) -> std::optional<std::string> { 
-			return std::nullopt; 
-		});
+		if (!key_damaged) {
+			do_pretty_tabs(active_pane, [](const settings_pane) -> std::optional<std::string> { 
+				return std::nullopt; 
+			});
+		}
 
 		auto revert = make_revert_button_lambda(config, last_saved_config);
 
@@ -3712,7 +3726,7 @@ void settings_gui_state::perform(
 					No tab row for a single pane (the Steam build, CrazyGames, itch.io) - just its content.
 				*/
 
-				if (num_account_panes > 1) {
+				if (num_account_panes > 1 && !key_damaged) {
 					do_pretty_tabs(
 						active_account_pane,
 						[steam_icon_room](const account_settings_pane p) -> std::optional<std::string> {

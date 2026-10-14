@@ -590,7 +590,7 @@ void identity_session::advance(const input& in, const double now) {
 			const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
 			LOG("Received an identity cert for %x, valid for %x minutes.", broker_cert->account, static_cast<int>(lifetime / 60));
 
-			if (in.provider == provider_type::STEAM) {
+			if (in.provider == provider_type::STEAM && !in.steam_ticket_proof) {
 				save_cert();
 			}
 

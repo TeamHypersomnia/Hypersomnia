@@ -422,6 +422,15 @@ public:
 	const necessary_images_in_atlas_map* necessary_images = nullptr;
 
 	/*
+		account.key does not read and there is no key to play with: Settings stay on Backup - restore the key or start
+		a new account - with no tabs and no closing, and the main menu does nothing (work.cpp), until the key reads.
+		Quit is there too (quit_requested).
+	*/
+
+	bool key_damaged = false;
+	bool quit_requested = false;
+
+	/*
 		account.key does not read and there is no key to play with: Backup, with what to do.
 	*/
 
