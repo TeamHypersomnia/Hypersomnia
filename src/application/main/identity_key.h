@@ -33,6 +33,12 @@ namespace identity_key {
 	std::string link_message(const std::string& state, int64_t unix_time);
 
 	/*
+		The same for unlinking: only the key's owner (this game) opens a page that unlinks it.
+	*/
+
+	std::string unlink_message(const std::string& state, int64_t unix_time);
+
+	/*
 		The account id without the "key_" provider prefix.
 	*/
 

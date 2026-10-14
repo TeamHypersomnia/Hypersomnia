@@ -386,7 +386,7 @@ static std::string favorite_address_of(const server_list_entry& s) {
 		return s.favorite_address;
 	}
 
-	return s.get_my_connect_string();
+	return s.get_invite_address();
 }
 
 static std::string favorite_name_of(const server_list_entry& s) {
@@ -1065,7 +1065,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		return false;
 	}
 
-	shown_once = true;
+	if (!std::exchange(shown_once, true)) {
+		first_shown_at = augs::steady_secs();
+	}
 
 	using namespace augs::imgui;
 
@@ -1331,6 +1333,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		sort_entries();
+	}
+
+	/*
+		Only right after the first opening - never switching the tab under the cursor later.
+	*/
+
+	if (local_tab_precedence_pending && augs::steady_secs() - first_shown_at > 2.0) {
+		local_tab_precedence_pending = false;
 	}
 
 	if (local_tab_precedence_pending && has_local_servers) {
@@ -1956,6 +1966,16 @@ std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_serve
 		const bool is_ranked = s.is_official_server() && s.heartbeat.is_ranked_server();
 		return !s.heartbeat.versions_compatible() || is_ranked || s.heartbeat.require_password || s.heartbeat.is_full();
 	});
+
+	/*
+		A list that failed to download is the last one (maybe cached days ago): only servers that answer a ping now.
+	*/
+
+	if (server_list_failed()) {
+		erase_if(candidates, [&](const auto& s) {
+			return !s.progress.responding();
+		});
+	}
 
 	auto public_ones = candidates;
 

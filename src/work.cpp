@@ -762,12 +762,21 @@ work_result work(
 			The keys of the instances this config runs - one for a single server, "ranked 0: <key>" lines for several.
 		*/
 
-		const auto num_ranked = pattern.num_ranked_servers;
-		const auto num_casual = pattern.num_casual_servers;
+		/*
+			As many as start - see the multi-instance start below.
+		*/
+
+		const auto num_ranked = std::min(uint16_t(20u), pattern.num_ranked_servers);
+		const auto num_casual = std::min(uint16_t(20u), pattern.num_casual_servers);
 		const auto first = pattern.server_private.instance_number;
 
 		if (num_ranked == 0 && num_casual == 0) {
-			std::cout << server_key::public_key_hex(server_key::instance_seed(server_seed, server_key::kind_of(pattern.server.ranked.is_ranked_server()), first)) << std::endl;
+			/*
+				The kind as the server takes it: from the config files, not runtime_prefs.
+			*/
+
+			const bool ranked = canon_config_with_confd.server.ranked.is_ranked_server();
+			std::cout << server_key::public_key_hex(server_key::instance_seed(server_seed, server_key::kind_of(ranked), first)) << std::endl;
 			return work_result::SUCCESS;
 		}
 
@@ -1275,6 +1284,13 @@ work_result work(
 			auto this_config = config_pattern;
 
 			/*
+				The instance's vars as the config files give them (no runtime_prefs) - its key's kind comes from
+				these, so a ranked autostart changed over RCON never changes the key.
+			*/
+
+			auto canon_server_vars = canon_config_with_confd.server;
+
+			/*
 				SINGLE instance respects the autostart_when value from the config.
 				Multi-instance RANKED/CASUAL types force it.
 			*/
@@ -1284,6 +1300,8 @@ work_result work(
 					ranked_autostart_type::ALWAYS :
 					ranked_autostart_type::NEVER
 				;
+
+				canon_server_vars.ranked.autostart_when = this_config.server.ranked.autostart_when;
 			}
 
 			LOG_NVPS(this_config.server.server_name, server_name_suffix);
@@ -1339,7 +1357,7 @@ work_result work(
 				*official,
 				this_config.server_start,
 				this_config.server,
-				canon_config_with_confd.server,
+				canon_server_vars,
 				this_config.server_private,
 				this_config.client,
 				this_config.dedicated_server,
@@ -1385,6 +1403,15 @@ work_result work(
 
 			return p.empty() || p.is_absolute() ? p : (USER_DIR / p);
 		};
+
+		/*
+			Every instance's key comes from server.key - a damaged one starts nothing (tournament matches neither).
+		*/
+
+		if (server_key::damaged(KEYS_DIR / server_key::file_name)) {
+			LOG("ERROR: %x is there but can not be read - not starting. Restore it, or move it away to make a new key.", KEYS_DIR / server_key::file_name);
+			return work_result::FAILURE;
+		}
 
 		const auto tournament_file_path = [&]() -> augs::path_type {
 			if (!params.tournament.empty()) {
@@ -1436,11 +1463,6 @@ work_result work(
 		const auto num_casual = std::min(uint16_t(20u), config_pattern.num_casual_servers);
 
 		const auto num_total = num_ranked + num_casual;
-
-		if (server_key::damaged(KEYS_DIR / server_key::file_name)) {
-			LOG("ERROR: %x is there but can not be read - not starting. Restore it, or move it away to make a new key.", KEYS_DIR / server_key::file_name);
-			return work_result::FAILURE;
-		}
 
 		if (num_total == 0) {
 			LOG("This is a single-instance dedicated server.");
@@ -1980,6 +2002,8 @@ work_result work(
 			in.provider = identity_session::provider_type::STEAM;
 		}
 
+		in.hold_account = settings_gui.in_ranked_match;
+
 		return in;
 	};
 
@@ -2063,7 +2087,28 @@ work_result work(
 
 	WEBSTATIC auto update_favorite_of = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
 		if (!client.connected_through_localhost_fallback()) {
-			favorites.update_if_favorite(key, client.get_connect_string(), client.get_server_name());
+			/*
+				Its public address: from the list if it has this key, else where it was joined - not an address in
+				this player's network (another network may have someone else there).
+			*/
+
+			const auto address = [&]() -> std::string {
+				if (const auto listed = browse_servers_gui.find_entry_by_key(key)) {
+					return listed->get_invite_address();
+				}
+
+				auto joined = client_connect_string(client.get_connect_string());
+				auto ip = joined;
+				cut_preffix(ip, "rtc:");
+
+				if (const auto parsed = ::find_netcode_addr(ip); parsed.has_value() && ::is_internal(*parsed)) {
+					return std::string();
+				}
+
+				return joined;
+			}();
+
+			favorites.update_if_favorite(key, address, client.get_server_name());
 		}
 	};
 
@@ -2390,6 +2435,7 @@ work_result work(
 	*/
 
 	WEBSTATIC bool launch_after_server_list = false;
+	WEBSTATIC bool join_without_waiting_for_list_once = false;
 	WEBSTATIC double launch_after_server_list_since = 0.0;
 	WEBSTATIC bool join_without_sign_in_once = false;
 	WEBSTATIC std::optional<int> retry_attempts_before;
@@ -2979,6 +3025,27 @@ work_result work(
 		};
 	};
 
+	/*
+		A join by address alone, about to send a password: from now on to the key that server proved - the password
+		goes to no one else answering there (see connect_target.h).
+	*/
+
+	WEBSTATIC auto pin_proven_key = [&](const client_setup& client) {
+		const auto key = client.get_server_public_key();
+		auto target = connect_target::parse(config.client_connect);
+
+		if (!key.has_value() || target.key.has_value()) {
+			return;
+		}
+
+		if (target.address.empty()) {
+			target.address = client.get_connect_string();
+		}
+
+		target.key = key;
+		config.client_connect = target.to_string();
+	};
+
 	WEBSTATIC auto launch_client_setup = [&]() {
 		/*
 			What to join - see connect_target.h: a server by its key (with where it was), or just an address.
@@ -2987,11 +3054,16 @@ work_result work(
 		const auto target = connect_target::parse(config.client_connect);
 
 		/*
-			A password is for the launch right after it - one that stops early (e.g. waiting for the sign-in,
-			the player cancelling) drops it, so it never reaches the next server joined.
+			A password is for this join only: kept while the join waits (the server list, the sign-in, Join anyway),
+			dropped when it stops (Cancel, something else started).
 		*/
 
 		auto password_for_this_launch = std::exchange(next_connect_password, std::nullopt);
+
+		auto wait = [&]() {
+			next_connect_password = password_for_this_launch;
+			return false;
+		};
 
 		/*
 			What the server list says about the chosen server - found by its key if the join names one.
@@ -3007,13 +3079,15 @@ work_result work(
 		auto connect_string = client_connect_string(target.address);
 
 		if (connect_string.empty() && target.key.has_value()) {
-			if (found != nullptr) {
-				connect_string = found->get_my_connect_string();
-			}
-			else if (const auto favorite = favorites.find(*target.key); favorite != nullptr && !favorite->address.empty()) {
-				connect_string = favorite->address;
-			}
-			else if (!browse_servers_gui.refreshed_at_least_once() || browse_servers_gui.refresh_in_progress()) {
+			/*
+				A fresh list on its way is waited for (a few seconds at most) - the cached one or a favorite's last
+				address may be out of date.
+			*/
+
+			const bool list_coming = !browse_servers_gui.refreshed_at_least_once() || browse_servers_gui.refresh_in_progress();
+			const bool waited_enough = std::exchange(join_without_waiting_for_list_once, false);
+
+			if (list_coming && !waited_enough) {
 				LOG("Waiting for the server list to find %x.", config.client_connect);
 
 				if (!browse_servers_gui.refresh_in_progress()) {
@@ -3022,15 +3096,25 @@ work_result work(
 
 				launch_after_server_list = true;
 				launch_after_server_list_since = augs::steady_secs();
-				return false;
+				return wait();
+			}
+
+			if (found != nullptr) {
+				connect_string = found->get_my_connect_string();
+			}
+			else if (const auto favorite = favorites.find(*target.key); favorite != nullptr && !favorite->address.empty()) {
+				connect_string = favorite->address;
 			}
 			else {
+				const auto short_key = "0x" + augs::bytes_to_hex(*target.key).substr(0, 8) + "...";
+
 				auto popup = simple_popup();
 				popup.title = "Server not found";
-				popup.message = typesafe_sprintf(
-					"No server with the key %x is on the server list,\nand it is not among your favorites with an address.",
-					"0x" + augs::bytes_to_hex(*target.key).substr(0, 8) + "..."
-				);
+				popup.message =
+					browse_servers_gui.server_list_failed()
+					? typesafe_sprintf("The server list could not be downloaded to find the server with the key %x,\nand it is not among your favorites with an address.", short_key)
+					: typesafe_sprintf("No server with the key %x is on the server list,\nand it is not among your favorites with an address.", short_key)
+				;
 
 				sign_in_popup = popup;
 				sign_in_popup_before_connect = false;
@@ -3070,12 +3154,12 @@ work_result work(
 			if (identity->signing_in_first_time(in, now) && !join_without_sign_in) {
 				LOG("Waiting for the first sign-in before connecting.");
 				launch_after_sign_in = true;
-				return false;
+				return wait();
 			}
 
 			if (identity->sign_in_failed(in, now) && !sign_in_message_shown) {
 				open_sign_in_popup(true);
-				return false;
+				return wait();
 			}
 		}
 
@@ -3226,6 +3310,8 @@ work_result work(
 
 		if (mode != activity_type::CLIENT) {
 			launch_after_sign_in = false;
+			launch_after_server_list = false;
+			next_connect_password.reset();
 		}
 
 		if (mode != activity_type::TUTORIAL && !config.skip_tutorial) {
@@ -3410,13 +3496,16 @@ work_result work(
 				}
 			}
 			else if (now - launch_after_server_list_since > 8.0) {
-				launch_after_server_list = false;
+				/*
+					The list did not come: the join goes on with what there is - the cached list, a favorite.
+				*/
 
-				auto popup = simple_popup();
-				popup.title = "Server not found";
-				popup.message = "The server list did not come - the server could not be found by its key.\nTry again later, or join it by its address.";
-				sign_in_popup = popup;
-				sign_in_popup_before_connect = false;
+				launch_after_server_list = false;
+				join_without_waiting_for_list_once = true;
+
+				if (!has_current_setup()) {
+					start_client_setup();
+				}
 			}
 		}
 
@@ -3465,6 +3554,7 @@ work_result work(
 
 					if (ImGui::Button("Cancel##SigningIn")) {
 						launch_after_sign_in = false;
+						next_connect_password.reset();
 					}
 				}
 			}
@@ -3498,6 +3588,9 @@ work_result work(
 
 					if (result == 1) {
 						start_client_setup();
+					}
+					else {
+						next_connect_password.reset();
 					}
 				}
 			}
@@ -4194,6 +4287,7 @@ work_result work(
 						if (auto new_password = setup.take_pending_password_save()) {
 							if (const auto key = setup.get_server_public_key(); key.has_value() && !setup.connected_through_localhost_fallback()) {
 								saved_server_passwords.set(*key, *new_password);
+								pin_proven_key(setup);
 							}
 
 							next_connect_password = *new_password;
@@ -5924,10 +6018,16 @@ work_result work(
 
 					visit_current_setup([&](auto& setup) {
 						if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
-							if (setup.kicked_for_password_not_sent()) {
+							/*
+								Never for a server on this machine that answered in the remote one's place (the localhost
+								fallback) - its key is not the remote server's.
+							*/
+
+							if (setup.kicked_for_password_not_sent() && !setup.connected_through_localhost_fallback()) {
 								if (const auto key = setup.get_server_public_key()) {
 									if (const auto saved = saved_server_passwords.find(*key); !saved.empty()) {
 										next_connect_password = saved;
+										pin_proven_key(setup);
 										relaunch_with_saved_password = true;
 									}
 								}

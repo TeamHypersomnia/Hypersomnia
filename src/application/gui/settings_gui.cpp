@@ -382,6 +382,15 @@ EM_JS(int, web_tab_was_blocked, (), {
 });
 
 /*
+	A blocked tab opens on the next click (common.js) - not after the player called the whole thing off.
+*/
+
+EM_JS(void, web_forget_blocked_tab, (), {
+	Module.hs_blocked_url = null;
+	Module.hs_tab_blocked = false;
+});
+
+/*
 	Choosing a file in the browser: its text is kept for the game to take - the length (-1 while nothing came), then the text.
 */
 
@@ -1422,12 +1431,26 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		the game opens the page and asks every second how it went.
 	*/
 
+	/*
+		Signed with the key and the time now - every opening, so "Open it again" later is not too old.
+	*/
+
 	auto open_unlink_page = [&]() {
+		const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::unlink_message(unlink_state, unix_time)) : std::nullopt;
+
+		if (!signature.has_value()) {
+			LOG("Could not sign the unlink page's link.");
+			return;
+		}
+
 		augs::open_url(typesafe_sprintf(
-			"%x/link_key/unlink?state=%x&key=%x%x",
+			"%x/link_key/unlink?state=%x&t=%x&key=%x&sig=%x%x",
 			website_url,
 			unlink_state,
+			unix_time,
 			public_key.has_value() ? augs::bytes_to_hex(*public_key) : std::string(),
+			augs::bytes_to_hex(*signature),
 			identity != nullptr ? identity->device_query() : std::string()
 		));
 	};
@@ -1504,6 +1527,16 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	*/
 
 	auto open_steam_sign_in = [&]() {
+		/*
+			Signed anew with the time now - "Open it again" after a while is not too old for the page.
+		*/
+
+		steam_link_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
+
+		if (const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state, steam_link_time)) : std::nullopt) {
+			steam_link_signature = augs::bytes_to_hex(*signature);
+		}
+
 		augs::open_url(typesafe_sprintf(
 			"%x/link_key/start?state=%x&t=%x&key=%x&sig=%x%x",
 			website_url,
@@ -1764,6 +1797,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				ImGui::SameLine();
 
 				if (ImGui::Button("Cancel##LinkFlow", ImVec2(120, 0))) {
+#if PLATFORM_WEB
+					web_forget_blocked_tab();
+#endif
 					close();
 				}
 			}
@@ -1869,6 +1905,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				ImGui::SameLine();
 
 				if (ImGui::Button("Cancel##Unlink", ImVec2(120, 0))) {
+#if PLATFORM_WEB
+					web_forget_blocked_tab();
+#endif
 					close_unlink();
 				}
 			}
@@ -1920,6 +1959,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				ImGui::SameLine();
 
 				if (ImGui::Button("Cancel##Unlink", ImVec2(120, 0))) {
+#if PLATFORM_WEB
+					web_forget_blocked_tab();
+#endif
 					close_unlink();
 				}
 			}

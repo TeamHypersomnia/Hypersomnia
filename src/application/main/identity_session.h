@@ -57,12 +57,20 @@ public:
 
 		std::string crazygames_user;
 
+		/*
+			In a ranked match: an unlink learned meanwhile waits for its end - the match is played, and rejoined,
+			on the account it began with.
+		*/
+
+		bool hold_account = false;
+
 		bool operator==(const input&) const = default;
 
 		bool same_account(input other) const {
 			auto self = *this;
 			self.crazygames_token.clear();
 			other.crazygames_token.clear();
+			self.hold_account = other.hold_account = false;
 			return self == other;
 		}
 	};

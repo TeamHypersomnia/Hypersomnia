@@ -20,7 +20,14 @@ function decodeCrazyGamesToken(token) {
 
 // At most 3 s - the sign-in waits for it, and a join started meanwhile would go in as a guest
 function downloadAvatar(avatarUrl, callback) {
-  fetch(avatarUrl, { signal: AbortSignal.timeout(3000) })
+  // An AbortController with a timer - AbortSignal.timeout is missing in older browsers (Safari < 16)
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+
+  if (controller) {
+    setTimeout(() => controller.abort(), 3000);
+  }
+
+  fetch(avatarUrl, controller ? { signal: controller.signal } : {})
     .then(response => response.arrayBuffer())
     .then(buffer => {
       const byteArray = new Uint8Array(buffer);

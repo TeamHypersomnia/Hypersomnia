@@ -42,10 +42,14 @@ void https_file_downloader::download_next_file_from_queue() {
             final_location, 
             {}, 
             [this](std::size_t loaded, std::size_t total) {
-                downloadedBytes = loaded;
-                totalBytes = total;
+                /*
+                    What came since the last call - before the counter is moved, or it is always 0.
+                */
 
                 bandwidth.newDataReceived(loaded - downloadedBytes);
+
+                downloadedBytes = loaded;
+                totalBytes = total;
                 return keepRunning.load();
             }
         );

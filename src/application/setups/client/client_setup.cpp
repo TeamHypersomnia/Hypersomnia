@@ -2115,11 +2115,17 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			else {
 				ImGui::Separator();
 
-				if (ImGui::Button("Retry")) {
-					return custom_imgui_result::RETRY;
-				}
+				/*
+					Against a stale list Retry would fail the same way - Go back refreshes the list.
+				*/
 
-				ImGui::SameLine();
+				if (!failed_on_list_key()) {
+					if (ImGui::Button("Retry")) {
+						return custom_imgui_result::RETRY;
+					}
+
+					ImGui::SameLine();
+				}
 
 				if (ImGui::Button("Go back")) {
 					return custom_imgui_result::GO_TO_MAIN_MENU;

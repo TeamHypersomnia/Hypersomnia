@@ -59,10 +59,15 @@ def result_for(state):
     status, body, _ = get('/link_key/result?state=' + state)
     return json.loads(body) if status == 200 else None
 
-def unlink(cookie_of=None):
+def unlink_fields(state, t=None):
+    # What the game puts in the unlink URL: its state and the time signed with its key
+    t = t or str(int(time.time()))
+    return { 'state': state, 't': t, 'key': pub, 'sig': key.sign(('hypersomnia-unlink-v1 %s %s' % (state, t)).encode()).hex(), 'device': 'test', 'os': 'linux' }
+
+def unlink(cookie_of=None, state=None):
     # "Unlink from Steam..." in the game: the page signed in as the account, its [Unlink this game key]
-    state = secrets.token_hex(16)
-    fields = { 'state': state, 'key': pub, 'device': 'test', 'os': 'linux' }
+    state = state or secrets.token_hex(16)
+    fields = unlink_fields(state)
     page_status, page, _ = get('/link_key/unlink?' + urllib.parse.urlencode(fields), cookie_of or cookie)
     status, body, _ = post('/link_key/unlink', fields, cookie_of or cookie)
     return page_status, page, status, result_for(state)
@@ -101,6 +106,9 @@ old_t = str(int(time.time()) - 3600)
 old.update({ 't': old_t, 'sig': key.sign(('hypersomnia-link-v1 %s %s' % (state, old_t)).encode()).hex() })
 status, body, _ = get('/link_key/start?' + urllib.parse.urlencode(old), cookie)
 check('start refuses a link page an hour old', status == 400 and 'too old' in body)
+check('the game learns that the link page was too old', 'too old' in (result_for(state) or {}).get('error', ''), str(result_for(state)))
+state = secrets.token_hex(16)
+start_query = urllib.parse.urlencode(fields(state))
 status, _, _ = get('/link_key/start?state=xyz&t=1&key=%s&sig=%s' % (pub, '0' * 128), cookie)
 check('start refuses a malformed state', status == 400)
 bad = fields(state)
@@ -144,8 +152,14 @@ check('cert after linking is the Steam account', cert_account() == 'steam_' + st
 check('progress moved to the Steam account', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
 
 
-status, _, headers = get('/link_key/unlink?state=%s&key=%s' % (secrets.token_hex(16), pub))
+status, _, headers = get('/link_key/unlink?' + urllib.parse.urlencode(unlink_fields(secrets.token_hex(16))))
 check('the unlink page without a session goes to Steam sign in', status == 302 and '/auth/steam' in headers.get('Location', ''))
+status, _, _ = get('/link_key/unlink?state=%s&key=%s' % (secrets.token_hex(16), pub), cookie)
+check('an unsigned unlink page is refused', status == 400)
+forged = unlink_fields(secrets.token_hex(16))
+forged['sig'] = unlink_fields(secrets.token_hex(16))['sig']
+status, _, _ = post('/link_key/unlink', forged, cookie)
+check('an unlink signed for another state is refused', status == 400)
 page_status, page, status, result = unlink()
 check('the unlink page shows the device and one button', page_status == 200 and 'Unlink this game key' in page and 'test' in page)
 check('unlink on that page, the game learns it', status == 200 and result == { 'unlinked': 'steam_' + steam_id }, str(result))

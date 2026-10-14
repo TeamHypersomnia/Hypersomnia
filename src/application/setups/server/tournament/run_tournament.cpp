@@ -149,7 +149,15 @@ work_result run_tournament(const run_tournament_input& in) {
 		std::vector<std::thread> threads;
 		threads.reserve(matches.size());
 
+		/*
+			Parallel matches are servers of their own: each its own key (ranked, numbered from instance_number).
+		*/
+
+		uint16_t match_index = 0;
+
 		for (auto& match : matches) {
+			const auto this_match_index = match_index++;
+
 			if (match.result.has_value()) {
 				/*
 					Carried over from a previous (crashed) session: this match already
@@ -169,6 +177,10 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.server_name = match.server_name;
 			this_config.server.shutdown_after_one_match = true;
 			this_config.server.ranked.autostart_when = ranked_autostart_type::ALWAYS;
+			this_config.server_private.instance_number = static_cast<uint16_t>(in.config_pattern.server_private.instance_number + this_match_index);
+
+			auto canon_server_vars = in.canon_config_with_confd.server;
+			canon_server_vars.ranked.autostart_when = ranked_autostart_type::ALWAYS;
 			this_config.server.webrtc_udp_mux = true;
 			this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
 			this_config.server.daily_autoupdate = false;
@@ -279,6 +291,7 @@ work_result run_tournament(const run_tournament_input& in) {
 			threads.emplace_back([
 				match_ptr,
 				this_config = std::move(this_config),
+				canon_server_vars = std::move(canon_server_vars),
 				roster = std::move(roster),
 				nickname_auth,
 				stage_should_interrupt,
@@ -314,7 +327,7 @@ work_result run_tournament(const run_tournament_input& in) {
 						in.official,
 						this_config.server_start,
 						this_config.server,
-						in.canon_config_with_confd.server,
+						canon_server_vars,
 						this_config.server_private,
 						this_config.client,
 						this_config.dedicated_server,

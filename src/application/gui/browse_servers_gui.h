@@ -144,6 +144,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	browser_tab current_tab = browser_tab::FAVORITES;
 	bool tab_loaded = false;
 	bool shown_once = false;
+	double first_shown_at = 0.0;
 	bool local_tab_precedence_pending = true;
 
 	void save_tab(const augs::path_type&) const;

@@ -12,6 +12,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/httplib_utils.h"
 #include "augs/misc/date_time.h"
+#include "augs/string/hex.h"
 #include "augs/templates/container_templates.h"
 
 /*
@@ -187,6 +188,18 @@ public:
 			}
 
 			auto& backoff = backoff_by_url[result.url];
+
+			/*
+				A 401 is most often a key the site does not know as official - every instance has its own: said loudly,
+				with the key, or the ranked matches of this instance quietly never count.
+			*/
+
+			if (status == 401) {
+				LOG(
+					"ERROR: hypersomnia.io does not accept this server's key %x - its ranked matches do not count until the key is in official_servers.d (--print-server-key prints every instance's key).",
+					augs::bytes_to_hex(augs::ed25519_public_key(server_key).value_or(augs::ed25519_public_key_type()))
+				);
+			}
 
 			LOG("Match report %x not delivered (HTTP %x). Retrying its endpoint in %x seconds.", result.file.filename(), status, backoff.retry_delay);
 			backoff.next_attempt_at = now + backoff.retry_delay;

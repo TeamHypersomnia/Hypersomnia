@@ -17,7 +17,32 @@ struct connect_target {
 	std::string address;
 	std::optional<augs::ed25519_public_key_type> key;
 
-	static std::optional<augs::ed25519_public_key_type> key_of(const std::string& hex) {
+	/*
+		Pasted text: spaces, a newline around it.
+	*/
+
+	static std::string trimmed(const std::string& s) {
+		const auto first = s.find_first_not_of(" \t\r\n");
+
+		if (first == std::string::npos) {
+			return std::string();
+		}
+
+		const auto last = s.find_last_not_of(" \t\r\n");
+		return s.substr(first, last - first + 1);
+	}
+
+	/*
+		A key as the game shows it (with 0x) or bare.
+	*/
+
+	static std::optional<augs::ed25519_public_key_type> key_of(const std::string& text) {
+		auto hex = trimmed(text);
+
+		if (hex.rfind("0x", 0) == 0 || hex.rfind("0X", 0) == 0) {
+			hex = hex.substr(2);
+		}
+
 		if (hex.size() != 64) {
 			return std::nullopt;
 		}
@@ -25,8 +50,9 @@ struct connect_target {
 		return augs::hex_to_array<32>(hex);
 	}
 
-	static connect_target parse(const std::string& in) {
+	static connect_target parse(const std::string& untrimmed) {
 		auto out = connect_target();
+		const auto in = trimmed(untrimmed);
 
 		if (const auto key = key_of(in)) {
 			out.key = key;
@@ -35,7 +61,7 @@ struct connect_target {
 
 		if (const auto comma = in.rfind(','); comma != std::string::npos) {
 			if (const auto key = key_of(in.substr(comma + 1))) {
-				out.address = in.substr(0, comma);
+				out.address = trimmed(in.substr(0, comma));
 				out.key = key;
 				return out;
 			}
