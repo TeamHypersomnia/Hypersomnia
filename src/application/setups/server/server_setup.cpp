@@ -918,7 +918,11 @@ server_setup::server_setup(
 ) :
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
-	this_server_key(server_key::obtain(KEYS_DIR / server_key::file_name)),
+	this_server_key(server_key::instance_seed(
+		server_key::obtain(KEYS_DIR / server_key::file_name),
+		initial_vars.ranked.is_ranked_server(),
+		private_initial_vars.instance_number
+	)),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),

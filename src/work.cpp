@@ -754,8 +754,31 @@ work_result work(
 			return work_result::FAILURE;
 		}
 
-		const auto key = server_key::obtain(path);
-		std::cout << server_key::public_key_hex(key) << std::endl;
+		const auto server_seed = server_key::obtain(path);
+		const auto& pattern = config;
+
+		/*
+			The keys of the instances this config runs - one for a single server, "ranked 0: <key>" lines for several.
+		*/
+
+		const auto num_ranked = pattern.num_ranked_servers;
+		const auto num_casual = pattern.num_casual_servers;
+		const auto first = pattern.server_private.instance_number;
+
+		if (num_ranked == 0 && num_casual == 0) {
+			std::cout << server_key::public_key_hex(server_key::instance_seed(server_seed, pattern.server.ranked.is_ranked_server(), first)) << std::endl;
+			return work_result::SUCCESS;
+		}
+
+		auto print_kind = [&](const bool with_progress, const uint16_t count) {
+			for (uint16_t i = 0; i < count; ++i) {
+				const auto number = static_cast<uint16_t>(first + i);
+				std::cout << server_key::kind_name(with_progress) << " " << number << ": " << server_key::public_key_hex(server_key::instance_seed(server_seed, with_progress, number)) << std::endl;
+			}
+		};
+
+		print_kind(false, num_casual);
+		print_kind(true, num_ranked);
 		return work_result::SUCCESS;
 	}
 
@@ -1263,6 +1286,15 @@ work_result work(
 			}
 
 			LOG_NVPS(this_config.server.server_name, server_name_suffix);
+
+			/*
+				Each instance its own key, by its kind and number: the casual ones and the ranked ones count from the
+				configured instance_number each.
+			*/
+
+			if (type != SINGLE) {
+				this_config.server_private.instance_number = static_cast<uint16_t>(config_pattern.server_private.instance_number + index - 1);
+			}
 
 			this_config.server_start.port = port_counter++;
 

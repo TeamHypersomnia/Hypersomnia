@@ -341,6 +341,8 @@ struct server_private_vars {
 	std::vector<std::string> identity_broker_public_keys;
 
 	admin_profiles_type admin_profiles;
+
+	uint16_t instance_number = 0;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_private_vars& b) const = default;

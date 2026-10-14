@@ -178,13 +178,13 @@ If your server has a domain pointing to it, set `domain` in the `server` section
 
 ### The server key
 
-Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/server.key``). Every connection to the server is encrypted to it, and the server signs its heartbeats to the server list with it. Print its public part with:
+Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). From it, each server instance gets a key of its own - by its kind (casual, or ranked/tournament) and number (``instance_number`` in ``server_private``; with ``num_casual_servers`` / ``num_ranked_servers`` the next ones count on from it). Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Print the public keys with:
 
 ```sh
 ./Hypersomnia-Headless.AppImage --print-server-key
 ```
 
-Back the file up and keep it private. Players who joined from the server list know the server by this key: a server with another key (e.g. reinstalled without the file) is shown to them as a possible impostor.
+Back ``server.key`` up and keep it private. Moving a server to another host (or splitting instances between hosts): copy ``server.key`` and keep the numbers - the keys stay the same. Players know a server by its key: a server with another one (e.g. reinstalled without the file) is not the server they added to their favorites.
 
 ### Official servers
 

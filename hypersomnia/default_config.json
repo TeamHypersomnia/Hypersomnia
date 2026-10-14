@@ -489,7 +489,12 @@
         // { "account": "<account id>", "rcon": "NONE" (default) | "RCON" | "MASTER_RCON", "badge": optional, shown in place of [ADMIN] }, e.g.:
         // [ { "account": "steam_76561198000000000", "rcon": "MASTER_RCON" }, { "account": "key_<64 hex characters>", "rcon": "RCON", "badge": "MOD" } ]
         // Your id: Settings - Advanced - "Copy my account id".
-        "admin_profiles": []
+        "admin_profiles": [],
+
+        // This server's number among the casual or ranked ones of the same server.key - each has its own key, made from
+        // server.key (--print-server-key prints them). With num_casual_servers / num_ranked_servers, the first one's;
+        // the next ones count on from it. Moving a server to another host: copy server.key and keep its number.
+        "instance_number": 0
     },
 
     "dedicated_server": {

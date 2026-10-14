@@ -1,5 +1,7 @@
 #pragma once
+#include <cstdint>
 #include <stdexcept>
+#include <sodium.h>
 #include <string_view>
 #include "augs/log.h"
 #include "augs/filesystem/path.h"
@@ -8,8 +10,9 @@
 #include "application/main/identity_key.h"
 
 /*
-	Every server's Ed25519 key (server.key in KEYS_DIR - see all_paths.h), created on the first start and never overwritten.
-	The clients seal their handshakes to it, and the masterserver and hypersomnia.io know an official server by it.
+	Every server's Ed25519 key: one secret, server.key in KEYS_DIR (see all_paths.h), created on the first start and never
+	overwritten - and from it a key for each instance, by its kind and number (see instance_seed). The clients seal their
+	handshakes to that key, and the masterserver and hypersomnia.io know an official server by it.
 	The same format as the account keys - see identity_key.h.
 */
 
@@ -46,6 +49,44 @@ namespace server_key {
 
 	inline bool damaged(const augs::path_type& path) {
 		return augs::exists(path) && !identity_key::load(path).has_value();
+	}
+
+	/*
+		One key per server, all from one server.key - as many wallets from one seed: a casual or a ranked (any with progress,
+		tournaments too) instance number N has its own key, the same on any host and port. Moving instances elsewhere
+		(or splitting them between hosts) keeps their keys: copy server.key and set their numbers (instance_number).
+	*/
+
+	inline augs::ed25519_seed_type instance_seed(const augs::ed25519_seed_type& server_seed, const bool with_progress, const uint16_t number) {
+		const auto tag = std::string_view("hs-instance-v1");
+
+		uint8_t message[32];
+		std::size_t n = 0;
+
+		for (const auto c : tag) {
+			message[n++] = static_cast<uint8_t>(c);
+		}
+
+		message[n++] = with_progress ? 1 : 0;
+		message[n++] = static_cast<uint8_t>(number & 0xff);
+		message[n++] = static_cast<uint8_t>(number >> 8);
+
+		auto out = augs::ed25519_seed_type();
+
+		crypto_generichash(
+			out.data(),
+			out.size(),
+			message,
+			n,
+			server_seed.data(),
+			server_seed.size()
+		);
+
+		return out;
+	}
+
+	inline std::string kind_name(const bool with_progress) {
+		return with_progress ? "ranked" : "casual";
 	}
 
 	inline std::string public_key_hex(const augs::ed25519_seed_type& seed) {
