@@ -3451,6 +3451,12 @@ work_result work(
 
 		relisting = false;
 
+		/*
+			The browser is not performed during a connection - the list it asked for is taken here.
+		*/
+
+		browse_servers_gui.take_server_list_response();
+
 		const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
 		const auto fresh_key = found != nullptr ? found->get_public_key() : std::nullopt;
 

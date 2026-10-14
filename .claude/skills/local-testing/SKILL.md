@@ -169,6 +169,12 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 `run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/.keys/account.key`,
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
+- **Server key vs the server list (community.sh on arena):** `community.sh start` (a community server on 9005 with a new key each
+  start, listed on the test master) or `start silent` (never tells the master - for the master's 60 s entry timeout the list keeps the
+  previous key: a misconfigured server). A fresh client (never joined - a known_servers entry beats a community list key) with
+  `"server_list_provider": "http://<arenaus>:18420"`: open Browse servers, restart the server, join the row. Stale list (restarted
+  normally): two 5 s failures, the list again, "stale key ... joining again", connected. Silent: "The fresh server list has the
+  same key" and the "misconfigured or under maintenance" message.
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
   `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one

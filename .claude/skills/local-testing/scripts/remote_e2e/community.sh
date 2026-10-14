@@ -1,0 +1,70 @@
+#!/bin/bash
+# A community server on arena (port 9005), all inside ~/yojimbo-test/e2e/community: listed on the test masterserver on arenaus
+# by its public address - so a client joining from the list expects the list's key (locally every server is a LAN entry, no key).
+# Uses the e2e dir's binary, content and libs (match.sh's upload).
+#   community.sh start [silent]   starts it with a new key each time (its server.key removed); "silent" never tells the masterserver,
+#                                 so the list keeps the previous key (within the master's 60 s entry timeout) - a misconfigured server
+#   community.sh stop | key | log
+E=$HOME/yojimbo-test/e2e
+C=$E/community
+export LD_LIBRARY_PATH=$E/lib
+umask 077
+
+stop() {
+	if [ -f $C.pid ]; then
+		# Only if that pid is still our server - after a reboot it could be anything
+		pid=$(cat $C.pid)
+		if ps -o args= -p $pid 2>/dev/null | grep -q -- "--appdata-dir $C"; then
+			kill $pid 2>/dev/null
+		fi
+		rm -f $C.pid
+	fi
+}
+
+case "$1" in
+start)
+	stop
+	sleep 1
+	# A new key: only the key file goes, nothing else
+	rm -f $C/user/.keys/server.key
+	mkdir -p $C/user/conf.d
+
+	NOTIFY="\"notified_server_list\": \"${ARENAUS_IP:-154.12.226.211}:18430\","
+
+	if [ "$2" = "silent" ]; then
+		NOTIFY="\"notified_server_list\": \"127.0.0.1:1\","
+	fi
+
+	cat > $C/user/conf.d/test.json <<EOF
+{
+  "server_start": { "ip": "0.0.0.0", "port": 9005, "slots": 8 },
+  "webrtc_signalling_server_url": "ws://${ARENAUS_IP:-154.12.226.211}:18000",
+  "server": {
+    "server_name": "[PL] E2E community",
+    "arena": "de_cyberaqua",
+    $NOTIFY
+    "suppress_new_community_server_webhook": true,
+    "webrtc_port_range_begin": 9006,
+    "webrtc_port_range_end": 9010
+  }
+}
+EOF
+
+	cd $E/hypersomnia
+	setsid nohup timeout 900 $E/Hypersomnia --dedicated-server --appdata-dir $C --no-update-on-launch > $C.out 2>&1 < /dev/null &
+	echo $! > $C.pid
+	sleep 5
+	$E/Hypersomnia --print-server-key --appdata-dir $C 2>/dev/null | grep -E '^[0-9a-f]{64}$'
+	;;
+key)
+	cd $E/hypersomnia
+	$E/Hypersomnia --print-server-key --appdata-dir $C 2>/dev/null | grep -E '^[0-9a-f]{64}$'
+	;;
+stop)
+	stop
+	echo stopped
+	;;
+log)
+	grep -hE "connected\. SID|listening|heartbeat|kicked|Reason|disconnect" $C.out | sed 's/^\[[0-9:]*\] //' | tail -20
+	;;
+esac

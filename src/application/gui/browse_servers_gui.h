@@ -168,6 +168,13 @@ public:
 	bool refresh_in_progress() const;
 
 	/*
+		The downloaded list into server_list - perform does it while the browser shows,
+		this is for the times it does not (e.g. a list asked for during a connection).
+	*/
+
+	bool take_server_list_response();
+
+	/*
 		A password entered before connecting, with the server it was entered for.
 	*/
 

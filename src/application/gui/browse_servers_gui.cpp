@@ -877,13 +877,20 @@ void browse_servers_gui_state::show_server_list(
 	scroll_once_to_selected = false;
 }
 
-bool browse_servers_gui_state::perform(const browse_servers_input in) {
-	using namespace httplib_utils;
-
+bool browse_servers_gui_state::take_server_list_response() {
 	if (augs::is_ready(data->future_response)) {
 		server_list = ::to_server_list(augs::get_once(data->future_response), error_message);
 		when_last_updated_time_to_events = 0;
+		return true;
 	}
+
+	return false;
+}
+
+bool browse_servers_gui_state::perform(const browse_servers_input in) {
+	using namespace httplib_utils;
+
+	take_server_list_response();
 
 	if (selected_server.unlisted) {
 		server_details.perform(selected_server, in.faction_view, in.streamer_mode);

@@ -2302,6 +2302,9 @@ if(BUILD_WEBRTC)
 		# Would otherwise give error on src/3rdparty/libdatachannel/src/rtp.cpp
 		target_compile_options(datachannel-static PRIVATE -Wno-cast-align)
 
+		# 0.24.6 captures this with [=] in impl/peerconnection.cpp - an error with clang 18's C++20 (not with 22)
+		target_compile_options(datachannel-static PRIVATE -Wno-deprecated-this-capture)
+
 		list(APPEND HYPERSOMNIA_LIBS datachannel-static)
 	endif()	
 endif()
