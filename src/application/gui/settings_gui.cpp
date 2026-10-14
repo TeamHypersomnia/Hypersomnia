@@ -4032,70 +4032,7 @@ void settings_gui_state::perform(
 #endif
 
 						if (const auto& provider = signed_in.provider_label; !provider.empty()) {
-							/*
-								No Revert next to it - it would be taken for Refresh. Saved like the other settings.
-							*/
-
 							checkbox(typesafe_sprintf("Use my %x name and avatar", provider), scope_cfg.use_account_profile);
-
-							/*
-								The Steam name and avatar asked for anew (otherwise taken from hypersomnia.io's cache of a day).
-							*/
-
-							if (provider == "Steam" && scope_cfg.use_account_profile && identity != nullptr && identity->has_valid_cert(augs::steady_secs())) {
-								ImGui::SameLine();
-
-								/*
-									hypersomnia.io asks Steam anew at most once a minute per account - the button waits as long.
-								*/
-
-								const auto refreshed_at_path = CACHE_DIR / "profile_refreshed_at.txt";
-								const auto now = static_cast<int64_t>(augs::date_time::secs_since_epoch());
-
-								if (!profile_refreshed_at.has_value()) {
-									profile_refreshed_at = [&]() -> int64_t {
-										try {
-											return std::stoll(augs::file_to_string(refreshed_at_path));
-										}
-										catch (...) {
-											return 0;
-										}
-									}();
-								}
-
-								/*
-									A time ahead of now (the clock set back) does not block it.
-								*/
-
-								const bool recently = now >= *profile_refreshed_at && now - *profile_refreshed_at < 60;
-
-								if (identity->is_refreshing_profile()) {
-									spinner(ImGui::GetTextLineHeight(), white);
-								}
-								else {
-									const bool clicked = [&]() {
-										auto scope = maybe_disabled_cols({}, recently);
-										return ImGui::Button("Refresh##AccountProfile");
-									}();
-
-									if (clicked && !recently) {
-										identity->refresh_profile_now();
-										profile_refreshed_at = now;
-
-										try {
-											augs::save_as_text(refreshed_at_path, std::to_string(now));
-										}
-										catch (...) {
-										}
-									}
-
-									tooltip_on_hover(
-										identity->did_profile_refresh_fail() ? "Couldn't refresh - try again later." :
-										recently ? "You can refresh again in a minute." :
-										"Get your current Steam name and avatar."
-									);
-								}
-							}
 						}
 
 						ImGui::EndGroup();

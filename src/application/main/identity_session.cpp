@@ -419,22 +419,11 @@ void identity_session::start_request(const input& in, const double now) {
 
 	auto headers = augs::Headers();
 
-	/*
-		The device's name, percent-encoded - only letters, digits and a few marks go as they are.
-	*/
-
-	const auto device = device_query();
-
 	if (in.provider == provider_type::CRAZYGAMES) {
 		headers["X-CrazyGames-Token"] = in.crazygames_token;
 	}
 
-	const auto refresh = profile_refresh_wanted ? std::string("&refresh_profile=1") : std::string();
-	profile_refresh_pending = profile_refresh_wanted;
-	profile_refresh_wanted = false;
-
-
-	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location + device + refresh, headers);
+	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location, headers);
 	requested_for = in;
 }
 
@@ -619,19 +608,6 @@ void identity_session::advance(const input& in, const double now) {
 		++attempts_finished;
 
 		/*
-			Asked for along with another request still on its way: it waits for the next one - unless that one failed.
-		*/
-
-		const bool refresh_was_pending = profile_refresh_pending;
-		profile_refresh_pending = false;
-		profile_refresh_failed = refresh_was_pending && response.status != 200;
-
-		if (response.status != 200) {
-			profile_refresh_failed = profile_refresh_failed || profile_refresh_wanted;
-			profile_refresh_wanted = false;
-		}
-
-		/*
 			Asked for an account that is no longer the player's: whatever came back is not theirs - asked again right away.
 		*/
 
@@ -740,9 +716,6 @@ void identity_session::advance(const input& in, const double now) {
 			A failed attempt, or "Signing in..." would never end.
 		*/
 
-		profile_refresh_failed = profile_refresh_failed || profile_refresh_wanted;
-		profile_refresh_wanted = false;
-
 		if (!last_attempt_failed) {
 			last_error = "No identity broker set (Settings - Advanced).";
 			attempts_finished = std::max(attempts_finished, 1);
@@ -760,7 +733,7 @@ void identity_session::advance(const input& in, const double now) {
 		on_steam_ticket({}, false);
 	}
 
-	if (broker_cert.has_value() && !profile_refresh_wanted) {
+	if (broker_cert.has_value()) {
 		const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
 
 		if (cert_secs_left(now) > lifetime / 2) {
@@ -810,12 +783,6 @@ void identity_session::on_steam_ticket(const std::vector<std::byte>& ticket_byte
 	}
 
 	steam_ticket = ticket_bytes;
-}
-
-void identity_session::refresh_profile_now() {
-	profile_refresh_wanted = true;
-	profile_refresh_failed = false;
-	next_attempt_at = 0.0;
 }
 
 void identity_session::retry_now() {

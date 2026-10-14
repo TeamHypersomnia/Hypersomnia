@@ -140,13 +140,6 @@ private:
 
 	std::string device_name;
 
-	/*
-		"Refresh" next to "Use my Steam name and avatar": a new cert at once, with the name and avatar fetched anew.
-	*/
-
-	bool profile_refresh_wanted = false;
-	bool profile_refresh_pending = false;
-	bool profile_refresh_failed = false;
 	bool steam_ticket_requested = false;
 	double steam_ticket_requested_at = 0.0;
 	std::optional<std::vector<std::byte>> steam_ticket;
@@ -228,8 +221,6 @@ public:
 
 	void retry_now();
 
-	void refresh_profile_now();
-
 	/*
 		The broker answered 401 to a CrazyGames token: the game asks CrazyGames for a new one.
 	*/
@@ -249,14 +240,6 @@ public:
 
 	bool is_requesting() const {
 		return request != nullptr;
-	}
-
-	bool did_profile_refresh_fail() const {
-		return profile_refresh_failed;
-	}
-
-	bool is_refreshing_profile() const {
-		return profile_refresh_wanted || profile_refresh_pending;
 	}
 
 	/*
