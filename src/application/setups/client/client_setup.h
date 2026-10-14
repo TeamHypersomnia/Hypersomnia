@@ -133,7 +133,6 @@ class client_setup :
 
 	client_identity_context identity;
 	std::string connected_account;
-	bool sent_password = false;
 	bool list_key_mismatch = false;
 
 	/*
@@ -1056,20 +1055,11 @@ public:
 	std::optional<float> ranked_rejoin_budget() const;
 
 	/*
-		Kicked for a wrong password without having sent any - e.g. joined by address, so its saved password
-		could not be picked before the server's key was known. The game then retries with the one saved for that key.
-	*/
-
-	/*
 		The server's key did not match the server list - Go back shows a fresh list.
 	*/
 
 	bool failed_on_list_key() const {
 		return list_key_mismatch;
-	}
-
-	bool kicked_for_password_not_sent() const {
-		return wrong_password_kick && !sent_password;
 	}
 
 	bool is_ranked_live_or_starting() const;

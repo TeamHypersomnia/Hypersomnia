@@ -1,0 +1,160 @@
+<title>Audyt diffa po decyzjach</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+	--bg: #f5f6f8;
+	--surface: #ffffff;
+	--ink: #1c2230;
+	--muted: #5d6677;
+	--line: #dde1e8;
+	--accent: #2f5bd3;
+	--keep-bg: #e3f3e8; --keep-ink: #1e6b3a;
+	--cut-bg: #fbe4e2; --cut-ink: #9a2a22;
+	--todo-bg: #fff1d6; --todo-ink: #8a5a00;
+	--skip-bg: #eceef2; --skip-ink: #4c5566;
+	--super-bg: #e6ecfb; --super-ink: #2c4aa8;
+	--loop: #c2410c;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+		--bg: #12151c; --surface: #1a1f29; --ink: #e6e9ef; --muted: #9aa3b4; --line: #2b3240; --accent: #7aa0ff;
+		--keep-bg: #183324; --keep-ink: #8fdcaa;
+		--cut-bg: #3a1c1a; --cut-ink: #f3a39b;
+		--todo-bg: #3a2c10; --todo-ink: #f2c66b;
+		--skip-bg: #262b35; --skip-ink: #b4bccb;
+		--super-bg: #1c2747; --super-ink: #a9bfff;
+		--loop: #fb923c;
+	}
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--bg: #12151c; --surface: #1a1f29; --ink: #e6e9ef; --muted: #9aa3b4; --line: #2b3240; --accent: #7aa0ff;
+	--keep-bg: #183324; --keep-ink: #8fdcaa;
+	--cut-bg: #3a1c1a; --cut-ink: #f3a39b;
+	--todo-bg: #3a2c10; --todo-ink: #f2c66b;
+	--skip-bg: #262b35; --skip-ink: #b4bccb;
+	--super-bg: #1c2747; --super-ink: #a9bfff;
+	--loop: #fb923c;
+}
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 "IBM Plex Sans", system-ui, sans-serif; padding-inline: 16px; padding-block: 28px 48px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 28px; }
+h1 { font-size: 26px; margin: 0; text-wrap: balance; font-weight: 600; }
+h2 { font-size: 18px; margin: 0 0 10px; font-weight: 600; }
+p { margin: 0; max-width: 72ch; }
+.sub { color: var(--muted); }
+code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.92em; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; color: var(--muted); font-size: 13px; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; letter-spacing: 0.02em; }
+.keep { background: var(--keep-bg); color: var(--keep-ink); }
+.cut { background: var(--cut-bg); color: var(--cut-ink); }
+.todo { background: var(--todo-bg); color: var(--todo-ink); }
+.skip { background: var(--skip-bg); color: var(--skip-ink); }
+.super { background: var(--super-bg); color: var(--super-ink); }
+.loop { color: var(--loop); font-weight: 600; font-size: 12px; white-space: nowrap; }
+.counts { display: flex; flex-wrap: wrap; gap: 10px; }
+.counts div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; display: grid; gap: 2px; min-width: 120px; }
+.counts b { font-size: 22px; font-variant-numeric: tabular-nums; }
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; min-width: 820px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: "IBM Plex Mono", monospace; color: var(--muted); width: 2.5em; }
+td.what { width: 28%; }
+td.state { width: 9em; }
+.loops { display: grid; gap: 12px; }
+.loopcard { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--loop); border-radius: 6px; padding: 12px 14px; display: grid; gap: 6px; }
+.chain { font-size: 14px; color: var(--muted); }
+.chain span { color: var(--ink); }
+.lesson { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
+.lesson ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+tr.g td:first-child { box-shadow: inset 4px 0 0 var(--keep-ink); }
+tr.r td:first-child { box-shadow: inset 4px 0 0 var(--cut-ink); }
+tr.g { background: color-mix(in srgb, var(--keep-bg) 55%, transparent); }
+tr.r { background: color-mix(in srgb, var(--cut-bg) 65%, transparent); }
+.yes { color: var(--keep-ink); font-weight: 500; white-space: nowrap; }
+.no { color: var(--muted); white-space: nowrap; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; background: var(--skip-bg); color: var(--skip-ink); white-space: nowrap; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; }
+.sw.g { background: var(--keep-ink); } .sw.r { background: var(--cut-ink); }
+.counts div.g { border-color: var(--keep-ink); } .counts div.r { border-color: var(--cut-ink); }
+.loopcard { border-left-color: var(--cut-ink); }
+</style>
+
+<div class="wrap">
+	<header style="display:grid;gap:6px">
+		<h1>Audyt diffa po wszystkich decyzjach</h1>
+		<p class="sub">Każde znalezisko audytu diffa, z tym czy już się do niego odniosłeś. Zielone = dobrze albo zaplanowane dobrze (nie dokłada złożoności), czerwone = dalej źle, nierozwiązane lub w kółko.  (2026-10-14, <code>c33fe9f51..409a96043</code>) z tym, co zrobiłem zaraz po audycie, i z tym, co z tego zostaje po ustaleniach z 15.10. Źródło ustaleń: <code>~/Downloads/audyty/ostateczne/USTALENIA.md</code>.</p>
+	</header>
+
+	<section class="counts" aria-label="Podsumowanie">
+		<div class="g"><b>18</b><span class="sub">dobrze lub zaplanowane dobrze</span></div>
+		<div class="r"><b>6</b><span class="sub">źle, nierozwiązane albo w kółko</span></div>
+		<div><b>13/24</b><span class="sub">punktów, do których się odniosłeś</span></div>
+	</section>
+
+	<div class="legend">
+		<span><span class="sw g"></span> zielone: stan dobry albo zaplanowany dobrze - nie dokłada złożoności lub ją usuwa</span>
+		<span><span class="sw r"></span> czerwone: dalej źle, nierozwiązane albo dokłada złożoność / kręci się w kółko</span>
+		<span><span class="tag">↻</span> wraca coś, co już raz wycięliśmy lub zmienialiśmy</span>
+	</div>
+
+	<section>
+		<h2>Znaleziska</h2>
+		<div class="tablebox">
+			<table>
+				<thead><tr><th>#</th><th>Znalezisko</th><th>Ty</th><th>Etykieta</th><th>Ocena i stan po decyzjach</th></tr></thead>
+				<tbody>
+					<tr class="g"><td class="n">1</td><td class="what">Hasło szło do niezweryfikowanego serwera przy auto-ponownym łączeniu po kicku</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">wycięte · ↻</span></td><td>Auto-relaunch wycięty, <code>pin_proven_key</code> też. Hasło idzie samo tylko przy joinie z kluczem; goły adres = prompt. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">2</td><td class="what">Ranked na kluczu nieznanym stronie, raporty przepadają po cichu</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">zrobić inaczej</span></td><td><code>/test_identity</code> na starcie i co kilka minut, tylko dla serwerów z rankedem; 401 = brak heartbeatu, ERROR w logu, sam wraca. Dokłada jeden mechanizm, ale zamienia ciche psucie na widoczne i wycina ERROR przy raportach.</td></tr>
+<tr class="g"><td class="n">3</td><td class="what">Gra czeka bez końca, gdy strona odrzuci przeterminowany link</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">zrobić inaczej · ↻</span></td><td>Teraz w kodzie zapis wyniku w GET (DoS, nadpisywanie) - źle. Plan: wynik tylko w POST, gra sama „Start again” po 15 min. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">4</td><td class="what">Unlink po logowaniu Steam lądował na /profile</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje</span></td><td>Jedna linia whitelisty.</td></tr>
+<tr class="g"><td class="n">5</td><td class="what">Klucz zależał od autostart_when zmienianego przez RCON</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">etykiety</span></td><td>Jeden klucz na host + typ instancji jako enum: wylatuje wyprowadzanie kluczy, rodzaj i obecna łatka. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">6</td><td class="what">Turniej na uszkodzonym server.key; mecze na jednym kluczu</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">etykiety · ↻</span></td><td>Sprawdzenie uszkodzonego klucza zostaje. Klucz na mecz (zrobił 401) zastąpią etykiety t1, t2. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">7</td><td class="what">Odpięcie w trakcie rankeda przełącza konto</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">wycięte · ↻</span></td><td><code>hold_account</code> wycięte. Usuwa złożoność.</td></tr>
+<tr class="r"><td class="n">8</td><td class="what">Sfałszowany heartbeat ack trzyma serwer poza listą</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">pominięte</span></td><td>Nierozwiązane, audyt 3 zgłosił drugi raz. Do decyzji.</td></tr>
+<tr class="r"><td class="n">9</td><td class="what">Link z historii przeglądarki działał drugi raz</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje</span></td><td>Dokłada mapę zużytych <code>state</code> (markUsed/wasUsed) na rzadki przypadek wycieku URL-a. Do rozważenia, czy warta.</td></tr>
+<tr class="r"><td class="n">10</td><td class="what">Unlink bez dowodu od właściciela klucza</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje · ↻</span></td><td>Podpis w URL wrócił po tym, jak w K go wycięliśmy. Ten sam schemat co link, ale to kółko. Do decyzji: zostawić czy wrócić do bez podpisu.</td></tr>
+<tr class="g"><td class="n">11</td><td class="what">AbortSignal.timeout na starym Safari</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje</span></td><td>Kilka linii.</td></tr>
+<tr class="r"><td class="n">12</td><td class="what">Zablokowana karta otwiera się przy następnym kliknięciu</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zrobić inaczej</span></td><td>Teraz zepsute dalej (B5: ponowny podpis psuje rozpoznanie duplikatu). Plan: duplikat po <code>state</code>. Po poprawce zielone.</td></tr>
+<tr class="g"><td class="n">13</td><td class="what">yojimbo: skan 4096 cookies przed limitem</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje</span></td><td>Ta sama funkcja, krótszy skan.</td></tr>
+<tr class="g"><td class="n">14</td><td class="what">yojimbo: sfałszowany challenge skraca łączenie</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje</span></td><td>Jeden warunek.</td></tr>
+<tr class="g"><td class="n">15</td><td class="what">Happy hours tylko dla pierwszej instancji</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">etykiety</span></td><td>Z jednym wpisem na host prefiks zbędny - do wycięcia.</td></tr>
+<tr class="g"><td class="n">16</td><td class="what">Quick play z nieaktualnej listy z cache'u</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">wycięte · ↻</span></td><td>Cache tylko w GUI, łatka cofnięta. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">17</td><td class="what">Join samym kluczem bierze adres z cache'u</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">wycięte · ↻</span></td><td>Cofnięte; czekanie na listę max 4 s. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">18</td><td class="what">Hasło ginie, gdy join czeka na cert</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">zrobić inaczej</span></td><td>Okienko hasła dopiero przed połączeniem, <code>wait()</code> wylatuje. Usuwa złożoność.</td></tr>
+<tr class="g"><td class="n">19</td><td class="what">Retry po niezgodności z listą kręci się w kółko</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">zostaje</span></td><td>Przy niezgodności tylko Go back (odświeża listę).</td></tr>
+<tr class="g"><td class="n">20</td><td class="what">Ostatni adres ulubionego bywa adresem z LAN</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">zostaje</span></td><td>Automatyczna aktualizacja nie nadpisuje adresem z LAN; LAN-owe serwery dalej mają gwiazdkę i mogą być w ulubionych.</td></tr>
+<tr class="g"><td class="n">21</td><td class="what">Zakładka przeskakuje na Local pod kursorem</td><td><span class="yes">✓ odniosłeś się</span></td><td class="state"><span class="tag">zostaje</span></td><td>Local tylko przez 2 s od pierwszego otwarcia.</td></tr>
+<tr class="r"><td class="n">22</td><td class="what">Web: pobieranie z postępem bez timeoutu</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">pominięte</span></td><td>Nierozwiązane, niepewne.</td></tr>
+<tr class="g"><td class="n">23</td><td class="what">Drobne: limit 20, komunikat przy padniętej liście, 0x/spacje w kluczu, licznik przepustowości</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">zostaje</span></td><td>Limit 20 straci sens przy etykietach.</td></tr>
+<tr class="r"><td class="n">23</td><td class="what">Drobne: kolejność aliasów, 503 zamiast 401</td><td><span class="no">— jeszcze nie</span></td><td class="state"><span class="tag">pominięte</span></td><td>Bez skutku dla graczy, ale nierozwiązane.</td></tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section>
+		<h2>Gdzie się kręciliśmy</h2>
+		<div class="loops">
+			<div class="loopcard"><b>Hasło po kicku</b><div class="chain"><span><code>known_servers</code> + <code>learn_server_key</code></span> → wycięte w J2, ale auto-relaunch został (dziura) → <span><code>pin_proven_key</code></span> po audycie → <span>wycięty auto-relaunch</span>. Zachowanie docelowe to po prostu prompt.</div></div>
+			<div class="loopcard"><b>Konto w trakcie rankeda</b><div class="chain"><span><code>cert_held_for_ranked</code></span> wycięte w nocy → <span><code>hold_account</code></span> po audycie → <span>wycięte</span>.</div></div>
+			<div class="loopcard"><b>Potwierdzenie „official”</b><div class="chain"><span>bit official w acku + blokada rankeda</span> wycięte w nocy → <span>ERROR przy każdym 401</span> po audycie → <span>ERROR raz na uruchomienie</span>.</div></div>
+			<div class="loopcard"><b>Wynik linku dla gry</b><div class="chain"><span>tylko POST</span> → <span>także GET</span> po audycie (DoS, nadpisywanie) → <span>tylko POST + timeout w grze</span>.</div></div>
+			<div class="loopcard"><b>Unlink</b><div class="chain"><span>podpisany endpoint</span> → <span>strona bez podpisu (K)</span> → <span>podpis w URL strony</span>, ten sam schemat co link. Zostaje.</div></div>
+			<div class="loopcard"><b>Klucze serwerów</b><div class="chain"><span>jeden klucz</span> → <span>klucz na instancję (wyprowadzany)</span> → <span>rodzaj z konfiguracji</span> po audycie → <span>klucz na mecz turniejowy</span> po audycie (401) → <span>jeden klucz na host + etykiety</span>.</div></div>
+			<div class="loopcard"><b>Cache listy</b><div class="chain"><span>cache w ścieżce łączenia</span> → <span>łatki 16, 17 i wyścig</span> → <span>cache tylko w GUI</span>.</div></div>
+			<div class="loopcard"><b>Hasło w trakcie czekania</b><div class="chain"><span>ginęło</span> → <span>trzymane przez <code>wait()</code></span> po audycie → <span>okienko hasła przeniesione za czekanie</span>.</div></div>
+		</div>
+	</section>
+
+	<section class="lesson">
+		<h2>Wniosek</h2>
+		<ul>
+			<li>Prawie każde kółko zaczęło się od tego, że audyt zgłosił skutek wcześniejszego wycięcia, a ja przywróciłem mniejszą wersję wyciętego mechanizmu zamiast usunąć zachowanie, które go potrzebowało.</li>
+			<li>Dwie łatki z audytu same zrobiły nowe błędy: zapis wyniku w GET (DoS) i osobne klucze turniejowe (401).</li>
+			<li>Reguła na dalej: przy znalezisku najpierw pytanie, czy da się usunąć zachowanie albo przenieść je w miejsce, gdzie problem nie istnieje (hasło po czekaniu, cache tylko w GUI, etykiety zamiast kluczy).</li>
+		</ul>
+	</section>
+</div>

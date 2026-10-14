@@ -875,8 +875,6 @@ void client_setup::connect() {
 		return;
 	}
 
-	sent_password = !blob.password.empty();
-
 	const auto resolution = adapter->connect(connect_string, connect_identity);
 
 	if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {

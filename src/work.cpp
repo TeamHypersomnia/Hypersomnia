@@ -2002,8 +2002,6 @@ work_result work(
 			in.provider = identity_session::provider_type::STEAM;
 		}
 
-		in.hold_account = settings_gui.in_ranked_match;
-
 		return in;
 	};
 
@@ -2382,6 +2380,22 @@ work_result work(
 
 			if (server_key.has_value()) {
 				update_favorite_of(client, *server_key);
+
+				/*
+					Joined by address alone: the last join names the key this server proved - the next start expects
+					it, and its saved password goes with it. Never the key of a server on this machine that answered
+					in the remote one's place.
+				*/
+
+				const auto last_join = connect_target::parse(config.client_connect);
+
+				if (!last_join.key.has_value() && !client.connected_through_localhost_fallback() && last_join.address == client.get_connect_string()) {
+					const auto with_key = connect_target { last_join.address, server_key }.to_string();
+
+					change_with_save([&](auto& cfg) {
+						cfg.client_connect = with_key;
+					});
+				}
 			}
 
 			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
@@ -2431,11 +2445,10 @@ work_result work(
 	WEBSTATIC bool launch_after_sign_in = false;
 
 	/*
-		A join by a server's key only, before the server list came: it waits for it - 8 s at most.
+		A join by a server's key only, before the server list came: it waits for it - 4 s at most.
 	*/
 
 	WEBSTATIC bool launch_after_server_list = false;
-	WEBSTATIC bool join_without_waiting_for_list_once = false;
 	WEBSTATIC double launch_after_server_list_since = 0.0;
 	WEBSTATIC bool join_without_sign_in_once = false;
 	WEBSTATIC std::optional<int> retry_attempts_before;
@@ -3025,27 +3038,6 @@ work_result work(
 		};
 	};
 
-	/*
-		A join by address alone, about to send a password: from now on to the key that server proved - the password
-		goes to no one else answering there (see connect_target.h).
-	*/
-
-	WEBSTATIC auto pin_proven_key = [&](const client_setup& client) {
-		const auto key = client.get_server_public_key();
-		auto target = connect_target::parse(config.client_connect);
-
-		if (!key.has_value() || target.key.has_value()) {
-			return;
-		}
-
-		if (target.address.empty()) {
-			target.address = client.get_connect_string();
-		}
-
-		target.key = key;
-		config.client_connect = target.to_string();
-	};
-
 	WEBSTATIC auto launch_client_setup = [&]() {
 		/*
 			What to join - see connect_target.h: a server by its key (with where it was), or just an address.
@@ -3079,15 +3071,15 @@ work_result work(
 		auto connect_string = client_connect_string(target.address);
 
 		if (connect_string.empty() && target.key.has_value()) {
-			/*
-				A fresh list on its way is waited for (a few seconds at most) - the cached one or a favorite's last
-				address may be out of date.
-			*/
-
 			const bool list_coming = !browse_servers_gui.refreshed_at_least_once() || browse_servers_gui.refresh_in_progress();
-			const bool waited_enough = std::exchange(join_without_waiting_for_list_once, false);
 
-			if (list_coming && !waited_enough) {
+			if (found != nullptr) {
+				connect_string = found->get_my_connect_string();
+			}
+			else if (const auto favorite = favorites.find(*target.key); favorite != nullptr && !favorite->address.empty()) {
+				connect_string = favorite->address;
+			}
+			else if (list_coming) {
 				LOG("Waiting for the server list to find %x.", config.client_connect);
 
 				if (!browse_servers_gui.refresh_in_progress()) {
@@ -3097,13 +3089,6 @@ work_result work(
 				launch_after_server_list = true;
 				launch_after_server_list_since = augs::steady_secs();
 				return wait();
-			}
-
-			if (found != nullptr) {
-				connect_string = found->get_my_connect_string();
-			}
-			else if (const auto favorite = favorites.find(*target.key); favorite != nullptr && !favorite->address.empty()) {
-				connect_string = favorite->address;
 			}
 			else {
 				const auto short_key = "0x" + augs::bytes_to_hex(*target.key).substr(0, 8) + "...";
@@ -3495,17 +3480,15 @@ work_result work(
 					start_client_setup();
 				}
 			}
-			else if (now - launch_after_server_list_since > 8.0) {
-				/*
-					The list did not come: the join goes on with what there is - the cached list, a favorite.
-				*/
-
+			else if (now - launch_after_server_list_since > 4.0) {
 				launch_after_server_list = false;
-				join_without_waiting_for_list_once = true;
+				next_connect_password.reset();
 
-				if (!has_current_setup()) {
-					start_client_setup();
-				}
+				auto popup = simple_popup();
+				popup.title = "Server not found";
+				popup.message = "The server list did not come - the server could not be found by its key.\nTry again later, or join it by its address.";
+				sign_in_popup = popup;
+				sign_in_popup_before_connect = false;
 			}
 		}
 
@@ -4287,7 +4270,6 @@ work_result work(
 						if (auto new_password = setup.take_pending_password_save()) {
 							if (const auto key = setup.get_server_public_key(); key.has_value() && !setup.connected_through_localhost_fallback()) {
 								saved_server_passwords.set(*key, *new_password);
-								pin_proven_key(setup);
 							}
 
 							next_connect_password = *new_password;
@@ -6007,39 +5989,6 @@ work_result work(
 #endif
 				advance_identity();
 				sync_identity_with_settings();
-
-				{
-					/*
-						Joined by address, kicked for a password it could not send before the server's key was known:
-						retried right away with the one saved for that key.
-					*/
-
-					bool relaunch_with_saved_password = false;
-
-					visit_current_setup([&](auto& setup) {
-						if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
-							/*
-								Never for a server on this machine that answered in the remote one's place (the localhost
-								fallback) - its key is not the remote server's.
-							*/
-
-							if (setup.kicked_for_password_not_sent() && !setup.connected_through_localhost_fallback()) {
-								if (const auto key = setup.get_server_public_key()) {
-									if (const auto saved = saved_server_passwords.find(*key); !saved.empty()) {
-										next_connect_password = saved;
-										pin_proven_key(setup);
-										relaunch_with_saved_password = true;
-									}
-								}
-							}
-						}
-					});
-
-					if (relaunch_with_saved_password) {
-						LOG("Reconnecting with the password saved for this server's key.");
-						launch_setup(activity_type::CLIENT);
-					}
-				}
 
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;

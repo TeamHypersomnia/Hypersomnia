@@ -284,7 +284,7 @@ void browse_servers_gui_state::load_cached_list_once(const browse_servers_input&
 		return;
 	}
 
-	if (!server_list.empty() || !augs::exists(in.list_cache_path)) {
+	if (!augs::exists(in.list_cache_path)) {
 		return;
 	}
 
@@ -297,7 +297,7 @@ void browse_servers_gui_state::load_cached_list_once(const browse_servers_input&
 
 		if (cache_error.empty()) {
 			LOG("Loaded %x servers from the cached server list.", cached.size());
-			server_list = std::move(cached);
+			cached_list = std::move(cached);
 		}
 		else {
 			LOG("The cached server list does not read: %x", cache_error);
@@ -468,7 +468,7 @@ bool server_list_entry::is_behind_nat() const {
 }
 
 server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address) {
-	for (auto& s : server_list) {
+	for (auto& s : displayed_list()) {
 		if (s.address == address) {
 			return &s;
 		}
@@ -484,7 +484,7 @@ server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t&
 }
 
 server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(const netcode_address_t& address, const uint64_t ping_sequence) {
-	for (auto& s : server_list) {
+	for (auto& s : displayed_list()) {
 		if (s.progress.ping_sequence == ping_sequence) {
 			if (s.heartbeat.internal_network_address == address) {
 				return &s;
@@ -642,7 +642,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 		}
 	};
 
-	for (auto& s : server_list) {
+	for (auto& s : displayed_list()) {
 		ping_entry(s);
 	}
 
@@ -1027,6 +1027,8 @@ void browse_servers_gui_state::advance_list(const browse_servers_input& in) {
 
 		if (error_message.empty()) {
 			server_list = std::move(new_list);
+			fresh_list_arrived = true;
+			cached_list.clear();
 			::save_cached_list(in.list_cache_path, response.body);
 		}
 
@@ -1077,7 +1079,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (current_time - when_last_updated_time_to_events > 1.0) {
 			when_last_updated_time_to_events = current_time;
 
-			update_cached_time_to_event(server_list);
+			update_cached_time_to_event(displayed_list());
 		}
 	}
 
@@ -1149,7 +1151,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	requested_connection = std::nullopt;
 
-	for (auto& s : server_list) {
+	for (auto& s : displayed_list()) {
 		const auto& name = s.heartbeat.server_name;
 		const auto& arena = s.heartbeat.current_arena;
 		const auto effective_name = std::string(name) + " " + std::string(arena);
@@ -1756,7 +1758,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	
 	if (server_details.show) {
 		if (!selected_server.is_set()) {
-			for (auto& s : server_list) {
+			for (auto& s : displayed_list()) {
 				if (s.address == selected_server.address) {
 					selected_server = s;
 				}
@@ -1966,16 +1968,6 @@ std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_serve
 		const bool is_ranked = s.is_official_server() && s.heartbeat.is_ranked_server();
 		return !s.heartbeat.versions_compatible() || is_ranked || s.heartbeat.require_password || s.heartbeat.is_full();
 	});
-
-	/*
-		A list that failed to download is the last one (maybe cached days ago): only servers that answer a ping now.
-	*/
-
-	if (server_list_failed()) {
-		erase_if(candidates, [&](const auto& s) {
-			return !s.progress.responding();
-		});
-	}
 
 	auto public_ones = candidates;
 
@@ -2577,7 +2569,7 @@ bool server_details_gui_state::perform(
 }
 
 void browse_servers_gui_state::reping_all_servers() {
-	for (auto& s : server_list) {
+	for (auto& s : displayed_list()) {
 		s.progress = {};
 	}
 
@@ -2590,7 +2582,9 @@ void browse_servers_gui_state::update_favorite_only_list(const favorite_servers&
 	auto new_list = std::vector<server_list_entry>();
 
 	for (const auto& f : favorites.all()) {
-		const bool listed = std::any_of(server_list.begin(), server_list.end(), [&](const auto& s) {
+		const auto& shown_list = displayed_list();
+
+		const bool listed = std::any_of(shown_list.begin(), shown_list.end(), [&](const auto& s) {
 			return s.get_public_key() == f.key;
 		});
 
@@ -2660,7 +2654,7 @@ void browse_servers_gui_state::update_favorite_only_list(const favorite_servers&
 		const bool was_elsewhere = !entry.other_server_at_address.empty();
 		entry.other_server_at_address.clear();
 
-		for (const auto& s : server_list) {
+		for (const auto& s : shown_list) {
 			const bool same_address =
 				(entry.address.type != NETCODE_ADDRESS_NONE && s.address == entry.address)
 				|| s.get_my_connect_string() == f.address

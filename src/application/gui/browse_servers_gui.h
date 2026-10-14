@@ -182,6 +182,18 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	std::vector<server_list_entry> server_list;
 
+	/*
+		The last list downloaded, from the disk - only shown in the browser until a fresh one comes in this run.
+		Joins, quick play, invites and keys are found only in the fresh one (server_list).
+	*/
+
+	std::vector<server_list_entry> cached_list;
+	bool fresh_list_arrived = false;
+
+	std::vector<server_list_entry>& displayed_list() {
+		return fresh_list_arrived ? server_list : cached_list;
+	}
+
 	bool scroll_once_to_selected = false;
 	server_list_entry selected_server;
 

@@ -169,14 +169,14 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
 - **Joins name the server's key (connect_target.h):** `--connect <key>` (found on the list, else the favorites' last address;
-  without a list yet it waits up to 8 s), `--connect <address>,<key>` / `--connect-ip` (straight there, expecting the key), or an
+  without a list yet it waits up to 4 s), `--connect <address>,<key>` / `--connect-ip` (straight there, expecting the key), or an
   address alone (nothing verified). A join from the server list is `<address>,<key>` and so is the last join saved in
   runtime_prefs (`client_connect`) - the next start joins without the masterserver. A mismatch: "doesn't match the server list"
   (list key) or "another key than the one you chose" - no Connect anyway anywhere. `remote_e2e/community.sh start` - a
   community server on 9005 with a new key each start, listed on the test master; `crash` then `start silent` - a server whose
   list entry (60 s) keeps the previous key. Never `kill -9` the pid file's pid (it is `timeout`'s). A client with
   `"server_list_provider": "http://<arenaus>:18420"` and `"last_activity": "MAIN_MENU"` joins from Browse servers.
-- **Server browser and invites:** the list is cached at `<appdata>/cache/server_list.bin` and downloaded at every start in the
+- **Server browser and invites:** the list is cached at `<appdata>/cache/server_list.bin` (shown in the browser only, until a fresh one comes - joins, quick play and invites never use it) and downloaded at every start in the
   background (even with `--connect`); favorites are `user/favorite_servers.txt` (key, last address, name), the tab in
   `user/server_browser_tab.txt` (0 Local .. 4 All; none = Favorites). Esc - Invite to join opens a window from what the game
   knows (no list download): links, address, key, ★; joined over the LAN it shows the public address from the list. The log

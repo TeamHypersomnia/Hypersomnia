@@ -526,12 +526,6 @@ void identity_session::advance(const input& in, const double now) {
 			*/
 
 			if (cert_saved || (broker_cert.has_value() && !is_key_account(broker_cert->account))) {
-				if (in.hold_account && broker_cert.has_value() && !was_check) {
-					LOG("The key is no longer linked to a Steam account - kept until the ranked match ends.");
-					next_attempt_at = now + 60.0;
-					return;
-				}
-
 				LOG("The key is no longer linked to a Steam account.");
 				on_unlinked();
 			}
