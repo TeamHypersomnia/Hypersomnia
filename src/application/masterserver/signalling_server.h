@@ -649,11 +649,14 @@ public:
 		erase_if(pending_packets, [](const auto& p) { return p.times <= 0; });
 	}
 
-	void set_webrtc_id_alias(
-		const std::string& from, const std::string& to
-	) {
+	/*
+		All the aliases at once (e.g. "ranked-pl:1" -> "1.2.3.4:8412"), as the official servers on the list now have them -
+		an alias of a server gone, no longer official or renamed goes with it.
+	*/
+
+	void set_webrtc_id_aliases(std::unordered_map<std::string, std::string> aliases) {
 		std::scoped_lock lk(aliases_mutex);
-		webrtc_id_aliases[from] = to;
+		webrtc_id_aliases = std::move(aliases);
 	}
 
 	template <class... Args>

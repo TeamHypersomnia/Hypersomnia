@@ -415,8 +415,56 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	auto previous_peers = signalling_server::peer_map();
 
+	/*
+		A browser joins an official server by its alias (e.g. /game/ranked-pl:1) - only an official server has one.
+	*/
+
+	auto update_webrtc_alias = [&](masterserver_client& entry) {
+		if (entry.meta.is_official_server()) {
+			entry.meta.webrtc_id = ::to_webrtc_alias(
+				entry.last_heartbeat.is_ranked_server(),
+				entry.last_heartbeat.get_location_id(),
+				entry.last_heartbeat.server_name
+			);
+		}
+		else {
+			entry.meta.webrtc_id = {};
+		}
+	};
+
+	/*
+		The aliases as the list has them now, each to one server - two official servers with the same name get it
+		in turn no more: the first keeps it and the clash is logged (once a minute at most).
+	*/
+
+	uint64_t last_logged_alias_clash = 0;
+
+	auto rebuild_webrtc_aliases = [&]() {
+		auto aliases = std::unordered_map<std::string, std::string>();
+
+		for (const auto& server : server_list) {
+			const auto& alias = server.second.meta.webrtc_id;
+
+			if (!server.second.meta.is_official_server() || alias.empty()) {
+				continue;
+			}
+
+			const auto address = ::ToString(server.first);
+
+			if (const auto taken = aliases.try_emplace(std::string(alias), address); !taken.second && taken.first->second != address) {
+				if (::official_log_allowed(last_logged_alias_clash)) {
+					LOG("Two official servers want the alias %x (%x and %x) - check their names.", alias, taken.first->second, address);
+				}
+			}
+		}
+
+		signalling.set_webrtc_id_aliases(std::move(aliases));
+	};
+
 	auto reserialize_list = [&]() {
 		// MSR_LOG("Reserializing the server list.");
+
+		rebuild_webrtc_aliases();
 
 		const auto peer_map = signalling.get_new_peers_map();
 
@@ -985,16 +1033,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								server_entry.meta.domain = ::is_acceptable_domain(domain, official_id != nullptr) ? typed_request.domain : decltype(typed_request.domain)();
 							}
 
-							if (server_entry.meta.is_official_server()) {
-								const auto new_webrtc_alias = ::to_webrtc_alias(
-									server_entry.last_heartbeat.is_ranked_server(),
-									server_entry.last_heartbeat.get_location_id(),
-									server_entry.last_heartbeat.server_name
-								);
-
-								server_entry.meta.webrtc_id = new_webrtc_alias;
-								signalling.set_webrtc_id_alias(new_webrtc_alias, ip_str);
-							}
+							update_webrtc_alias(server_entry);
 
 							const bool heartbeats_mismatch = 
 								heartbeat_before != server_entry.last_heartbeat
@@ -1105,6 +1144,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 					entry.meta.is_official = now_official;
 					entry.official_server_id = now_official ? *official_id : std::string();
+					update_webrtc_alias(entry);
 				}
 			}
 
