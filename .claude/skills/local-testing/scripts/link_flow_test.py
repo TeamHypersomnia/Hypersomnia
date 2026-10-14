@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 The whole key <-> Steam link flow against a test site (broker.sh), as the game does it - without Steam:
-a fake Steam session in the site's DB, /link_key/start -> the code in the redirect, /link_key/info, the signed GET /link_key/link,
+a fake Steam session in the site's DB, /link_key/start (the confirm page, its POST) -> the code at /link_key/result, /link_key/info, the signed GET /link_key/link,
 a cert for the key (now the Steam account), the signed GET /link_key/unlink, a cert again (the key's own account).
 Usage: SESSION_SECRET=<the site's> link_flow_test.py <site dir> <site url>
 """

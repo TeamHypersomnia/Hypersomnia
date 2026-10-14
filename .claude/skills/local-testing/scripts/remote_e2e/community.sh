@@ -4,6 +4,7 @@
 # Uses the e2e dir's binary, content and libs (match.sh's upload).
 #   community.sh start [silent]   starts it with a new key each time (its server.key removed); "silent" never tells the masterserver,
 #                                 so the list keeps the previous key (within the master's 60 s entry timeout) - a misconfigured server
+#   community.sh crash            kills it without a goodbye to the masterserver (its entry, with the key, stays for 60 s)
 #   community.sh stop | key | log
 E=$HOME/yojimbo-test/e2e
 C=$E/community
@@ -63,6 +64,14 @@ key)
 stop)
 	stop
 	echo stopped
+	;;
+crash)
+	# SIGKILL to the server itself (the pid file has timeout's): no goodbye to the masterserver, so its entry stays until the timeout
+	if [ -f $C.pid ]; then
+		for p in $(ps -o pid= --ppid $(cat $C.pid)); do kill -9 $p; done
+	fi
+	stop
+	echo crashed
 	;;
 log)
 	grep -hE "connected\. SID|listening|heartbeat|kicked|Reason|disconnect" $C.out | sed 's/^\[[0-9:]*\] //' | tail -20

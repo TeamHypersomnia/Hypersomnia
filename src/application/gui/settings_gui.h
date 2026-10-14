@@ -253,11 +253,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string steam_link_state;
 
 	/*
-		Native: where the browser comes back after the sign-in through Steam.
-	*/
-
-
-	/*
 		While the browser is out: the game asks hypersomnia.io every second for the code waiting under its state.
 	*/
 

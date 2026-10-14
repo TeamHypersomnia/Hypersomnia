@@ -170,11 +170,13 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
 - **Server key vs the server list (community.sh on arena):** `community.sh start` (a community server on 9005 with a new key each
-  start, listed on the test master) or `start silent` (never tells the master - for the master's 60 s entry timeout the list keeps the
-  previous key: a misconfigured server). A fresh client (never joined - a known_servers entry beats a community list key) with
+  start, listed on the test master) or `crash` then `start silent` (no goodbye to the master and never telling it - for the master's 60 s entry timeout the
+  list keeps the previous key: a misconfigured server; a plain stop says goodbye and the entry is gone - then the server is
+  simply unlisted and a join takes its key like a join by address). Never `kill -9` the pid file's pid - it is `timeout`'s,
+  the server would keep running with the old key. A fresh client (never joined - a known_servers entry beats a community list key) with
   `"server_list_provider": "http://<arenaus>:18420"`: open Browse servers, restart the server, join the row. Stale list (restarted
   normally): two 5 s failures, the list again, "stale key ... joining again", connected. Silent: "The fresh server list has the
-  same key" and the "misconfigured or under maintenance" message.
+  same key" and the "misconfigured or under maintenance" message; Retry checks the same key again (no join).
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
   `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one
@@ -183,7 +185,8 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
 - **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
-  `curl -b "$cookie"` then reaches `/link_key/start?state=..[&port=..]`, which redirects with a fresh code;
+  `curl -b "$cookie"` then reaches `/link_key/start?state=..&key=..` (the confirm page); a POST of the same fields keeps a code
+  for that key under the state, which `GET /link_key/result?state=..` gives once;
   `POST /profile/unlink_key` with `key=key_...` unlinks.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb and `ui.sh`'s
   fake xdg-open: Settings - Account - Link with Steam - Link with Steam..., then `browser_sign_in.sh` against that site

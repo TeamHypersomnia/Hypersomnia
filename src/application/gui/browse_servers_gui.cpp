@@ -327,8 +327,12 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 		return;
 	}
 
+	/*
+		The list stays until a new one replaces it - a join meanwhile (e.g. Retry after a key mismatch) still finds
+		its server's key there.
+	*/
+
 	error_message.clear();
-	server_list.clear();
 	auto prev_addr = selected_server.address;
 	selected_server = {};
 	selected_server.address = prev_addr;
@@ -879,7 +883,16 @@ void browse_servers_gui_state::show_server_list(
 
 bool browse_servers_gui_state::take_server_list_response() {
 	if (augs::is_ready(data->future_response)) {
-		server_list = ::to_server_list(augs::get_once(data->future_response), error_message);
+		/*
+			A failed download keeps the last list (and says why) - an empty one would expect no key of any server.
+		*/
+
+		auto new_list = ::to_server_list(augs::get_once(data->future_response), error_message);
+
+		if (error_message.empty()) {
+			server_list = std::move(new_list);
+		}
+
 		when_last_updated_time_to_events = 0;
 		return true;
 	}

@@ -15,7 +15,8 @@
 	The keys of the servers this game connected to, by the address it connected with - like SSH's known_hosts.
 	A server joined by address later shows the same key, or the game warns before connecting (see the key mismatch
 	in client_setup) - also while the masterserver, whose list has the keys, can not be reached.
-	The server list's key, when there is one, comes first - it is fetched over HTTPS.
+	An official server's key from the server list (fetched over HTTPS) comes first; a community server's comes after this one -
+	the list only repeats what the server itself said. Connect anyway replaces the key here.
 	One line per address: the address, a space, the key in hex.
 */
 

@@ -3412,6 +3412,7 @@ work_result work(
 	*/
 
 	WEBSTATIC std::optional<augs::ed25519_public_key_type> relisted_old_key;
+	WEBSTATIC client_connect_string relisted_server;
 	WEBSTATIC bool relisting = false;
 	WEBSTATIC double relisting_since = 0.0;
 
@@ -3424,6 +3425,7 @@ work_result work(
 					const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
 
 					relisted_old_key = found != nullptr ? found->get_public_key() : std::nullopt;
+					relisted_server = config.client_connect;
 					relisting = true;
 					relisting_since = now;
 					browse_servers_gui.refresh_server_list(get_browse_servers_input());
@@ -3460,7 +3462,26 @@ work_result work(
 		const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
 		const auto fresh_key = found != nullptr ? found->get_public_key() : std::nullopt;
 
-		if (fresh_key.has_value() && fresh_key != relisted_old_key) {
+		/*
+			Only while the player still stays with that server - not after Go back, the editor or a join elsewhere.
+		*/
+
+		const bool still_on_that_server = [&]() {
+			bool on_client = false;
+
+			visit_current_setup([&](auto& setup) {
+				if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
+					on_client = true;
+				}
+			});
+
+			return on_client && config.client_connect == relisted_server;
+		}();
+
+		if (!still_on_that_server) {
+			LOG("Left %x before the server list came - not joining again.", relisted_server);
+		}
+		else if (fresh_key.has_value() && fresh_key != relisted_old_key) {
 			LOG("The server list had a stale key for %x - joining again with the fresh one.", config.client_connect);
 			launch_setup(activity_type::CLIENT);
 		}
