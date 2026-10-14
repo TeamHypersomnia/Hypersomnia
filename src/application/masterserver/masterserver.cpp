@@ -904,8 +904,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							auto ack = masterserver_out::heartbeat_ack();
 							ack.cookie = cookies.make(from);
-							ack.nonce = typed_request.signature->nonce;
-							ack.official = official_id != nullptr;
 
 							if (!cookies.valid(typed_request.signature->cookie, from)) {
 								send_back(ack);

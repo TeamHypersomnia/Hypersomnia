@@ -1198,31 +1198,17 @@ void server_setup::reset_afk_timer() {
 
 /*
 	Servers sign what they send to the masterserver with their key, so that nobody else can list them
-	under it or remove them from the list. The nonce of each request is kept to recognize the answers to it.
+	under it or remove them from the list.
 */
-
-std::optional<netcode_address_t> server_setup::main_masterserver_address() const {
-#if BUILD_NATIVE_SOCKETS
-	return resolved_server_list_addr;
-#else
-	return std::nullopt;
-#endif
-}
 
 template <class Request>
 void server_setup::sign_for_masterserver(Request& request) const {
-	sign_for_masterserver(request, masterserver_cookie, main_masterserver_address());
+	sign_for_masterserver(request, masterserver_cookie);
 }
 
 template <class Request>
-void server_setup::sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie, const std::optional<netcode_address_t>& to) const {
-	auto nonce = uint64_t(0);
-	randombytes_buf(&nonce, sizeof(nonce));
-
-	recent_masterserver_nonces[next_masterserver_nonce % recent_masterserver_nonces.size()] = { nonce, to };
-	++next_masterserver_nonce;
-
-	if (!::sign_server_request(request, this_server_key, cookie, nonce)) {
+void server_setup::sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie) const {
+	if (!::sign_server_request(request, this_server_key, cookie)) {
 		LOG("Failed to sign a request to the masterserver with the server key.");
 	}
 }
@@ -1253,7 +1239,7 @@ void server_setup::send_goodbye_to_masterserver() {
 			}
 
 			auto goodbye = masterserver_in::goodbye {};
-			sign_for_masterserver(goodbye, list.cookie, list.resolved);
+			sign_for_masterserver(goodbye, list.cookie);
 
 			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
 
@@ -2515,25 +2501,13 @@ bool server_setup::handle_masterserver_response(
 
 		if constexpr(std::is_same_v<T, masterserver_out::heartbeat_ack>) {
 			/*
-				Only an answer to a heartbeat this server sent, from the masterserver it sent it to -
-				anyone can send a packet to the game port.
+				Only from a masterserver this server sends heartbeats to - anyone can send a packet to the game port.
+				A forged answer (a spoofed address) could only cost a resent heartbeat.
 			*/
 
 			{
-				const bool our_nonce = typed_request.nonce != 0 && std::any_of(
-					recent_masterserver_nonces.begin(),
-					recent_masterserver_nonces.end(),
-					[&](const auto& sent) {
-						return sent.nonce == typed_request.nonce && (!sent.to.has_value() || *sent.to == from);
-					}
-				);
-
-				if (!our_nonce) {
-					return true;
-				}
-
 				/*
-					An additional server list keeps only its cookie - the rest (official or not) is the main one's to say.
+					An additional server list keeps its own cookie.
 				*/
 
 				for (auto& list : additional_server_lists) {
@@ -2583,27 +2557,6 @@ bool server_setup::handle_masterserver_response(
 			}
 			else {
 				resent_heartbeat_for_cookie = false;
-			}
-
-			if (masterserver_says_official != typed_request.official) {
-				masterserver_says_official = typed_request.official;
-
-				LOG("The masterserver knows this server's key as %x.", typed_request.official ? "an official server" : "a community server");
-			}
-
-			if (!typed_request.official && is_ranked_server()) {
-				static double last_logged = -1000.0;
-
-				if (server_time - last_logged > 600.0) {
-					last_logged = server_time;
-
-					LOG(
-						"ERROR: this is a ranked server, but the masterserver does not know its key (%x) as an official one.\n"
-						"Ranked matches will not start and their reports would be refused. Send the key to the developers, "
-						"or check .keys/server.key was not replaced.",
-						server_key::public_key_hex(this_server_key)
-					);
-				}
 			}
 
 			return true;
@@ -2752,7 +2705,7 @@ void server_setup::sync_additional_server_lists() {
 
 		if (removed && old.resolved.has_value() && has_sent_any_heartbeats()) {
 			auto goodbye = masterserver_in::goodbye {};
-			sign_for_masterserver(goodbye, old.cookie, old.resolved);
+			sign_for_masterserver(goodbye, old.cookie);
 
 			auto goodbye_bytes = augs::to_bytes(masterserver_request(std::move(goodbye)));
 			server->send_udp_packet(*old.resolved, goodbye_bytes.data(), goodbye_bytes.size());
@@ -3134,7 +3087,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 
 		auto copy = heartbeat;
-		sign_for_masterserver(copy, list.cookie, list.resolved);
+		sign_for_masterserver(copy, list.cookie);
 
 		auto bytes = augs::to_bytes(masterserver_request(std::move(copy)));
 		server->send_udp_packet(*list.resolved, bytes.data(), bytes.size());
@@ -3597,15 +3550,6 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	if (!vars.requires_authentication()) {
 		out.all_authenticated = true;
 		out.all_not_banned = true;
-	}
-
-	/*
-		A ranked server the masterserver explicitly does not know as official starts no ranked matches:
-		hypersomnia.io would refuse their reports. No answer (the masterserver down) does not stop them.
-	*/
-
-	if (vars.requires_authentication() && !vars.authenticate_with_nicknames && masterserver_says_official == false) {
-		out.all_authenticated = false;
 	}
 
 	out.friendly_fire = vars.get_friendly_fire();

@@ -169,14 +169,10 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 `run_match.sh A B` plays one match with two local CLI clients (account keys made in `$SCRATCH/e2e/client_<name>/user/.keys/account.key`,
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
-- **Server key vs the server list (community.sh on arena):** `community.sh start` (a community server on 9005 with a new key each
-  start, listed on the test master) or `crash` then `start silent` (no goodbye to the master and never telling it - for the master's 60 s entry timeout the
-  list keeps the previous key: a misconfigured server; a plain stop says goodbye and the entry is gone - then the server is
-  simply unlisted and a join takes its key like a join by address). Never `kill -9` the pid file's pid - it is `timeout`'s,
-  the server would keep running with the old key. A fresh client (never joined - a known_servers entry beats a community list key) with
-  `"server_list_provider": "http://<arenaus>:18420"`: open Browse servers, restart the server, join the row. Stale list (restarted
-  normally): two 5 s failures, the list again, "stale key ... joining again", connected. Silent: "The fresh server list has the
-  same key" and the "misconfigured or under maintenance" message; Retry checks the same key again (no join).
+- **Server keys from the list:** only an official server's key (official_servers.d) is expected from the list - a mismatch says
+  "misconfigured or under maintenance", no Connect anyway. A community server's list key is ignored: the first join takes the
+  key it presents (known_servers), later ones warn with Connect anyway. Test the official case with `run_match.sh`'s server
+  (its key in `official_servers.d/pl`) restarted with a new key.
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
   `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one
@@ -231,8 +227,8 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
 - **Never `prepare_web.sh` while that web build is building** - it copies a half-written wasm and the game hangs at start.
 - A scenario's server list check right after start can be empty: the first heartbeat goes ~10 s after start - wait 14 s.
 - Scripts that `cd $REPO/hypersomnia` must not use `$(dirname "$0")` afterwards - resolve `HERE` to an absolute path first.
-- A key added to `official_servers.d` is picked up at the master's next rescan (~40 s): the first heartbeat ack says "community"
-  and a ranked server logs the ERROR and holds its match until the ack says official - expected, not a failure.
+- A key added to `official_servers.d` is picked up at the master's next rescan (~40 s) - until then the list shows the server
+  as community. The server itself never knows; a ranked match of a key the site does not know as official is refused at the report.
 - In `run_match.sh` tournament mode the server name is built from the rosters, so with `key_...` ids it is a long `[key_...` string.
 - On the site, a `key_` account gets its MMR row only with a match it did not abandon - the abandoning loser shows no row.
 - **A reboot clears /tmp** - the session scratchpad, test keys, the broker copy and a rootfs under /tmp are gone. Commit before long

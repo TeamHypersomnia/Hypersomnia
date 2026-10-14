@@ -3122,23 +3122,19 @@ work_result work(
 			*/
 
 			if (list_key.has_value() && found->is_official_server()) {
-				source = S::SERVER_LIST;
+				source = S::OFFICIAL_SERVER_LIST;
 				return *list_key;
 			}
 
 			/*
 				Played on before: the key it showed then, wherever the join came from - a different one now is warned about
-				(and Connect anyway takes the new one, as SSH would). A community server's list key is only its own word.
+				(and Connect anyway takes the new one, as SSH would). A community server's key on the list is only its own
+				word - the first join takes whatever key it presents and remembers it.
 			*/
 
 			if (const auto remembered = remembered_servers.find(std::string(connect_string))) {
 				source = S::EARLIER_CONNECTION;
 				return *remembered;
-			}
-
-			if (list_key.has_value()) {
-				source = S::SERVER_LIST;
-				return *list_key;
 			}
 
 			return std::nullopt;
@@ -3403,90 +3399,6 @@ work_result work(
 		}
 		else {
 			save_last_activity(mode);
-		}
-	};
-
-	/*
-		A join from the server list met another key than the list's: the list is downloaded again - if the fresh one
-		has another key for the server (the list was stale), the game joins again by itself; otherwise the message stays.
-	*/
-
-	WEBSTATIC std::optional<augs::ed25519_public_key_type> relisted_old_key;
-	WEBSTATIC client_connect_string relisted_server;
-	WEBSTATIC bool relisting = false;
-	WEBSTATIC double relisting_since = 0.0;
-
-	WEBSTATIC auto relist_after_key_mismatch = [&]() {
-		const auto now = augs::steady_secs();
-
-		visit_current_setup([&](auto& setup) {
-			if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
-				if (setup.take_list_key_mismatch()) {
-					const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
-
-					relisted_old_key = found != nullptr ? found->get_public_key() : std::nullopt;
-					relisted_server = config.client_connect;
-					relisting = true;
-					relisting_since = now;
-					browse_servers_gui.refresh_server_list(get_browse_servers_input());
-				}
-			}
-		});
-
-		if (!relisting) {
-			return;
-		}
-
-		/*
-			The masterserver not answering in time: the message stays.
-		*/
-
-		if (now - relisting_since > 8.0) {
-			LOG("The server list did not come in time after a key mismatch.");
-			relisting = false;
-			return;
-		}
-
-		if (browse_servers_gui.refresh_in_progress()) {
-			return;
-		}
-
-		relisting = false;
-
-		/*
-			The browser is not performed during a connection - the list it asked for is taken here.
-		*/
-
-		browse_servers_gui.take_server_list_response();
-
-		const auto found = browse_servers_gui.find_entry_by_connect_string(config.client_connect);
-		const auto fresh_key = found != nullptr ? found->get_public_key() : std::nullopt;
-
-		/*
-			Only while the player still stays with that server - not after Go back, the editor or a join elsewhere.
-		*/
-
-		const bool still_on_that_server = [&]() {
-			bool on_client = false;
-
-			visit_current_setup([&](auto& setup) {
-				if constexpr(std::is_same_v<remove_cref<decltype(setup)>, client_setup>) {
-					on_client = true;
-				}
-			});
-
-			return on_client && config.client_connect == relisted_server;
-		}();
-
-		if (!still_on_that_server) {
-			LOG("Left %x before the server list came - not joining again.", relisted_server);
-		}
-		else if (fresh_key.has_value() && fresh_key != relisted_old_key) {
-			LOG("The server list had a stale key for %x - joining again with the fresh one.", config.client_connect);
-			launch_setup(activity_type::CLIENT);
-		}
-		else {
-			LOG("The fresh server list has the same key for %x - not joining.", config.client_connect);
 		}
 	};
 
@@ -6012,7 +5924,6 @@ work_result work(
 #endif
 				advance_identity();
 				sync_identity_with_settings();
-				relist_after_key_mismatch();
 
 				{
 					/*

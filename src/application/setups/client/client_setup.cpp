@@ -1980,12 +1980,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 					switch (adapter->get_disconnect_reason()) {
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_SERVER_KEY_MISMATCH:
 							/*
-								Against the server list: nothing to accept - the list (refreshed by the game right away)
-								is what the server itself reported. Joined again by itself if the fresh list agrees.
+								Against the official server list: nothing to accept - the masterserver vouches for that key.
 							*/
 
-							if (identity.expected_key_source == expected_server_key_source::SERVER_LIST) {
-								list_key_mismatch = true;
+							if (identity.expected_key_source == expected_server_key_source::OFFICIAL_SERVER_LIST) {
 								set_disconnect_reason("The server's key doesn't match the server list -\nit may be misconfigured or under maintenance. Try again later.");
 								break;
 							}

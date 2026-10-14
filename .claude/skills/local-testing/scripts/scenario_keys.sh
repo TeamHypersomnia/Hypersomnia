@@ -78,7 +78,6 @@ sleep 12
 
 echo "=== heartbeat targets"
 grep -h "Sending heartbeat through UDP to" $T/casual_de.out $T/ranked_pl.out $T/community.out | awk '{print $7}' | sort | uniq -c
-grep -h "The masterserver knows this server's key" $T/casual_de.out $T/ranked_pl.out $T/community.out
 
 echo "=== list"
 curl -s http://127.0.0.1:18420/server_list_json | python3 -c "

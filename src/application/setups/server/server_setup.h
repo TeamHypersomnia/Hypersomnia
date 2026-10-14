@@ -126,34 +126,13 @@ class server_setup :
 	*/
 
 	masterserver_cookie_type masterserver_cookie = {};
-	/*
-		Each nonce with the address it was sent to - an answer counts only from there
-		(an additional server list can not answer for the main one).
-	*/
-
-	struct sent_masterserver_nonce {
-		uint64_t nonce = 0;
-		std::optional<netcode_address_t> to;
-	};
-
-	mutable std::array<sent_masterserver_nonce, 64> recent_masterserver_nonces = {};
-	mutable uint32_t next_masterserver_nonce = 0;
 	bool resent_heartbeat_for_cookie = false;
-
-	/*
-		None until the masterserver answers. An explicit "no" keeps a ranked server from starting ranked matches;
-		no answer at all (the masterserver down) does not.
-	*/
-
-	std::optional<bool> masterserver_says_official;
 
 	template <class Request>
 	void sign_for_masterserver(Request& request) const;
 
 	template <class Request>
-	void sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie, const std::optional<netcode_address_t>& to) const;
-
-	std::optional<netcode_address_t> main_masterserver_address() const;
+	void sign_for_masterserver(Request& request, const masterserver_cookie_type& cookie) const;
 
 	server_public_vars last_broadcast_public_vars;
 	synced_dynamic_vars last_broadcast_dynamic_vars;
