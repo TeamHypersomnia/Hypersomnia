@@ -1008,6 +1008,12 @@ public:
 	std::string get_browser_location() const;
 	std::string get_connect_string() const;
 
+	/*
+		This instance's public key - what its players expect.
+	*/
+
+	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
+
 #if PLATFORM_WEB
 #else
 	std::string get_native_server_connect_string() const;

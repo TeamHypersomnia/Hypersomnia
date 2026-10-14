@@ -4,6 +4,7 @@
 #include "augs/misc/future.h"
 
 #include "application/setups/client/connect_target.h"
+#include "application/main/favorite_servers.h"
 #include "application/gui/browse_servers_gui.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
@@ -29,6 +30,8 @@
 #include "augs/misc/async_get.h"
 
 #include "augs/misc/profanity_filter.h"
+#include "augs/filesystem/file.h"
+#include "application/gui/pretty_tabs.h"
 
 #if PLATFORM_WEB
 #include "application/gui/calculate_server_distance.hpp"
@@ -143,10 +146,6 @@ bool server_list_entry::is_set() const {
 struct browse_servers_gui_internal {
 	augs::async_response_ptr future_response;
 	netcode_socket_t socket;
-
-	bool refresh_op_in_progress() const {
-		return augs::in_progress(future_response);
-	}
 };
 
 browse_servers_gui_state::~browse_servers_gui_state() = default;
@@ -243,96 +242,76 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
     return new_server_list;
 }
 
-#if !WEB_SINGLETHREAD
-void browse_servers_gui_state::open_matching_server_entry(
-	const browse_servers_input in,
-	const client_connect_string& server
-) {
-	sync_download_server_entry(in, server);
+/*
+	The cached list: the bytes of /server_list_binary as they came.
+*/
 
-	if (const auto entry = find_entry_by_connect_string(server)) {
-		open();
+static void save_cached_list(const augs::path_type& path, const std::string& bytes) {
+	try {
+		augs::create_directories_for(path);
 
-		select_server(*entry);
-		server_details.open();
+		auto tmp = path;
+		tmp += ".tmp";
 
-		return;
+		{
+			auto out = augs::open_binary_output_stream(tmp);
+			out.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+		}
+
+		std::filesystem::rename(tmp, path);
 	}
-	else {
-		select_server(server_list_entry());
-
-		if (const auto connected_address = ::find_netcode_addr(server)) {
-			selected_server.address = *connected_address;
-		}
-		else {
-			selected_server.meta.webrtc_id = server;
-		}
-
-		selected_server.unlisted = true;
-
-		server_details.open();
-
-		return;
+	catch (const std::exception& e) {
+		LOG("Could not cache the server list at %x: %x", path, e.what());
 	}
 }
 
-void browse_servers_gui_state::sync_download_server_entry(
-	const browse_servers_input in,
-	const client_connect_string& server
-) {
-	LOG("Calling sync_download_server_entry.");
-
-	/*
-		For now this will just refresh the whole list
-		so find_entry later returns a valid entry.
-	*/
-
-	(void)server;
-	(void)in;
-
-	error_message.clear();
-
-	/* Todo: make async */
-	auto lbd = 
-		[address = in.server_list_provider]() -> std::optional<httplib_result> {
-			/* 
-				Right now it's the same as the one that downloads the whole list,
-				but we'll need to support downloading just one entry.
-			*/
-
-			LOG("Connecting to server list at: %x", address);
-
-			auto cli = httplib_utils::make_client(address);
-			return cli->Get("/server_list_binary");
-		}
-	;
-
-	auto result = lbd();
-
-	if (result.has_value() && *result != nullptr) {
-		/*
-			A failed download keeps the last list, as in perform.
-		*/
-
-		auto new_list = ::to_server_list( { (*result)->status, (*result)->body } , error_message);
-
-		if (error_message.empty()) {
-			server_list = std::move(new_list);
-		}
-	}
-}
-#endif
 
 bool browse_servers_gui_state::refreshed_at_least_once() const {
 	return when_last_started_refreshing_server_list != 0;
 }
 
 bool browse_servers_gui_state::refresh_in_progress() const {
-	return data->refresh_op_in_progress();
+	/*
+		Until the answer is read into the list (advance_list) - a join waiting for the list must not look
+		at it between the answer arriving and being read.
+	*/
+
+	return data->future_response != nullptr;
+}
+
+void browse_servers_gui_state::load_cached_list_once(const browse_servers_input& in) {
+	if (std::exchange(cache_loaded, true)) {
+		return;
+	}
+
+	if (!server_list.empty() || !augs::exists(in.list_cache_path)) {
+		return;
+	}
+
+	try {
+		auto file = augs::open_binary_input_stream(in.list_cache_path);
+		auto bytes = std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+
+		auto cache_error = std::string();
+		auto cached = ::to_server_list({ 200, std::move(bytes) }, cache_error);
+
+		if (cache_error.empty()) {
+			LOG("Loaded %x servers from the cached server list.", cached.size());
+			server_list = std::move(cached);
+		}
+		else {
+			LOG("The cached server list does not read: %x", cache_error);
+		}
+	}
+	catch (const std::exception& e) {
+		LOG("Could not read the cached server list: %x", e.what());
+	}
 }
 
 void browse_servers_gui_state::refresh_server_list(const browse_servers_input in) {
 	using namespace httplib;
+
+	load_cached_list_once(in);
 
 	if (refresh_in_progress()) {
 		return;
@@ -361,9 +340,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 }
 
 void browse_servers_gui_state::refresh_server_pings() {
-	for (auto& s : server_list) {
-		s.progress = {};
-	}
+	reping_all_servers();
 }
 
 std::string get_steam_join_link(const std::string& addr);
@@ -393,7 +370,36 @@ std::string server_list_entry::get_my_connect_string() const {
 }
 
 std::string server_list_entry::get_join_string() const {
+	if (favorite_only) {
+		return connect_target { favorite_address, get_public_key() }.to_string();
+	}
+
 	return connect_target { get_my_connect_string(), get_public_key() }.to_string();
+}
+
+/*
+	Where a favorite is remembered to be - only a hint for when the server list does not have it.
+*/
+
+static std::string favorite_address_of(const server_list_entry& s) {
+	if (s.favorite_only) {
+		return s.favorite_address;
+	}
+
+	return s.get_my_connect_string();
+}
+
+static std::string favorite_name_of(const server_list_entry& s) {
+	return std::string(s.heartbeat.server_name);
+}
+
+std::string server_list_entry::get_invite_address() const {
+	if (meta.type == server_type::WEB) {
+		return std::string(meta.webrtc_id);
+	}
+
+	const auto ip = ::ToString(address);
+	return is_behind_nat() ? "rtc:" + ip : ip;
 }
 
 std::string server_list_entry::get_web_connect_string() const {
@@ -463,6 +469,12 @@ bool server_list_entry::is_behind_nat() const {
 
 server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address) {
 	for (auto& s : server_list) {
+		if (s.address == address) {
+			return &s;
+		}
+	}
+
+	for (auto& s : favorite_only_list) {
 		if (s.address == address) {
 			return &s;
 		}
@@ -558,17 +570,17 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 	int packets_left = max_packets_per_frame_v;
 
-	if (server_list.empty()) {
-		return;
-	}
-
-	for (auto& s : server_list) {
+	auto ping_entry = [&](server_list_entry& s) {
 		if (packets_left <= 0) {
-			break;
+			return;
 		}
 
 		if (s.meta.type == server_type::WEB) {
-			continue;
+			return;
+		}
+
+		if (s.favorite_only && (s.address.type == NETCODE_ADDRESS_NONE || !s.other_server_at_address.empty())) {
+			return;
 		}
 
 		auto& p = s.progress;
@@ -608,7 +620,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 			if (when_first_ping >= 0.0 && interval_passed(server_entry_timeout, when_first_ping)) {
 				p.state = server_entry_state::GIVEN_UP;
-				continue;
+				return;
 			}
 		}
 
@@ -628,15 +640,49 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 			reping_if_its_time();
 		}
+	};
+
+	for (auto& s : server_list) {
+		ping_entry(s);
+	}
+
+	for (auto& s : favorite_only_list) {
+		ping_entry(s);
 	}
 }
 #endif
 
+/*
+	The first column is the favorite star - no header, never sorted by.
+*/
+
 #if WEB_LOWEND
-constexpr auto num_columns = 6;
-#else
 constexpr auto num_columns = 7;
+#else
+constexpr auto num_columns = 8;
 #endif
+
+/*
+	A text in the name column of a row of its own (e.g. a section's label).
+*/
+
+static void name_column_row(const std::function<void()> content) {
+	using namespace augs::imgui;
+
+	next_columns(2);
+	content();
+	next_columns(num_columns - 2);
+}
+
+void browse_servers_gui_state::save_tab(const augs::path_type& path) const {
+	try {
+		augs::create_directories_for(path);
+		augs::save_as_text(path, std::to_string(static_cast<int>(current_tab)));
+	}
+	catch (const std::exception& e) {
+		LOG("Could not save the server browser's tab to %x: %x", path, e.what());
+	}
+}
 
 void browse_servers_gui_state::select_server(const server_list_entry& s) {
 	selected_server = s;
@@ -647,18 +693,20 @@ void browse_servers_gui_state::select_server(const server_list_entry& s) {
 void browse_servers_gui_state::show_server_list(
 	const std::string& label,
 	const std::vector<server_list_entry*>& server_list,
-	const faction_view_settings& faction_view,
-	const bool streamer_mode,
-	const std::function<bool(const server_list_entry&)>& has_saved_password
+	const browse_servers_input& in
 ) {
 	using namespace augs::imgui;
 
 	const auto& style = ImGui::GetStyle();
+	const auto& faction_view = in.faction_view;
+	const auto streamer_mode = in.streamer_mode;
+	const auto& has_saved_password = in.has_saved_password;
 
 	if (server_list.empty()) {
-		ImGui::NextColumn();
-		text_disabled(typesafe_sprintf("No %x servers match the applied filters.", label));
-		next_columns(num_columns - 1);
+		name_column_row([&]() {
+			text_disabled(typesafe_sprintf("No %x servers match the applied filters.", label));
+		});
+
 		return;
 	}
 
@@ -675,7 +723,47 @@ void browse_servers_gui_state::show_server_list(
 			text_color(t, color);
 		};
 
-		const bool is_selected = selected_server.address == s.address;
+		const bool is_selected = selected_server.same_server(s);
+
+		/*
+			The star: gold for a favorite, an outline otherwise - a click adds or removes it, never selects the row.
+		*/
+
+		const auto key = s.get_public_key();
+		const bool is_favorite = key.has_value() && in.favorites.contains(*key);
+		bool star_hovered = false;
+
+		if (key.has_value()) {
+			const auto star_size = ImGui::GetTextLineHeight();
+			const auto star_pos = ImGui::GetCursorScreenPos();
+			const auto star_max = ImVec2(star_pos.x + star_size, star_pos.y + star_size);
+
+			star_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) && ImGui::IsMouseHoveringRect(star_pos, star_max);
+
+			const auto star_color = [&]() {
+				if (is_favorite) {
+					return rgba(255, 200, 0, 255);
+				}
+
+				return rgba(star_hovered ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled]);
+			}();
+
+			const auto center = ImVec2(star_pos.x + star_size / 2, star_pos.y + star_size / 2);
+			star_shape(ImGui::GetWindowDrawList(), center, star_size * 0.45f, ImGui::GetColorU32(ImVec4(star_color)), is_favorite);
+
+			if (star_hovered && ImGui::IsMouseClicked(0)) {
+				if (is_favorite) {
+					in.favorites.remove(*key);
+				}
+				else {
+					in.favorites.set(*key, ::favorite_address_of(s), ::favorite_name_of(s));
+				}
+			}
+
+			ImGui::Dummy(ImVec2(star_size, star_size));
+		}
+
+		ImGui::NextColumn();
 
 		if (sp->meta.type == server_type::WEB) {
 			do_text("Web");
@@ -763,14 +851,31 @@ void browse_servers_gui_state::show_server_list(
 				}
 			}
 
-			if (ImGui::Selectable(displayed_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
+			if (ImGui::Selectable(displayed_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns) && !star_hovered) {
 				selected_server = s;
 			}
 		}
 
 		const bool ranked_unavailable = s.is_official_server() && d.is_ranked_server() && !ranked_unavailable_reason.empty();
 
-		if (ImGui::IsItemHovered()) {
+		if (star_hovered) {
+			auto tool = scoped_tooltip();
+			text(is_favorite ? "Remove from favorites" : "Add to favorites");
+		}
+		else if (ImGui::IsItemHovered() && s.favorite_only) {
+			auto tool = scoped_tooltip();
+			text_disabled("Not on the server list.");
+
+			if (!s.other_server_at_address.empty()) {
+				text_color(typesafe_sprintf("Another server is at its address now: %x", s.other_server_at_address), orange);
+				text_disabled("This one moved or got a new key - add it to your favorites anew.");
+			}
+
+			if (!streamer_mode) {
+				text_disabled(typesafe_sprintf("Last seen at: %x", s.favorite_address));
+			}
+		}
+		else if (ImGui::IsItemHovered()) {
 			auto tool = scoped_tooltip();
 
 			if (ranked_unavailable) {
@@ -810,7 +915,7 @@ void browse_servers_gui_state::show_server_list(
 			}
 		}
 		
-		if (ImGui::IsItemClicked() && !ranked_unavailable) {
+		if (ImGui::IsItemClicked() && !ranked_unavailable && !star_hovered) {
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
@@ -831,6 +936,12 @@ void browse_servers_gui_state::show_server_list(
 		}
 
 		ImGui::NextColumn();
+
+		if (s.favorite_only) {
+			text_disabled("-");
+			next_columns(num_columns - 3);
+			continue;
+		}
 
 		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online());
 
@@ -905,30 +1016,56 @@ void browse_servers_gui_state::show_server_list(
 	scroll_once_to_selected = false;
 }
 
-bool browse_servers_gui_state::perform(const browse_servers_input in) {
-	using namespace httplib_utils;
-
+void browse_servers_gui_state::advance_list(const browse_servers_input& in) {
 	if (augs::is_ready(data->future_response)) {
 		/*
 			A failed download keeps the last list (and says why) - an empty one would expect no key of any server.
 		*/
 
-		auto new_list = ::to_server_list(augs::get_once(data->future_response), error_message);
+		const auto response = augs::get_once(data->future_response);
+		auto new_list = ::to_server_list(response, error_message);
 
 		if (error_message.empty()) {
 			server_list = std::move(new_list);
+			::save_cached_list(in.list_cache_path, response.body);
 		}
 
 		when_last_updated_time_to_events = 0;
 	}
 
+	/*
+		At the start: the cached list at once, and a fresh one downloading in the background.
+	*/
+
+	if (!refreshed_at_least_once()) {
+		refresh_server_list(in);
+	}
+}
+
+bool browse_servers_gui_state::perform(const browse_servers_input in) {
+	using namespace httplib_utils;
+
+	advance_list(in);
+
+	update_favorite_only_list(in.favorites);
+
 	if (selected_server.unlisted) {
-		server_details.perform(selected_server, in.faction_view, in.streamer_mode);
+		server_details.perform(selected_server, in.faction_view, in.streamer_mode, std::addressof(in.favorites));
 	}
 
 	if (!show) {
+		/*
+			Local servers take the first look in a run only - not a later one.
+		*/
+
+		if (shown_once) {
+			local_tab_precedence_pending = false;
+		}
+
 		return false;
 	}
+
+	shown_once = true;
 
 	using namespace augs::imgui;
 
@@ -955,6 +1092,44 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	if (!imgui_window) {
 		return false;
+	}
+
+	if (!tab_loaded) {
+		tab_loaded = true;
+
+		/*
+			The last chosen tab - Favorites if none was saved.
+		*/
+
+		try {
+			const auto saved = augs::file_to_string(in.last_tab_path);
+			const auto index = std::atoi(saved.c_str());
+
+			if (index >= 0 && index < static_cast<int>(browser_tab::COUNT)) {
+				current_tab = static_cast<browser_tab>(index);
+			}
+		}
+		catch (...) {
+		}
+	}
+
+	/*
+		What went wrong with the server list - above all the tabs, which show what they can meanwhile.
+	*/
+
+	if (error_message.size() > 0) {
+		text_color(error_message, red);
+	}
+
+	{
+		const auto previous_tab = current_tab;
+
+		do_pretty_tabs(current_tab);
+
+		if (current_tab != previous_tab) {
+			local_tab_precedence_pending = false;
+			save_tab(in.last_tab_path);
+		}
 	}
 
 	thread_local ImGuiTextFilter filter;
@@ -1039,6 +1214,27 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
+	favorite_only_shown.clear();
+
+	for (auto& s : favorite_only_list) {
+		if (!filter.PassFilter(std::string(s.heartbeat.server_name).c_str())) {
+			continue;
+		}
+
+		/*
+			A favorite answering on this machine or the local network is a local server - found even when the server
+			list hangs or is down.
+		*/
+
+		if (s.progress.responding() && ::is_internal(s.address)) {
+			has_local_servers = true;
+			local_server_list.push_back(&s);
+			continue;
+		}
+
+		favorite_only_shown.push_back(&s);
+	}
+
 	{
 		using T = const server_list_entry*;
 
@@ -1104,6 +1300,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				sort_range(tournament_server_list, make_comparator(cmps...));
 				sort_range(official_server_list, make_comparator(cmps...));
 				sort_range(community_server_list, make_comparator(cmps...));
+				sort_range(favorite_only_shown, make_comparator(cmps...));
 			};
 
 			switch (c) {
@@ -1136,17 +1333,61 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		sort_entries();
 	}
 
+	if (local_tab_precedence_pending && has_local_servers) {
+		local_tab_precedence_pending = false;
+		current_tab = browser_tab::LOCAL;
+	}
+
 	ImGui::Separator();
 
 	if (when_last_started_refreshing_server_list == 0) {
 		refresh_server_list(in);
 	}
 
+	/*
+		A white plus where the star is, "Add a server" where the name is - one row of the table's columns.
+	*/
+
+	auto draw_add_server_row = [&]() {
+		const auto size = ImGui::GetTextLineHeight();
+		const auto pos = ImGui::GetCursorScreenPos();
+		const auto center = ImVec2(pos.x + size / 2, pos.y + size / 2);
+		const auto arm = size * 0.35f;
+		const auto thickness = std::max(1.0f, size * 0.12f);
+		auto* const draw_list = ImGui::GetWindowDrawList();
+
+		draw_list->AddLine(ImVec2(center.x - arm, center.y), ImVec2(center.x + arm, center.y), IM_COL32_WHITE, thickness);
+		draw_list->AddLine(ImVec2(center.x, center.y - arm), ImVec2(center.x, center.y + arm), IM_COL32_WHITE, thickness);
+		ImGui::Dummy(ImVec2(size, size));
+
+		next_columns(2);
+
+		if (ImGui::Selectable("Add a server", false, ImGuiSelectableFlags_SpanAllColumns)) {
+			add_server_open = true;
+			add_server_name.clear();
+			add_server_address.clear();
+			add_server_key.clear();
+		}
+
+		next_columns(num_columns - 2);
+	};
+
+	const bool add_row_pinned_now = current_tab == browser_tab::FAVORITES && add_server_row_pinned;
+	auto column_widths = std::array<float, num_columns>();
+	auto table_width = 0.0f;
+
+	auto set_column_widths = [&]() {
+		for (int i = 0; i < num_columns; ++i) {
+			ImGui::SetColumnWidth(i, column_widths[i]);
+		}
+	};
+
 	auto do_list_view = [&](bool disable_content_view) {
 		const auto max_sname = 35;
 
 		const auto avail_x = ImGui::GetContentRegionAvail().x;
 
+		const float col_star = ImGui::GetTextLineHeight() + ImGui::GetStyle().ItemSpacing.x * 2;
 		float col_1 = ImGui::CalcTextSize("9999999").x;
 		float col_3 = ImGui::CalcTextSize("99h 99m 9").x;
 		float col_4 = ImGui::CalcTextSize("Players  9").x;
@@ -1154,12 +1395,21 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		float col_6 = ImGui::CalcTextSize("Capture the flag 9").x;
 		float col_7 = ImGui::CalcTextSize("9").x * 25;
 
-		float total_width = col_1 + col_3 + col_4 + col_5 + col_6 + col_7;
+		float total_width = col_star + col_1 + col_3 + col_4 + col_5 + col_6 + col_7;
 
 		float col_2 = std::max(ImGui::CalcTextSize("9").x * (max_sname - 5) - 4, avail_x - total_width);
 		total_width += col_2;
 
-		auto child = scoped_child("list view", ImVec2(total_width, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)), false, ImGuiWindowFlags_HorizontalScrollbar);
+		/*
+			Room below for the buttons view - and the Favorites tab's note there.
+		*/
+
+		const auto favorites_note_h = current_tab == browser_tab::FAVORITES ? ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y : 0.0f;
+		const auto pinned_row_h = add_row_pinned_now ? ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y * 2 : 0.0f;
+		table_width = total_width;
+		const auto buttons_view_h = 2 * (ImGui::GetFrameHeightWithSpacing() + 4) + favorites_note_h + pinned_row_h;
+
+		auto child = scoped_child("list view", ImVec2(total_width, -buttons_view_h), false, ImGuiWindowFlags_HorizontalScrollbar);
 
 		if (disable_content_view) {
 			return;
@@ -1167,17 +1417,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		ImGui::Columns(num_columns);
 
-		ImGui::SetColumnWidth(0, col_1);
-		ImGui::SetColumnWidth(1, col_2);
-		ImGui::SetColumnWidth(2, col_3);
-		ImGui::SetColumnWidth(3, col_4);
-		ImGui::SetColumnWidth(4, col_5);
-		ImGui::SetColumnWidth(5, col_6);
 #if WEB_LOWEND
 		(void)col_7;
+		column_widths = { col_star, col_1, col_2, col_3, col_4, col_5, col_6 };
 #else
-		ImGui::SetColumnWidth(6, col_7);
+		column_widths = { col_star, col_1, col_2, col_3, col_4, col_5, col_6, col_7 };
 #endif
+
+		set_column_widths();
 
 		int current_col = 0;
 
@@ -1214,6 +1461,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		auto do_column_labels = [&](const auto& with_label, const auto& col) {
+			ImGui::NextColumn();
 			do_column("Ping");
 			do_column(with_label, col);
 			do_column("Players");
@@ -1227,23 +1475,46 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::Separator();
 		};
 
-		const auto num_locals = local_server_list.size();
-		const auto num_tournaments = tournament_server_list.size();
-		const auto num_officials = official_server_list.size();
-		const auto num_communities = community_server_list.size();
+		/*
+			The Favorites tab: the favorites from each list, then the ones not on it.
+		*/
 
-		const auto local_servers_label = typesafe_sprintf("Local servers (%x)", num_locals);
-		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", num_tournaments);
-		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_officials);
-		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", num_communities);
+		const bool favorites_tab = current_tab == browser_tab::FAVORITES;
+
+		auto shown = [&](const std::vector<server_list_entry*>& list) {
+			if (!favorites_tab) {
+				return list;
+			}
+
+			auto out = std::vector<server_list_entry*>();
+
+			for (const auto e : list) {
+				if (const auto key = e->get_public_key(); key.has_value() && in.favorites.contains(*key)) {
+					out.push_back(e);
+				}
+			}
+
+			return out;
+		};
+
+		const auto locals = shown(local_server_list);
+		const auto tournaments = shown(tournament_server_list);
+		const auto officials = shown(official_server_list);
+		const auto communities = shown(community_server_list);
+
+		const auto local_servers_label = typesafe_sprintf("Local servers (%x)", locals.size());
+		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", tournaments.size());
+		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", officials.size());
+		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", communities.size());
+		const auto not_listed_label = typesafe_sprintf("Not on the server list (%x)", favorite_only_shown.size());
 
 		auto separate_with_label_only = [&](const auto& label, const auto& color) {
 			text_disabled("\n\n");
 
 			ImGui::Separator();
-			ImGui::NextColumn();
-			text_color(label, color);
-			next_columns(num_columns - 1);
+			name_column_row([&]() {
+				text_color(label, color);
+			});
 			ImGui::Separator();
 		};
 
@@ -1259,59 +1530,118 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 		};
 
-		if (has_local_servers) {
-			header_or_separator(local_servers_label, green);
-			show_server_list("local", local_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
+		auto section = [&](const auto& header, const auto& color, const std::string& kind, const auto& list, const std::string& none_text) {
+			header_or_separator(header, color);
+
+			if (list.empty() && !none_text.empty()) {
+				name_column_row([&]() {
+					text_disabled(none_text);
+				});
+			}
+			else {
+				show_server_list(kind, list, in);
+			}
+		};
+
+		const auto t = current_tab;
+
+		if (favorites_tab) {
+			const auto any_favorite = !in.favorites.all().empty();
+
+			if (!locals.empty()) {
+				section(local_servers_label, green, "local", locals, "");
+			}
+
+			if (!tournaments.empty()) {
+				section(tournament_servers_label, cyan, "tournament", tournaments, "");
+			}
+
+			if (!officials.empty()) {
+				section(official_servers_label, yellow, "official", officials, "");
+			}
+
+			if (!communities.empty()) {
+				section(community_servers_label, orange, "community", communities, "");
+			}
+
+			if (!favorite_only_shown.empty()) {
+				section(not_listed_label, rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]), "favorite", favorite_only_shown, "");
+			}
+
+			if (first_section) {
+				do_column_labels(std::string("Favorites"), std::optional<rgba>());
+
+				name_column_row([&]() {
+					if (any_favorite) {
+						text_disabled("No favorite servers match the applied filters.");
+					}
+					else {
+						text_disabled("No favorite servers yet. Click the star next to a server, or add one below.");
+					}
+				});
+			}
+
+			/*
+				The last row: adding a server by hand - pinned below the table instead once the table scrolls
+				(decided by the last frame's height, the same with the row inside or not - no flicker).
+			*/
+
+			const auto add_row_h = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().ItemSpacing.y * 2;
+			const auto table_h_without_pin = ImGui::GetWindowHeight() + (add_server_row_pinned ? add_row_h : 0.0f);
+			const bool pin_next = ImGui::GetCursorPosY() + add_row_h > table_h_without_pin;
+
+			if (!add_server_row_pinned) {
+				ImGui::Separator();
+				draw_add_server_row();
+			}
+
+			add_server_row_pinned = pin_next;
+			return;
 		}
 
-		if (has_tournament_servers) {
-			header_or_separator(tournament_servers_label, cyan);
-			show_server_list("tournament", tournament_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
+		if (t == browser_tab::LOCAL || (t == browser_tab::ALL && has_local_servers)) {
+			section(local_servers_label, green, "local", locals, has_local_servers ? "" : "No servers found on your local network.");
 		}
 
-		header_or_separator(official_servers_label, yellow);
+		if (t == browser_tab::OFFICIAL || t == browser_tab::ALL) {
+			if (has_tournament_servers) {
+				section(tournament_servers_label, cyan, "tournament", tournaments, "");
+			}
 
-		if (has_official_servers) {
-			show_server_list("official", official_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
-		}
-		else {
-			ImGui::NextColumn();
-			text_disabled("No official servers are online at the time.");
-			next_columns(num_columns - 1);
+			section(official_servers_label, yellow, "official", officials, has_official_servers ? "" : "No official servers are online at the time.");
 		}
 
-		separate_with_label_only(community_servers_label, orange);
-
-		if (has_community_servers) {
-			show_server_list("community", community_server_list, in.faction_view, in.streamer_mode, in.has_saved_password);
-		}
-		else {
-			ImGui::NextColumn();
-			text_disabled("No community servers are online at the time.");
-			next_columns(num_columns - 1);
+		if (t == browser_tab::COMMUNITY || t == browser_tab::ALL) {
+			section(community_servers_label, orange, "community", communities, has_community_servers ? "" : "No community servers are online at the time.");
 		}
 	};
 
-	{
-		bool disable_content_view = false;
+	do_list_view(false);
 
-		if (error_message.size() > 0) {
-			text_color(error_message, red);
-			disable_content_view = true;
-		}
+	if (add_row_pinned_now) {
+		/*
+			A child like the table's, so the columns line up with it.
+		*/
 
-		if (refresh_in_progress()) {
-			text_disabled("Downloading the server list...");
-			disable_content_view = true;
-		}
+		ImGui::Separator();
 
-		do_list_view(disable_content_view);
+		auto pinned = scoped_child("pinned add row", ImVec2(table_width, ImGui::GetTextLineHeightWithSpacing()), false, ImGuiWindowFlags_NoScrollbar);
+
+		ImGui::Columns(num_columns, "##PinnedAddServer");
+		set_column_widths();
+		draw_add_server_row();
+		ImGui::Columns(1);
 	}
 
 	{
 		auto child = scoped_child("buttons view");
 
 		ImGui::Separator();
+
+		if (current_tab == browser_tab::FAVORITES) {
+			text_disabled("Favorite servers are remembered by their public key, for security.");
+			ImGui::Separator();
+		}
 
 		checkbox("Only responding", only_responding);
 		ImGui::SameLine();
@@ -1385,6 +1715,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::SameLine();
 		}
 
+
 		ImGui::SameLine();
 
 		{
@@ -1408,6 +1739,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (refresh_in_progress()) {
 			ImGui::SameLine();
 			spinner(ImGui::GetTextLineHeight(), white);
+			ImGui::SameLine();
+			text_disabled("Downloading the server list...");
 		}
 	}
 	
@@ -1422,8 +1755,97 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	if (const bool listed = !selected_server.unlisted) {
-		if (server_details.perform(selected_server, in.faction_view, in.streamer_mode)) {
+		if (server_details.perform(selected_server, in.faction_view, in.streamer_mode, std::addressof(in.favorites))) {
 			refresh_server_list(in);
+		}
+	}
+
+	{
+		/*
+			Add a server to the favorites by hand: its name, where it is and its key - all needed.
+		*/
+
+		if (add_server_open) {
+			center_next_window(ImGuiCond_Appearing);
+		}
+
+		if (auto popup = cond_scoped_modal_popup(
+			add_server_open,
+			"Add a server",
+			nullptr,
+			ImGuiWindowFlags_AlwaysAutoResize
+		)) {
+			if (ImGui::IsWindowAppearing()) {
+				ImGui::SetKeyboardFocusHere();
+			}
+
+			{
+				auto width = scoped_item_width(ImGui::CalcTextSize("9").x * 66);
+
+				auto field = [](const std::string& label, const char* const hint, std::string& value) {
+					std::array<char, 256> buf;
+					input_text_with_hint(buf, label, hint, value);
+				};
+
+				field("Name##add_server", "", add_server_name);
+				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address);
+				field("Public key##add_server", "64 hex digits - from the server's admin", add_server_key);
+			}
+
+			/*
+				The key as Server details shows it (with 0x) or bare.
+			*/
+
+			const auto key = [&]() {
+				auto hex = add_server_key;
+				cut_preffix(hex, "0x");
+				return connect_target::key_of(hex);
+			}();
+			const bool name_ok = !add_server_name.empty();
+			const bool address_ok = !add_server_address.empty() && !connect_target::parse(add_server_address).key.has_value();
+
+			/*
+				One line for what is wrong or worth knowing - always there, so the layout never jumps.
+				An address and a key of two different servers (e.g. pasted from two rows) is told too.
+			*/
+
+			const auto [note, note_color] = [&]() -> std::pair<std::string, rgba> {
+				if (!add_server_key.empty() && !key.has_value()) {
+					return { "The key should be 64 hex digits.", orange };
+				}
+
+				if (key.has_value() && !add_server_address.empty()) {
+					if (const auto listed = find_entry_by_connect_string(add_server_address); listed != nullptr && listed->get_public_key() != key) {
+						return { typesafe_sprintf("The server list has \"%x\" at this address - with another key.", std::string(listed->heartbeat.server_name)), orange };
+					}
+				}
+
+				if (key.has_value() && in.favorites.contains(*key)) {
+					return { "Among your favorites already - adding it updates its name and address.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
+				}
+
+				return { " ", white };
+			}();
+
+			text_color(note, note_color);
+
+			const bool can_add = name_ok && address_ok && key.has_value();
+
+			const bool add_clicked = [&]() {
+				auto scope = maybe_disabled_cols(!can_add);
+				return ImGui::Button("Add");
+			}();
+
+			if (can_add && add_clicked) {
+				in.favorites.set(*key, add_server_address, add_server_name);
+				add_server_open = false;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+				add_server_open = false;
+			}
 		}
 	}
 
@@ -1548,6 +1970,134 @@ std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_serve
 	}
 
 	return minimum_of(chosen, compare_servers);
+}
+
+const server_list_entry* browse_servers_gui_state::find_entry_by_key(const augs::ed25519_public_key_type& key) const {
+	for (const auto& s : server_list) {
+		if (s.get_public_key() == key) {
+			return &s;
+		}
+	}
+
+	return nullptr;
+}
+
+invite_target invite_target::of(
+	const std::string& address,
+	const std::optional<augs::ed25519_public_key_type>& key,
+	const server_list_entry* const listed
+) {
+	auto out = invite_target();
+	out.key = key;
+
+	if (listed != nullptr) {
+		out.native_address = listed->get_invite_address();
+		out.web_id = listed->get_web_connect_string();
+		return out;
+	}
+
+	/*
+		Not on the list: where the player joined. A web client joined by a WebRTC id, which a native game joins too;
+		an IP is a WebRTC id for the browser as it is.
+	*/
+
+	out.native_address = address;
+
+	auto web_id = client_connect_string(address);
+	cut_preffix(web_id, "rtc:");
+	out.web_id = web_id;
+
+	if (const auto ip = ::find_netcode_addr(web_id)) {
+		out.local_network_only = ::is_internal(*ip);
+	}
+
+	return out;
+}
+
+std::string invite_target::join_string() const {
+	return connect_target { native_address, key }.to_string();
+}
+
+void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
+	using namespace augs::imgui;
+
+	if (!show) {
+		return;
+	}
+
+	auto window = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking);
+
+	if (!window) {
+		return;
+	}
+
+	text(in.server_name.empty() ? std::string("This server") : in.server_name);
+
+	if (in.server_key.has_value()) {
+		ImGui::SameLine();
+
+		if (in.favorites.contains(*in.server_key)) {
+			if (ImGui::Button("Remove from favorites")) {
+				in.favorites.remove(*in.server_key);
+			}
+		}
+		else if (ImGui::Button("Add to favorites")) {
+			const auto target = invite_target::of(in.address, in.server_key, in.listed);
+			in.favorites.set(*in.server_key, target.native_address, in.server_name);
+		}
+	}
+
+	ImGui::Separator();
+
+	if (in.address.empty() && in.listed == nullptr) {
+		text_color(
+			in.hosting
+			? "The server's public address is not known yet -\nit learns it from the server list host."
+			: "Not connected to a server.",
+			orange
+		);
+
+		return;
+	}
+
+	const auto target = invite_target::of(in.address, in.server_key, in.listed);
+	const auto rdonly_flags = ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_AutoSelectAll;
+
+	auto row = [&](const std::string& label, std::string value, const bool hidden) {
+		if (hidden) {
+			text_disabled("(hidden)");
+		}
+		else {
+			input_text("##" + label, value, rdonly_flags);
+		}
+
+		ImGui::SameLine();
+		copy_icon_button(label, value);
+		ImGui::SameLine();
+		text(label);
+	};
+
+	/*
+		The streamer mode hides an address - the links carry it too.
+	*/
+
+	const bool hide = in.streamer_mode;
+
+	row("Browser join link", ::get_browser_join_link(target.web_id), hide);
+	row("Steam join link", ::get_steam_join_link(target.join_string()), hide);
+	row("Address", target.native_address, hide);
+
+	if (target.key.has_value()) {
+		row("Server public key", "0x" + augs::bytes_to_hex(*target.key), false);
+	}
+	else {
+		text_color("The server's key is not known - a join is not verified.", orange);
+	}
+
+	if (target.local_network_only) {
+		ImGui::Separator();
+		text_color("An address in your local network - friends elsewhere need the server's public one\n(it shows here once the server list has this server).", orange);
+	}
 }
 
 const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(const client_connect_string& joined) const {
@@ -1747,7 +2297,8 @@ void server_details_gui_state::perform_online_players(
 bool server_details_gui_state::perform(
 	const server_list_entry& entry,
 	const faction_view_settings& faction_view,
-	const bool streamer_mode
+	const bool streamer_mode,
+	favorite_servers* const favorites
 ) {
 	using namespace augs::imgui;
 	//ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
@@ -1766,14 +2317,47 @@ bool server_details_gui_state::perform(
 
 	const bool listed = !entry.unlisted;
 
-	auto steam_link = ::get_steam_join_link(entry.get_native_connect_string(true));
+	/*
+		The Steam join link names the server by its IP (a domain is only a label the server declares) and its key.
+	*/
+
+	const auto steam_join = [&]() {
+		if (entry.favorite_only) {
+			return entry.get_join_string();
+		}
+
+		return connect_target { entry.get_invite_address(), entry.get_public_key() }.to_string();
+	}();
+
+	auto steam_link = ::get_steam_join_link(steam_join);
 
 	auto sid = scoped_id(steam_link.c_str());
 
+	bool refresh_requested = false;
+
 	if (listed) {
 		if (ImGui::Button("Refresh")) {
-			return true;
+			refresh_requested = true;
 		}
+
+		ImGui::SameLine();
+	}
+
+	if (favorites != nullptr) {
+		if (const auto key = entry.get_public_key()) {
+			if (favorites->contains(*key)) {
+				if (ImGui::Button("Remove from favorites")) {
+					favorites->remove(*key);
+				}
+			}
+			else if (ImGui::Button("Add to favorites")) {
+				favorites->set(*key, ::favorite_address_of(entry), ::favorite_name_of(entry));
+			}
+		}
+	}
+
+	if (refresh_requested) {
+		return true;
 	}
 
 	ImGui::Separator();
@@ -1797,9 +2381,7 @@ bool server_details_gui_state::perform(
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Copy##SteJoin")) {
-			ImGui::SetClipboardText(link.c_str());
-		}
+		copy_icon_button("SteJoin", link);
 
 		ImGui::SameLine();
 
@@ -1817,9 +2399,7 @@ bool server_details_gui_state::perform(
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Copy##BroJoin")) {
-			ImGui::SetClipboardText(link.c_str());
-		}
+		copy_icon_button("BroJoin", link);
 
 		ImGui::SameLine();
 		text_color("Browser join link", green);
@@ -1850,22 +2430,20 @@ bool server_details_gui_state::perform(
 	}
 
 	if (!do_show_ips) {
-		if (ImGui::Button("Copy External IP address to clipboard")) {
-			ImGui::SetClipboardText(external_address.c_str());
-		}
+		text("IP address (hidden)");
+		ImGui::SameLine();
+		copy_icon_button("HiddenExtIp", external_address);
 
-		if (ImGui::Button("Copy Internal IP address to clipboard")) {
-			ImGui::SetClipboardText(internal_address.c_str());
-		}
+		text("IP address (internal, hidden)");
+		ImGui::SameLine();
+		copy_icon_button("HiddenIntIp", internal_address);
 	}
 	else {
 		input_text("##IP address", external_address, rdonly_flags);
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Copy##ExtIp")) {
-			ImGui::SetClipboardText(external_address.c_str());
-		}
+		copy_icon_button("ExtIp", external_address);
 
 		ImGui::SameLine();
 
@@ -1876,9 +2454,7 @@ bool server_details_gui_state::perform(
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Copy##IntIp")) {
-				ImGui::SetClipboardText(internal_address.c_str());
-			}
+			copy_icon_button("IntIp", internal_address);
 
 			ImGui::SameLine();
 
@@ -1897,9 +2473,7 @@ bool server_details_gui_state::perform(
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Copy##Domain")) {
-			ImGui::SetClipboardText(domain.c_str());
-		}
+		copy_icon_button("Domain", domain);
 
 		ImGui::SameLine();
 
@@ -1914,9 +2488,7 @@ bool server_details_gui_state::perform(
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Copy##WebId")) {
-				ImGui::SetClipboardText(webrtc_id.c_str());
-			}
+			copy_icon_button("WebId", webrtc_id);
 
 			ImGui::SameLine();
 
@@ -1935,9 +2507,7 @@ bool server_details_gui_state::perform(
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Copy##ServerKey")) {
-			ImGui::SetClipboardText(shown.c_str());
-		}
+		copy_icon_button("ServerKey", shown);
 
 		ImGui::SameLine();
 
@@ -1960,9 +2530,16 @@ bool server_details_gui_state::perform(
 		arena = "Community arena";
 	}
 
-	input_text("Server name", name, rdonly_flags);
+	auto copyable_row = [&](const std::string& label, std::string value) {
+		input_text("##" + label, value, rdonly_flags);
+		ImGui::SameLine();
+		copy_icon_button(label, value);
+		ImGui::SameLine();
+		text(label);
+	};
 
-	input_text("Arena", arena, rdonly_flags);
+	copyable_row("Server name", std::string(name));
+	copyable_row("Arena", std::string(arena));
 
 	auto nat = nat_type_to_string(heartbeat.nat.type); 
 
@@ -1983,5 +2560,107 @@ void browse_servers_gui_state::reping_all_servers() {
 	for (auto& s : server_list) {
 		s.progress = {};
 	}
+
+	for (auto& s : favorite_only_list) {
+		s.progress = {};
+	}
+}
+
+void browse_servers_gui_state::update_favorite_only_list(const favorite_servers& favorites) {
+	auto new_list = std::vector<server_list_entry>();
+
+	for (const auto& f : favorites.all()) {
+		const bool listed = std::any_of(server_list.begin(), server_list.end(), [&](const auto& s) {
+			return s.get_public_key() == f.key;
+		});
+
+		if (listed || f.address.empty()) {
+			continue;
+		}
+
+		auto entry = server_list_entry();
+
+		for (const auto& old : favorite_only_list) {
+			if (old.meta.server_public_key == f.key && old.favorite_address == f.address) {
+				entry = old;
+			}
+		}
+
+		entry.favorite_only = true;
+		entry.unlisted = true;
+		entry.meta.server_public_key = f.key;
+		entry.favorite_address = f.address;
+		entry.heartbeat.server_name = f.name.empty() ? "0x" + augs::bytes_to_hex(f.key).substr(0, 8) + "..." : f.name;
+
+#if BUILD_NATIVE_SOCKETS
+		/*
+			Pinged at the address it was last at - a domain is resolved first, once.
+		*/
+
+		auto host = client_connect_string(f.address);
+		cut_preffix(host, "rtc:");
+
+		if (const auto parsed = ::find_netcode_addr(host)) {
+			entry.address = *parsed;
+		}
+		else if (const auto resolved = favorite_resolved.find(host); resolved != favorite_resolved.end()) {
+			if (resolved->second.has_value()) {
+				entry.address = *resolved->second;
+			}
+			else {
+				entry.progress.state = server_entry_state::GIVEN_UP;
+			}
+		}
+		else if (const auto resolving = favorite_resolutions.find(host); resolving != favorite_resolutions.end()) {
+			if (::valid_and_is_ready(resolving->second)) {
+				const auto result = resolving->second.get();
+
+				favorite_resolved[host] =
+					result.result == resolve_result_type::OK ?
+					std::optional<netcode_address_t>(result.addr) :
+					std::nullopt
+				;
+
+				favorite_resolutions.erase(resolving);
+			}
+		}
+		else {
+			auto in = host_with_default_port();
+			in.address = host;
+			favorite_resolutions.emplace(host, ::async_resolve_address(in));
+		}
+#else
+		entry.progress.state = server_entry_state::GIVEN_UP;
+#endif
+
+		/*
+			A listed server with another key at that address: the favorite is not there (moved, or got a new key).
+		*/
+
+		const bool was_elsewhere = !entry.other_server_at_address.empty();
+		entry.other_server_at_address.clear();
+
+		for (const auto& s : server_list) {
+			const bool same_address =
+				(entry.address.type != NETCODE_ADDRESS_NONE && s.address == entry.address)
+				|| s.get_my_connect_string() == f.address
+				|| s.get_native_connect_string(true) == f.address
+			;
+
+			if (same_address && s.get_public_key() != f.key) {
+				entry.other_server_at_address = std::string(s.heartbeat.server_name);
+				entry.progress.state = server_entry_state::GIVEN_UP;
+				break;
+			}
+		}
+
+		if (was_elsewhere && entry.other_server_at_address.empty()) {
+			entry.progress = {};
+		}
+
+		new_list.emplace_back(std::move(entry));
+	}
+
+	favorite_only_list = std::move(new_list);
 }
 

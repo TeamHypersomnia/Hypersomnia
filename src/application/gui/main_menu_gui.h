@@ -73,13 +73,22 @@ struct main_menu_gui {
 			return true;
 		}
 
-		if (change.was_pressed(augs::event::keys::key::C)) {
+		if (change.was_pressed(augs::event::keys::key::P)) {
 			button_callback(main_menu_button_type::QUICK_PLAY);
 			return true;
 		}
 
-#if !WEB_LOWEND
-		if (change.was_pressed(augs::event::keys::key::U)) {
+#if WEB_LOWEND
+		/*
+			No Connect to server here - C plays at once.
+		*/
+
+		if (change.was_pressed(augs::event::keys::key::C)) {
+			button_callback(main_menu_button_type::QUICK_PLAY);
+			return true;
+		}
+#else
+		if (change.was_pressed(augs::event::keys::key::C)) {
 			button_callback(main_menu_button_type::CONNECT_TO_SERVER);
 			return true;
 		}

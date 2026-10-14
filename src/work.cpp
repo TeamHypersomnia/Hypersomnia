@@ -1773,6 +1773,7 @@ work_result work(
 #if BUILD_NETWORKING
 	WEBSTATIC bool was_browser_open_in_main_menu = false;
 	WEBSTATIC browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
+	WEBSTATIC invite_to_join_gui_state invite_to_join_gui = std::string("Invite to join");
 
 	WEBSTATIC auto find_chosen_server_info = [&]() {
 		return browse_servers_gui.find_entry_by_connect_string(config.client_connect);
@@ -2563,14 +2564,40 @@ work_result work(
 		return false;
 	};
 
-	WEBSTATIC auto still_querying_server_info = [&]() {
-		if (has_current_setup()) {
-			if (const auto setup = std::get_if<server_setup>(std::addressof(*current_setup))) {
-				return setup->get_connect_string() == "";
-			}
+	/*
+		Invite to join: the server played on (or hosted), from what the game knows - see invite_to_join_input.
+	*/
+
+	WEBSTATIC auto get_invite_input = [&]() -> std::optional<invite_to_join_input> {
+		if (!has_current_setup()) {
+			return std::nullopt;
 		}
 
-		return false;
+		auto make = [&](std::string name, std::string address, const auto key, const bool hosting) {
+			return invite_to_join_input {
+				std::move(name),
+				std::move(address),
+				key,
+				key.has_value() ? browse_servers_gui.find_entry_by_key(*key) : nullptr,
+				favorites,
+				config.streamer_mode,
+				hosting
+			};
+		};
+
+		if (const auto client = std::get_if<client_setup>(std::addressof(*current_setup))) {
+			if (client->is_replaying()) {
+				return std::nullopt;
+			}
+
+			return make(client->get_server_name(), client->get_connect_string(), client->get_invite_server_key(), false);
+		}
+
+		if (const auto server = std::get_if<server_setup>(std::addressof(*current_setup))) {
+			return make(std::string(server->get_server_name()), server->get_connect_string(), server->get_server_public_key(), true);
+		}
+
+		return std::nullopt;
 	};
 
 	WEBSTATIC auto should_hide_invite_to_join = [&]() {
@@ -2580,6 +2607,14 @@ work_result work(
 					std::holds_alternative<client_setup>(*current_setup) ||
 					std::holds_alternative<server_setup>(*current_setup)
 				;
+			}
+
+			if (const auto client = std::get_if<client_setup>(std::addressof(*current_setup))) {
+				/*
+					A demo is not joined.
+				*/
+
+				return client->is_replaying();
 			}
 
 			return std::holds_alternative<editor_setup>(*current_setup);
@@ -2921,6 +2956,9 @@ work_result work(
 	};
 
 #if BUILD_NETWORKING
+	WEBSTATIC const auto server_browser_tab_path = USER_DIR / "server_browser_tab.txt";
+	WEBSTATIC const auto server_list_cache_path = CACHE_DIR / "server_list.bin";
+
 	WEBSTATIC auto get_browse_servers_input = [&]() {
 		return browse_servers_input {
 			config.server_list_provider,
@@ -2934,7 +2972,10 @@ work_result work(
 				}
 
 				return false;
-			}
+			},
+			favorites,
+			server_browser_tab_path,
+			server_list_cache_path
 		};
 	};
 
@@ -3062,7 +3103,13 @@ work_result work(
 			*/
 
 			if (target.key.has_value()) {
-				const bool as_on_the_list = found != nullptr && found->get_public_key() == target.key;
+				/*
+					As on the list only if the list has that key at that address - a key of another listed server
+					typed by hand is the player's choice.
+				*/
+
+				const auto listed_at_address = target.address.empty() ? found : browse_servers_gui.find_entry_by_connect_string(target.address);
+				const bool as_on_the_list = found != nullptr && found == listed_at_address && found->get_public_key() == target.key;
 				source = as_on_the_list ? S::SERVER_LIST : S::CHOSEN_KEY;
 				return target.key;
 			}
@@ -3511,7 +3558,9 @@ work_result work(
 			config.client_connect, 
 			displayed_connecting_server_name,
 			config.client,
-			config.streamer_mode
+			config.streamer_mode,
+			favorites,
+			browse_servers_gui
 		);
 
 		if (perform_result || client_start_requested) {
@@ -3778,7 +3827,6 @@ work_result work(
 			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup),
 			is_during_tutorial(),
 			is_shooting_range(),
-			still_querying_server_info(),
 			would_abandon_ranked_match(),
 			should_hide_invite_to_join()
 		};
@@ -4238,12 +4286,9 @@ work_result work(
 				config.client_connect = address_string;
 
 #if BUILD_NETWORKING
-				/* We must know if it's behind NAT */
-
-				browse_servers_gui.sync_download_server_entry(
-					get_browse_servers_input(),
-					config.client_connect
-				);
+				/*
+					An invite has where the server is (rtc: if behind NAT) and its key - no waiting for the server list.
+				*/
 
 				start_client_setup();
 #endif
@@ -4420,12 +4465,20 @@ work_result work(
 					browse_servers_gui.refresh_server_list(get_browse_servers_input());
 				}
 
+				browse_servers_gui.advance_list(get_browse_servers_input());
+
 #if BUILD_NATIVE_SOCKETS
 				browse_servers_gui.advance_ping_logic();
 #endif
 
 				if (const bool show_server_browser = !has_current_setup() || ingame_menu.show) {
 					perform_browse_servers();
+				}
+
+				if (ingame_menu.show) {
+					if (const auto invite = get_invite_input()) {
+						invite_to_join_gui.perform(*invite);
+					}
 				}
 #endif
 
@@ -4833,24 +4886,7 @@ work_result work(
 					ingame_menu.show = false;
 				}
 				else {
-					visit_current_setup([&]<typename T>(const T& setup) {
-						if constexpr(is_one_of_v<T, server_setup, client_setup>) {
-							const auto address = setup.get_connect_string();
-
-							if (address == "") {
-								return;
-							}
-
-#if WEB_SINGLETHREAD
-							return;
-#else
-							browse_servers_gui.open_matching_server_entry(
-								get_browse_servers_input(),
-								setup.get_connect_string()
-							);
-#endif
-						}
-					});
+					invite_to_join_gui.open();
 				}
 
 				break;
@@ -5364,6 +5400,32 @@ work_result work(
 				pairs.clear();
 
 				setup.get_steam_rich_presence_pairs(pairs);
+
+				/*
+					A friend joins where the invite window says - the public address even if this player joined over
+					the local network (see invite_target).
+				*/
+
+				if (const auto invite = get_invite_input(); invite.has_value() && !invite->address.empty()) {
+					const auto join = invite_target::of(invite->address, invite->server_key, invite->listed).join_string();
+
+					for (auto& p : pairs) {
+						if (p.first == "connect" && p.second.has_value()) {
+							p.second = join;
+						}
+					}
+				}
+
+				for (const auto& p : pairs) {
+					if (p.first == "connect") {
+						thread_local std::optional<std::string> last_connect;
+
+						if (p.second != last_connect) {
+							last_connect = p.second;
+							LOG("Steam rich presence connect: %x", p.second.value_or("(none)"));
+						}
+					}
+				}
 
 				for (auto& p : pairs) {
 					if (p.second.has_value()) {
@@ -5997,7 +6059,13 @@ work_result work(
 					{
 						auto control_main_menu = [&]() {
 							if (has_main_menu() && !has_current_setup()) {
-								if (main_menu_gui.show && !settings_gui.key_damaged) {
+								/*
+									No menu hotkeys behind a modal (e.g. Add a server, with no text field active).
+								*/
+
+								const bool modal_open = ImGui::GetTopMostPopupModal() != nullptr;
+
+								if (main_menu_gui.show && !settings_gui.key_damaged && !modal_open) {
 									main_menu_gui.control(create_menu_context(main_menu_gui), e, do_main_menu_option);
 								}
 
@@ -6291,7 +6359,16 @@ work_result work(
 					is_replaying_demo(),
 					new_viewing_config.streamer_mode,
 					new_viewing_config.streamer_mode_flags,
-					visit_current_setup([&](auto& setup) { return setup.get_scoreboard_caption(); })
+					visit_current_setup([&](auto& setup) { return setup.get_scoreboard_caption(); }),
+					visit_current_setup([&]<typename S>(const S& setup) {
+						if constexpr(std::is_same_v<client_setup, remove_cref<S>>) {
+							const auto key = setup.get_server_public_key();
+							return key.has_value() && favorites.contains(*key);
+						}
+						else {
+							return false;
+						}
+					})
 				};
 			};
 

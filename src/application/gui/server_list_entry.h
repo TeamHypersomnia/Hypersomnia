@@ -68,6 +68,21 @@ struct server_list_entry {
 
 	bool unlisted = false;
 
+	/*
+		A favorite server not on the server list - only its key, name and the address it was last at
+		(pinged there, joined there expecting the key).
+	*/
+
+	bool favorite_only = false;
+	std::string favorite_address;
+
+	/*
+		The server list has another server (another key) at the favorite's address - named here; the favorite is
+		not pinged there (that one would answer).
+	*/
+
+	std::string other_server_at_address;
+
 	bool is_community_server() const {
 		return meta.is_community_server();
 	}
@@ -93,10 +108,29 @@ struct server_list_entry {
 	std::string get_my_connect_string() const;
 
 	/*
+		The same server: by its key if it has one, else by the address.
+	*/
+
+	bool same_server(const server_list_entry& b) const {
+		if (const auto key = get_public_key()) {
+			return key == b.get_public_key();
+		}
+
+		return !b.get_public_key().has_value() && address == b.address;
+	}
+
+	/*
 		What a join from the server list names: where it is and its key (see connect_target.h).
 	*/
 
 	std::string get_join_string() const;
+
+	/*
+		Where a friend joins it (invites, the Steam join link): its public IP, rtc: if behind NAT, a web server's
+		WebRTC id - never a domain (only a label the server declares) nor an address in this player's network.
+	*/
+
+	std::string get_invite_address() const;
 
 	std::string get_web_connect_string() const;
 	std::string get_native_connect_string(bool for_sending) const;

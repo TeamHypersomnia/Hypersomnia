@@ -244,6 +244,36 @@ namespace augs {
 			ImGui::Dummy(ImVec2(size * 0.8f, size));
 		}
 
+		/*
+			A five-pointed star (favorites): gold and filled, or only its outline - drawn by ImGui, no glyph needed.
+		*/
+
+		inline void star_shape(ImDrawList* const draw_list, const ImVec2 center, const float radius, const ImU32 col, const bool filled) {
+			ImVec2 points[10];
+
+			for (int i = 0; i < 10; ++i) {
+				const auto r = (i % 2 == 0) ? radius : radius * 0.45f;
+				const auto angle = -3.14159265f / 2 + i * 3.14159265f / 5;
+				points[i] = ImVec2(center.x + std::cos(angle) * r, center.y + std::sin(angle) * r);
+			}
+
+			if (filled) {
+				/*
+					Not convex - filled as five triangles around the middle, and the middle pentagon.
+				*/
+
+				for (int i = 0; i < 10; i += 2) {
+					draw_list->AddTriangleFilled(points[i], points[(i + 1) % 10], points[(i + 9) % 10], col);
+				}
+
+				const ImVec2 inner[5] = { points[1], points[3], points[5], points[7], points[9] };
+				draw_list->AddConvexPolyFilled(inner, 5, col);
+			}
+			else {
+				draw_list->AddPolyline(points, 10, col, ImDrawFlags_Closed, std::max(1.0f, radius * 0.15f));
+			}
+		}
+
 		inline void spinner_line(const std::string& label, const rgba col) {
 			const auto size = ImGui::GetTextLineHeight();
 

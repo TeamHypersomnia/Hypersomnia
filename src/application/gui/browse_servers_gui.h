@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "augs/math/vec2.h"
+#include "augs/filesystem/path.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/misc/timing/timer.h"
 #include "3rdparty/yojimbo/netcode/netcode.h"
@@ -10,12 +11,18 @@
 #include "application/setups/client/client_connect_string.h"
 #include "view/faction_view_settings.h"
 #include "application/gui/server_list_entry.h"
+#include "application/gui/browser_tab.h"
+#include "augs/misc/ed25519.h"
 
 #include <chrono>
+#include <future>
+#include <unordered_map>
+#include "application/network/resolve_address_result.h"
 
 struct nat_detection_settings;
 struct browse_servers_gui_internal;
 struct netcode_socket_t;
+class favorite_servers;
 
 struct browse_servers_input {
 	const std::string& server_list_provider;
@@ -30,6 +37,20 @@ struct browse_servers_input {
 	*/
 
 	std::function<bool(const server_list_entry&)> has_saved_password;
+
+	favorite_servers& favorites;
+
+	/*
+		Where the last chosen tab is remembered.
+	*/
+
+	const augs::path_type& last_tab_path;
+
+	/*
+		The last server list downloaded - shown at once on the next start, while a fresh one downloads.
+	*/
+
+	const augs::path_type& list_cache_path;
 };
 
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
@@ -43,11 +64,54 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 		base::open();
 	}
 
-	bool perform(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
+	bool perform(const server_list_entry&, const faction_view_settings&, const bool streamer_mode, favorite_servers* favorites = nullptr);
 	void perform_online_players(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
 
 private:
 	using base::open;
+};
+
+/*
+	Invite to join: the server played on, from what the game knows of it - no waiting for the server list.
+	The list (if it has this key) only adds the public address (joined over the local network) and an official alias.
+*/
+
+struct invite_to_join_input {
+	std::string server_name;
+
+	/*
+		Where the player joined (or, hosting, where the server is) and its key - the address empty if not known yet.
+	*/
+
+	std::string address;
+	std::optional<augs::ed25519_public_key_type> server_key;
+
+	const server_list_entry* listed;
+	favorite_servers& favorites;
+	const bool streamer_mode;
+	const bool hosting;
+};
+
+/*
+	Where a friend joins: from the list entry of this key if there is one, else the address played at.
+*/
+
+struct invite_target {
+	std::string native_address;
+	std::string web_id;
+	std::optional<augs::ed25519_public_key_type> key;
+	bool local_network_only = false;
+
+	static invite_target of(const std::string& address, const std::optional<augs::ed25519_public_key_type>& key, const server_list_entry* listed);
+
+	std::string join_string() const;
+};
+
+struct invite_to_join_gui_state : public standard_window_mixin<invite_to_join_gui_state> {
+	using base = standard_window_mixin<invite_to_join_gui_state>;
+	using base::base;
+
+	void perform(const invite_to_join_input&);
 };
 
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
@@ -60,10 +124,42 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void show_server_list(
 		const std::string& label,
 		const std::vector<server_list_entry*>&,
-		const faction_view_settings&,
-		const bool streamer_mode,
-		const std::function<bool(const server_list_entry&)>& has_saved_password
+		const browse_servers_input& in
 	);
+
+	/*
+		The favorites not on the server list - pinged at the address each was last at.
+	*/
+
+	std::vector<server_list_entry> favorite_only_list;
+	std::vector<server_list_entry*> favorite_only_shown;
+
+#if BUILD_NATIVE_SOCKETS
+	std::unordered_map<std::string, std::future<resolve_address_result>> favorite_resolutions;
+	std::unordered_map<std::string, std::optional<netcode_address_t>> favorite_resolved;
+#endif
+
+	void update_favorite_only_list(const favorite_servers&);
+
+	browser_tab current_tab = browser_tab::FAVORITES;
+	bool tab_loaded = false;
+	bool shown_once = false;
+	bool local_tab_precedence_pending = true;
+
+	void save_tab(const augs::path_type&) const;
+
+	/*
+		Add a server (the Favorites tab).
+	*/
+
+	bool add_server_open = false;
+	bool add_server_row_pinned = false;
+
+	bool cache_loaded = false;
+	void load_cached_list_once(const browse_servers_input&);
+	std::string add_server_name;
+	std::string add_server_address;
+	std::string add_server_key;
 
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;
@@ -132,14 +228,18 @@ public:
 
 	bool perform(browse_servers_input);
 
-#if !WEB_SINGLETHREAD
-	void sync_download_server_entry(browse_servers_input, const client_connect_string& in);
+	/*
+		Every frame, menu or not: the cached list at the start, the downloads - so an invite or a join by key
+		has the list in the game too.
+	*/
 
-	void open_matching_server_entry(
-		const browse_servers_input in,
-		const client_connect_string& server
-	);
-#endif
+	void advance_list(const browse_servers_input&);
+
+	/*
+		The list entry of this key, if the list (or the cached one) has it.
+	*/
+
+	const server_list_entry* find_entry_by_key(const augs::ed25519_public_key_type&) const;
 
 #if BUILD_NATIVE_SOCKETS
 	void advance_ping_logic();

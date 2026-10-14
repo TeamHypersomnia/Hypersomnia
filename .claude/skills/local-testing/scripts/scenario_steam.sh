@@ -7,7 +7,8 @@ umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/steam_test
+# A fresh directory every run - never removed recursively
+T=$S/steam_test_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 SBIN=${STEAM_BIN:-$REPO/build/Debug-x64-clang-claude-steam/Hypersomnia}
 [ -n "$BROKER_URL" ] && [ -n "$BROKER_PUBLIC_KEY" ] || { echo "need BROKER_URL and BROKER_PUBLIC_KEY"; exit 1; }
@@ -17,7 +18,6 @@ for port in 10042; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port busy, abort"; exit 1; fi
 done
 
-rm -rf $T
 mkdir -p $T/ranked/user/conf.d $T/steam/user/conf.d
 cat > $T/ranked/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": 10042, "slots": 16 },

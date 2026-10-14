@@ -40,6 +40,12 @@ struct draw_setup_gui_input {
 	const streamer_mode_flags_data streamer_mode_flags;
 	const std::string scoreboard_caption;
 
+	/*
+		The server played on is a favorite - a star before its name on the scoreboard.
+	*/
+
+	const bool server_is_favorite;
+
 	auto get_drawer() const {
 		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };
 	}

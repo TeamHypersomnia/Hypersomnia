@@ -9,6 +9,7 @@
 #include "application/setups/server/server_vars.h"
 #include "application/nat/nat_detection_session.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
+#include "augs/misc/imgui/imgui_status_icons.h"
 #include "augs/misc/date_time.h"
 #include "application/gui/bot_quota_widget.h"
 #include "game/modes/logic_speed.h"
@@ -110,9 +111,9 @@ as well as to test your skills in a laggy environment.
 
 		const auto log_text = nat_detection->get_full_log();
 
-		if (ImGui::Button("Copy to clipboard")) {
-			ImGui::SetClipboardText(log_text.c_str());
-		}
+		text_disabled("The log");
+		ImGui::SameLine();
+		copy_icon_button("NatLog", log_text);
 
 		const auto log_color = rgba(210, 210, 210, 255);
 		text_color(::censor_ips(log_text), log_color);

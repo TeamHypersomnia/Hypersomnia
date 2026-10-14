@@ -2596,11 +2596,25 @@ void server_setup::send_tell_me_my_address() {
 }
 
 std::string server_setup::get_steam_join_command_line() const {
-	return get_native_server_connect_string();
+	/*
+		Where this server is and its key, as a client's invite (see connect_target.h).
+	*/
+
+	const auto address = get_native_server_connect_string();
+
+	if (address.empty()) {
+		return "";
+	}
+
+	return address + "," + server_key::public_key_hex(this_server_key);
 }
 
 void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
-	const auto player_group_identifier = get_steam_join_command_line();
+	/*
+		The same group as the clients on this server - its key (see client_setup).
+	*/
+
+	const auto player_group_identifier = server_key::public_key_hex(this_server_key);
 
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
@@ -5154,6 +5168,10 @@ std::string server_setup::get_native_server_connect_string() const {
 	return "";
 }
 #endif
+
+std::optional<augs::ed25519_public_key_type> server_setup::get_server_public_key() const {
+	return augs::ed25519_public_key(this_server_key);
+}
 
 std::string server_setup::get_connect_string() const {
 #if PLATFORM_WEB

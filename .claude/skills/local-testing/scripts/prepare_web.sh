@@ -9,7 +9,8 @@ set -e
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 B=$1
 W=$2
-rm -rf $W
+# Never removed recursively - a fresh directory every time
+if [ -e $W ]; then echo "$W exists - give a new directory"; exit 1; fi
 mkdir -p $W
 cp $B/Hypersomnia.html $B/Hypersomnia.js $B/Hypersomnia.wasm $B/Hypersomnia.data $W/
 ln -s $REPO/cmake/web/assets $W/assets

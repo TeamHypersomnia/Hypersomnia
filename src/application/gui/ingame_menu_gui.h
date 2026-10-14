@@ -147,10 +147,6 @@ struct ingame_menu_gui {
 				if (context.deps.is_range) {
 					root.buttons[i].set_complete_caption("Restart range");
 				}
-
-				if (context.deps.still_querying_server_info) {
-					root.buttons[i].set_complete_caption("Querying server info...");
-				}
 			}
 		}
 

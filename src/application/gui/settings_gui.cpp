@@ -4404,9 +4404,7 @@ void settings_gui_state::perform(
 							text("Account: " + identity_key::short_form_of_account(current_account_id));
 							ImGui::SameLine();
 
-							if (ImGui::Button("Copy my account id")) {
-								ImGui::SetClipboardText(current_account_id.c_str());
-							}
+							copy_icon_button("MyAccountId", current_account_id);
 
 							tooltip_on_hover("For a server admin - e.g. to make you an admin of their server, or to unban you.");
 						}

@@ -21,6 +21,35 @@
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "augs/templates/logically_empty.h"
 
+/*
+	A filled five-pointed star of triangles: the tips, and the middle pentagon as a fan.
+*/
+
+static void draw_star(const augs::drawer_with_default& o, const vec2 center, const float radius, const rgba col) {
+	const auto uv = o.default_texture.get_atlas_space_uv({ 0.5f, 0.5f });
+
+	auto points = std::array<vec2, 10>();
+
+	for (std::size_t i = 0; i < points.size(); ++i) {
+		const auto r = i % 2 == 0 ? radius : radius * 0.45f;
+		points[i] = center + vec2::from_degrees(-90.f + 36.f * static_cast<float>(i)) * r;
+	}
+
+	auto triangle = [&](const vec2 a, const vec2 b, const vec2 c) {
+		auto t = augs::vertex_triangle();
+		t.vertices = { augs::vertex { a, uv, col }, augs::vertex { b, uv, col }, augs::vertex { c, uv, col } };
+		o.push(t);
+	};
+
+	for (std::size_t i = 0; i < points.size(); i += 2) {
+		const auto before = points[(i + 9) % 10];
+		const auto after = points[(i + 1) % 10];
+
+		triangle(points[i], after, before);
+		triangle(center, after, before);
+	}
+}
+
 bool arena_scoreboard_gui::control(general_gui_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
@@ -272,10 +301,24 @@ void arena_scoreboard_gui::draw_gui(
 			return result;
 		}();
 		const auto speed_caption_size = calc_size(speed_caption);
-		const auto caption_x = sz.x / 2 - (window_name_size.x + speed_caption_size.x) / 2;
 
-		text_stroked(window_name, col, { caption_x, 0 });
-		text_stroked(speed_caption, gray, { caption_x + window_name_size.x, 0 });
+		/*
+			A favorite server: a gold star before its name - drawn, the font has no star.
+		*/
+
+		const auto star_w = in.server_is_favorite ? static_cast<int>(window_name_size.y * 1.2f) : 0;
+		const auto caption_x = sz.x / 2 - (star_w + window_name_size.x + speed_caption_size.x) / 2;
+
+		if (in.server_is_favorite) {
+			const auto star_center = vec2(pen) + vec2(caption_x + star_w / 2.0f, window_name_size.y / 2.0f);
+			const auto star_radius = window_name_size.y * 0.45f;
+
+			::draw_star(o, star_center, star_radius + 1.5f, black);
+			::draw_star(o, star_center, star_radius, rgba(255, 200, 0, 255));
+		}
+
+		text_stroked(window_name, col, { caption_x + star_w, 0 });
+		text_stroked(speed_caption, gray, { caption_x + star_w + window_name_size.x, 0 });
 	}
 
 	pen.y += window_name_size.y;

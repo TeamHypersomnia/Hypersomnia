@@ -7,6 +7,7 @@
 #include "augs/network/network_types.h"
 #include "application/activity_type.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "application/setups/client/connect_target.h"
 
 struct cmd_line_params {
 	std::string complete_command_line;
@@ -295,8 +296,13 @@ struct cmd_line_params {
 			else if (a == "--calling-cwd") {
 				calling_cwd = get_next();
 			}
-			else {
+			else if (!a.empty() && a[0] != '-' && connect_target::parse(a).key.has_value()) {
+				/*
+					A Steam invite starting the game: the friend's "connect" - "<address>,<key>" - comes as an argument
+					of its own, unless Steam gives it through GetLaunchCommandLine (then it is read there).
+				*/
 
+				set_connect(a);
 			}
 		}
 	}

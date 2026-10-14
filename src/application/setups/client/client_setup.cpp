@@ -423,11 +423,21 @@ void client_demo_player::play_demo_from(const augs::path_type& p) {
 		std::vector<std::byte> decompressed;
 		decompressed.resize(meta.uncompressed_size);
 
-		augs::decompress(
-			source_bytes.data() + pos,
-			source_bytes.size() - pos,
-			decompressed
-		);
+		/*
+			A demo that does not read (e.g. cut off, or not a finished .demc) plays nothing - it never ends the game.
+		*/
+
+		try {
+			augs::decompress(
+				source_bytes.data() + pos,
+				source_bytes.size() - pos,
+				decompressed
+			);
+		}
+		catch (const augs::decompression_error& err) {
+			LOG("The demo %x does not read: %x", source_path, err.what());
+			decompressed.clear();
+		}
 
 		auto s = augs::make_ptr_read_stream(decompressed);
 
@@ -2415,11 +2425,29 @@ std::string client_setup::get_steam_join_command_line() const {
 		Where the server is and its key - a friend joins exactly this server, the masterserver not needed.
 	*/
 
-	return connect_target { get_connect_string(), get_server_public_key() }.to_string();
+	return connect_target { get_connect_string(), get_invite_server_key() }.to_string();
+}
+
+std::optional<augs::ed25519_public_key_type> client_setup::get_invite_server_key() const {
+	if (const auto key = get_server_public_key()) {
+		return key;
+	}
+
+	/*
+		Still connecting: the key the join expects - the one the handshake will prove.
+	*/
+
+	return identity.expected_server_public_key;
 }
 
 void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
-	const auto player_group_identifier = get_steam_join_command_line();
+	/*
+		Friends on the same server are one group whichever way each joined (an IP, a domain, rtc:) - the server's key
+		tells the server.
+	*/
+
+	const auto server_key = get_server_public_key();
+	const auto player_group_identifier = server_key.has_value() ? augs::bytes_to_hex(*server_key) : get_connect_string();
 
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
@@ -2430,7 +2458,16 @@ void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 		player_group_identifier
 	);
 
-	pairs.push_back({ "connect", get_steam_join_command_line() });
+	/*
+		A demo is not joined.
+	*/
+
+	if (is_replaying()) {
+		pairs.push_back({ "connect", std::nullopt });
+	}
+	else {
+		pairs.push_back({ "connect", get_steam_join_command_line() });
+	}
 }
 
 std::string client_setup::get_connect_string() const {

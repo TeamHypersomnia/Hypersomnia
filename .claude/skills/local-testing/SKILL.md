@@ -176,6 +176,13 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
   community server on 9005 with a new key each start, listed on the test master; `crash` then `start silent` - a server whose
   list entry (60 s) keeps the previous key. Never `kill -9` the pid file's pid (it is `timeout`'s). A client with
   `"server_list_provider": "http://<arenaus>:18420"` and `"last_activity": "MAIN_MENU"` joins from Browse servers.
+- **Server browser and invites:** the list is cached at `<appdata>/cache/server_list.bin` and downloaded at every start in the
+  background (even with `--connect`); favorites are `user/favorite_servers.txt` (key, last address, name), the tab in
+  `user/server_browser_tab.txt` (0 Local .. 4 All; none = Favorites). Esc - Invite to join opens a window from what the game
+  knows (no list download): links, address, key, ★; joined over the LAN it shows the public address from the list. The log
+  line `Steam rich presence connect: <address>,<key>` shows what a Steam friend would join (also in non-Steam builds).
+  Main menu keys: C - Connect to server, P - Quick play. `backend.sh` and the e2e servers stop by themselves after 2 h
+  (`SECS=` for `community.sh`) - a list that stops coming is usually that.
 - **Idle CLI clients never get onto a team** - joining players stay spectators. Only tournament mode assigns teams:
   `match.sh` writes a two-team `tournament.json` with the clients' account ids (`key_...`, or `steam_...` once linked).
 - **Tournament mode forces overtime**, so idle players never finish by score. Use `"ranked": { "max_rejoins": 0 }` and kill one

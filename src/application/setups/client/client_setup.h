@@ -1027,6 +1027,12 @@ public:
 	*/
 
 	std::optional<augs::ed25519_public_key_type> get_server_public_key() const;
+
+	/*
+		For invites: the proven key, or while connecting the expected one.
+	*/
+
+	std::optional<augs::ed25519_public_key_type> get_invite_server_key() const;
 	mutable std::optional<augs::ed25519_public_key_type> server_public_key_seen;
 
 	/*

@@ -11,18 +11,19 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
-T=$S/web_test
+# A fresh directory every run - never removed recursively
+T=$S/web_test_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 GAME=$REPO/hypersomnia
-WEB=$S/webserve
+WEB=${WEB:-$S/webserve}
 CONNECT=${1:-pl}
 BROKER_URL=${BROKER_URL:-http://127.0.0.1:13500}
 BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 WAIT=${2:-120}
 
-for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $S/web_test"); do kill $p; done
 for p in $(pgrep -f "webserve.py $WEB"); do kill $p; done
-for p in $(pgrep -f "firefox --no-remote --profile $T"); do kill $p; done
+for p in $(pgrep -f "firefox --no-remote --profile $S/web_test"); do kill $p; done
 for p in $(pgrep -f "^Xvfb :78"); do kill $p; done
 sleep 1
 
@@ -30,7 +31,6 @@ for port in 18000 18410 18420 18430 10002 8765; do
 	if ss -tulpn 2>/dev/null | grep -q ":$port\b"; then echo "port $port busy, abort"; exit 1; fi
 done
 
-rm -rf $T
 mkdir -p $T/official_servers.d $T/ff
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
@@ -94,7 +94,7 @@ echo "=== browser console (game)"
 grep -E "identity cert|Connecting as|client connected|Received initial|WebRTC: DataChannel|last_disconnect_reason" $T/firefox.out | head -10
 
 sleep 12
-for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
+for p in $(pgrep -f "^$BIN .*--appdata-dir $S/web_test"); do kill $p; done
 for p in $(pgrep -f "webserve.py $WEB"); do kill $p; done
 for p in $(pgrep -f "^Xvfb :78"); do kill $p; done
 echo "=== screenshot: $T/screen.png"
