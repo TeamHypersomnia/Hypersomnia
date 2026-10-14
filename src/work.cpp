@@ -2073,10 +2073,16 @@ work_result work(
 	WEBSTATIC auto favorites = favorite_servers(USER_DIR / favorite_servers::file_name);
 
 	/*
-		A password entered for a server whose key is not known yet - for the next launch only.
+		A password entered for a join whose key is not known yet (an address alone, the localhost fallback, a Steam
+		request) - goes only with the next connection to that same join, whenever it comes; any other one drops it.
 	*/
 
-	WEBSTATIC std::optional<std::string> next_connect_password;
+	struct one_join_password {
+		std::string client_connect;
+		std::string password;
+	};
+
+	WEBSTATIC std::optional<one_join_password> next_connect_password;
 
 	/*
 		A favorite server's name and address kept up to date while connected - never from a server on this machine
@@ -3025,13 +3031,6 @@ work_result work(
 			displayed_connecting_server_name,
 			config.faction_view,
 			config.streamer_mode && config.streamer_mode_flags.community_servers,
-			[&](const server_list_entry& entry) {
-				if (const auto key = entry.get_public_key()) {
-					return !saved_server_passwords.find(*key).empty();
-				}
-
-				return false;
-			},
 			favorites,
 			server_browser_tab_path,
 			server_list_cache_path
@@ -3044,18 +3043,6 @@ work_result work(
 		*/
 
 		const auto target = connect_target::parse(config.client_connect);
-
-		/*
-			A password is for this join only: kept while the join waits (the server list, the sign-in, Join anyway),
-			dropped when it stops (Cancel, something else started).
-		*/
-
-		auto password_for_this_launch = std::exchange(next_connect_password, std::nullopt);
-
-		auto wait = [&]() {
-			next_connect_password = password_for_this_launch;
-			return false;
-		};
 
 		/*
 			What the server list says about the chosen server - found by its key if the join names one.
@@ -3088,7 +3075,7 @@ work_result work(
 
 				launch_after_server_list = true;
 				launch_after_server_list_since = augs::steady_secs();
-				return wait();
+				return false;
 			}
 			else {
 				const auto short_key = "0x" + augs::bytes_to_hex(*target.key).substr(0, 8) + "...";
@@ -3139,12 +3126,12 @@ work_result work(
 			if (identity->signing_in_first_time(in, now) && !join_without_sign_in) {
 				LOG("Waiting for the first sign-in before connecting.");
 				launch_after_sign_in = true;
-				return wait();
+				return false;
 			}
 
 			if (identity->sign_in_failed(in, now) && !sign_in_message_shown) {
 				open_sign_in_popup(true);
-				return wait();
+				return false;
 			}
 		}
 
@@ -3190,8 +3177,21 @@ work_result work(
 			identity_context.password = saved_server_passwords.find(*identity_context.expected_server_public_key);
 		}
 
-		if (password_for_this_launch.has_value()) {
-			identity_context.password = *password_for_this_launch;
+		if (const auto one_join = std::exchange(next_connect_password, std::nullopt)) {
+			if (one_join->client_connect == config.client_connect) {
+				identity_context.password = one_join->password;
+			}
+		}
+
+		/*
+			A server on the list that wants a password, with none for this join: asked right here, when nothing
+			else holds the join any more - the entered one goes at once.
+		*/
+
+		if (found != nullptr && found->heartbeat.require_password && identity_context.password.empty()) {
+			LOG("Asking for the password of %x before connecting.", found->heartbeat.server_name);
+			browse_servers_gui.ask_password(*found);
+			return false;
 		}
 
 		streaming.wait_demos_compressed();
@@ -3296,7 +3296,6 @@ work_result work(
 		if (mode != activity_type::CLIENT) {
 			launch_after_sign_in = false;
 			launch_after_server_list = false;
-			next_connect_password.reset();
 		}
 
 		if (mode != activity_type::TUTORIAL && !config.skip_tutorial) {
@@ -3482,7 +3481,6 @@ work_result work(
 			}
 			else if (now - launch_after_server_list_since > 4.0) {
 				launch_after_server_list = false;
-				next_connect_password.reset();
 
 				auto popup = simple_popup();
 				popup.title = "Server not found";
@@ -3537,7 +3535,6 @@ work_result work(
 
 					if (ImGui::Button("Cancel##SigningIn")) {
 						launch_after_sign_in = false;
-						next_connect_password.reset();
 					}
 				}
 			}
@@ -3572,14 +3569,28 @@ work_result work(
 					if (result == 1) {
 						start_client_setup();
 					}
-					else {
-						next_connect_password.reset();
-					}
 				}
 			}
 			else if (sign_in_popup->perform()) {
 				sign_in_popup = std::nullopt;
 			}
+		}
+
+		/*
+			The password asked right before connecting: under the key the join names, else for this join only.
+		*/
+
+		if (const auto entered = browse_servers_gui.perform_password_prompt()) {
+			const auto& password = entered->first;
+
+			if (const auto key = connect_target::parse(config.client_connect).key) {
+				saved_server_passwords.set(*key, password);
+			}
+			else {
+				next_connect_password = one_join_password { config.client_connect, password };
+			}
+
+			start_client_setup();
 		}
 
 		if (!has_current_setup() && now < signed_in_notice_until) {
@@ -3609,17 +3620,6 @@ work_result work(
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
-			if (auto new_password = browse_servers_gui.take_pending_password_save()) {
-				const auto& [password, entry] = *new_password;
-
-				if (const auto key = entry.get_public_key()) {
-					saved_server_passwords.set(*key, password);
-				}
-				else {
-					next_connect_password = password;
-				}
-			}
-
 			start_client_setup();
 		}
 	};
@@ -4272,7 +4272,7 @@ work_result work(
 								saved_server_passwords.set(*key, *new_password);
 							}
 
-							next_connect_password = *new_password;
+							next_connect_password = one_join_password { config.client_connect, *new_password };
 						}
 
 						launch_setup(activity_type::CLIENT);
@@ -4421,12 +4421,14 @@ work_result work(
 				const auto& password = event.server_password;
 				const auto password_length = ::strnlen(password.data(), password.size());
 
+				const auto& address = event.server_address;
+				const auto address_string = std::string(address.data(), ::strnlen(address.data(), address.size()));
+
 				if (password_length > 0) {
-					next_connect_password = std::string(password.data(), password_length);
+					next_connect_password = one_join_password { address_string, std::string(password.data(), password_length) };
 				}
 
-				const auto& address = event.server_address;
-				connect_to(std::string(address.data(), ::strnlen(address.data(), address.size())));
+				connect_to(address_string);
 			}
 			else if constexpr(std::is_same_v<E, steam_auth_ticket>) {
 				LOG("(Steam Callback) steam_auth_ticket.");

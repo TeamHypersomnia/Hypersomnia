@@ -270,6 +270,75 @@ bool browse_servers_gui_state::refreshed_at_least_once() const {
 	return when_last_started_refreshing_server_list != 0;
 }
 
+void browse_servers_gui_state::ask_password(const server_list_entry& entry) {
+	pending_password_entry = entry;
+	password_prompt_input.clear();
+}
+
+std::optional<std::pair<std::string, server_list_entry>> browse_servers_gui_state::perform_password_prompt() {
+	using namespace augs::imgui;
+
+	auto result = std::optional<std::pair<std::string, server_list_entry>>();
+
+	const bool show_password_popup = pending_password_entry.has_value();
+
+	if (show_password_popup) {
+		center_next_window(ImGuiCond_Appearing);
+	}
+
+	if (auto popup = cond_scoped_modal_popup(
+		show_password_popup,
+		"Server password required",
+		nullptr,
+		ImGuiWindowFlags_AlwaysAutoResize
+	)) {
+		text("Server '%x' requires a password.", pending_password_entry->heartbeat.server_name);
+
+		/*
+			Don't use ImGuiInputTextFlags_EnterReturnsTrue here: the input_text wrapper
+			only writes back into password_prompt_input when ImGui::InputText returns true,
+			which with that flag happens only on Enter. We want every keystroke captured.
+		*/
+		const auto flags = ImGuiInputTextFlags_Password;
+
+		if (ImGui::IsWindowAppearing()) {
+			ImGui::SetKeyboardFocusHere();
+		}
+
+		input_text("Password##server_password_prompt", password_prompt_input, flags);
+
+		const bool enter_pressed =
+			ImGui::IsItemFocused()
+			&& (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter))
+		;
+
+		const bool can_connect = !password_prompt_input.empty();
+
+		const bool connect_clicked = [&]() {
+			auto scope = maybe_disabled_cols(!can_connect);
+			return ImGui::Button("Connect!");
+		}();
+
+		if (can_connect && (connect_clicked || enter_pressed)) {
+			result = std::make_pair(std::exchange(password_prompt_input, std::string()), *pending_password_entry);
+			pending_password_entry.reset();
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
+
+		if (ImGui::Button("Cancel") || escape_pressed) {
+			pending_password_entry.reset();
+			password_prompt_input.clear();
+			ImGui::CloseCurrentPopup();
+		}
+	}
+
+	return result;
+}
+
 bool browse_servers_gui_state::refresh_in_progress() const {
 	/*
 		Until the answer is read into the list (advance_list) - a join waiting for the list must not look
@@ -700,7 +769,6 @@ void browse_servers_gui_state::show_server_list(
 	const auto& style = ImGui::GetStyle();
 	const auto& faction_view = in.faction_view;
 	const auto streamer_mode = in.streamer_mode;
-	const auto& has_saved_password = in.has_saved_password;
 
 	if (server_list.empty()) {
 		name_column_row([&]() {
@@ -919,14 +987,8 @@ void browse_servers_gui_state::show_server_list(
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
-				if (d.require_password && !(has_saved_password && has_saved_password(s))) {
-					pending_password_entry = s;
-					password_prompt_input.clear();
-				}
-				else {
-					displayed_connecting_server_name = d.server_name;
-					requested_connection = s.get_join_string();
-				}
+				displayed_connecting_server_name = d.server_name;
+				requested_connection = s.get_join_string();
 			}
 		}
 
@@ -1708,14 +1770,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				LOG("Chosen server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);
 
-				if (s.heartbeat.require_password && !(in.has_saved_password && in.has_saved_password(s))) {
-					pending_password_entry = s;
-					password_prompt_input.clear();
-				}
-				else {
-					displayed_connecting_server_name = s.heartbeat.server_name;
-					requested_connection = s.get_join_string();
-				}
+				displayed_connecting_server_name = s.heartbeat.server_name;
+				requested_connection = s.get_join_string();
 			}
 
 			ImGui::SameLine();
@@ -1857,67 +1913,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape)) {
 				add_server_open = false;
-			}
-		}
-	}
-
-	{
-		const bool show_password_popup = pending_password_entry.has_value();
-
-		if (show_password_popup) {
-			center_next_window(ImGuiCond_Appearing);
-		}
-
-		if (auto popup = cond_scoped_modal_popup(
-			show_password_popup,
-			"Server password required",
-			nullptr,
-			ImGuiWindowFlags_AlwaysAutoResize
-		)) {
-			text("Server '%x' requires a password.", pending_password_entry->heartbeat.server_name);
-
-			/*
-				Don't use ImGuiInputTextFlags_EnterReturnsTrue here: the input_text wrapper
-				only writes back into password_prompt_input when ImGui::InputText returns true,
-				which with that flag happens only on Enter. We want every keystroke captured.
-			*/
-			const auto flags = ImGuiInputTextFlags_Password;
-
-			if (ImGui::IsWindowAppearing()) {
-				ImGui::SetKeyboardFocusHere();
-			}
-
-			input_text("Password##server_password_prompt", password_prompt_input, flags);
-
-			const bool enter_pressed =
-				ImGui::IsItemFocused()
-				&& (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter))
-			;
-
-			const bool can_connect = !password_prompt_input.empty();
-
-			const bool connect_clicked = [&]() {
-				auto scope = maybe_disabled_cols(!can_connect);
-				return ImGui::Button("Connect!");
-			}();
-
-			if (can_connect && (connect_clicked || enter_pressed)) {
-				displayed_connecting_server_name = pending_password_entry->heartbeat.server_name;
-				requested_connection = pending_password_entry->get_join_string();
-				pending_password_save = password_prompt_input;
-				pending_password_save_entry = pending_password_entry;
-				pending_password_entry.reset();
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::SameLine();
-
-			const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
-
-			if (ImGui::Button("Cancel") || escape_pressed) {
-				pending_password_entry.reset();
-				password_prompt_input.clear();
-				ImGui::CloseCurrentPopup();
 			}
 		}
 	}

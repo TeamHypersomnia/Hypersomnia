@@ -32,12 +32,6 @@ struct browse_servers_input {
 	const faction_view_settings& faction_view;
 	const bool streamer_mode;
 
-	/*
-		Whether a password is saved for the key of this server - else a server that requires one asks for it first.
-	*/
-
-	std::function<bool(const server_list_entry&)> has_saved_password;
-
 	favorite_servers& favorites;
 
 	/*
@@ -167,8 +161,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	std::optional<server_list_entry> pending_password_entry;
 	std::string password_prompt_input;
-	std::optional<std::string> pending_password_save;
-	std::optional<server_list_entry> pending_password_save_entry;
 
 	net_time_t when_last_started_refreshing_server_list = 0;
 	net_time_t when_last_updated_time_to_events = 0;
@@ -281,18 +273,10 @@ public:
 	bool refresh_in_progress() const;
 
 	/*
-		A password entered before connecting, with the server it was entered for.
+		A join to a server with a password and none saved asks for it right before connecting.
+		The entered password, with the server it was entered for.
 	*/
 
-	std::optional<std::pair<std::string, server_list_entry>> take_pending_password_save() {
-		auto out = std::optional<std::pair<std::string, server_list_entry>>();
-
-		if (pending_password_save.has_value() && pending_password_save_entry.has_value()) {
-			out = std::make_pair(*pending_password_save, *pending_password_save_entry);
-		}
-
-		pending_password_save.reset();
-		pending_password_save_entry.reset();
-		return out;
-	}
+	void ask_password(const server_list_entry&);
+	std::optional<std::pair<std::string, server_list_entry>> perform_password_prompt();
 };
