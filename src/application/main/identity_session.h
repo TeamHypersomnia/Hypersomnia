@@ -230,7 +230,7 @@ public:
 	}
 
 	/*
-		Unlinked from the game: back to "this computer" right away, steam.cert deleted.
+		Unlinked from the game: back to the key account right away, steam.cert deleted.
 	*/
 
 	void on_unlinked();

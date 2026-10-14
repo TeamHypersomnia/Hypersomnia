@@ -1361,7 +1361,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	}
 
 	/*
-		Every client has a cert - signed by the identity broker, or by its own key ("this computer").
+		Every client has a cert - signed by the identity broker, or by its own key (the key account).
 		One that does not verify is most often a broker cert outside its time: this host's or the player's clock being off.
 	*/
 

@@ -577,7 +577,7 @@ void identity_session::advance(const input& in, const double now) {
 
 			if (is_key_account(answer->cert.account) && !in.steam_ticket_proof && in.provider == provider_type::STEAM) {
 				/*
-					The key's own account: it was unlinked on the site. Back to "this computer", no error.
+					The key's own account: it was unlinked on the site. Back to the key account, no error.
 				*/
 
 				LOG("The key is no longer linked to a Steam account.");

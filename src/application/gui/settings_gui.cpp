@@ -362,10 +362,6 @@ std::string get_custom_binding_name(const app_intent_type) {
 #include <emscripten.h>
 
 /*
-	Choosing a file in the browser: its text is kept for the game to take - the length (-1 while nothing came), then the text.
-*/
-
-/*
 	0 when the browser's storage is written, 1 when another tab writes it, 2 when it failed to load.
 */
 
@@ -384,6 +380,10 @@ EM_JS(int, web_storage_may_be_cleared, (), {
 EM_JS(int, web_tab_was_blocked, (), {
 	return Module.hs_tab_blocked ? 1 : 0;
 });
+
+/*
+	Choosing a file in the browser: its text is kept for the game to take - the length (-1 while nothing came), then the text.
+*/
 
 EM_JS(void, web_pick_text_file, (), {
 	const input = document.createElement("input");
@@ -445,14 +445,14 @@ EM_JS(void, web_download_text, (const char* file_name, const char* text), {
 });
 #endif
 
-/*
-	A modal centered on the screen, with the screen behind it dimmed by ImGui.
-*/
-
 static std::string steam_profile_url(const std::string& steam_account) {
 	const auto id64 = steam_account.rfind("steam_", 0) == 0 ? steam_account.substr(6) : steam_account;
 	return "https://steamcommunity.com/profiles/" + id64;
 }
+
+/*
+	A modal centered on the screen, with the screen behind it dimmed by ImGui.
+*/
 
 static void center_next_modal() {
 	const auto display = ImGui::GetIO().DisplaySize;
@@ -1012,10 +1012,6 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 	ImGui::Separator();
-
-	/*
-		Not while a ranked match is on: its rejoin is tied to the account it was joined with.
-	*/
 
 	/*
 		The key only ever as a file - backed up by copying the file (or downloading it on the web), restored by choosing it.

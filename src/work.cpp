@@ -2116,7 +2116,7 @@ work_result work(
 	WEBSTATIC bool joined_ranked_since_leaderboards = false;
 
 	/*
-		The account the player is now: the signed-in one while its cert is valid, else "this computer".
+		The account the player is now: the signed-in one while its cert is valid, else the key account.
 		Empty while the first sign-in of the run is on its way - the leaderboards show "..." rather than an account
 		that may change in a moment.
 	*/
