@@ -103,7 +103,7 @@ def cert_account():
 
 check('cert before linking is the key', cert_account() == 'key_' + pub)
 
-# Ranked progress of the key: moves to a Steam account without matches on linking, comes back on the key's own unlink
+# Ranked progress of the key: moves to a Steam account without matches on linking, stays there on an unlink
 with db:
     db.execute("INSERT INTO mmr_team (account_id, nickname, mmr, mu, sigma, matches_won, matches_lost) VALUES (?, 'k', 7.5, 30, 5, 3, 2)", ('key_' + pub,))
 
@@ -132,7 +132,7 @@ status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s'
 check('unlink by GET', status == 200 and json.loads(body).get('from') == 'steam_' + steam_id, body)
 
 check('cert after unlinking is the key again', cert_account() == 'key_' + pub)
-check('progress moved back to the key', mmr_owner() == ['key_' + pub], str(mmr_owner()))
+check('progress stays with the Steam account after the unlink', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
 
 status, body, _ = get('/link_key/unlink?public_key=%s&timestamp=%d&signature=%s' % (pub, ts, unlink_sig))
 check('a signed unlink can not be replayed', status == 401, body)
