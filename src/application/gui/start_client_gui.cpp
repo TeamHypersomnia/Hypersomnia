@@ -77,6 +77,12 @@ bool start_client_gui_state::perform(
 			custom_address = found->address;
 			custom_key = "0x" + augs::bytes_to_hex(found->key);
 			with_key = true;
+
+			/*
+				No field stays being edited - it would keep showing what was pasted into it, commas and all.
+			*/
+
+			ImGui::ClearActiveID();
 			return true;
 		}
 
@@ -89,8 +95,9 @@ bool start_client_gui_state::perform(
 			A clipboard is taken once - the fields changed since stay until another one is copied.
 		*/
 
-		const bool focused_now = window.is_active() && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-		const bool focus_gained = focused_now && !was_focused;
+		const bool focused_now = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+		const bool game_focused_again = window.get_times_activated() != std::exchange(times_window_activated, window.get_times_activated());
+		const bool focus_gained = (focused_now && !was_focused) || game_focused_again;
 		const bool unlisted_tab_entered = current_tab == start_client_tab_type::CUSTOM_ADDRESS && tab_last_frame != current_tab;
 
 		was_focused = focused_now;
@@ -234,28 +241,22 @@ bool start_client_gui_state::perform(
 		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
-			if (ImGui::RadioButton("IP with key (recommended)", with_key)) {
+			if (ImGui::RadioButton("IP with key", with_key)) {
 				with_key = true;
 			}
 
 			ImGui::SameLine();
+			text_disabled("(recommended)");
+			ImGui::SameLine();
 
-			if (ImGui::RadioButton("Only IP address (insecure)", !with_key)) {
+			if (ImGui::RadioButton("Only IP address", !with_key)) {
 				with_key = false;
 			}
 
+			ImGui::SameLine();
+			text_disabled("(insecure)");
+
 			const auto flags = streamer_mode ? ImGuiInputTextFlags_Password : 0; 
-
-			/*
-				A line of its own, kept even when empty - the layout never jumps.
-			*/
-
-			if (const bool as_autopasted = with_key && autopasted.has_value() && autopasted->first == custom_address && autopasted->second == custom_key) {
-				checkmark_line("Auto-pasted from clipboard", green);
-			}
-			else {
-				text(" ");
-			}
 
 			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
 
@@ -266,8 +267,20 @@ bool start_client_gui_state::perform(
 			if (with_key) {
 				input_text<67>("Public key (64 hex digits)", custom_key);
 
+				/*
+					The line under the fields: what is wrong, else that they came from the clipboard (until one is
+					changed) - kept even when empty, so the layout never jumps.
+				*/
+
 				const bool key_error = !custom_key.empty() && custom_key_invalid;
-				text_color(key_error ? "The key should be 64 hex digits." : " ", orange);
+				const bool as_autopasted = autopasted.has_value() && autopasted->first == custom_address && autopasted->second == custom_key;
+
+				if (!key_error && as_autopasted) {
+					checkmark_line("Auto-pasted from clipboard", green);
+				}
+				else {
+					text_color(key_error ? "The key should be 64 hex digits." : " ", orange);
+				}
 
 				/*
 					A favorite added by hand - the address and the key as given (see favorite_servers.h).

@@ -113,6 +113,13 @@ namespace augs {
 
 		bool active = true;
 
+		/*
+			How many times the window got the focus back - compared, so that no return is missed by a frame
+			that never saw it inactive.
+		*/
+
+		uint32_t times_activated = 0;
+
 		bool cursor_clipping = false;
 		bool cursor_visible = true;
 
@@ -186,6 +193,9 @@ namespace augs {
 		void set_cursor_visible(bool flag); 
 
 		bool is_active() const;
+		uint32_t get_times_activated() const {
+			return times_activated;
+		}
 		xywhi get_display() const;
 
 		int get_refresh_rate();

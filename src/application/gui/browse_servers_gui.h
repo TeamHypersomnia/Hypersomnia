@@ -47,10 +47,10 @@ struct browse_servers_input {
 	const augs::path_type& list_cache_path;
 
 	/*
-		Whether the game's window has the focus - Add an unlisted server looks at the clipboard again when it comes back.
+		How many times the game's window got the focus back - Add an unlisted server looks at the clipboard again then.
 	*/
 
-	const bool app_focused;
+	const uint32_t times_window_activated;
 };
 
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
@@ -191,7 +191,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	std::optional<std::array<std::string, 3>> add_server_autopasted;
 	std::string add_server_last_clipboard;
-	bool app_was_focused = false;
+	uint32_t times_window_activated = 0;
 
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;

@@ -102,6 +102,10 @@ namespace augs {
 		if (ch.msg == message::activate
 			|| ch.msg == message::click_activate
 		) {
+			if (!active) {
+				++times_activated;
+			}
+
 			active = true;
 
 #if PLATFORM_LINUX || PLATFORM_MACOS

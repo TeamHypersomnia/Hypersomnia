@@ -64,6 +64,7 @@ public:
 	*/
 
 	bool was_focused = false;
+	uint32_t times_window_activated = 0;
 	start_client_tab_type tab_last_frame = start_client_tab_type::BEST_SERVER;
 	std::string demo_size;
 

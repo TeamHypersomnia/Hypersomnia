@@ -3267,7 +3267,7 @@ work_result work(
 			favorites,
 			menus_state.server_browser_tab,
 			server_list_cache_path,
-			window.is_active()
+			window.get_times_activated()
 		};
 	};
 

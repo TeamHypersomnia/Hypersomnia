@@ -1540,6 +1540,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			if (!found->name.empty()) {
 				add_server_name = found->name;
 			}
+
+			/*
+				No field stays being edited - it would keep showing what was pasted into it, commas and all.
+			*/
+
+			ImGui::ClearActiveID();
 		}
 	};
 
@@ -1564,7 +1570,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 #endif
 	};
 
-	if (const bool focus_gained = in.app_focused && !std::exchange(app_was_focused, in.app_focused); focus_gained && add_server_open) {
+	if (const bool focused_again = in.times_window_activated != std::exchange(times_window_activated, in.times_window_activated); focused_again && add_server_open) {
 		autopaste_from_clipboard();
 	}
 
