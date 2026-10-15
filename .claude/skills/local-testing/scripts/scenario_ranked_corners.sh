@@ -16,7 +16,8 @@ umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/ranked_corners_${CASE:-unlink}
+# A fresh directory every run - never removed recursively
+T=$S/ranked_corners_${CASE:-unlink}_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 PORT=18710
 PROXY=13710
@@ -24,7 +25,6 @@ STEAM_ID=steam_7656119000000$(printf '%04d' $((RANDOM % 10000)))
 [ -n "$BROKER_URL" ] && [ -n "$BROKER_PUBLIC_KEY" ] || { echo "start broker.sh and export BROKER_URL, BROKER_PUBLIC_KEY"; exit 1; }
 for p in $PORT $PROXY; do if ss -tuln | grep -q ":$p "; then echo "port $p busy, abort"; exit 1; fi; done
 
-rm -rf $T
 mkdir -p $T/server/user/conf.d $T/server/user/downloads/arenas
 
 A=$T/server/user/downloads/arenas/de_e2e_short
