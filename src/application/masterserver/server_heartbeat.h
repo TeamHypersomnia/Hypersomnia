@@ -151,6 +151,5 @@ struct server_heartbeat {
 		return players_spectating.size();
 	}
 
-	std::string get_location_id() const;
 	bool versions_compatible() const;
 };

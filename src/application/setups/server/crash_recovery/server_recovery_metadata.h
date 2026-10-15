@@ -15,4 +15,10 @@ struct server_recovery_metadata {
 	arena_identifier arena_name;
 	game_mode_name_type game_mode;
 	augs::secure_hash_type arena_hash = augs::secure_hash_type();
+
+	/*
+		Not in the mode's state (only the server knows it) - the resumed match's report needs it.
+	*/
+
+	std::string match_start_timestamp;
 };

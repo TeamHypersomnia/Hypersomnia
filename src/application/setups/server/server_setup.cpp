@@ -5759,30 +5759,59 @@ static uint64_t unix_now_secs() {
 	return static_cast<uint64_t>(augs::date_time::secs_since_epoch());
 }
 
+/*
+	server_bans.json is the truth for every instance of the process (and others on the same folder): each reads it again
+	once it changed - a ban added elsewhere, or removed by hand, holds here within seconds - and a new ban is added to
+	what is in the file, never to this instance's older copy of it.
+*/
+
+static std::mutex bans_file_mutex;
+
+static std::filesystem::file_time_type bans_file_time_now(const augs::path_type& path) {
+	std::error_code ec;
+	const auto t = std::filesystem::last_write_time(path, ec);
+	return ec ? std::filesystem::file_time_type() : t;
+}
+
 void server_setup::load_bans() {
 	const auto path = bans_path();
+	bans_file_time = bans_file_time_now(path);
 
 	if (!augs::exists(path)) {
+		bans = {};
 		return;
 	}
 
 	try {
-		augs::from_json_file(path, bans);
+		auto loaded = server_bans();
+		augs::from_json_file(path, loaded);
+		bans = std::move(loaded);
 		LOG("Loaded %x bans from %x.", bans.bans.size(), path);
 	}
 	catch (const std::exception& e) {
-		LOG("ERROR: could not read the bans from %x: %x. Not banning anyone until fixed.", path, e.what());
-		bans = {};
+		/*
+			A file damaged by hand: the bans known until now stay - until it is fixed.
+		*/
+
+		LOG("ERROR: could not read the bans from %x: %x. Keeping the %x known until it is fixed.", path, e.what(), bans.bans.size());
 	}
 }
 
-/*
-	The servers of one process (num_ranked_servers, num_casual_servers) share the file: each save first takes in what
-	the others banned meanwhile, so that no ban is lost - and this server knows those from then on too.
-*/
+void server_setup::reload_bans_if_changed() {
+	if (server_time - when_checked_bans_file < 3.0) {
+		return;
+	}
 
-void server_setup::save_bans() {
-	static std::mutex bans_file_mutex;
+	when_checked_bans_file = server_time;
+
+	auto lock = std::lock_guard<std::mutex>(bans_file_mutex);
+
+	if (bans_file_time_now(bans_path()) != bans_file_time) {
+		load_bans();
+	}
+}
+
+void server_setup::save_ban(const server_ban& entry) {
 	auto lock = std::lock_guard<std::mutex>(bans_file_mutex);
 
 	const auto path = bans_path();
@@ -5791,26 +5820,21 @@ void server_setup::save_bans() {
 		try {
 			auto on_disk = server_bans();
 			augs::from_json_file(path, on_disk);
-
-			for (const auto& b : on_disk.bans) {
-				if (std::find(bans.bans.begin(), bans.bans.end(), b) == bans.bans.end()) {
-					bans.bans.push_back(b);
-				}
-			}
-
-			bans.remove_expired(::unix_now_secs());
+			bans = std::move(on_disk);
 		}
 		catch (const std::exception& e) {
 			/*
-				A damaged file is kept aside - it is replaced by this server's bans now.
+				Never overwritten while damaged - that would lift every ban in it. This ban holds here for now.
 			*/
 
-			LOG("ERROR: could not read the bans from %x: %x. Kept as .damaged; saving only this server's.", path, e.what());
-
-			std::error_code ec;
-			std::filesystem::copy_file(path, augs::path_type(path).concat(".damaged"), std::filesystem::copy_options::overwrite_existing, ec);
+			LOG("ERROR: could not read the bans from %x: %x. Not saving the new ban until it is fixed.", path, e.what());
+			bans.bans.push_back(entry);
+			return;
 		}
 	}
+
+	bans.remove_expired(::unix_now_secs());
+	bans.bans.push_back(entry);
 
 	try {
 		augs::save_as_json_atomic(bans, path);
@@ -5818,6 +5842,8 @@ void server_setup::save_bans() {
 	catch (const std::exception& e) {
 		LOG("ERROR: could not save the bans to %x: %x", path, e.what());
 	}
+
+	bans_file_time = bans_file_time_now(path);
 }
 
 /*
@@ -5987,9 +6013,7 @@ void server_setup::ban(const client_id_type& id, const std::string& reason, cons
 		entry.ip = get_client_ip_for_bans(id);
 	}
 
-	bans.remove_expired(::unix_now_secs());
-	bans.bans.push_back(entry);
-	save_bans();
+	save_ban(entry);
 
 	LOG("Banned %x (account: %x, ip: %x) %x. Reason: %x", entry.nickname, entry.account, entry.ip, minutes == 0 ? std::string("for good") : typesafe_sprintf("for %x minutes", minutes), reason);
 
@@ -6944,44 +6968,6 @@ bool server_heartbeat::versions_compatible() const {
 	}
 
 	return false;
-}
-
-std::string server_heartbeat::get_location_id() const {
-	const auto n = std::string(server_name);
-
-	if (begins_with(n, "[AU]")) {
-		return "au";
-	}
-
-	if (begins_with(n, "[NL]")) {
-		return "nl";
-	}
-
-	if (begins_with(n, "[PL]")) {
-		return "pl";
-	}
-
-	if (begins_with(n, "[US]")) {
-		return "us-central";
-	}
-
-	if (begins_with(n, "[RU]")) {
-		return "ru";
-	}
-
-	if (begins_with(n, "[DE]")) {
-		return "de";
-	}
-
-	if (begins_with(n, "[CH]")) {
-		return "ch";
-	}
-
-	if (begins_with(n, "[FI]")) {
-		return "fi";
-	}
-
-	return "";
 }
 
 std::string get_steam_join_link(const std::string& suffix) {

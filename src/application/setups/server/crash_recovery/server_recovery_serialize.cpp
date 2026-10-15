@@ -59,6 +59,7 @@ std::vector<std::byte> serialize_server_recovery_state(
 		augs::write_bytes(s, metadata.arena_name);
 		augs::write_bytes(s, metadata.game_mode);
 		augs::write_bytes(s, metadata.arena_hash);
+		augs::write_bytes(s, metadata.match_start_timestamp);
 
 		s.write(body.data(), body.size());
 	}
@@ -85,6 +86,7 @@ bool parse_server_recovery_header(
 		augs::read_bytes(s, out_metadata.arena_name);
 		augs::read_bytes(s, out_metadata.game_mode);
 		augs::read_bytes(s, out_metadata.arena_hash);
+		augs::read_bytes(s, out_metadata.match_start_timestamp);
 
 		out_body_offset = s.get_read_pos();
 	}

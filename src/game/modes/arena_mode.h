@@ -832,6 +832,14 @@ public:
 	*/
 	void recover_from_crash();
 
+	const std::string& get_match_start_timestamp() const {
+		return match_start_timestamp;
+	}
+
+	void restore_match_start_timestamp(const std::string& timestamp) {
+		match_start_timestamp = timestamp;
+	}
+
 	bool can_use_map_command_now(const const_input in) const;
 
 	bool is_idle() const;

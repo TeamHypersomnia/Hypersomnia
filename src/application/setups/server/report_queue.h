@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -84,6 +86,22 @@ private:
 	/*
 		<url>\n<body>
 	*/
+
+	/*
+		Only the first line - whether its endpoint is backing off is known without reading the report (up to hundreds
+		of KB with the avatars).
+	*/
+
+	static std::optional<std::string> url_of(const augs::path_type& file) {
+		auto in = std::ifstream(file, std::ios::binary);
+		std::string url;
+
+		if (!in || !std::getline(in, url)) {
+			return std::nullopt;
+		}
+
+		return url;
+	}
 
 	static bool parse(const std::string& content, std::string& url, std::string& body) {
 		const auto newline = content.find('\n');
@@ -235,6 +253,12 @@ public:
 				continue;
 			}
 
+			if (const auto candidate_endpoint = url_of(candidate)) {
+				if (const auto backoff = mapped_or_nullptr(backoff_by_url, *candidate_endpoint); backoff != nullptr && now < backoff->next_attempt_at) {
+					continue;
+				}
+			}
+
 			std::string candidate_url;
 			std::string candidate_body;
 
@@ -247,10 +271,6 @@ public:
 			}
 			catch (...) {
 				remove(candidate);
-				continue;
-			}
-
-			if (const auto backoff = mapped_or_nullptr(backoff_by_url, candidate_url); backoff != nullptr && now < backoff->next_attempt_at) {
 				continue;
 			}
 

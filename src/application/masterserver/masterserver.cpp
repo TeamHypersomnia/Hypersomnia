@@ -420,10 +420,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	*/
 
 	auto update_webrtc_alias = [&](masterserver_client& entry) {
+		entry.meta.location_id = entry.official_server_id;
+
 		if (entry.meta.is_official_server()) {
 			entry.meta.webrtc_id = ::to_webrtc_alias(
 				entry.last_heartbeat.is_ranked_server(),
-				entry.last_heartbeat.get_location_id(),
+				entry.official_server_id,
 				entry.last_heartbeat.server_name
 			);
 		}
@@ -1142,8 +1144,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				const auto official_id = official_servers.find(entry.meta.server_public_key);
 				const bool now_official = official_id != nullptr;
 
-				if (entry.meta.is_official != now_official) {
-					LOG("The server at %x is %x.", ::ToString(server.first), now_official ? "now official" : "no longer official");
+				const auto now_id = now_official ? *official_id : std::string();
+
+				if (entry.meta.is_official != now_official || entry.official_server_id != now_id) {
+					LOG("The server at %x is %x.", ::ToString(server.first), now_official ? "official as " + now_id : std::string("no longer official"));
 
 					entry.meta.is_official = now_official;
 					entry.official_server_id = now_official ? *official_id : std::string();

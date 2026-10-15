@@ -118,6 +118,8 @@ class server_setup :
 	std::vector<augs::ed25519_public_key_type> trusted_broker_keys;
 	bool broker_keys_read = false;
 	server_bans bans;
+	std::filesystem::file_time_type bans_file_time = {};
+	double when_checked_bans_file = -1000.0;
 	report_queue reports;
 	augs::ed25519_seed_type this_server_key = {};
 
@@ -661,6 +663,7 @@ public:
 				resolve_heartbeat_host_if_its_time();
 				send_heartbeat_to_server_list_if_its_time();
 				reports.advance(server_time);
+				reload_bans_if_changed();
 				send_tell_me_my_address_if_its_time();
 			}
 
@@ -827,7 +830,8 @@ public:
 	std::string ban_message_for(const std::string& account) const;
 	std::string ban_message(const server_ban&) const;
 	void load_bans();
-	void save_bans();
+	void save_ban(const server_ban&);
+	void reload_bans_if_changed();
 
 	mode_player_id get_local_player_id() const {
 		return get_integrated_player_id();

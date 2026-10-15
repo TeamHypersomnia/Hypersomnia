@@ -95,6 +95,14 @@ struct server_list_entry {
 		The key from the server list, if the masterserver gave one - what the client expects in the handshake.
 	*/
 
+	/*
+		An official server's time zone for happy hours - see masterserver_entry_meta.
+	*/
+
+	std::string get_location_id() const {
+		return std::string(meta.location_id);
+	}
+
 	std::string get_instance_label() const {
 		return std::string(heartbeat.instance_label);
 	}

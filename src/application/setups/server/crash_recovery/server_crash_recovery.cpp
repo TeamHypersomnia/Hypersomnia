@@ -132,6 +132,15 @@ void server_crash_recovery::dump_now(
 	metadata.game_mode = game_mode;
 	metadata.arena_hash = arena_hash;
 
+	std::visit(
+		[&]<typename M>(const M& typed_mode) {
+			if constexpr(std::is_same_v<M, arena_mode>) {
+				metadata.match_start_timestamp = typed_mode.get_match_start_timestamp();
+			}
+		},
+		arena.current_mode_state
+	);
+
 	/*
 		Serialize on the main thread, reusing the same snapshot serialization that
 		sends full state to joining clients (the only serialization instantiated for
@@ -230,8 +239,12 @@ bool server_crash_recovery::consume(
 	arena.current_mode_state = std::move(mode);
 
 	arena.on_mode(
-		[&](auto& typed_mode) {
+		[&]<typename M>(M& typed_mode) {
 			typed_mode.recover_from_crash();
+
+			if constexpr(std::is_same_v<M, arena_mode>) {
+				typed_mode.restore_match_start_timestamp(metadata.match_start_timestamp);
+			}
 		}
 	);
 

@@ -163,7 +163,7 @@ void update_cached_time_to_event(T& server_list) {
 			for (auto& s : server_list) {
 				s.heartbeat.cached_time_to_event = 
 					s.heartbeat.is_ranked_server()
-					? augs::date_time::get_secs_until_next_weekend_evening(s.heartbeat.get_location_id()) 
+					? augs::date_time::get_secs_until_next_weekend_evening(s.get_location_id()) 
 					: std::numeric_limits<double>::max()
 				;
 			}
@@ -228,7 +228,7 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
 
 #if PLATFORM_WEB
 	for (auto& n : new_server_list) {
-		if (const auto ping = get_estimated_ping_to_server(n.heartbeat.get_location_id())) {
+		if (const auto ping = get_estimated_ping_to_server(n.get_location_id())) {
 			n.progress.state = server_entry_state::PING_MEASURED;
 			n.progress.ping = static_cast<uint32_t>(*ping);
 		}
@@ -1018,7 +1018,7 @@ void browse_servers_gui_state::show_server_list(
 
 		if (s.is_official_server() ) {
 			if (d.is_ranked_server()) {
-				const auto location_id = d.get_location_id();
+				const auto location_id = s.get_location_id();
 
 #if PLATFORM_WEB
 				if (const auto result = augs::date_time::format_time_until_weekend_evening(d.cached_time_to_event)) {
