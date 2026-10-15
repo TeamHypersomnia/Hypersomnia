@@ -822,7 +822,7 @@ work_result work(
 		}
 
 		/*
-			The key alone on stdout - for scripts; how to use it on stderr.
+			The key on a line of its own on stdout (grep -E "^[0-9a-f]{64}$" in scripts); how to use it on stderr.
 		*/
 
 		const auto key_hex = server_key::public_key_hex(*seed);

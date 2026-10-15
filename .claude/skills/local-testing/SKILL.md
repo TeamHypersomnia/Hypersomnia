@@ -171,7 +171,7 @@ and reporting to that site; `run_match.sh` puts its key in arenaus's `official_s
 or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the site DB.
 
 - **Joins name the server's key (connect_target.h):** `--connect <key>` (found on the list, else the favorites' last address;
-  without a list yet it waits up to 4 s), `--connect <address>,<key>` / `--connect-ip` (straight there, expecting the key), or an
+  without a list yet it waits up to 4 s), `--connect <address>,<key>` (straight there, expecting the key), or an
   address alone (nothing verified). A join from the server list is `<address>,<key>` and so is the last join saved in
   runtime_prefs (`client_connect`) - the next start joins without the masterserver. A mismatch: "doesn't match the server list"
   (list key) or "another key than the one you chose" - no Connect anyway anywhere. `remote_e2e/community.sh start` - a

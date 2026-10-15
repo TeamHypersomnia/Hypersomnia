@@ -547,15 +547,20 @@ bool server_list_entry::is_behind_nat() const {
 	return heartbeat.is_behind_nat();
 }
 
-server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address) {
+/*
+	The one pinged with this sequence at this address - a favorite added by hand may be at the address of a listed
+	server, and each gets its own answer.
+*/
+
+server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address, const uint64_t ping_sequence) {
 	for (auto& s : displayed_list()) {
-		if (s.address == address) {
+		if (s.address == address && s.progress.ping_sequence == ping_sequence) {
 			return &s;
 		}
 	}
 
 	for (auto& s : favorite_only_list) {
-		if (s.address == address) {
+		if (s.address == address && s.progress.ping_sequence == ping_sequence) {
 			return &s;
 		}
 	}
@@ -583,7 +588,7 @@ bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_
 	if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
 		const auto sequence = *maybe_sequence;
 
-		if (const auto entry = find_entry(from)) {
+		if (const auto entry = find_entry(from, sequence)) {
 			BRW_LOG("Received a pingback (seq=%x) from an EXTERNAL game server at: %x", sequence, ::ToString(from));
 
 			auto& progress = entry->progress;
@@ -1345,11 +1350,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		/*
-			A favorite answering on this machine or the local network is a local server - found even when the server
-			list hangs or is down.
+			A favorite starred on the list answering on this machine or the local network is a local server - found
+			even when the server list hangs or is down. One added by hand stays under Unlisted.
 		*/
 
-		if (s.progress.responding() && ::is_internal(s.address)) {
+		if (!s.unlisted && s.progress.responding() && ::is_internal(s.address)) {
 			has_local_servers = true;
 			local_server_list.push_back(&s);
 			continue;
@@ -2095,7 +2100,7 @@ invite_target invite_target::of(
 		out.native_address = listed->get_invite_address();
 		out.web_id = listed->get_web_connect_string();
 
-		if (is_internal_address(address)) {
+		if (is_internal_address(address) && address != out.native_address) {
 			out.local_address = address;
 		}
 
@@ -2675,6 +2680,14 @@ bool server_details_gui_state::perform(
 
 	copyable_row("Server name", std::string(name));
 	copyable_row("Arena", std::string(arena));
+
+	/*
+		A favorite the list does not have now: only its name, address and key are known - nothing made up for the rest.
+	*/
+
+	if (entry.favorite_only) {
+		return false;
+	}
 
 	auto nat = nat_type_to_string(heartbeat.nat.type); 
 

@@ -70,6 +70,8 @@ EOF
 cd $GAME
 # Official by its public key
 $BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
+# "@KEY" in the connect string is the server's key - e.g. "pl,@KEY", as the site's Browser links are
+CONNECT=${CONNECT//@KEY/$(cat $T/official_servers.d/pl)}
 
 timeout $((WAIT + 60)) $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
 sleep 3

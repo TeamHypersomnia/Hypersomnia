@@ -218,7 +218,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	void refresh_server_pings();
 
-	server_list_entry* find_entry(const netcode_address_t&);
+	server_list_entry* find_entry(const netcode_address_t&, uint64_t ping_sequence);
 	server_list_entry* find_entry_by_internal_address(const netcode_address_t&, uint64_t ping_sequence);
 
 	bool handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes);
