@@ -115,9 +115,18 @@ struct server_list_entry {
 		The same server: by its key if it has one, else by the address.
 	*/
 
+	/*
+		The same row: a host's instances share the key (told apart by the label), and a favorite added by hand at a
+		listed server's address and key is a row of its own.
+	*/
+
 	bool same_server(const server_list_entry& b) const {
+		if (favorite_only != b.favorite_only || unlisted != b.unlisted || favorite_address != b.favorite_address) {
+			return false;
+		}
+
 		if (const auto key = get_public_key()) {
-			return key == b.get_public_key();
+			return key == b.get_public_key() && get_instance_label() == b.get_instance_label();
 		}
 
 		return !b.get_public_key().has_value() && address == b.address;

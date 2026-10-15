@@ -793,7 +793,12 @@ void browse_servers_gui_state::show_server_list(
 		const auto& d = s.heartbeat;
 
 		const bool given_up = progress.state == server_entry_state::GIVEN_UP;
-		const auto color = rgba(given_up || d.is_full() ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
+		/*
+			A favorite the list does not have knows no slots - never "full".
+		*/
+
+		const bool full = !s.favorite_only && d.is_full();
+		const auto color = rgba(given_up || full ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
 
 		auto do_text = [&](const auto& t) {
 			text_color(t, color);
@@ -1719,7 +1724,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			if (!unlisted_favorites.empty()) {
-				section(unlisted_label, rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]), "unlisted", unlisted_favorites, "");
+				section(unlisted_label, white, "unlisted", unlisted_favorites, "");
 			}
 
 			if (first_section) {
@@ -1931,14 +1936,18 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			{
 				auto width = scoped_item_width(ImGui::CalcTextSize("9").x * 66);
 
-				auto field = [](const std::string& label, const char* const hint, std::string& value) {
-					std::array<char, 256> buf;
+				/*
+					A hostname is at most 253 characters, with ":port" 259; the key 64 hex digits with "0x"; the name
+					as long as a server's own.
+				*/
+
+				auto field = [](const std::string& label, const char* const hint, std::string& value, auto buf) {
 					input_text_with_hint(buf, label, hint, value);
 				};
 
-				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address);
-				field("Public key##add_server", "64 hex digits - from the server's admin", add_server_key);
-				field("Server name (optional)##add_server", "", add_server_name);
+				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address, std::array<char, 260>());
+				field("Public key##add_server", "64 hex digits - from the server's admin", add_server_key, std::array<char, 67>());
+				field("Server name (optional)##add_server", "", add_server_name, std::array<char, max_server_name_length_v + 1>());
 			}
 
 			/*
@@ -1971,7 +1980,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			const bool add_clicked = [&]() {
 				auto scope = maybe_disabled_cols(!can_add);
-				return ImGui::Button("Add");
+				return ImGui::Button("Add server");
 			}();
 
 			if (can_add && add_clicked) {
