@@ -301,7 +301,41 @@ bool start_client_gui_state::perform(
 			*/
 
 			if (with_key) {
-				input_text<67>("Public key (64 hex digits)", custom_key, ImGuiInputTextFlags_AutoSelectAll);
+				/*
+					The key on lines of its own, as many as it takes to show all of it (a key has no spaces to wrap at -
+					it is broken into lines as wide as the field; the breaks are never part of the key).
+				*/
+
+				text("Public key (64 hex digits)");
+
+				{
+					const auto& style = ImGui::GetStyle();
+					const auto field_width = ImGui::GetContentRegionAvail().x;
+					const auto char_width = ImGui::CalcTextSize("0").x;
+					const auto per_line = std::max(std::size_t(8), static_cast<std::size_t>((field_width - 2 * style.FramePadding.x - char_width) / char_width));
+
+					auto shown = std::string();
+
+					for (std::size_t i = 0; i < custom_key.size(); i += per_line) {
+						if (i > 0) {
+							shown += '\n';
+						}
+
+						shown += custom_key.substr(i, per_line);
+					}
+
+					const auto lines = std::max(std::size_t(1), (custom_key.size() + per_line - 1) / per_line);
+					const auto height = lines * ImGui::GetTextLineHeight() + 2 * style.FramePadding.y;
+
+					std::array<char, 200> buf {};
+					std::copy_n(shown.data(), std::min(shown.size(), buf.size() - 1), buf.data());
+
+					if (ImGui::InputTextMultiline("##custom_key", buf.data(), buf.size(), ImVec2(field_width, height), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_NoHorizontalScroll)) {
+						auto edited = std::string(buf.data());
+						std::erase(edited, '\n');
+						custom_key = edited.substr(0, 66);
+					}
+				}
 
 				/*
 					The line under the fields: what is wrong, else that they came from the clipboard (until one is
