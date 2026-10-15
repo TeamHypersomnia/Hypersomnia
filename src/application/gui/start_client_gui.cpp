@@ -42,8 +42,7 @@ bool start_client_gui_state::perform(
 	std::string& into_displayed_connecting_server_name,
 	client_vars& into_vars,
 	const bool streamer_mode,
-	favorite_servers& favorites,
-	const browse_servers_gui_state& server_browser
+	favorite_servers& favorites
 ) {
 	if (!show) {
 		return false;
@@ -67,59 +66,52 @@ bool start_client_gui_state::perform(
 		return false;
 	}
 
+	/*
+		An unlisted server's "<address>,0x<key>" (see connect_target::find_server_identifiers) - from the clipboard
+		when the window opens (the web build has no clipboard to read), or pasted into the address field.
+	*/
+
+	auto take_server_identifiers = [&](const std::string& text) {
+		if (const auto found = connect_target::find_server_identifiers(text)) {
+			custom_address = found->address;
+			custom_key = "0x" + augs::bytes_to_hex(found->key);
+			with_key = true;
+			return true;
+		}
+
+		return false;
+	};
+
+#if !PLATFORM_WEB
+	if (ImGui::IsWindowAppearing()) {
+		if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr && take_server_identifiers(clipboard)) {
+			current_tab = start_client_tab_type::CUSTOM_ADDRESS;
+		}
+	}
+#endif
+
+	take_server_identifiers(custom_address);
+
 	bool result = false;
 
 	/*
-		Custom server: where it is and, if expected, its key (as Server details shows it, with 0x, or bare).
+		Unlisted server: its address and the key it must have (as Server details shows it, with 0x, or bare) -
+		or the address only, verifying nothing.
 	*/
 
 	const auto typed_key = connect_target::key_of(custom_key);
 
 	const auto custom_target = [&]() {
-		if (by_public_key) {
-			auto out = connect_target();
-			out.key = typed_key;
-			return out;
-		}
-
 		auto out = connect_target::parse(custom_address);
 
-		if (expect_key) {
+		if (with_key) {
 			out.key = typed_key;
 		}
 
 		return out;
 	}();
 
-	const bool key_wanted = by_public_key || expect_key;
-	const bool custom_key_invalid = key_wanted && !typed_key.has_value();
-
-	/*
-		Where a key alone would lead: the server list, else a favorite's last address.
-	*/
-
-	/*
-		Only by the key alone - an address picks the instance there, whatever the list says.
-	*/
-
-	const auto listed = typed_key.has_value() && by_public_key ? server_browser.find_entry_by_key(*typed_key, std::string()) : nullptr;
-	const auto favorite = typed_key.has_value() && by_public_key ? favorites.find_any(*typed_key) : nullptr;
-
-	const auto favorite_address = [&]() -> std::string {
-		/*
-			Its public address - never one in this player's network.
-		*/
-
-		if (listed != nullptr) {
-			return listed->get_invite_address();
-		}
-
-		if (favorite != nullptr) {
-			return favorite->address;
-		}
-
-		return custom_target.address;
-	}();
+	const bool custom_key_invalid = with_key && !typed_key.has_value();
 
 	{
 		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
@@ -127,7 +119,7 @@ bool start_client_gui_state::perform(
 
 		do_pretty_tabs(current_tab, [](const start_client_tab_type t) -> std::optional<std::string> {
 			if (t == start_client_tab_type::CUSTOM_ADDRESS) {
-				return "Custom server";
+				return "Unlisted server";
 			}
 
 			return std::nullopt;
@@ -224,108 +216,58 @@ bool start_client_gui_state::perform(
 		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
-			if (ImGui::RadioButton("Public key (recommended)", by_public_key)) {
-				by_public_key = true;
+			if (ImGui::RadioButton("IP with key (recommended)", with_key)) {
+				with_key = true;
 			}
 
 			ImGui::SameLine();
 
-			if (ImGui::RadioButton("IP address", !by_public_key)) {
-				by_public_key = false;
+			if (ImGui::RadioButton("Only IP address (insecure)", !with_key)) {
+				with_key = false;
 			}
 
 			const auto flags = streamer_mode ? ImGuiInputTextFlags_Password : 0; 
 
-			/*
-				One line under the fields for what is wrong or where the key leads - always there, so the layout never jumps.
-			*/
-
-			const auto key_error = !custom_key.empty() && custom_key_invalid;
-
-			if (by_public_key) {
-				input_text<100>("Public key (64 hex digits)", custom_key);
-
-				const auto [note, note_color] = [&]() -> std::pair<std::string, rgba> {
-					if (key_error) {
-						return { "The key should be 64 hex digits.", orange };
-					}
-
-					if (!typed_key.has_value()) {
-						return { "The server's admin publishes it - Server details shows it too.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
-					}
-
-					if (listed != nullptr) {
-						return { typesafe_sprintf("On the server list: %x", std::string(listed->heartbeat.server_name)), green };
-					}
-
-					if (favorite != nullptr && !favorite->address.empty()) {
-						const auto where = streamer_mode ? std::string("its last address") : favorite->address;
-						return { typesafe_sprintf("Not on the server list - among your favorites, last at %x.", where), white };
-					}
-
-					return { "Not on the server list, nor among your favorites.", orange };
-				}();
-
-				text_color(note, note_color);
-			}
-			else {
-				input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
-
-				checkbox("Expect public key (recommended)", expect_key);
-
-				if (expect_key) {
-					input_text<100>("Public key (64 hex digits)", custom_key);
-					text_color(key_error ? "The key should be 64 hex digits." : " ", orange);
-				}
-				else {
-					text_color("Not verified - anyone at this address could answer.", orange);
-				}
-			}
+			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
 
 			/*
-				Found on the list by the key: a favorite like a star there. Else a favorite added by hand -
-				the address and the key as given (see favorite_servers.h).
+				One line under the fields for what is wrong - always there, so the layout never jumps.
 			*/
 
-			if (favorites_kept) {
-				const bool already = [&]() {
-					if (!custom_target.key.has_value()) {
-						return false;
+			if (with_key) {
+				input_text<67>("Public key (64 hex digits)", custom_key);
+
+				const bool key_error = !custom_key.empty() && custom_key_invalid;
+				text_color(key_error ? "The key should be 64 hex digits." : " ", orange);
+
+				/*
+					A favorite added by hand - the address and the key as given (see favorite_servers.h).
+				*/
+
+				if (favorites_kept) {
+					const auto address = connect_target::trimmed(custom_address);
+
+					if (typed_key.has_value() && favorites.contains_manual(*typed_key, address)) {
+						text_color("Already in favorites", green);
 					}
+					else {
+						const bool can_add = !address.empty() && typed_key.has_value();
 
-					if (listed != nullptr) {
-						return favorites.contains(*custom_target.key, listed->get_instance_label());
-					}
+						{
+							auto scope = maybe_disabled_cols({}, !can_add);
 
-					if (by_public_key) {
-						return favorite != nullptr;
-					}
-
-					return favorites.contains_manual(*custom_target.key, favorite_address);
-				}();
-
-				if (already) {
-					text_color("Already in favorites", green);
-				}
-				else {
-					const bool can_add = !favorite_address.empty() && custom_target.key.has_value();
-
-					{
-						auto scope = maybe_disabled_cols({}, !can_add);
-
-						if (ImGui::Button("Add to favorites") && can_add) {
-							if (listed != nullptr) {
-								favorites.set(*custom_target.key, listed->get_instance_label(), favorite_address, std::string(listed->heartbeat.server_name));
-							}
-							else {
-								favorites.add_manual(*custom_target.key, favorite_address, std::string());
+							if (ImGui::Button("Add to favorites") && can_add) {
+								favorites.add_manual(*typed_key, address, std::string());
 							}
 						}
-					}
 
-					ImGui::SameLine();
-					text_disabled("To quickly connect in the future");
+						ImGui::SameLine();
+						text_disabled("To quickly connect in the future");
+					}
 				}
+			}
+			else {
+				text_color("Not verified - anyone at this address could answer.", orange);
 			}
 		}
 		else if (current_tab == start_client_tab_type::BEST_SERVER) {
@@ -440,7 +382,7 @@ bool start_client_gui_state::perform(
 		else {
 			const bool custom_addr_empty = 
 				current_tab == start_client_tab_type::CUSTOM_ADDRESS
-				&& ((!by_public_key && custom_address.empty()) || custom_key_invalid)
+				&& (custom_address.empty() || custom_key_invalid)
 			;
 
 			const bool best_still_unresolved = 
@@ -461,13 +403,6 @@ bool start_client_gui_state::perform(
 						break;
 					case start_client_tab_type::CUSTOM_ADDRESS:
 						into_connect_string = custom_target.to_string();
-
-						if (listed != nullptr) {
-							into_displayed_connecting_server_name = listed->heartbeat.server_name;
-						}
-						else if (favorite != nullptr && !favorite->name.empty()) {
-							into_displayed_connecting_server_name = favorite->name;
-						}
 						break;
 					default:
 						break;

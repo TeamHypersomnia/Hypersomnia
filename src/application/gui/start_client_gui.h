@@ -26,7 +26,6 @@ enum class demo_choice_result_type {
 
 struct server_list_entry;
 class favorite_servers;
-class browse_servers_gui_state;
 
 class start_client_gui_state : public standard_window_mixin<start_client_gui_state> {
 public:
@@ -42,17 +41,11 @@ public:
 	std::string custom_address;
 
 	/*
-		Custom server: the key the server must have - else nothing verifies who answers at the address.
+		Custom server: its address and the key it must have - or the address only, with nothing verifying who answers.
 	*/
 
-	bool expect_key = false;
+	bool with_key = true;
 	std::string custom_key;
-
-	/*
-		Custom server by its public key alone (found on the server list, else among the favorites) - or by an address.
-	*/
-
-	bool by_public_key = true;
 	std::string demo_size;
 
 	bool allow_start = false;
@@ -71,7 +64,6 @@ public:
 		std::string& into_displayed_connecting_server_name,
 		client_vars&,
 		const bool streamer_mode,
-		favorite_servers& favorites,
-		const browse_servers_gui_state& server_browser
+		favorite_servers& favorites
 	);
 };

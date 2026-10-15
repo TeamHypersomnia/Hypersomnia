@@ -146,7 +146,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::unordered_map<std::string, std::optional<netcode_address_t>> favorite_resolved;
 #endif
 
-	void update_favorite_only_list(const favorite_servers&);
+	void update_favorite_only_list(favorite_servers&);
 
 	/*
 		Remembered in gui_state.json. Local only while there are local servers (seen in the last frame).

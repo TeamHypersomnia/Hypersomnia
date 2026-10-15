@@ -2293,8 +2293,10 @@ work_result work(
 				this player's network (another network may have someone else there).
 			*/
 
+			const auto listed = browse_servers_gui.find_entry_by_key(key, client.get_server_instance_label());
+
 			const auto address = [&]() -> std::string {
-				if (const auto listed = browse_servers_gui.find_entry_by_key(key, client.get_server_instance_label())) {
+				if (listed != nullptr) {
 					return listed->get_invite_address();
 				}
 
@@ -2309,7 +2311,9 @@ work_result work(
 				return joined;
 			}();
 
-			favorites.update_if_favorite(key, client.get_server_instance_label(), address, client.get_server_name());
+			const auto official = listed != nullptr ? std::optional<bool>(listed->is_official_server()) : std::nullopt;
+
+			favorites.update_if_favorite(key, client.get_server_instance_label(), address, client.get_server_name(), official);
 		}
 	};
 
@@ -3865,8 +3869,7 @@ work_result work(
 			displayed_connecting_server_name,
 			config.client,
 			config.streamer_mode,
-			favorites,
-			browse_servers_gui
+			favorites
 		);
 
 		if (perform_result || client_start_requested) {

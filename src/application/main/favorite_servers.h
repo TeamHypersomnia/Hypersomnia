@@ -37,6 +37,7 @@ struct favorite_server_entry {
 	std::string address;
 	std::string name;
 	bool manual = false;
+	bool official = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -46,6 +47,12 @@ struct favorite_server {
 	std::string address;
 	std::string name;
 	bool manual = false;
+
+	/*
+		Starred on the list: whether it was official there last - its section when the list does not have it.
+	*/
+
+	bool official = false;
 };
 
 class favorite_servers {
@@ -70,7 +77,7 @@ class favorite_servers {
 				}
 
 				if (const auto key = augs::hex_to_array<32>(hex)) {
-					servers.push_back({ *key, e.manual ? std::string() : e.label, e.address, e.name, e.manual });
+					servers.push_back({ *key, e.manual ? std::string() : e.label, e.address, e.name, e.manual, !e.manual && e.official });
 				}
 			}
 		}
@@ -82,7 +89,7 @@ class favorite_servers {
 		auto entries = std::vector<favorite_server_entry>();
 
 		for (const auto& s : servers) {
-			entries.push_back({ "0x" + augs::bytes_to_hex(s.key), s.label, s.address, s.name, s.manual });
+			entries.push_back({ "0x" + augs::bytes_to_hex(s.key), s.label, s.address, s.name, s.manual, s.official });
 		}
 
 		try {
@@ -148,23 +155,27 @@ public:
 	}
 
 	/*
-		Starred on the server list: added, or its name and address brought up to date (an empty one keeps what it was).
+		Starred on the server list: added, or its name, address and whether it is official brought up to date (an empty
+		one, or official not known, keeps what it was).
 	*/
 
 	void set(
 		const augs::ed25519_public_key_type& key,
 		const std::string& label,
 		const std::string& address,
-		const std::string& name
+		const std::string& name,
+		const std::optional<bool> official
 	) {
 		for (auto& s : servers) {
 			if (!s.manual && s.key == key && s.label == label) {
 				const auto new_address = address.empty() ? s.address : address;
 				const auto new_name = name.empty() ? s.name : name;
+				const auto new_official = official.value_or(s.official);
 
-				if (new_address != s.address || new_name != s.name) {
+				if (new_address != s.address || new_name != s.name || new_official != s.official) {
 					s.address = new_address;
 					s.name = new_name;
+					s.official = new_official;
 					save();
 				}
 
@@ -172,7 +183,7 @@ public:
 			}
 		}
 
-		servers.push_back({ key, label, address, name, false });
+		servers.push_back({ key, label, address, name, false, official.value_or(false) });
 		save();
 	}
 
@@ -191,7 +202,7 @@ public:
 			}
 		}
 
-		servers.push_back({ key, std::string(), address, shown_name, true });
+		servers.push_back({ key, std::string(), address, shown_name, true, false });
 		save();
 	}
 
@@ -200,9 +211,15 @@ public:
 		and one added by hand is never changed.
 	*/
 
-	void update_if_favorite(const augs::ed25519_public_key_type& key, const std::string& label, const std::string& address, const std::string& name) {
+	void update_if_favorite(
+		const augs::ed25519_public_key_type& key,
+		const std::string& label,
+		const std::string& address,
+		const std::string& name,
+		const std::optional<bool> official
+	) {
 		if (contains(key, label)) {
-			set(key, label, address, name);
+			set(key, label, address, name, official);
 		}
 	}
 

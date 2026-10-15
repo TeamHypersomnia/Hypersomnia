@@ -72,6 +72,50 @@ struct connect_target {
 		return out;
 	}
 
+	/*
+		What an unlisted server's admin publishes: "<address>,0x<key>" or "<address>,0x<key>,<name>" (the name may hold
+		commas) - taken from the clipboard when Add an unlisted server or Connect opens, and from their address field
+		when pasted there.
+	*/
+
+	struct server_identifiers {
+		std::string address;
+		augs::ed25519_public_key_type key = {};
+		std::string name;
+	};
+
+	static std::optional<server_identifiers> find_server_identifiers(const std::string& text) {
+		const auto first = text.find(',');
+
+		if (first == std::string::npos) {
+			return std::nullopt;
+		}
+
+		const auto second = text.find(',', first + 1);
+		const auto address = trimmed(text.substr(0, first));
+		/*
+			Only with "0x" - so that no other text with a comma in the clipboard is taken for one.
+		*/
+
+		const auto key_text = trimmed(text.substr(first + 1, second == std::string::npos ? std::string::npos : second - first - 1));
+
+		if (key_text.rfind("0x", 0) != 0) {
+			return std::nullopt;
+		}
+
+		const auto key = key_of(key_text);
+
+		if (address.empty() || !key.has_value() || address.find('\n') != std::string::npos) {
+			return std::nullopt;
+		}
+
+		auto out = server_identifiers();
+		out.address = address;
+		out.key = *key;
+		out.name = second == std::string::npos ? std::string() : trimmed(text.substr(second + 1));
+		return out;
+	}
+
 	std::string to_string() const {
 		if (!key.has_value()) {
 			return address;
