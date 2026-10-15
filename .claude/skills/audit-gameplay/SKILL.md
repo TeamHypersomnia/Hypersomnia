@@ -66,6 +66,10 @@ description: Audit/review a Hypersomnia feature or system (recently added gamepl
 Per checklist point: findings with `file:line`, severity, a concrete problem and a concrete fix.
 Skip points with nothing to report, but list them in one line as "clean". Rank the most severe findings first.
 
+The `auditor` agents write Markdown (their own finding format plus this checklist's severities); the HTML page below
+is put together from them by the session - only when the audit is what the user asked for directly. Inside a longer
+working session the session reads the Markdown and summarizes it instead (see the `audit-rounds` skill).
+
 **The final report is an HTML page, in exactly the format of `report_template.html` next to this file** -
 a real report from 2026-09-30, kept as the example. Copy it, keep its CSS and script, and replace only the data:
 

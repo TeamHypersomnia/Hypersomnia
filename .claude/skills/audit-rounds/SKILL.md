@@ -24,11 +24,10 @@ skill keeps that from happening.
    (e.g. a removed mechanism), do not edit the prompt - append a short "current state" context block to it, listing
    what was removed and which decisions are intentional (no backward compatibility, etc.), so the auditor does not
    flag decided behavior or hunt for deleted code. Say you did this.
-3. Every audit runs as the `auditor` agent (`.claude/agents/auditor.md` - read-only, writes only its report, without the
-   general-purpose agent's many tool definitions), the report's format in the prompt.
-4. Diff audits: one clean-context agent over the exact ranges (game commit range, the site's commits since the same
-   time, the netcode fork's commits), report in the user's style - a few sentences per finding: where (file:line),
-   what goes wrong, a concrete scenario, the fix; sorted by severity; uncertain ones marked as such.
+3. Every audit runs as the `auditor` agent (`.claude/agents/auditor.md` - read-only, writes one Markdown report in
+   its own finding format; you read it and summarize it for the user, never an HTML report here).
+4. Diff audits: one `auditor` over the exact ranges (game commit range, the site's commits since the same time, the
+   netcode fork's commits).
 5. Long waits: wrap every test command in a short `timeout`, check background shells about every minute (builds
    are the only exception), never pipe a script that backgrounds a server into `tail`.
 
