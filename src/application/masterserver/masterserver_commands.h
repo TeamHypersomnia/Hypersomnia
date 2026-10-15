@@ -26,10 +26,29 @@ namespace masterserver_out {
 		(a spoofed masterserver address) can not hand it a cookie.
 	*/
 
+	/*
+		Why a signed heartbeat with a fresh cookie was not listed - the server's log says it.
+	*/
+
+	enum class heartbeat_refusal : uint8_t {
+		NONE,
+		LIST_FULL,
+		BAD_SIGNATURE,
+		BAD_INSTANCE_LABEL,
+		INSTANCE_LABEL_TAKEN
+	};
+
 	struct heartbeat_ack {
 		masterserver_cookie_type cookie = {};
 		heartbeat_nonce_type nonce = {};
 		bool accepted = false;
+		heartbeat_refusal refusal = heartbeat_refusal::NONE;
+
+		/*
+			INSTANCE_LABEL_TAKEN: where the server with this key and label already listed is.
+		*/
+
+		netcode_address_t taken_by = {};
 	};
 }
 

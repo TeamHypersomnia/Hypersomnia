@@ -821,7 +821,15 @@ work_result work(
 			return work_result::FAILURE;
 		}
 
-		std::cout << server_key::public_key_hex(*seed) << std::endl;
+		/*
+			The key alone on stdout - for scripts; how to use it on stderr.
+		*/
+
+		const auto key_hex = server_key::public_key_hex(*seed);
+
+		std::cout << key_hex << std::endl;
+		std::cerr << "\nPublish it with this server's address, e.g. 1.2.3.4:8412,0x" << key_hex << "\n";
+		std::cerr << "Players add it in Browse servers - Favorites - Add an unlisted server." << std::endl;
 		return work_result::SUCCESS;
 	}
 
@@ -2273,32 +2281,6 @@ work_result work(
 		that answered in the remote one's place (the localhost fallback).
 	*/
 
-	/*
-		A join to remember for the next start never keeps an address in this player's network (a server found on the LAN
-		is short-lived there): its public one from the list, else the key alone with its instance label.
-		This machine's own (127.0.0.1, localhost) stays.
-	*/
-
-	WEBSTATIC auto without_lan_address = [&](connect_target join) {
-		auto ip = join.address;
-		cut_preffix(ip, "rtc:");
-
-		const bool this_machine = begins_with(ip, "127.") || begins_with(ip, "[::1]") || begins_with(ip, "localhost");
-
-		if (const auto parsed = ::find_netcode_addr(ip); parsed.has_value() && ::is_internal(*parsed) && !this_machine && join.key.has_value()) {
-			const auto listed = browse_servers_gui.find_entry_by_connect_string(join.address);
-			const bool same_server = listed != nullptr && listed->get_public_key() == join.key;
-
-			join.address = same_server ? listed->get_invite_address() : std::string();
-
-			if (same_server) {
-				join.label = listed->get_instance_label();
-			}
-		}
-
-		return join;
-	};
-
 	WEBSTATIC auto update_favorite_of = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
 		/*
 			Only once the server told which instance it is - with no label yet, the host's first favorite (another
@@ -2637,13 +2619,7 @@ work_result work(
 				const auto last_join = connect_target::parse(config.client_connect);
 
 				if (!last_join.key.has_value() && !client.connected_through_localhost_fallback() && last_join.address == client.get_connect_string()) {
-					auto proven = without_lan_address(connect_target { last_join.address, server_key, std::string() });
-
-					if (proven.label.empty()) {
-						proven.label = client.get_server_instance_label();
-					}
-
-					const auto with_key = proven.to_string();
+					const auto with_key = connect_target { last_join.address, server_key }.to_string();
 
 					change_with_save([&](auto& cfg) {
 						cfg.client_connect = with_key;
@@ -3312,7 +3288,7 @@ work_result work(
 			if (found != nullptr) {
 				connect_string = found->get_my_connect_string();
 			}
-			else if (const auto favorite = favorites.find(*target.key, target.label); favorite != nullptr && !favorite->address.empty()) {
+			else if (const auto favorite = favorites.find_any(*target.key)) {
 				connect_string = favorite->address;
 			}
 			else if (list_coming) {
@@ -3465,18 +3441,13 @@ work_result work(
 		std::string saved_for_next_launch;
 
 		/*
-			The next launch joins the same server right away, without asking the masterserver: where it is and its key.
+			The next launch joins the same server right away, without asking the masterserver: where it was joined and
+			its key - also an address on the local network (elsewhere it fails the key check, or times out).
 			A domain survives the server changing its IP.
 		*/
 
 		if (target.key.has_value()) {
-			auto next = connect_target { std::string(connect_string), target.key, std::string() };
-
-			next = without_lan_address(next);
-
-			if (next.address.empty() && next.label.empty()) {
-				next.label = found != nullptr ? found->get_instance_label() : target.label;
-			}
+			auto next = connect_target { std::string(connect_string), target.key };
 
 #if !PLATFORM_WEB
 			if (found != nullptr && !found->get_domain_with_port().empty()) {

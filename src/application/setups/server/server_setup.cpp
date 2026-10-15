@@ -2546,12 +2546,31 @@ bool server_setup::handle_masterserver_response(
 				}
 				else if (server_time - when_logged_heartbeat_refused > 60.0) {
 					/*
-						Refused even with a fresh cookie: the list is full, or the masterserver could not verify the
-						signature - this server is not on the list.
+						Refused even with a fresh cookie - this server is not on the list.
 					*/
 
 					when_logged_heartbeat_refused = server_time;
-					LOG("WARNING: the masterserver does not list this server (its list is full, or it refused the heartbeat's signature).");
+
+					using R = masterserver_out::heartbeat_refusal;
+
+					switch (typed_request.refusal) {
+						case R::INSTANCE_LABEL_TAKEN:
+							LOG(
+								"ERROR: the masterserver does not list this server: another server with this key already uses %x (at %x). Run all instances from one process (see \"instances\" in the config), or give this one its own appdata (its own key).",
+								std::string(instance_label),
+								::ToString(typed_request.taken_by)
+							);
+							break;
+						case R::BAD_INSTANCE_LABEL:
+							LOG("ERROR: the masterserver does not list this server: its instance label (%x) is not valid.", std::string(instance_label));
+							break;
+						case R::BAD_SIGNATURE:
+							LOG("WARNING: the masterserver does not list this server: it refused the heartbeat's signature.");
+							break;
+						default:
+							LOG("WARNING: the masterserver does not list this server (its list is full).");
+							break;
+					}
 				}
 			}
 			else {
@@ -3026,11 +3045,13 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.time_zone = get_time_zone();
 
 	/*
-		Happy hours by this server's own time zone - the browser shows them as they are, the report says them.
+		The next event: a ranked server's happy hours by its own time zone - the browser shows them as they are,
+		the report says them.
 	*/
 
 	if (is_ranked_server()) {
-		heartbeat.secs_until_happy_hours = static_cast<int32_t>(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()));
+		heartbeat.next_event_name = "2X EXP";
+		heartbeat.secs_until_next_event = static_cast<int32_t>(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()));
 	}
 	heartbeat.validate();
 

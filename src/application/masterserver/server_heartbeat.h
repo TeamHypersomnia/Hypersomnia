@@ -22,6 +22,13 @@ enum class ranked_server_type : uint8_t {
 	TOURNAMENT_FINALS
 };
 
+/*
+	What the Event column shows while the server's event is on (e.g. "2X EXP" in a ranked server's happy hours) -
+	the server names it, the browser counts down to it.
+*/
+
+using event_name_type = augs::constant_size_string<16>;
+
 struct server_heartbeat_player_info {
 	// GEN INTROSPECTOR struct server_heartbeat_player_info
 	client_nickname_type nickname;
@@ -75,7 +82,8 @@ struct server_heartbeat {
 
 	host_string_type domain;
 	host_string_type time_zone;
-	int32_t secs_until_happy_hours = -1;
+	event_name_type next_event_name;
+	int32_t secs_until_next_event = -1;
 	instance_label_type instance_label;
 	heartbeat_nonce_type ack_nonce = {};
 	std::optional<server_request_signature> signature;
@@ -101,11 +109,11 @@ struct server_heartbeat {
 	}
 
 	/*
-		When happy hours start by this computer's steady clock (from secs_until_happy_hours as the list came; 0 - on,
+		When the next event starts by this computer's steady clock (from secs_until_next_event as the list came; 0 - on,
 		-1 - none), and the seconds left, kept up to date for the Event column.
 	*/
 
-	double happy_hours_at = -1.0;
+	double next_event_at = -1.0;
 	double cached_time_to_event = 0.0;
 
 	bool any_human() const {

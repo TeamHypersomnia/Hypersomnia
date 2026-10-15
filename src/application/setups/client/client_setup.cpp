@@ -879,7 +879,7 @@ std::string client_setup::get_browser_location() const {
 		With the server's key: a reload (or the link shared from the address bar) joins verified.
 	*/
 
-	return typesafe_sprintf("game/%x", connect_target { connect_string, get_invite_server_key(), std::string() }.to_string());
+	return typesafe_sprintf("game/%x", connect_target { connect_string, get_invite_server_key() }.to_string());
 }
 
 void client_setup::connect() {
@@ -2485,7 +2485,7 @@ std::string client_setup::get_steam_join_command_line() const {
 		Where the server is and its key - a friend joins exactly this server, the masterserver not needed.
 	*/
 
-	return connect_target { get_connect_string(), get_invite_server_key(), std::string() }.to_string();
+	return connect_target { get_connect_string(), get_invite_server_key() }.to_string();
 }
 
 std::optional<augs::ed25519_public_key_type> client_setup::get_invite_server_key() const {

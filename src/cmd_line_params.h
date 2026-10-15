@@ -277,13 +277,6 @@ struct cmd_line_params {
 
 				set_connect(get_next());
 			}
-			else if (a == "--connect-ip") {
-				/*
-					Straight to an address - with ",<key>" expecting that key, without it verifying nothing.
-				*/
-
-				set_connect(get_next());
-			}
 			else if (a == "--live-log") {
 				live_log_path = get_next();
 			}

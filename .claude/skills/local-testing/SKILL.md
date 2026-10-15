@@ -179,8 +179,9 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
   list entry (60 s) keeps the previous key. Never `kill -9` the pid file's pid (it is `timeout`'s). A client with
   `"server_list_provider": "http://<arenaus>:18420"` and `"last_activity": "MAIN_MENU"` joins from Browse servers.
 - **Server browser and invites:** the list is cached at `<appdata>/cache/server_list.bin` (shown in the browser only, until a fresh one comes - joins, quick play and invites never use it) and downloaded at every start in the
-  background (even with `--connect`); favorites are `user/favorite_servers.txt` (key, last address, name), the tab in
-  `user/server_browser_tab.txt` (0 Local .. 4 All; none = Favorites). Esc - Invite to join opens a window from what the game
+  background (even with `--connect`); favorites are `user/favorite_servers.json` (`key`, `label`, `address`, `name`, `manual` - a
+  manual one is Add an unlisted server: shown under Unlisted, never matched with the list), passwords
+  `user/server_passwords.json`, the browser tab in `user/gui_state.json` (`server_browser_tab`: LOCAL, ALL, FAVORITES). Esc - Invite to join opens a window from what the game
   knows (no list download): links, address, key, ★; joined over the LAN it shows the public address from the list. The log
   line `Steam rich presence connect: <address>,<key>` shows what a Steam friend would join (also in non-Steam builds).
   Main menu keys: C - Connect to server, P - Quick play. `backend.sh` and the e2e servers stop by themselves after 2 h

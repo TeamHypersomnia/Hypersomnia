@@ -94,8 +94,8 @@ Options:
 
     --unit-tests-only           Perform unit tests only and quit.
     --print-server-key          Print this server's public key (.keys/server.key, made if missing) and quit.
-    --connect [ADDRESS]         Connect to an arena server in accordance with client_start inside the config file.
-                                The ADDRESS argument is optional - if specified, it will override the custom_address field from the config file.
+    --connect [TARGET]          Connect to an arena server. TARGET is an address (not verified), "<address>,0x<key>"
+                                (verified to be the server with that key) or "0x<key>" alone (found on the server list).
     --server                    Host an arena server in accordance with server_start inside the config file.
                                 Contrary to the --dedicated-server option, this lets you play on your own server within the same game instance.
     --dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.

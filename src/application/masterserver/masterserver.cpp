@@ -987,8 +987,47 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 									Not accepted - the server says so in its log.
 								*/
 
+								ack.refusal = masterserver_out::heartbeat_refusal::BAD_SIGNATURE;
 								send_back(ack);
 								return;
+							}
+
+							/*
+								Each instance of a host (one key) by its own label (see server_instance_label.h): one in a
+								wrong format, or one another address of this key is listed with already (two processes
+								on one host, or a server.key copied to another machine) is not listed - the older one
+								stays, until its goodbye or its timeout.
+							*/
+
+							{
+								const auto label = std::string(typed_request.instance_label);
+
+								if (!::is_instance_label(label)) {
+									ack.refusal = masterserver_out::heartbeat_refusal::BAD_INSTANCE_LABEL;
+									send_back(ack);
+									return;
+								}
+
+								for (const auto& other : server_list) {
+									const bool same_instance =
+										!(other.first == from)
+										&& other.second.meta.server_public_key == public_key
+										&& std::string(other.second.last_heartbeat.instance_label) == label
+									;
+
+									if (same_instance) {
+										static uint64_t last_logged_ms = 0;
+
+										if (::official_log_allowed(last_logged_ms)) {
+											LOG("Ignoring a heartbeat from %x: its key's %x is listed at %x already.", ip_str, label, ::ToString(other.first));
+										}
+
+										ack.refusal = masterserver_out::heartbeat_refusal::INSTANCE_LABEL_TAKEN;
+										ack.taken_by = other.first;
+										send_back(ack);
+										return;
+									}
+								}
 							}
 
 							/*
@@ -1012,6 +1051,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 										LOG("Ignoring a new server at %x: already %x servers from this address, or %x in all.", ip_str, settings.max_servers_per_address, settings.max_servers);
 									}
 
+									ack.refusal = masterserver_out::heartbeat_refusal::LIST_FULL;
 									send_back(ack);
 									return;
 								}

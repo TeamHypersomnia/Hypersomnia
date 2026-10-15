@@ -5,8 +5,8 @@
 
 /*
 	One server.key per host: all its instances (casual, ranked, tournament matches) have the same key and tell themselves
-	apart by a label the launcher gives them - c1, c2, r1, t1, a1 - in their signed heartbeat and to the players.
-	A join may name one ("c2-<key>", see connect_target.h).
+	apart by a label the launcher gives them - c1, c2, r1, t1, a1 - in their signed heartbeat.
+	A join names an instance by its address; the label is the list's and the favorites' (see favorite_servers.h).
 */
 
 enum class server_instance_type : uint8_t {

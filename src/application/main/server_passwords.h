@@ -1,19 +1,27 @@
 #pragma once
 #include <map>
 #include <optional>
-#include <sstream>
+#include <vector>
 #include <string>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/ed25519.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/readwrite/json_readwrite.h"
 
 /*
 	The passwords the player entered, each saved for the public key of its server -
 	so a password goes only to the server it was given for, sealed to that key, and never to another one.
-	One line per server: the key in hex, a space, the password.
+	Kept in server_passwords.json.
 */
+
+struct server_password_entry {
+	// GEN INTROSPECTOR struct server_password_entry
+	std::string key;
+	std::string password;
+	// END GEN INTROSPECTOR
+};
 
 class server_passwords {
 	augs::path_type path;
@@ -23,14 +31,9 @@ class server_passwords {
 		by_key.clear();
 
 		try {
-			auto in = std::istringstream(augs::file_to_string(path));
-			std::string line;
-
-			while (std::getline(in, line)) {
-				const auto space = line.find(' ');
-
-				if (space == 64) {
-					by_key[line.substr(0, space)] = line.substr(space + 1);
+			for (const auto& e : augs::from_json_file<std::vector<server_password_entry>>(path)) {
+				if (e.key.size() == 64) {
+					by_key[e.key] = e.password;
 				}
 			}
 		}
@@ -39,15 +42,15 @@ class server_passwords {
 	}
 
 	void save() const {
-		std::string content;
+		auto entries = std::vector<server_password_entry>();
 
 		for (const auto& [key, password] : by_key) {
-			content += key + " " + password + "\n";
+			entries.push_back({ key, password });
 		}
 
 		try {
 			augs::create_directories_for(path);
-			augs::save_as_text_atomic(path, content);
+			augs::save_as_json_atomic(entries, path);
 		}
 		catch (const std::exception& e) {
 			LOG("Could not save the server passwords to %x: %x", path, e.what());
@@ -55,7 +58,7 @@ class server_passwords {
 	}
 
 public:
-	static constexpr std::string_view file_name = "server_passwords.txt";
+	static constexpr std::string_view file_name = "server_passwords.json";
 
 	explicit server_passwords(const augs::path_type& path) : path(path) {
 		load();
@@ -75,10 +78,6 @@ public:
 		*/
 
 		if (password.size() > 64) {
-			return;
-		}
-
-		if (password.find('\n') != std::string::npos) {
 			return;
 		}
 

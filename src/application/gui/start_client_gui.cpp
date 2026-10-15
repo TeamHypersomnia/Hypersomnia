@@ -73,18 +73,12 @@ bool start_client_gui_state::perform(
 		Custom server: where it is and, if expected, its key (as Server details shows it, with 0x, or bare).
 	*/
 
-	/*
-		Also one instance of a host: "c2-<key>".
-	*/
-
-	const auto typed = connect_target::parse(custom_key);
-	const auto typed_key = typed.address.empty() ? typed.key : std::nullopt;
+	const auto typed_key = connect_target::key_of(custom_key);
 
 	const auto custom_target = [&]() {
 		if (by_public_key) {
 			auto out = connect_target();
 			out.key = typed_key;
-			out.label = typed.label;
 			return out;
 		}
 
@@ -104,8 +98,12 @@ bool start_client_gui_state::perform(
 		Where a key alone would lead: the server list, else a favorite's last address.
 	*/
 
-	const auto listed = typed_key.has_value() ? server_browser.find_entry_by_key(*typed_key, typed.label) : nullptr;
-	const auto favorite = typed_key.has_value() ? favorites.find(*typed_key, typed.label) : nullptr;
+	/*
+		Only by the key alone - an address picks the instance there, whatever the list says.
+	*/
+
+	const auto listed = typed_key.has_value() && by_public_key ? server_browser.find_entry_by_key(*typed_key, std::string()) : nullptr;
+	const auto favorite = typed_key.has_value() && by_public_key ? favorites.find_any(*typed_key) : nullptr;
 
 	const auto favorite_address = [&]() -> std::string {
 		/*
@@ -245,11 +243,11 @@ bool start_client_gui_state::perform(
 			const auto key_error = !custom_key.empty() && custom_key_invalid;
 
 			if (by_public_key) {
-				input_text<100>("Public key (or c2-<key> for one instance)", custom_key);
+				input_text<100>("Public key (64 hex digits)", custom_key);
 
 				const auto [note, note_color] = [&]() -> std::pair<std::string, rgba> {
 					if (key_error) {
-						return { "The key should be 64 hex digits (or c2-<key>).", orange };
+						return { "The key should be 64 hex digits.", orange };
 					}
 
 					if (!typed_key.has_value()) {
@@ -284,10 +282,29 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			const auto favorite_label = listed != nullptr ? listed->get_instance_label() : custom_target.label;
+			/*
+				Found on the list by the key: a favorite like a star there. Else a favorite added by hand -
+				the address and the key as given (see favorite_servers.h).
+			*/
 
 			if (favorites_kept) {
-				if (custom_target.key.has_value() && favorites.contains(*custom_target.key, favorite_label)) {
+				const bool already = [&]() {
+					if (!custom_target.key.has_value()) {
+						return false;
+					}
+
+					if (listed != nullptr) {
+						return favorites.contains(*custom_target.key, listed->get_instance_label());
+					}
+
+					if (by_public_key) {
+						return favorite != nullptr;
+					}
+
+					return favorites.contains_manual(*custom_target.key, favorite_address);
+				}();
+
+				if (already) {
 					text_color("Already in favorites", green);
 				}
 				else {
@@ -297,8 +314,12 @@ bool start_client_gui_state::perform(
 						auto scope = maybe_disabled_cols({}, !can_add);
 
 						if (ImGui::Button("Add to favorites") && can_add) {
-							const auto name = listed != nullptr ? std::string(listed->heartbeat.server_name) : std::string();
-							favorites.set(*custom_target.key, favorite_label, favorite_address, name);
+							if (listed != nullptr) {
+								favorites.set(*custom_target.key, listed->get_instance_label(), favorite_address, std::string(listed->heartbeat.server_name));
+							}
+							else {
+								favorites.add_manual(*custom_target.key, favorite_address, std::string());
+							}
 						}
 					}
 

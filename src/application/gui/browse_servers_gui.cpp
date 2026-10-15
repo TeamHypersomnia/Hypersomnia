@@ -161,10 +161,10 @@ void update_cached_time_to_event(T& server_list) {
 	main_thread_queue::execute(
 		[&]() {
 			for (auto& s : server_list) {
-				const auto at = s.heartbeat.happy_hours_at;
+				const auto at = s.heartbeat.next_event_at;
 
 				s.heartbeat.cached_time_to_event =
-					!s.heartbeat.is_ranked_server() || at < 0.0 ? std::numeric_limits<double>::max() :
+					at < 0.0 ? std::numeric_limits<double>::max() :
 					at == 0.0 ? 0.0 :
 					std::max(1.0, at - augs::steady_secs())
 				;
@@ -221,8 +221,8 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
             augs::read_bytes(stream, entry.heartbeat);
 
 			{
-				const auto secs = entry.heartbeat.secs_until_happy_hours;
-				entry.heartbeat.happy_hours_at = secs < 0 ? -1.0 : secs == 0 ? 0.0 : augs::steady_secs() + secs;
+				const auto secs = entry.heartbeat.secs_until_next_event;
+				entry.heartbeat.next_event_at = secs < 0 ? -1.0 : secs == 0 ? 0.0 : augs::steady_secs() + secs;
 			}
 
             new_server_list.emplace_back(std::move(entry));
@@ -451,10 +451,10 @@ std::string server_list_entry::get_my_connect_string() const {
 
 std::string server_list_entry::get_join_string() const {
 	if (favorite_only) {
-		return connect_target { favorite_address, get_public_key(), std::string() }.to_string();
+		return connect_target { favorite_address, get_public_key() }.to_string();
 	}
 
-	return connect_target { get_my_connect_string(), get_public_key(), std::string() }.to_string();
+	return connect_target { get_my_connect_string(), get_public_key() }.to_string();
 }
 
 /*
@@ -800,8 +800,18 @@ void browse_servers_gui_state::show_server_list(
 			The star: gold for a favorite, an outline otherwise - a click adds or removes it, never selects the row.
 		*/
 
+		/*
+			A favorite added by hand (unlisted) is that address and key - see favorite_servers.h.
+		*/
+
 		const auto key = s.get_public_key();
-		const bool is_favorite = key.has_value() && in.favorites.contains(*key, s.get_instance_label());
+		const bool manual_favorite = s.favorite_only && s.unlisted;
+
+		const bool is_favorite = key.has_value() && (
+			manual_favorite ?
+			in.favorites.contains_manual(*key, s.favorite_address) :
+			in.favorites.contains(*key, s.get_instance_label())
+		);
 		bool star_hovered = false;
 
 		if (key.has_value() && favorites_kept) {
@@ -824,7 +834,15 @@ void browse_servers_gui_state::show_server_list(
 
 			if (star_hovered && ImGui::IsMouseClicked(0)) {
 				if (is_favorite) {
-					in.favorites.remove(*key, s.get_instance_label());
+					if (manual_favorite) {
+						in.favorites.remove_manual(*key, s.favorite_address);
+					}
+					else {
+						in.favorites.remove(*key, s.get_instance_label());
+					}
+				}
+				else if (manual_favorite) {
+					in.favorites.add_manual(*key, s.favorite_address, std::string(s.heartbeat.server_name));
 				}
 				else {
 					in.favorites.set(*key, s.get_instance_label(), ::favorite_address_of(s), ::favorite_name_of(s));
@@ -910,16 +928,6 @@ void browse_servers_gui_state::show_server_list(
 
 			auto displayed_name = d.server_name;
 
-			/*
-				A favorite the player named (Add a server) shows that name - not the server's.
-			*/
-
-			if (key.has_value() && favorites_kept) {
-				if (const auto favorite = in.favorites.find(*key, s.get_instance_label()); favorite != nullptr && favorite->named_by_player && !favorite->name.empty()) {
-					displayed_name = favorite->name;
-				}
-			}
-
 			if (streamer_mode && s.is_community_server()) {
 				displayed_name = "Community server";
 			}
@@ -945,7 +953,10 @@ void browse_servers_gui_state::show_server_list(
 		}
 		else if (ImGui::IsItemHovered() && s.favorite_only) {
 			auto tool = scoped_tooltip();
-			text_disabled("Not on the server list.");
+
+			if (s.unlisted) {
+				text_disabled("Unlisted - added by hand.");
+			}
 
 			if (!s.other_server_at_address.empty()) {
 				text_color(typesafe_sprintf("Another server is at its address now: %x", s.other_server_at_address), orange);
@@ -953,7 +964,7 @@ void browse_servers_gui_state::show_server_list(
 			}
 
 			if (!streamer_mode) {
-				text_disabled(typesafe_sprintf("Last seen at: %x", s.favorite_address));
+				text_disabled(typesafe_sprintf(s.unlisted ? "Address: %x" : "Last seen at: %x", s.favorite_address));
 			}
 		}
 		else if (ImGui::IsItemHovered()) {
@@ -1030,12 +1041,13 @@ void browse_servers_gui_state::show_server_list(
 		ImGui::NextColumn();
 
 		if (s.is_official_server() ) {
-			if (d.is_ranked_server()) {
+			if (d.next_event_at >= 0.0) {
 				const auto secs_left = d.cached_time_to_event == std::numeric_limits<double>::max() ? -1.0 : d.cached_time_to_event;
 
 				if (const auto result = augs::date_time::format_time_until_weekend_evening(secs_left)) {
 					if (const bool ongoing = *result == "") {
-						text_color("2X EXP", wave_color);
+						const auto event_name = std::string(d.next_event_name);
+						text_color(event_name.empty() ? std::string("Event") : event_name, wave_color);
 					}
 					else {
 						text_disabled(*result);
@@ -1483,7 +1495,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		next_columns(2);
 
-		if (ImGui::Selectable("Add a server", false, ImGuiSelectableFlags_SpanAllColumns)) {
+		if (ImGui::Selectable("Add an unlisted server", false, ImGuiSelectableFlags_SpanAllColumns)) {
 			add_server_open = true;
 			add_server_name.clear();
 			add_server_address.clear();
@@ -1627,7 +1639,19 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", tournaments.size());
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", officials.size());
 		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", communities.size());
-		const auto not_listed_label = typesafe_sprintf("Not on the server list (%x)", favorite_only_shown.size());
+		/*
+			Starred on the list but not on it now (or no list) - and the ones added by hand.
+		*/
+
+		auto other_favorites = std::vector<server_list_entry*>();
+		auto unlisted_favorites = std::vector<server_list_entry*>();
+
+		for (const auto e : favorite_only_shown) {
+			(e->unlisted ? unlisted_favorites : other_favorites).push_back(e);
+		}
+
+		const auto other_favorites_label = typesafe_sprintf("Other favorites (%x)", other_favorites.size());
+		const auto unlisted_label = typesafe_sprintf("Unlisted (%x)", unlisted_favorites.size());
 
 		auto separate_with_label_only = [&](const auto& label, const auto& color) {
 			text_disabled("\n\n");
@@ -1685,8 +1709,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				section(community_servers_label, orange, "community", communities, "");
 			}
 
-			if (!favorite_only_shown.empty()) {
-				section(not_listed_label, rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]), "favorite", favorite_only_shown, "");
+			if (!other_favorites.empty()) {
+				section(other_favorites_label, rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]), "favorite", other_favorites, "");
+			}
+
+			if (!unlisted_favorites.empty()) {
+				section(unlisted_label, rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]), "unlisted", unlisted_favorites, "");
 			}
 
 			if (first_section) {
@@ -1697,7 +1725,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 						text_disabled("No favorite servers match the applied filters.");
 					}
 					else {
-						text_disabled("No favorite servers yet. Click the star next to a server, or add one below.");
+						text_disabled("No favorite servers yet. Click the star next to a server, or add an unlisted one below.");
 					}
 				});
 			}
@@ -1877,7 +1905,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	{
 		/*
-			Add a server to the favorites by hand: its name, where it is and its key - all needed.
+			Add an unlisted server to the favorites by hand: where it is and its key - both needed; the name optional
+			(the address if none). Never matched against the server list (see favorite_servers.h).
 		*/
 
 		if (add_server_open) {
@@ -1886,7 +1915,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		if (auto popup = cond_scoped_modal_popup(
 			add_server_open,
-			"Add a server",
+			"Add an unlisted server",
 			nullptr,
 			ImGuiWindowFlags_AlwaysAutoResize
 		)) {
@@ -1902,52 +1931,30 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 					input_text_with_hint(buf, label, hint, value);
 				};
 
-				field("Name##add_server", "", add_server_name);
 				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address);
 				field("Public key##add_server", "64 hex digits - from the server's admin", add_server_key);
+				field("Server name (optional)##add_server", "", add_server_name);
 			}
 
 			/*
 				The key as Server details shows it (with 0x) or bare.
 			*/
 
-			/*
-				The instance there if the list has it at that address, else as typed ("c2-<key>"), else not known yet.
-			*/
-
-			const auto typed = connect_target::parse(add_server_key);
-			const auto key = typed.address.empty() ? typed.key : std::nullopt;
-
-			const auto label = [&]() {
-				if (key.has_value() && !add_server_address.empty()) {
-					if (const auto listed = find_entry_by_connect_string(add_server_address); listed != nullptr && listed->get_public_key() == key) {
-						return listed->get_instance_label();
-					}
-				}
-
-				return typed.label;
-			}();
-			const bool name_ok = !add_server_name.empty();
-			const bool address_ok = !add_server_address.empty() && !connect_target::parse(add_server_address).key.has_value();
+			const auto key = connect_target::key_of(add_server_key);
+			const auto address = connect_target::trimmed(add_server_address);
+			const bool address_ok = !address.empty() && !connect_target::parse(address).key.has_value();
 
 			/*
 				One line for what is wrong or worth knowing - always there, so the layout never jumps.
-				An address and a key of two different servers (e.g. pasted from two rows) is told too.
 			*/
 
 			const auto [note, note_color] = [&]() -> std::pair<std::string, rgba> {
 				if (!add_server_key.empty() && !key.has_value()) {
-					return { "The key should be 64 hex digits (or c2-<key> for one instance).", orange };
+					return { "The key should be 64 hex digits.", orange };
 				}
 
-				if (key.has_value() && !add_server_address.empty()) {
-					if (const auto listed = find_entry_by_connect_string(add_server_address); listed != nullptr && listed->get_public_key() != key) {
-						return { typesafe_sprintf("The server list has \"%x\" at this address -\nwith a different key.", std::string(listed->heartbeat.server_name)), orange };
-					}
-				}
-
-				if (key.has_value() && in.favorites.contains(*key, label)) {
-					return { "Among your favorites already - adding it updates its name and address.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
+				if (key.has_value() && in.favorites.contains_manual(*key, address)) {
+					return { "Among your favorites already - adding it renames it.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
 				}
 
 				return { " ", white };
@@ -1955,7 +1962,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			text_color(note, note_color);
 
-			const bool can_add = name_ok && address_ok && key.has_value();
+			const bool can_add = address_ok && key.has_value();
 
 			const bool add_clicked = [&]() {
 				auto scope = maybe_disabled_cols(!can_add);
@@ -1963,7 +1970,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}();
 
 			if (can_add && add_clicked) {
-				in.favorites.set(*key, label, add_server_address, add_server_name, true);
+				in.favorites.add_manual(*key, address, connect_target::trimmed(add_server_name));
 				add_server_open = false;
 			}
 
@@ -2111,7 +2118,7 @@ invite_target invite_target::of(
 }
 
 std::string invite_target::join_string() const {
-	return connect_target { native_address, key, std::string() }.to_string();
+	return connect_target { native_address, key }.to_string();
 }
 
 void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
@@ -2182,7 +2189,7 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 
 	const bool hide = in.streamer_mode;
 
-	row("Browser join link", ::get_browser_join_link(connect_target { target.web_id, target.key, std::string() }.to_string()), hide);
+	row("Browser join link", ::get_browser_join_link(connect_target { target.web_id, target.key }.to_string()), hide);
 	row("Steam join link", ::get_steam_join_link(target.join_string()), hide);
 	row("Address", target.native_address, hide);
 
@@ -2214,8 +2221,8 @@ const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(
 	const auto target = connect_target::parse(joined);
 
 	/*
-		With an address too: the instance there if it has the key (all of a host's instances share it), else the host's
-		best one.
+		With an address too: the instance there if it has the key (all of a host's instances share it) - never another
+		instance of the host. The key alone: the host's best one.
 	*/
 
 	if (target.key.has_value()) {
@@ -2223,9 +2230,11 @@ const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(
 			if (const auto there = find_entry_by_connect_string(client_connect_string(target.address)); there != nullptr && there->get_public_key() == target.key) {
 				return there;
 			}
+
+			return nullptr;
 		}
 
-		return find_entry_by_key(*target.key, target.label);
+		return find_entry_by_key(*target.key, std::string());
 	}
 
 	const auto& in = target.address;
@@ -2434,7 +2443,7 @@ bool server_details_gui_state::perform(
 			return entry.get_join_string();
 		}
 
-		return connect_target { entry.get_invite_address(), entry.get_public_key(), std::string() }.to_string();
+		return connect_target { entry.get_invite_address(), entry.get_public_key() }.to_string();
 	}();
 
 	auto steam_link = ::get_steam_join_link(steam_join);
@@ -2453,13 +2462,31 @@ bool server_details_gui_state::perform(
 
 	if (favorites != nullptr && favorites_kept) {
 		if (const auto key = entry.get_public_key()) {
-			if (favorites->contains(*key, entry.get_instance_label())) {
+			const bool manual = entry.favorite_only && entry.unlisted;
+
+			const bool is_favorite =
+				manual ?
+				favorites->contains_manual(*key, entry.favorite_address) :
+				favorites->contains(*key, entry.get_instance_label())
+			;
+
+			if (is_favorite) {
 				if (ImGui::Button("Remove from favorites")) {
-					favorites->remove(*key, entry.get_instance_label());
+					if (manual) {
+						favorites->remove_manual(*key, entry.favorite_address);
+					}
+					else {
+						favorites->remove(*key, entry.get_instance_label());
+					}
 				}
 			}
 			else if (ImGui::Button("Add to favorites")) {
-				favorites->set(*key, entry.get_instance_label(), ::favorite_address_of(entry), ::favorite_name_of(entry));
+				if (manual) {
+					favorites->add_manual(*key, entry.favorite_address, std::string(entry.heartbeat.server_name));
+				}
+				else {
+					favorites->set(*key, entry.get_instance_label(), ::favorite_address_of(entry), ::favorite_name_of(entry));
+				}
 			}
 		}
 	}
@@ -2497,7 +2524,7 @@ bool server_details_gui_state::perform(
 	};
 
 	auto do_browser_join_link = [&](bool acquire) {
-		auto link = ::get_browser_join_link(connect_target { entry.get_web_connect_string(), entry.get_public_key(), std::string() }.to_string());
+		auto link = ::get_browser_join_link(connect_target { entry.get_web_connect_string(), entry.get_public_key() }.to_string());
 
 		if (acquire) {
 			acquire_keyboard_once();
@@ -2622,23 +2649,6 @@ bool server_details_gui_state::perform(
 		text("Server public key");
 	}
 
-	/*
-		Which of the host's instances (they share the key) - "c2-<key>" joins this one.
-	*/
-
-	if (const auto key = entry.get_public_key(); key.has_value() && !entry.get_instance_label().empty()) {
-		auto shown = entry.get_instance_label() + "-" + augs::bytes_to_hex(*key);
-		input_text("##Instance", shown, rdonly_flags);
-
-		ImGui::SameLine();
-
-		copy_icon_button("InstanceJoin", shown);
-
-		ImGui::SameLine();
-
-		text("This instance (" + entry.get_instance_label() + ")");
-	}
-
 	if (!listed) {
 		ImGui::Separator();
 		text_color("Server is unlisted.\nLimited information available.", orange);
@@ -2697,8 +2707,13 @@ void browse_servers_gui_state::update_favorite_only_list(const favorite_servers&
 	for (const auto& f : favorites.all()) {
 		const auto& shown_list = displayed_list();
 
-		const bool listed = std::any_of(shown_list.begin(), shown_list.end(), [&](const auto& s) {
-			return s.get_public_key() == f.key && (f.label.empty() || s.get_instance_label() == f.label);
+		/*
+			One starred on the list: shown here only while the list does not have it. One added by hand: always here,
+			never matched against the list.
+		*/
+
+		const bool listed = !f.manual && std::any_of(shown_list.begin(), shown_list.end(), [&](const auto& s) {
+			return s.get_public_key() == f.key && s.get_instance_label() == f.label;
 		});
 
 		if (listed || f.address.empty()) {
@@ -2708,13 +2723,13 @@ void browse_servers_gui_state::update_favorite_only_list(const favorite_servers&
 		auto entry = server_list_entry();
 
 		for (const auto& old : favorite_only_list) {
-			if (old.meta.server_public_key == f.key && old.get_instance_label() == f.label && old.favorite_address == f.address) {
+			if (old.unlisted == f.manual && old.meta.server_public_key == f.key && old.get_instance_label() == f.label && old.favorite_address == f.address) {
 				entry = old;
 			}
 		}
 
 		entry.favorite_only = true;
-		entry.unlisted = true;
+		entry.unlisted = f.manual;
 		entry.meta.server_public_key = f.key;
 		entry.heartbeat.instance_label = f.label;
 		entry.favorite_address = f.address;
@@ -2769,6 +2784,10 @@ void browse_servers_gui_state::update_favorite_only_list(const favorite_servers&
 		entry.other_server_at_address.clear();
 
 		for (const auto& s : shown_list) {
+			if (f.manual) {
+				break;
+			}
+
 			const bool same_address =
 				(entry.address.type != NETCODE_ADDRESS_NONE && s.address == entry.address)
 				|| s.get_my_connect_string() == f.address
