@@ -1543,6 +1543,31 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	};
 
+	/*
+		The clipboard when Add an unlisted server opens, or when the game gets the focus back while it is open (e.g.
+		after copying in a browser) - a clipboard taken once; never while editing one.
+	*/
+
+	auto autopaste_from_clipboard = [&]() {
+#if !PLATFORM_WEB
+		if (editing_unlisted.has_value()) {
+			return;
+		}
+
+		if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr && clipboard != add_server_last_clipboard) {
+			if (connect_target::find_server_identifiers(clipboard).has_value()) {
+				add_server_last_clipboard = clipboard;
+				take_server_identifiers(clipboard);
+				add_server_autopasted = std::array<std::string, 3> { add_server_address, add_server_key, add_server_name };
+			}
+		}
+#endif
+	};
+
+	if (const bool focus_gained = in.app_focused && !std::exchange(app_was_focused, in.app_focused); focus_gained && add_server_open) {
+		autopaste_from_clipboard();
+	}
+
 	auto draw_add_server_row = [&]() {
 		const auto size = ImGui::GetTextLineHeight();
 		const auto pos = ImGui::GetCursorScreenPos();
@@ -1560,19 +1585,17 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (ImGui::Selectable("Add an unlisted server", false, ImGuiSelectableFlags_SpanAllColumns)) {
 			add_server_open = true;
 			editing_unlisted.reset();
+			add_server_autopasted.reset();
 			add_server_name.clear();
 			add_server_address.clear();
 			add_server_key.clear();
 
-#if !PLATFORM_WEB
 			/*
-				What its admin published, already copied: filled in at once (the web build has no clipboard to read).
+				A new dialog takes the clipboard as it is, even one taken before.
 			*/
 
-			if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
-				take_server_identifiers(clipboard);
-			}
-#endif
+			add_server_last_clipboard.clear();
+			autopaste_from_clipboard();
 		}
 
 		next_columns(num_columns - 2);
@@ -1993,6 +2016,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
 			add_server_open = true;
 			editing_unlisted = std::make_pair(*key, selected_server.favorite_address);
+			add_server_autopasted.reset();
 			add_server_address = selected_server.favorite_address;
 			add_server_key = "0x" + augs::bytes_to_hex(*key);
 
@@ -2069,7 +2093,23 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				return { " ", white };
 			}();
 
-			text_color(note, note_color);
+			/*
+				Nothing wrong: the same line says the fields came from the clipboard, until one is changed.
+			*/
+
+			const bool as_autopasted =
+				add_server_autopasted.has_value()
+				&& (*add_server_autopasted)[0] == add_server_address
+				&& (*add_server_autopasted)[1] == add_server_key
+				&& (*add_server_autopasted)[2] == add_server_name
+			;
+
+			if (note == " " && as_autopasted) {
+				checkmark_line("Auto-pasted from clipboard", green);
+			}
+			else {
+				text_color(note, note_color);
+			}
 
 			const bool can_add = address_ok && key.has_value();
 

@@ -1,4 +1,7 @@
 #pragma once
+#include <optional>
+#include <string>
+#include <utility>
 #include "augs/window_framework/window.h"
 #include "application/setups/client/client_connect_string.h"
 #include "application/setups/client/client_vars.h"
@@ -46,6 +49,22 @@ public:
 
 	bool with_key = true;
 	std::string custom_key;
+
+	/*
+		Auto-paste: the clipboard taken last (a clipboard is taken once - the fields the player changed since stay),
+		and the address and key it filled in - "Auto-pasted from clipboard" shows while they are as filled.
+	*/
+
+	std::string last_autopasted_clipboard;
+	std::optional<std::pair<std::string, std::string>> autopasted;
+
+	/*
+		When the clipboard is looked at: the window opening, the window or the game getting the focus back (e.g. after
+		copying in a browser), the Unlisted server tab chosen.
+	*/
+
+	bool was_focused = false;
+	start_client_tab_type tab_last_frame = start_client_tab_type::BEST_SERVER;
 	std::string demo_size;
 
 	bool allow_start = false;

@@ -45,6 +45,12 @@ struct browse_servers_input {
 	*/
 
 	const augs::path_type& list_cache_path;
+
+	/*
+		Whether the game's window has the focus - Add an unlisted server looks at the clipboard again when it comes back.
+	*/
+
+	const bool app_focused;
 };
 
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
@@ -177,6 +183,15 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	*/
 
 	std::optional<std::pair<augs::ed25519_public_key_type, std::string>> editing_unlisted;
+
+	/*
+		What the clipboard filled in when the dialog opened (address, key, name) - "Auto-pasted from clipboard"
+		shows while they are as filled.
+	*/
+
+	std::optional<std::array<std::string, 3>> add_server_autopasted;
+	std::string add_server_last_clipboard;
+	bool app_was_focused = false;
 
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;

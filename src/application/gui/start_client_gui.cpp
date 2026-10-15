@@ -4,6 +4,7 @@
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/imgui/imgui_status_icons.h"
 
 #include "augs/network/network_types.h"
 #include "augs/misc/imgui/maybe_different.h"
@@ -83,9 +84,26 @@ bool start_client_gui_state::perform(
 	};
 
 #if !PLATFORM_WEB
-	if (ImGui::IsWindowAppearing()) {
-		if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr && take_server_identifiers(clipboard)) {
-			current_tab = start_client_tab_type::CUSTOM_ADDRESS;
+	{
+		/*
+			A clipboard is taken once - the fields changed since stay until another one is copied.
+		*/
+
+		const bool focused_now = window.is_active() && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+		const bool focus_gained = focused_now && !was_focused;
+		const bool unlisted_tab_entered = current_tab == start_client_tab_type::CUSTOM_ADDRESS && tab_last_frame != current_tab;
+
+		was_focused = focused_now;
+		tab_last_frame = current_tab;
+
+		if (ImGui::IsWindowAppearing() || focus_gained || unlisted_tab_entered) {
+			if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr && clipboard != last_autopasted_clipboard) {
+				if (take_server_identifiers(clipboard)) {
+					last_autopasted_clipboard = clipboard;
+					autopasted = std::make_pair(custom_address, custom_key);
+					current_tab = start_client_tab_type::CUSTOM_ADDRESS;
+				}
+			}
 		}
 	}
 #endif
@@ -227,6 +245,17 @@ bool start_client_gui_state::perform(
 			}
 
 			const auto flags = streamer_mode ? ImGuiInputTextFlags_Password : 0; 
+
+			/*
+				A line of its own, kept even when empty - the layout never jumps.
+			*/
+
+			if (const bool as_autopasted = with_key && autopasted.has_value() && autopasted->first == custom_address && autopasted->second == custom_key) {
+				checkmark_line("Auto-pasted from clipboard", green);
+			}
+			else {
+				text(" ");
+			}
 
 			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
 

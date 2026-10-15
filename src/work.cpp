@@ -3266,7 +3266,8 @@ work_result work(
 			config.streamer_mode && config.streamer_mode_flags.community_servers,
 			favorites,
 			menus_state.server_browser_tab,
-			server_list_cache_path
+			server_list_cache_path,
+			window.is_active()
 		};
 	};
 
