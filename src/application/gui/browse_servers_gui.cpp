@@ -2850,7 +2850,7 @@ bool server_details_gui_state::perform(
 
 	if (!listed) {
 		ImGui::Separator();
-		text_color("Server is unlisted.\nLimited information available.", orange);
+		text_disabled("Server is unlisted.\nNo more data to display.");
 
 		return false;
 	}
