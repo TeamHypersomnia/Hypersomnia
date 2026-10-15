@@ -2,7 +2,8 @@
 """
 Signs in to a local test site (broker.sh) as a Steam user without Steam: inserts a passport session into its DB and prints
 the connect.sid cookie, signed with the SESSION_SECRET the site was started with.
-Usage: SESSION_SECRET=<the site's> fake_steam_session.py <site dir> [steam id64] [name]
+Usage: SESSION_SECRET=<the site's> fake_steam_session.py <site dir> [steam id64] [name] [link page state]
+With a link page's state: signed in anew for that page, as the Steam sign-in started from it leaves it (auth.js).
 """
 import base64, hashlib, hmac, json, os, secrets, sqlite3, sys, urllib.parse
 from datetime import datetime, timedelta, timezone
@@ -15,6 +16,8 @@ sid = secrets.token_urlsafe(24)
 expires = datetime.now(timezone.utc) + timedelta(days=1)
 sess = { 'cookie': { 'originalMaxAge': 604800000, 'expires': expires.isoformat(), 'httpOnly': True, 'path': '/' },
          'passport': { 'user': { 'id': steam_id, 'displayName': name, 'provider': 'steam' } } }
+if len(sys.argv) > 4:
+    sess['fresh_link_state'] = sys.argv[4]
 db = sqlite3.connect(os.path.join(site_dir, 'private/mmr.db'))
 with db:
     db.execute('INSERT INTO sessions (sid, sess, expire) VALUES (?, ?, ?)', (sid, json.dumps(sess), expires.isoformat()))

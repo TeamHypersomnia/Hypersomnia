@@ -238,12 +238,10 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	double key_unreadable_since = -1.0;
 
 	/*
-		"Unlink from Steam...": the page on hypersomnia.io with this state, asked every second how it went.
+		"Unlink from Steam...": the request signed by the key, answered at once.
 	*/
 
-	std::string unlink_state;
-	augs::async_response_ptr unlink_result_request;
-	double unlink_result_asked_at = -1000.0;
+	augs::async_response_ptr unlink_request;
 
 	/*
 		This linking's random state and the key's signature of it - the page opened in the browser links the key at once
@@ -253,13 +251,13 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string steam_link_state;
 	int64_t steam_link_time = 0;
 	std::string steam_link_signature;
+	std::string steam_link_url_cached;
 
 	/*
-		While the browser is out: the game asks hypersomnia.io every second how the link for its state went.
+		While the browser is out: the game asks for its cert every few seconds - a cert for a Steam account is the link.
 	*/
 
-	augs::async_response_ptr link_result_request;
-	double link_result_asked_at = -1000.0;
+	double link_checked_at = -1000.0;
 
 	/*
 		"Link with Steam..." runs in one dimmed modal, from asking whether the key is linked already to the result.
@@ -269,7 +267,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 		IDLE,
 		CHECKING_BEFORE,
 		NEEDS_STEAM_SIGN_IN,
-		CHECKING_AFTER,
 		DONE
 	};
 

@@ -517,7 +517,6 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 		link_flow = link_flow_type::IDLE;
 		link_flow_message.clear();
 		steam_link_state.clear();
-		link_result_request.reset();
 
 		if (identity != nullptr) {
 			identity->clear_link_check();
@@ -1391,7 +1390,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 	/*
 		All through GET requests without redirects, as the web build can only make those.
-		Never after a redirect - the state asks for a result that is the player's.
 	*/
 
 	auto get_from_website = [&](const std::string& location) {
@@ -1399,7 +1397,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	auto finish = [&](const bool succeeded, const std::string& message, const bool conflict = false) {
-		link_result_request.reset();
 		link_flow = F::DONE;
 		link_flow_succeeded = succeeded;
 		link_flow_conflict = conflict;
@@ -1412,7 +1409,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	/*
-		A random state only this game knows - for the page in the browser and for asking how it went (/link_key/result).
+		A random state only this game knows - the page in the browser is signed in through Steam anew for it.
 	*/
 
 	auto make_browser_state = []() {
@@ -1427,40 +1424,26 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	/*
-		Unlinking happens on hypersomnia.io, signed in through Steam as the account the key is linked to -
-		the game opens the page and asks every second how it went.
+		Unlinking is one request signed by the key, answered at once - no browser.
 	*/
 
-	/*
-		Signed with the key and the time now - every opening, so "Open it again" later is not too old.
-	*/
-
-	auto open_unlink_page = [&]() {
+	auto start_unlink = [&]() {
 		const auto unix_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
-		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::unlink_message(unlink_state, unix_time)) : std::nullopt;
+		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::unlink_message(unix_time)) : std::nullopt;
 
 		if (!signature.has_value()) {
-			LOG("Could not sign the unlink page's link.");
+			unlink_succeeded = false;
+			unlink_result = std::string("Couldn't sign the unlink with your key.\n\nSee the logs.");
 			return;
 		}
 
-		augs::open_url(typesafe_sprintf(
-			"%x/link_key/unlink?state=%x&t=%x&key=%x&sig=%x%x",
-			website_url,
-			unlink_state,
-			unix_time,
-			public_key.has_value() ? augs::bytes_to_hex(*public_key) : std::string(),
-			augs::bytes_to_hex(*signature),
-			identity != nullptr ? identity->device_query() : std::string()
-		));
-	};
-
-	auto start_unlink = [&]() {
-		unlink_state = make_browser_state();
-		unlink_result_request.reset();
-		unlink_result_asked_at = -1000.0;
 		unlinking = true;
-		open_unlink_page();
+		unlink_request = get_from_website(typesafe_sprintf(
+			"/link_key/unlink?t=%x&key=%x&sig=%x",
+			unix_time,
+			augs::bytes_to_hex(*public_key),
+			augs::bytes_to_hex(*signature)
+		));
 	};
 
 	local_key_line(public_key);
@@ -1522,36 +1505,18 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	}
 
 	/*
-		The sign-in through Steam in the browser, with a random state only this game knows, signed with the key, and the
-		device (shown on the page the player confirms). Confirmed there, the key is linked - the game asks how it went.
+		The sign-in through Steam in the browser, with a random state only this game knows, signed with the key once, and
+		the device (kept for the account's /profile). Confirmed there, the key is linked - the game sees it in its /cert.
+		"Open it again" opens the same page.
 	*/
 
 	auto open_steam_sign_in = [&]() {
-		/*
-			Signed anew with the time now - "Open it again" after a while is not too old for the page.
-		*/
-
-		steam_link_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
-
-		if (const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state, steam_link_time)) : std::nullopt) {
-			steam_link_signature = augs::bytes_to_hex(*signature);
-		}
-
-		augs::open_url(typesafe_sprintf(
-			"%x/link_key/start?state=%x&t=%x&key=%x&sig=%x%x",
-			website_url,
-			steam_link_state,
-			steam_link_time,
-			public_key.has_value() ? augs::bytes_to_hex(*public_key) : std::string(),
-			steam_link_signature,
-			identity != nullptr ? identity->device_query() : std::string()
-		));
+		augs::open_url(steam_link_url_cached);
 	};
 
 	auto start_steam_sign_in = [&]() {
 		steam_link_state = make_browser_state();
-		link_result_request.reset();
-		link_result_asked_at = -1000.0;
+		link_checked_at = augs::steady_secs();
 
 		steam_link_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
 
@@ -1563,6 +1528,16 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		}
 
 		steam_link_signature = augs::bytes_to_hex(*signature);
+		steam_link_url_cached = typesafe_sprintf(
+			"%x/link_key/start?state=%x&t=%x&key=%x&sig=%x%x",
+			website_url,
+			steam_link_state,
+			steam_link_time,
+			augs::bytes_to_hex(*public_key),
+			steam_link_signature,
+			identity != nullptr ? identity->device_query() : std::string()
+		);
+
 		open_steam_sign_in();
 	};
 
@@ -1570,7 +1545,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		The answers.
 	*/
 
-	if (identity != nullptr && (link_flow == F::CHECKING_BEFORE || link_flow == F::CHECKING_AFTER)) {
+	if (identity != nullptr && link_flow == F::CHECKING_BEFORE) {
 		const auto check = identity->get_link_check();
 
 		if (check == L::LINKED) {
@@ -1589,34 +1564,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		else if (check == L::NOT_LINKED) {
 			identity->clear_link_check();
 
-			if (link_flow == F::CHECKING_BEFORE) {
-				link_flow = F::NEEDS_STEAM_SIGN_IN;
-				start_steam_sign_in();
-			}
-			else {
-				finish(false, "The link did not take effect. Try again.");
-			}
+			link_flow = F::NEEDS_STEAM_SIGN_IN;
+			start_steam_sign_in();
 		}
 		else if (check == L::FAILED) {
 			identity->clear_link_check();
 
-			if (const auto& refusal = identity->get_link_check_error(); !refusal.empty() && link_flow == F::CHECKING_AFTER) {
-				/*
-					Linked, but the broker refuses the account (e.g. a banned Steam account) - not a success.
-				*/
-
-				finish(false, refusal);
-			}
-			else if (link_flow == F::CHECKING_AFTER) {
-				/*
-					The site took the link - only the game could not hear it yet; it keeps asking by itself.
-				*/
-
-				identity->recheck_link_quietly();
-				finish(true, typesafe_sprintf("Couldn't reach %x to sign in to the Steam account yet.\nThe game will keep trying on its own.", website_url));
-				link_flow_message_is_warning = true;
-			}
-			else if (const auto& refusal = identity->get_link_check_error(); !refusal.empty()) {
+			if (const auto& refusal = identity->get_link_check_error(); !refusal.empty()) {
 				finish(false, refusal);
 			}
 			else {
@@ -1633,86 +1587,85 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	}
 
 	/*
-		Asked every second while the browser is out - 204 until the player confirmed there, then how it went once:
-		{"linked": "steam_..."} - the Steam cert the broker now gives for the key is what links it here -
-		or {"error", "conflict"}.
+		While the browser is out: the cert asked every 3 s - a cert for the Steam account is the link done. A refusal
+		on the page (another account's key, too many keys) is told there only; a banned account is told here too.
+		The page is good for 15 minutes - then the wait ends.
 	*/
 
-	if (link_flow == F::NEEDS_STEAM_SIGN_IN && !steam_link_state.empty()) {
-		const auto now = augs::steady_secs();
+	if (identity != nullptr && link_flow == F::NEEDS_STEAM_SIGN_IN && !steam_link_state.empty()) {
+		const auto check = identity->get_link_check();
+		const auto page_age = static_cast<int64_t>(augs::date_time::secs_since_epoch()) - steam_link_time;
 
-		if (augs::is_ready(link_result_request)) {
-			const auto response = augs::get_once(link_result_request);
-
-			if (response.status == 200) {
-				try {
-					const auto doc = augs::json_document_from(response.body);
-
-					if (doc.IsObject() && doc.HasMember("linked") && doc["linked"].IsString()) {
-						steam_link_state.clear();
-
-						if (identity != nullptr) {
-							identity->start_link_check(identity_input.broker_url);
-							link_flow = F::CHECKING_AFTER;
-						}
-					}
-					else if (doc.IsObject() && doc.HasMember("error") && doc["error"].IsString()) {
-						steam_link_state.clear();
-
-						const bool conflict = doc.HasMember("conflict") && doc["conflict"].IsBool() && doc["conflict"].GetBool();
-						finish(false, std::string("Linking failed:\n") + doc["error"].GetString(), conflict);
-					}
-				}
-				catch (...) {
-					LOG("Unreadable answer for the link: %x", response.body);
-				}
+		if (check == L::LINKED) {
+			if (upload_link_avatar(identity->get_link_check_profile().avatar)) {
+				linked_has_avatar = true;
 			}
+
+			linked_name = identity->get_link_check_profile().name;
+			identity->clear_link_check();
+			steam_link_state.clear();
+			finish(true, "Progress now counts towards your Steam account.");
 		}
-		else if (!augs::in_progress(link_result_request) && now - link_result_asked_at >= 1.0) {
-			link_result_asked_at = now;
-			link_result_request = get_from_website("/link_key/result?state=" + steam_link_state);
+		else if (check == L::FAILED && !identity->get_link_check_error().empty()) {
+			const auto refusal = identity->get_link_check_error();
+			identity->clear_link_check();
+			steam_link_state.clear();
+			finish(false, refusal);
+		}
+		else if (page_age > 15 * 60) {
+			identity->clear_link_check();
+			steam_link_state.clear();
+			finish(false, "The page in the browser is too old now. Try again.");
+		}
+		else if (check != L::PENDING && now - link_checked_at >= 3.0) {
+			/*
+				Not linked yet, or no answer this time - asked again.
+			*/
+
+			identity->clear_link_check();
+			link_checked_at = now;
+			identity->start_link_check(identity_input.broker_url);
 		}
 	}
 
 	/*
-		Asked every second while the unlink page is out: {"unlinked": "steam_..."} or {"error"} once it was clicked there.
+		The unlink's answer: {"unlinked": true} or {"error"}.
 	*/
 
-	if (unlinking && !unlink_state.empty()) {
-		const auto now = augs::steady_secs();
+	if (unlinking && augs::is_ready(unlink_request)) {
+		const auto response = augs::get_once(unlink_request);
+		unlinking = false;
 
-		if (augs::is_ready(unlink_result_request)) {
-			const auto response = augs::get_once(unlink_result_request);
+		const auto error = [&]() -> std::string {
+			try {
+				const auto doc = augs::json_document_from(response.body);
 
-			if (response.status == 200) {
-				try {
-					const auto doc = augs::json_document_from(response.body);
-
-					if (doc.IsObject() && doc.HasMember("unlinked") && doc["unlinked"].IsString()) {
-						unlinking = false;
-						unlink_state.clear();
-						unlink_succeeded = true;
-						unlink_result = std::string("Unlinked");
-
-						if (identity != nullptr) {
-							identity->on_unlinked();
-						}
-					}
-					else if (doc.IsObject() && doc.HasMember("error") && doc["error"].IsString()) {
-						unlinking = false;
-						unlink_state.clear();
-						unlink_succeeded = false;
-						unlink_result = std::string("Unlinking failed:\n") + doc["error"].GetString();
-					}
+				if (response.status == 200 && doc.IsObject() && doc.HasMember("unlinked")) {
+					return std::string();
 				}
-				catch (...) {
-					LOG("Unreadable answer for the unlink: %x", response.body);
+
+				if (doc.IsObject() && doc.HasMember("error") && doc["error"].IsString()) {
+					return doc["error"].GetString();
 				}
 			}
+			catch (...) {
+				LOG("Unreadable answer for the unlink: %x", response.body);
+			}
+
+			return typesafe_sprintf("Couldn't reach %x.\n\nTry again later.", website_url);
+		}();
+
+		if (error.empty()) {
+			unlink_succeeded = true;
+			unlink_result = std::string("Unlinked");
+
+			if (identity != nullptr) {
+				identity->on_unlinked();
+			}
 		}
-		else if (!augs::in_progress(unlink_result_request) && now - unlink_result_asked_at >= 1.0) {
-			unlink_result_asked_at = now;
-			unlink_result_request = get_from_website("/link_key/result?state=" + unlink_state);
+		else {
+			unlink_succeeded = false;
+			unlink_result = std::string("Unlinking failed:\n") + error;
 		}
 	}
 
@@ -1732,7 +1685,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				link_flow_message.clear();
 
 				steam_link_state.clear();
-				link_result_request.reset();
 
 				if (identity != nullptr) {
 					identity->clear_link_check();
@@ -1750,20 +1702,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				ImGui::CloseCurrentPopup();
 			};
 
-			if (link_flow == F::CHECKING_AFTER) {
-				/*
-					Linked on the site - the Steam cert with the name and avatar comes a moment later.
-				*/
-
-				spinner_line("Linking...", white);
-				text("Progress will count towards your Steam account.");
-
-				ImGui::Separator();
-
-				auto scope = maybe_disabled_cols({}, true);
-				ImGui::Button("OK##LinkFlow", ImVec2(120, 0));
-			}
-			else if (link_flow == F::CHECKING_BEFORE) {
+			if (link_flow == F::CHECKING_BEFORE) {
 				spinner_line("Checking with hypersomnia.io...", white);
 				ImGui::Separator();
 
@@ -1778,13 +1717,16 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				*/
 
 				if (::web_tab_was_blocked() != 0) {
-					text_color("The browser blocked the new tab - click Open it again.", orange);
+					text_color("The browser blocked the new tab - click Open it again, or open this page yourself:", orange);
+					text_disabled(steam_link_url_cached);
+					ImGui::SameLine();
+					copy_icon_button("LinkUrl", steam_link_url_cached);
 				}
 				else {
-					spinner_line("Continue in the new tab: sign in with Steam if asked, then click Link.", white);
+					spinner_line("Continue in the new tab: sign in with Steam, then click Link.", white);
 				}
 #else
-				spinner_line("Continue in your browser: sign in with Steam if asked, then click Link.", white);
+				spinner_line("Continue in your browser: sign in with Steam, then click Link.", white);
 #endif
 				text_disabled("The game continues by itself.");
 
@@ -1863,18 +1805,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			);
 
 			auto close_unlink = [&]() {
-				/*
-					Cancelled with the page still open - unlinked there later, it is found quietly in a while (and at every start).
-				*/
-
-				if (unlinking && identity != nullptr) {
-					identity->recheck_link_quietly();
-				}
-
 				confirm_unlink = false;
 				unlinking = false;
-				unlink_state.clear();
-				unlink_result_request.reset();
+				unlink_request.reset();
 				unlink_result.reset();
 				unlinked_name.clear();
 				ImGui::CloseCurrentPopup();
@@ -1889,27 +1822,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				}
 			}
 			else if (unlinking) {
-#if PLATFORM_WEB
-				spinner_line("Continue in the new tab: sign in with Steam if asked, then click Unlink.", white);
-#else
-				spinner_line("Continue in your browser: sign in with Steam if asked, then click Unlink.", white);
-#endif
-				text_disabled("The game continues by itself.");
-
-				ImGui::Separator();
-
-				if (ImGui::Button("Open it again##Unlink")) {
-					open_unlink_page();
-				}
-
-				ImGui::SameLine();
-
-				if (ImGui::Button("Cancel##Unlink", ImVec2(120, 0))) {
-#if PLATFORM_WEB
-					web_forget_blocked_tab();
-#endif
-					close_unlink();
-				}
+				spinner_line("Unlinking...", white);
+				link_avatar_and_name(shown_name, unlink_has_avatar);
 			}
 			else if (unlink_result.has_value()) {
 				checkmark_line(*unlink_result, green);
@@ -1936,7 +1850,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				{
 					const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
 
-					if (ImGui::Button("Unlink...", ImVec2(120, 0))) {
+					if (ImGui::Button("Unlink", ImVec2(120, 0))) {
 						/*
 							The name stays as it was asked about - the linked account is gone a moment later.
 						*/

@@ -31,8 +31,8 @@ namespace identity_key {
 		return "hypersomnia-link-v1 " + state + " " + std::to_string(unix_time);
 	}
 
-	std::string unlink_message(const std::string& state, const int64_t unix_time) {
-		return "hypersomnia-unlink-v1 " + state + " " + std::to_string(unix_time);
+	std::string unlink_message(const int64_t unix_time) {
+		return "hypersomnia-unlink-v1 " + std::to_string(unix_time);
 	}
 
 	std::string account_id(const augs::ed25519_public_key_type& public_key) {

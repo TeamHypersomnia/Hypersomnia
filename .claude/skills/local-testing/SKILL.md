@@ -73,9 +73,10 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
   WebGL works through llvmpipe. Allow ~60 s for the 100 MB data to load.
 - The web account is a key in its own IDBFS database (`/hypersomnia_keys/account.key`, apart from `/user`), made on the first start. Link with Steam (Settings - Account)
   opens `<website>/link_key/start?state=..&key=..&sig=..&device=..&os=..` (the state signed with the key) in a new tab (native:
-  in the browser); signed in through Steam, the player confirms the device on that page and the key is linked at once - the game
-  asks `/link_key/result?state=..` every second and learns how it went (no redirect back, no local listener, no code; the same
-  natively, in a tab or an iframe).
+  in the browser); signed in through Steam anew (every link), the player confirms the Steam account on that page and the key is
+  linked at once - the game asks for its cert every 3 s and sees the Steam account there (no redirect back, no local listener,
+  no code; the same natively, in a tab or an iframe). A refusal (another account's key, 32 keys) shows on the page only; the
+  game stops waiting after 15 min. Unlink from Steam is one signed GET `/link_key/unlink?t&key&sig`, answered at once.
 
 ## UI checks
 
@@ -104,7 +105,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   says only "Your progress is on your Steam account - nothing to back up...".
 - `srv.sh start|stop <name> <port> [TEAMS_EQUAL]` - a server trusting the scratch broker.
 - `link_key.py <account.key> [steam id64]` - links that key to a fake Steam session's account, as confirming the game's
-  link page would (prints what /link_key/result gives the game)
+  link page would (prints the confirm POST's status)
   (a Steam account takes at most 32 keys - a test account full of them answers 409).
 - `../link_flow_test.py <site dir> <site url>` (with `SESSION_SECRET`) - the whole link protocol against the site, bans and replays included.
 - `slow_broker.py <port> <delay>` - the broker answering after `delay` s (a closed port is a dead broker).
@@ -191,10 +192,11 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
 - Wins count on the site only from 5 rounds (`MIN_ROUNDS_TO_COUNT_WINS`), so these abandon matches show W 0.
 - **Signing in to the site as a Steam user without Steam:** `fake_steam_session.sh <steam id64> [name]` inserts a passport
   session into the test DB and prints a `connect.sid=...` cookie (signed with the `SESSION_SECRET` that `backend.sh` sets).
-  `curl -b "$cookie"` then reaches `/link_key/start?state=..&key=..&sig=..` (the confirm page); a POST of the same fields links
-  the key, and `GET /link_key/result?state=..` gives `{"linked"}` or `{"error"}` once;
-  `POST /profile/unlink_key` with `key=key_...` unlinks; the game's Unlink from Steam... opens `/link_key/unlink?state=..&key=..`
-  (one button, POSTs the same fields) and asks `/link_key/result` like linking - `browser_sign_in.sh` clicks either page.
+  `fake_steam_session.py <site dir> <id> <name> <state>` signs in anew for that link page's state (as the Steam sign-in started
+  from it does); `curl -b "$cookie"` then reaches `/link_key/start?state=..&t=..&key=..&sig=..` (the confirm page) and a POST of
+  the same fields links the key; a page or unlink not newer than the key's last change (`key_link_changes`) is refused;
+  `POST /profile/unlink_key` with `key=key_...` unlinks; the game's unlink is `GET /link_key/unlink?t&key&sig` -
+  `browser_sign_in.sh` plays the browser for the link page.
 - **Linking from the game by clicking:** a client with `"website_url": "http://<arenaus>:13000"` in conf.d, under Xvfb and `ui.sh`'s
   fake xdg-open: Settings - Account - Link with Steam - Link with Steam..., then `browser_sign_in.sh` against that site
   (it needs the site's session secret for the fake Steam session). Check with `db.sh show`.
