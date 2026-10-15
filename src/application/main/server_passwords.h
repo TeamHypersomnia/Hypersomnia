@@ -1,5 +1,7 @@
 #pragma once
+#include <filesystem>
 #include <map>
+#include <system_error>
 #include <optional>
 #include <vector>
 #include <string>
@@ -51,6 +53,13 @@ class server_passwords {
 		try {
 			augs::create_directories_for(path);
 			augs::save_as_json_atomic(entries, path);
+
+			/*
+				Readable by this user only, like account.key.
+			*/
+
+			auto ignored = std::error_code();
+			std::filesystem::permissions(path, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write, std::filesystem::perm_options::replace, ignored);
 		}
 		catch (const std::exception& e) {
 			LOG("Could not save the server passwords to %x: %x", path, e.what());
