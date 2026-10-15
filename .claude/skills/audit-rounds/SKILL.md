@@ -1,6 +1,6 @@
 ---
 name: audit-rounds
-description: Running audits inside a longer working session and acting on their findings without going in circles - keeps one decisions document, checks every fix against what was already cut or decided, and shows the state of each finding as a status page (checkmarks, green/red, loop markers). Use whenever, after other work in the session, the user asks to run or launch audits ("puść audyt", "audyt diffa", "puść te audyty", "zaudytuj"), asks what an audit found, asks to fix after an audit ("popraw po audycie"), or asks whether we are going in circles ("czy kręcimy się w kółko"). Not for a session whose only prompt is the audit itself - that one just audits (see the `audit` skill or the given prompt).
+description: Running audits inside a longer working session and acting on their findings without going in circles - keeps one decisions document, checks every fix against what was already cut or decided, and shows the state of each finding as a status page (checkmarks, green/red, loop markers). Use whenever, after other work in the session, the user asks to run or launch audits ("puść audyt", "audyt diffa", "puść te audyty", "zaudytuj"), asks what an audit found, asks to fix after an audit ("popraw po audycie"), or asks whether we are going in circles ("czy kręcimy się w kółko"). Not for a session whose only prompt is the audit itself - that one just audits (see the `audit-gameplay` skill or the given prompt).
 ---
 
 # Audit rounds in a working session
@@ -24,10 +24,12 @@ skill keeps that from happening.
    (e.g. a removed mechanism), do not edit the prompt - append a short "current state" context block to it, listing
    what was removed and which decisions are intentional (no backward compatibility, etc.), so the auditor does not
    flag decided behavior or hunt for deleted code. Say you did this.
-3. Diff audits: one clean-context agent over the exact ranges (game commit range, the site's commits since the same
+3. Every audit runs as the `auditor` agent (`.claude/agents/auditor.md` - read-only, writes only its report, without the
+   general-purpose agent's many tool definitions), the report's format in the prompt.
+4. Diff audits: one clean-context agent over the exact ranges (game commit range, the site's commits since the same
    time, the netcode fork's commits), report in the user's style - a few sentences per finding: where (file:line),
    what goes wrong, a concrete scenario, the fix; sorted by severity; uncertain ones marked as such.
-4. Long waits: wrap every test command in a short `timeout`, check background shells about every minute (builds
+5. Long waits: wrap every test command in a short `timeout`, check background shells about every minute (builds
    are the only exception), never pipe a script that backgrounds a server into `tail`.
 
 ## A loop is a decision to make, not a verdict

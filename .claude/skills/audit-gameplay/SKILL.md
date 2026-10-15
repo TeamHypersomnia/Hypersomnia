@@ -1,5 +1,5 @@
 ---
-name: audit
+name: audit-gameplay
 description: Audit/review a Hypersomnia feature or system (recently added gameplay, rendering, UI code) against the project's review checklist - crash safety, simulation determinism, lag-robust RNG, comments, performance, web compatibility, parameter plumbing, logic vs audiovisual placement, deduplication, header hygiene, dead code, settings/editor UI. Use whenever the user says "zreviewuj mi X", "zaudytuj mi X", "zrób review X", "audyt X", "review X", "audit X".
 ---
 
@@ -9,8 +9,8 @@ description: Audit/review a Hypersomnia feature or system (recently added gamepl
 
 1. Find the code of the feature: `git log --oneline --grep=<keyword>` and `git show --stat <commits>`,
    then grep for the feature's structs/settings. Read the whole diff of the relevant commits, not only the final files.
-2. If the user lists several independent systems, launch one subagent per system (in one message, in parallel).
-   Give each subagent this skill's checklist path (`.claude/skills/audit/SKILL.md`) and the system's keywords/commits.
+2. If the user lists several independent systems, launch one `auditor` agent per system (in one message, in parallel).
+   Give each subagent this skill's checklist path (`.claude/skills/audit-gameplay/SKILL.md`) and the system's keywords/commits.
 3. Report only. Do not edit code unless the user asks to fix.
    When the user says "fix everything", that means every finding, nits included.
 
