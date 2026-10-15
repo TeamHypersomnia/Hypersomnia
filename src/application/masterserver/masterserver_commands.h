@@ -21,11 +21,14 @@ namespace masterserver_out {
 	};
 
 	/*
-		The answer to every heartbeat: a cookie for the next request (see server_request_signature.h).
+		The answer to every heartbeat: a cookie for the next request (see server_request_signature.h), with the heartbeat's
+		random nonce - the server takes only an answer to the heartbeat it sent last, so one forged from off the route
+		(a spoofed masterserver address) can not hand it a cookie.
 	*/
 
 	struct heartbeat_ack {
 		masterserver_cookie_type cookie = {};
+		heartbeat_nonce_type nonce = {};
 		bool accepted = false;
 	};
 }

@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
@@ -55,6 +56,12 @@ private:
 	};
 
 	std::unordered_map<std::string, endpoint_backoff> backoff_by_url;
+
+	/*
+		The reports a 401 was said loudly for - once each, not on every retry.
+	*/
+
+	std::unordered_set<std::string> told_unknown_key;
 
 	static uint64_t now_unix() {
 		return static_cast<uint64_t>(augs::date_time::secs_since_epoch());
@@ -190,14 +197,15 @@ public:
 			auto& backoff = backoff_by_url[result.url];
 
 			/*
-				A 401 is most often a key the site does not know as official - every instance has its own: said loudly,
-				with the key, or the ranked matches of this instance quietly never count.
+				A 401 is a key the site does not know as official: said loudly once per report, with the key, or the ranked
+				matches of this server quietly never count.
 			*/
 
-			if (status == 401) {
+			if (status == 401 && told_unknown_key.insert(result.file.filename().string()).second) {
 				LOG(
-					"ERROR: hypersomnia.io does not accept this server's key %x - its ranked matches do not count until the key is in official_servers.d (--print-server-key prints every instance's key).",
-					augs::bytes_to_hex(augs::ed25519_public_key(server_key).value_or(augs::ed25519_public_key_type()))
+					"ERROR: hypersomnia.io does not know this server's key %x - the match report %x counts once the key is in official_servers.d (--print-server-key prints it). Retrying for days.",
+					augs::bytes_to_hex(augs::ed25519_public_key(server_key).value_or(augs::ed25519_public_key_type())),
+					result.file.filename()
 				);
 			}
 

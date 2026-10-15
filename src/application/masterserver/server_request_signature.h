@@ -14,6 +14,12 @@
 using masterserver_cookie_type = std::array<uint8_t, 24>;
 
 /*
+	A heartbeat's random nonce, sent back in its answer (see masterserver_out::heartbeat_ack).
+*/
+
+using heartbeat_nonce_type = std::array<uint8_t, 8>;
+
+/*
 	A server in the browser has no cookie: it signs its heartbeats with its WebSocket session's id in its place,
 	so a native server's signed heartbeat can not be passed off as one of a browser's session (a clone on the list).
 */

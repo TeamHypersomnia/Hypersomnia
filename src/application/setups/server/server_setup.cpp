@@ -8,6 +8,7 @@
 #include <array>
 #include <string>
 #include <mutex>
+#include <sodium.h>
 #include "augs/misc/date_time.h"
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -2489,14 +2490,15 @@ bool server_setup::handle_masterserver_response(
 
 		if constexpr(std::is_same_v<T, masterserver_out::heartbeat_ack>) {
 			/*
-				Only from a masterserver this server sends heartbeats to - anyone can send a packet to the game port.
-				A forged answer (a spoofed address) could only cost a resent heartbeat.
+				Only from a masterserver this server sends heartbeats to, answering the heartbeat sent last (its nonce) -
+				anyone can send a packet to the game port, also with the masterserver's address.
 			*/
 
 			{
 				const bool from_masterserver = resolved_server_list_addr.has_value() && *resolved_server_list_addr == from;
+				const bool answers_last_heartbeat = last_heartbeat_nonce != heartbeat_nonce_type() && typed_request.nonce == last_heartbeat_nonce;
 
-				if (!from_masterserver) {
+				if (!from_masterserver || !answers_last_heartbeat) {
 					return true;
 				}
 			}
@@ -2969,6 +2971,9 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	sign_for_masterserver(heartbeat, ::web_session_cookie(resolved_this_server_webrtc_id));
 #else
+	randombytes_buf(last_heartbeat_nonce.data(), last_heartbeat_nonce.size());
+	heartbeat.ack_nonce = last_heartbeat_nonce;
+
 	sign_for_masterserver(heartbeat);
 #endif
 

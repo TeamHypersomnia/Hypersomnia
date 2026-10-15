@@ -126,6 +126,7 @@ class server_setup :
 	*/
 
 	masterserver_cookie_type masterserver_cookie = {};
+	heartbeat_nonce_type last_heartbeat_nonce = {};
 	bool resent_heartbeat_for_cookie = false;
 
 	template <class Request>

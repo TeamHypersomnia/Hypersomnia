@@ -73,6 +73,7 @@ struct server_heartbeat {
 	uint8_t zoom_hundredths = 100;
 
 	host_string_type domain;
+	heartbeat_nonce_type ack_nonce = {};
 	std::optional<server_request_signature> signature;
 	// END GEN INTROSPECTOR
 

@@ -963,6 +963,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							auto ack = masterserver_out::heartbeat_ack();
 							ack.cookie = cookies.make(from);
+							ack.nonce = typed_request.ack_nonce;
 
 							if (!cookies.valid(typed_request.signature->cookie, from)) {
 								send_back(ack);
@@ -1019,6 +1020,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 							server_entry.last_heartbeat = typed_request;
 							server_entry.last_heartbeat.signature.reset();
+							server_entry.last_heartbeat.ack_nonce = {};
 							server_entry.time_last_heartbeat = current_time;
 							server_entry.official_server_id = official_id != nullptr ? *official_id : std::string();
 
