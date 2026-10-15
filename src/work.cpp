@@ -246,13 +246,6 @@ EM_JS(void, call_get_user_geolocation, (), {
 	Module.getUserGeolocation();
 });
 
-double web_get_secs_until_next_weekend_evening(const char* locationId) {
-	return EM_ASM_DOUBLE({
-		const locationIdStr = UTF8ToString($0);
-		return get_secs_until_next_weekend_evening(locationIdStr);
-	}, locationId);
-}
-
 extern augs::mutex open_url_on_main_lk;
 extern std::string open_url_on_main;
 

@@ -9,8 +9,6 @@ enum class server_type : uint8_t {
 
 /*
 	server_public_key: the Ed25519 key the server signs its heartbeats with and seals its handshakes to; all zero if unknown.
-	location_id: an official server's id in official_servers.d ("de", "us-central") - its happy hours' time zone, the same
-	the site counts them by; empty for community servers.
 */
 
 struct masterserver_entry_meta {
@@ -23,7 +21,6 @@ struct masterserver_entry_meta {
 	webrtc_id_type webrtc_id;
 	server_type type = server_type::NATIVE;
 	std::array<uint8_t, 32> server_public_key = {};
-	host_string_type location_id;
 	// END GEN INTROSPECTOR
 
 	bool is_community_server() const {

@@ -14,6 +14,7 @@ namespace ranked_webhooks {
 		const std::string& arena,
 		const std::string& game_mode,
 		const messages::match_summary_message& info,
+		const bool happy_hours,
 		F get_clan_of,
 		A get_avatar_of
 	) {
@@ -34,6 +35,10 @@ namespace ranked_webhooks {
 
 		writer.Key("match_start_date");
 		writer.String(info.match_start_timestamp.c_str());
+
+		/* Happy hours by the server's own time zone when the match started - the site doubles the gains then. */
+		writer.Key("event_match_multiplier");
+		writer.Int(happy_hours ? 2 : 1);
 
 		writer.Key("server_name");
 		writer.String(server_name.c_str());

@@ -416,8 +416,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	*/
 
 	auto update_webrtc_alias = [&](masterserver_client& entry) {
-		entry.meta.location_id = entry.official_server_id;
-
 		if (entry.meta.is_official_server()) {
 			entry.meta.webrtc_id = ::to_webrtc_alias(
 				entry.last_heartbeat.is_ranked_server(),

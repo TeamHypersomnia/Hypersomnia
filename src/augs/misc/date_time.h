@@ -46,8 +46,18 @@ namespace augs {
 		static std::string format_countdown(const int64_t secs);
 		static std::string format_countdown_letters(const int64_t secs);
 
-		static double get_secs_until_next_weekend_evening(const std::string& location_id);
-		static std::optional<std::string> format_time_until_weekend_evening(const std::string& location_id);
+		/*
+			Happy hours: Friday to Sunday from 19:00 for 2 hours, in the given IANA time zone (e.g. "Europe/Berlin") -
+			0 while on, -1 for no zone.
+		*/
+
+		static double get_secs_until_next_weekend_evening(const std::string& iana_time_zone);
+
+		/*
+			This computer's IANA time zone (e.g. "Europe/Berlin"), empty if not known.
+		*/
+
+		static std::string system_time_zone();
 		static std::optional<std::string> format_time_until_weekend_evening(const double seconds_left);
 #if 0
 		static std::optional<std::chrono::system_clock::time_point> from_utc_timestamp(const std::string& s);

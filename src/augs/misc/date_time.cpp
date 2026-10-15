@@ -329,59 +329,18 @@ std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, 
 	return typesafe_sprintf("%xd", days);
 }
 
-// Function to get the IANA time zone name based on locationId
-/*
-	An official server's id is its time zone's key, or that key with "-<anything>" for one of several hosts there
-	("de-2", "us-central-2") - the same rule as the site's.
-*/
-
-static std::string zone_key_of(const std::string& locationId) {
-	for (const auto key : { "au", "ru", "de", "us-central", "pl", "ch", "nl" }) {
-		const auto k = std::string(key);
-
-		if (locationId == k || locationId.rfind(k + "-", 0) == 0) {
-			return k;
-		}
-	}
-
-	return "";
-}
-
-std::string getTimeZoneName(const std::string& locationId) {
-    if (locationId == "au") {
-        return "Australia/Sydney";
-    } else if (locationId == "ru") {
-        return "Europe/Moscow";
-    } else if (locationId == "de") {
-        return "Europe/Berlin";
-    } else if (locationId == "us-central") {
-        return "America/Chicago";
-    } else if (locationId == "pl") {
-        return "Europe/Warsaw";
-	} else if (locationId == "ch") {
-		return "Europe/Zurich";
-	} else if (locationId == "nl") {
-		return "Europe/Amsterdam";
-	}
-
-    return ""; // Return an empty string for unknown locationIds
-}
-
 #if PLATFORM_WINDOWS
 #undef min
 #undef max
 // MSVC supports C++20 chrono 
 
-double augs::date_time::get_secs_until_next_weekend_evening(const std::string& given_location_id) {
-	const auto locationId = ::zone_key_of(given_location_id);
-
+double augs::date_time::get_secs_until_next_weekend_evening(const std::string& timeZoneName) {
 	using namespace std::chrono;
     using clock = system_clock;
     using namespace std::chrono_literals;
 
-    const auto& timeZoneName = getTimeZoneName(locationId);
     if (timeZoneName.empty()) {
-        return -1; // Invalid locationId
+        return -1;
     }
 
     try {
@@ -416,27 +375,20 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& g
 }
 #else
 
+double augs::date_time::get_secs_until_next_weekend_evening(const std::string& timeZoneName) {
 #if PLATFORM_WEB
-double web_get_secs_until_next_weekend_evening(const char*);
-#endif
+	/*
+		A server in the browser is never official - it has no happy hours.
+	*/
 
-double augs::date_time::get_secs_until_next_weekend_evening(const std::string& given_location_id) {
-	const auto locationId = ::zone_key_of(given_location_id);
-
-#if PLATFORM_WEB
-	return web_get_secs_until_next_weekend_evening(locationId.c_str());
-#endif
-
-#if 0
-	(void)locationId;
+	(void)timeZoneName;
 	return -1.0;
 #else
     using namespace std::chrono;
 
 	try {
-		const auto& timeZoneName = getTimeZoneName(locationId);
 		if (timeZoneName.empty()) {
-			return -1; // Invalid locationId
+			return -1;
 		}
 
 		auto timeZone = date::locate_zone(timeZoneName);
@@ -470,6 +422,26 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& g
 
 #endif
 
+std::string augs::date_time::system_time_zone() {
+#if PLATFORM_WEB
+	return "";
+#elif PLATFORM_WINDOWS
+	try {
+		return std::string(std::chrono::current_zone()->name());
+	}
+	catch (...) {
+		return "";
+	}
+#else
+	try {
+		return std::string(date::current_zone()->name());
+	}
+	catch (...) {
+		return "";
+	}
+#endif
+}
+
 std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const double secs) {
 	if (secs == -1) {
 		return std::nullopt;
@@ -482,10 +454,6 @@ std::optional<std::string> augs::date_time::format_time_until_weekend_evening(co
 	return format_countdown_letters(secs);
 }
 
-std::optional<std::string> augs::date_time::format_time_until_weekend_evening(const std::string& location_id) {
-	const auto secs = get_secs_until_next_weekend_evening(location_id);
-	return format_time_until_weekend_evening(secs);
-}
 
 #if BUILD_NETWORKING
 /* Reliable yojimbo implementation */

@@ -130,6 +130,12 @@ class server_setup :
 	masterserver_cookie_type masterserver_cookie = {};
 	heartbeat_nonce_type last_heartbeat_nonce = {};
 	bool resent_heartbeat_for_cookie = false;
+
+	/*
+		Whether the ranked match started in happy hours - none known after a crash recovery (then: whether they are on).
+	*/
+
+	std::optional<bool> ranked_match_happy_hours;
 	double when_logged_heartbeat_refused = -1000.0;
 
 	template <class Request>
@@ -1005,6 +1011,7 @@ public:
 
 	bool is_ranked_server() const;
 	bool requires_authentication() const;
+	std::string get_time_zone() const;
 
 	bool recovered_from_crash() const {
 		return recovered_from_crash_flag;

@@ -1695,6 +1695,8 @@ void server_setup::lock_ranked_roster_if_started(const const_logic_step step) {
 		using J = messages::no_arg_mode_notification;
 
 		if (n.payload == decltype(n.payload)(J::RANKED_STARTED)) {
+			ranked_match_happy_hours = augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0;
+
 			/*
 				Lock in the game id to account id mappings.
 				We'll need them later to make a proper match report for the database endpoint.
@@ -2201,6 +2203,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		get_current_arena_name(),
 		get_current_game_mode_name(),
 		summary,
+		ranked_match_happy_hours.value_or(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0),
 		get_clan_of,
 		get_avatar_of
 	);
@@ -2212,6 +2215,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 			get_current_arena_name(),
 			get_current_game_mode_name(),
 			summary,
+			ranked_match_happy_hours.value_or(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0),
 			get_clan_of,
 			[](const mode_player_id) { return std::vector<std::byte>(); }
 		)
@@ -2847,6 +2851,32 @@ bool server_setup::is_ranked_server() const {
 	so non-Steam clients do not filter them out of the server browser as ranked-with-auth.
 */
 
+/*
+	Where this server is, for its happy hours (and the browser's guess of the distance): the config's time_zone, else the
+	system's - UTC there is no place (a VPS or a container left as it came), so no happy hours rather than wrong ones.
+*/
+
+std::string server_setup::get_time_zone() const {
+	if (!vars.time_zone.empty()) {
+		return std::string(vars.time_zone);
+	}
+
+	static const auto system_zone = []() {
+		const auto zone = augs::date_time::system_time_zone();
+		const bool utc = zone.empty() || zone == "UTC" || zone == "Etc/UTC" || zone == "Etc/Universal" || zone == "Universal" || zone == "Zulu" || zone == "GMT" || zone == "Etc/GMT";
+
+		if (utc) {
+			LOG("WARNING: this system's time zone is UTC or unknown - no happy hours for ranked matches. Set it (e.g. timedatectl set-timezone Europe/Berlin) or the server's time_zone.");
+			return std::string();
+		}
+
+		LOG("Time zone (happy hours): %x", zone);
+		return zone;
+	}();
+
+	return system_zone;
+}
+
 bool server_setup::requires_authentication() const {
 	return is_ranked_server() && !vars.authenticate_with_nicknames;
 }
@@ -2976,6 +3006,15 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.domain = vars.domain;
 	heartbeat.instance_label = instance_label;
+	heartbeat.time_zone = get_time_zone();
+
+	/*
+		Happy hours by this server's own time zone - the browser shows them as they are, the report says them.
+	*/
+
+	if (is_ranked_server()) {
+		heartbeat.secs_until_happy_hours = static_cast<int32_t>(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()));
+	}
 	heartbeat.validate();
 
 	if (!heartbeat.is_valid()) {

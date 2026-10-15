@@ -161,10 +161,12 @@ void update_cached_time_to_event(T& server_list) {
 	main_thread_queue::execute(
 		[&]() {
 			for (auto& s : server_list) {
-				s.heartbeat.cached_time_to_event = 
-					s.heartbeat.is_ranked_server()
-					? augs::date_time::get_secs_until_next_weekend_evening(s.get_location_id()) 
-					: std::numeric_limits<double>::max()
+				const auto at = s.heartbeat.happy_hours_at;
+
+				s.heartbeat.cached_time_to_event =
+					!s.heartbeat.is_ranked_server() || at < 0.0 ? std::numeric_limits<double>::max() :
+					at == 0.0 ? 0.0 :
+					std::max(1.0, at - augs::steady_secs())
 				;
 			}
 		}
@@ -218,6 +220,11 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
             augs::read_bytes(stream, entry.meta);
             augs::read_bytes(stream, entry.heartbeat);
 
+			{
+				const auto secs = entry.heartbeat.secs_until_happy_hours;
+				entry.heartbeat.happy_hours_at = secs < 0 ? -1.0 : secs == 0 ? 0.0 : augs::steady_secs() + secs;
+			}
+
             new_server_list.emplace_back(std::move(entry));
         }
     }
@@ -228,7 +235,7 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
 
 #if PLATFORM_WEB
 	for (auto& n : new_server_list) {
-		if (const auto ping = get_estimated_ping_to_server(n.get_location_id())) {
+		if (const auto ping = get_estimated_ping_to_server(std::string(n.heartbeat.time_zone))) {
 			n.progress.state = server_entry_state::PING_MEASURED;
 			n.progress.ping = static_cast<uint32_t>(*ping);
 		}
@@ -1018,13 +1025,9 @@ void browse_servers_gui_state::show_server_list(
 
 		if (s.is_official_server() ) {
 			if (d.is_ranked_server()) {
-				const auto location_id = s.get_location_id();
+				const auto secs_left = d.cached_time_to_event == std::numeric_limits<double>::max() ? -1.0 : d.cached_time_to_event;
 
-#if PLATFORM_WEB
-				if (const auto result = augs::date_time::format_time_until_weekend_evening(d.cached_time_to_event)) {
-#else
-				if (const auto result = augs::date_time::format_time_until_weekend_evening(location_id)) {
-#endif
+				if (const auto result = augs::date_time::format_time_until_weekend_evening(secs_left)) {
 					if (const bool ongoing = *result == "") {
 						text_color("2X EXP", wave_color);
 					}

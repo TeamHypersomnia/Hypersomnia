@@ -376,6 +376,7 @@
         "webrtc_port_range_end": 9050, // only matters if "webrtc_udp_mux": false
         "server_name": "", // Will be "Nickname's server" by default.
         "domain": "", // Optional, e.g. "hypersomnia.example.com" - shown in the server list so players can remember it instead of the IP.
+        "time_zone": "", // Where the server is, as an IANA time zone, e.g. "Europe/Berlin" - empty: the system's (not UTC). Ranked matches get happy hours there (2x, Friday to Sunday 19:00-21:00), and players in the browser see roughly how far it is.
         "notified_server_list": "masterserver.hypersomnia.io:8430",
         "suppress_new_community_server_webhook": false,
         "is_behind_nat": true,

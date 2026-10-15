@@ -159,6 +159,7 @@ struct server_vars {
 
 	server_name_type server_name;
 	host_string_type domain;
+	host_string_type time_zone;
 	address_string_type notified_server_list;
 	bool suppress_new_community_server_webhook = false;
 	bool show_on_server_list = true;

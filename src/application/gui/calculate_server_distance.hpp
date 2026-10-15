@@ -15,16 +15,16 @@ struct lat_long {
     double longitude;
 };
 
-// Unordered map to hold the mappings
+// Where an official server is, by the time zone it gives in its heartbeat (server.time_zone)
 std::unordered_map<std::string, lat_long> server_locations = {
-    {"au", { -33.8688, 151.2093 }},       // Sydney, Australia
-    {"ru", { 55.7558, 37.6173 }},         // St. Petersburg, Russia
-    {"de", { 52.5200, 13.4050 }},         // Berlin, Germany
-    {"us-central", { 41.8781, -87.6298 }},// Chicago, USA
-    {"pl", { 52.2297, 21.0122 }},         // Warsaw, Poland
-    {"ch", { 47.3769, 8.5417 }},          // Zurich, Switzerland
-    {"nl", { 50.8746, 6.0580 }},           // Eygelshoven, Netherlands
-    {"fi", { 60.1695, 24.9354 }}          // Helsinki, Finland
+    {"Australia/Sydney", { -33.8688, 151.2093 }},
+    {"Europe/Moscow", { 55.7558, 37.6173 }},
+    {"Europe/Berlin", { 52.5200, 13.4050 }},
+    {"America/Chicago", { 41.8781, -87.6298 }},
+    {"Europe/Warsaw", { 52.2297, 21.0122 }},
+    {"Europe/Zurich", { 47.3769, 8.5417 }},
+    {"Europe/Amsterdam", { 50.8746, 6.0580 }},
+    {"Europe/Helsinki", { 60.1695, 24.9354 }}
 };
 
 // Function to convert degrees to radians

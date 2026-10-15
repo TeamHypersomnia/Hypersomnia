@@ -74,6 +74,8 @@ struct server_heartbeat {
 	uint8_t zoom_hundredths = 100;
 
 	host_string_type domain;
+	host_string_type time_zone;
+	int32_t secs_until_happy_hours = -1;
 	instance_label_type instance_label;
 	heartbeat_nonce_type ack_nonce = {};
 	std::optional<server_request_signature> signature;
@@ -98,6 +100,12 @@ struct server_heartbeat {
 		zoom_hundredths = to_hundredths(zoom);
 	}
 
+	/*
+		When happy hours start by this computer's steady clock (from secs_until_happy_hours as the list came; 0 - on,
+		-1 - none), and the seconds left, kept up to date for the Event column.
+	*/
+
+	double happy_hours_at = -1.0;
 	double cached_time_to_event = 0.0;
 
 	bool any_human() const {

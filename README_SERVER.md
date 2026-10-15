@@ -176,6 +176,8 @@ The panel's *Players* tab kicks and bans by account. Bans are kept in ``server_b
 
 If your server has a domain pointing to it, set `domain` in the `server` section, e.g. `"domain": "hypersomnia.example.com"` - without the port. The server list will show it instead of the bare IP, players can copy it, and the game remembers it for the next launch, so they still find your server if its IP changes. It is only a label: nothing checks that the domain really points to your server, and it does not make the server official.
 
+Ranked matches of an official server get happy hours - 2x, Friday to Sunday from 19:00 to 21:00 - in the time zone of the host's system (e.g. `timedatectl set-timezone Europe/Berlin`), or in `time_zone` of the `server` section if set (an IANA name, e.g. `"Europe/Berlin"`). A host left in UTC (common for a VPS or a container) has no happy hours until one of these is set - the log says so.
+
 ### The server key
 
 Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). One key per host: all the instances it runs (``instances``, tournament matches) share it and differ by their labels - ``c1``, ``c2``, ``r1``, ``t1`` - shown on the server list. Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Players can join a given instance with ``c2-<key>``, or any of them with the key alone. Print the public key with:
