@@ -171,13 +171,13 @@ void perform_rcon_gui(
 
 					if (first_of_kind) {
 						text_disabled(typesafe_sprintf(
-							"Saved for all %x instances of this server - the others take them after a restart.",
+							"Saved for all %x instances of this server.\nThe others take the changes after a restart.",
 							ranked ? "ranked" : "casual"
 						));
 					}
 					else {
 						text_disabled(typesafe_sprintf(
-							"Only for this instance (%x) until a restart. To change all %x instances, edit them on %x.",
+							"Only for this instance (%x), until a restart.\nTo change all %x instances, change them on %x.",
 							state.instance_label,
 							ranked ? "ranked" : "casual",
 							ranked ? "r1" : "c1"

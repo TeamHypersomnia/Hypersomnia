@@ -918,6 +918,16 @@ void browse_servers_gui_state::show_server_list(
 
 			auto displayed_name = d.server_name;
 
+			/*
+				A favorite the player named (Add a server) shows that name - not the server's.
+			*/
+
+			if (key.has_value() && favorites_kept) {
+				if (const auto favorite = in.favorites.find(*key, s.get_instance_label()); favorite != nullptr && favorite->named_by_player && !favorite->name.empty()) {
+					displayed_name = favorite->name;
+				}
+			}
+
 			if (streamer_mode && s.is_community_server()) {
 				displayed_name = "Community server";
 			}

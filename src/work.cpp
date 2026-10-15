@@ -2238,7 +2238,12 @@ work_result work(
 	*/
 
 	WEBSTATIC auto update_favorite_of = [&](const client_setup& client, const augs::ed25519_public_key_type& key) {
-		if (!client.connected_through_localhost_fallback()) {
+		/*
+			Only once the server told which instance it is - with no label yet, the host's first favorite (another
+			instance of it) would take this one's address.
+		*/
+
+		if (!client.connected_through_localhost_fallback() && !client.get_server_instance_label().empty()) {
 			/*
 				Its public address: from the list if it has this key, else where it was joined - not an address in
 				this player's network (another network may have someone else there).
@@ -6609,7 +6614,8 @@ work_result work(
 					visit_current_setup([&]<typename S>(const S& setup) {
 						if constexpr(std::is_same_v<client_setup, remove_cref<S>>) {
 							const auto key = setup.get_server_public_key();
-							return favorites_kept && key.has_value() && favorites.contains(*key, setup.get_server_instance_label());
+							const auto label = setup.get_server_instance_label();
+							return favorites_kept && key.has_value() && !label.empty() && favorites.contains(*key, label);
 						}
 						else {
 							return false;

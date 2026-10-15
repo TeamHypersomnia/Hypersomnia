@@ -245,11 +245,11 @@ bool start_client_gui_state::perform(
 			const auto key_error = !custom_key.empty() && custom_key_invalid;
 
 			if (by_public_key) {
-				input_text<100>("Public key (64 hex digits)", custom_key);
+				input_text<100>("Public key (or c2-<key> for one instance)", custom_key);
 
 				const auto [note, note_color] = [&]() -> std::pair<std::string, rgba> {
 					if (key_error) {
-						return { "The key should be 64 hex digits.", orange };
+						return { "The key should be 64 hex digits (or c2-<key>).", orange };
 					}
 
 					if (!typed_key.has_value()) {
