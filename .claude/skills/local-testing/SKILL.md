@@ -163,6 +163,7 @@ no key to expect), key mismatches against the list, NAT/WebRTC from outside. Sam
 ## Remote end to end: official server, ranked, accounts (scripts/remote_e2e)
 
 The whole production flow on real hosts without touching production:
+`remote_e2e/official.sh start <broker key>` (arena) - an official host for playing by hand: casual c1, c2 and ranked r1 on 9005-9007 in one process, its `official.sh key` goes into arenaus's `official_servers.d/pl`.
 `arenaus:~/hs-test-backend` runs a test masterserver (UDP 18430, HTTP 18420) and a copy of the site (port 13000, clean DB,
 its own `broker.key`, Node from the official tarball - the host has none) via `backend.sh start|stop|status|broker_key`; both read its `official_servers.d`.
 `arena:~/yojimbo-test/e2e` runs a dedicated server with its own server key via `match.sh`, heartbeating to that master
