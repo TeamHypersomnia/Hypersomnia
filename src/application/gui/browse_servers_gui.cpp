@@ -403,9 +403,12 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	*/
 
 	error_message.clear();
-	auto prev_addr = selected_server.address;
+
+	if (selected_server.is_set()) {
+		reselect_after_refresh = selected_server;
+	}
+
 	selected_server = {};
-	selected_server.address = prev_addr;
 
 	LOG("Launching future_response");
 
@@ -1150,6 +1153,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	if (!show) {
 		/*
+			Edit is only there while the browser is - the dialog is its.
+		*/
+
+		server_details.edit_requested = false;
+
+		/*
 			Local servers take the first look in a run only - not a later one.
 		*/
 
@@ -1212,11 +1221,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	{
-		const auto previous_tab = current_tab;
-
 		/*
 			Local, All, Favorites - Local only while there are local servers, Favorites not on CrazyGames
-			(see favorites_kept).
+			(see favorites_kept). Only the player's click is remembered - not All shown in place of a tab not there,
+			nor Local taking the first look.
 		*/
 
 		auto shown_tabs = std::vector<browser_tab>();
@@ -1246,6 +1254,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 		}
 
+		const auto index_before = index;
+
 		{
 			auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
 			ImGui::TabLabels(labels.data(), static_cast<int>(labels.size()), index, nullptr);
@@ -1258,11 +1268,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::Separator();
 		}
 
-		if (current_tab != previous_tab) {
+		if (const bool clicked = index != index_before) {
 			local_tab_precedence_pending = false;
+			in.remembered_tab = current_tab;
 		}
-
-		in.remembered_tab = current_tab;
 	}
 
 	thread_local ImGuiTextFilter filter;
@@ -1898,13 +1907,21 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 	
-	if (server_details.show) {
-		if (!selected_server.is_set()) {
-			for (auto& s : displayed_list()) {
-				if (s.address == selected_server.address) {
+	if (server_details.show && reselect_after_refresh.has_value() && !selected_server.is_set()) {
+		auto reselect = [&](const auto& list) {
+			for (const auto& s : list) {
+				if (s.same_server(*reselect_after_refresh)) {
 					selected_server = s;
+					reselect_after_refresh.reset();
+					return;
 				}
 			}
+		};
+
+		reselect(displayed_list());
+
+		if (reselect_after_refresh.has_value()) {
+			reselect(favorite_only_list);
 		}
 	}
 
@@ -1969,6 +1986,19 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			/*
 				The key as Server details shows it (with 0x) or bare.
 			*/
+
+			/*
+				"<address>,0x<key>" pasted into Address (as --print-server-key and the site give it): split into both.
+			*/
+
+			if (const auto pasted = connect_target::parse(add_server_address); pasted.key.has_value() && !pasted.address.empty()) {
+				const auto typed_key = connect_target::key_of(add_server_key);
+
+				if (!typed_key.has_value() || typed_key == pasted.key) {
+					add_server_address = pasted.address;
+					add_server_key = "0x" + augs::bytes_to_hex(*pasted.key);
+				}
+			}
 
 			const auto key = connect_target::key_of(add_server_key);
 			const auto address = connect_target::trimmed(add_server_address);
@@ -2184,7 +2214,11 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 
 	text(in.server_name.empty() ? std::string("This server") : in.server_name);
 
-	if (in.server_key.has_value() && favorites_kept) {
+	/*
+		A favorite only once the server told which instance it is (its label) - see favorite_servers.h.
+	*/
+
+	if (in.server_key.has_value() && favorites_kept && !in.server_label.empty()) {
 		ImGui::SameLine();
 
 		if (in.favorites.contains(*in.server_key, in.server_label)) {
@@ -2600,7 +2634,12 @@ bool server_details_gui_state::perform(
 		text_color("Browser join link", green);
 	};
 
-	if (listed) {
+	/*
+		A favorite the list does not have now: no browser link either - a browser reaches a server only through the
+		list's signalling.
+	*/
+
+	if (listed && !entry.favorite_only) {
 		do_browser_join_link(true);
 		do_steam_join_link(false);
 	}

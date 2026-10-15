@@ -1,7 +1,8 @@
 #pragma once
+#include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <map>
-#include <system_error>
 #include <optional>
 #include <vector>
 #include <string>
@@ -34,8 +35,10 @@ class server_passwords {
 
 		try {
 			for (const auto& e : augs::from_json_file<std::vector<server_password_entry>>(path)) {
-				if (e.key.size() == 64) {
-					by_key[e.key] = e.password;
+				const auto key = e.key.rfind("0x", 0) == 0 ? e.key.substr(2) : e.key;
+
+				if (key.size() == 64) {
+					by_key[key] = e.password;
 				}
 			}
 		}
@@ -52,14 +55,23 @@ class server_passwords {
 
 		try {
 			augs::create_directories_for(path);
-			augs::save_as_json_atomic(entries, path);
 
 			/*
-				Readable by this user only, like account.key.
+				Readable by this user only, like account.key - the file written next to it is made so before the
+				passwords go in, then put in its place.
 			*/
 
-			auto ignored = std::error_code();
-			std::filesystem::permissions(path, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write, std::filesystem::perm_options::replace, ignored);
+			auto temporary = path;
+			temporary += ".tmp-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+
+			{
+				auto created = std::ofstream(temporary, std::ios::trunc);
+			}
+
+			std::filesystem::permissions(temporary, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write, std::filesystem::perm_options::replace);
+			augs::save_as_text(temporary, augs::to_json_string(entries));
+			std::filesystem::rename(temporary, path);
+			augs::sync_if_persistent(path);
 		}
 		catch (const std::exception& e) {
 			LOG("Could not save the server passwords to %x: %x", path, e.what());

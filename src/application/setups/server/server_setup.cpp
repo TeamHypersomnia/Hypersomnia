@@ -2556,7 +2556,7 @@ bool server_setup::handle_masterserver_response(
 					switch (typed_request.refusal) {
 						case R::INSTANCE_LABEL_TAKEN:
 							LOG(
-								"ERROR: the masterserver does not list this server: another server with this key already uses %x (at %x). Run all instances from one process (see \"instances\" in the config), or give this one its own appdata (its own key).",
+								"ERROR: the masterserver does not list this server: another server with this key already uses %x (at %x). Run all instances from one process (see \"instances\" in the config), or give this one its own appdata (its own key). If this server's own address just changed, it is listed again within a minute.",
 								std::string(instance_label),
 								::ToString(typed_request.taken_by)
 							);

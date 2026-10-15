@@ -2862,7 +2862,11 @@ work_result work(
 		}
 
 		auto make = [&](std::string name, std::string address, const auto key, std::string label, const bool hosting) {
-			const auto listed = key.has_value() ? browse_servers_gui.find_entry_by_key(*key, label) : nullptr;
+			/*
+				Only once the server told which instance it is - before that the host's best one could be another.
+			*/
+
+			const auto listed = key.has_value() && !label.empty() ? browse_servers_gui.find_entry_by_key(*key, label) : nullptr;
 
 			return invite_to_join_input {
 				std::move(name),

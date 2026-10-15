@@ -211,6 +211,12 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	bool scroll_once_to_selected = false;
 	server_list_entry selected_server;
 
+	/*
+		The row selected before Refresh list - selected again once the new list has the same row (see same_server).
+	*/
+
+	std::optional<server_list_entry> reselect_after_refresh;
+
 	server_details_gui_state server_details = std::string("Server details");
 
 	bool only_responding = false;

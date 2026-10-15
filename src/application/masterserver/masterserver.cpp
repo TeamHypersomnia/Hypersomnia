@@ -999,6 +999,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								stays, until its goodbye or its timeout.
 							*/
 
+							bool moved_here = false;
+
 							{
 								const auto label = std::string(typed_request.instance_label);
 
@@ -1008,12 +1010,25 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 									return;
 								}
 
+								/*
+									An entry of this instance at another address not heard from for longer than a
+									heartbeat's interval is this server's own old address (its address changed - IPv4
+									and IPv6, a NAT mapping, a restart on another port): replaced, not waited out.
+								*/
+
+								std::optional<netcode_address_t> old_address_of_this_instance;
+
 								for (const auto& other : server_list) {
 									const bool same_instance =
 										!(other.first == from)
 										&& other.second.meta.server_public_key == public_key
 										&& std::string(other.second.last_heartbeat.instance_label) == label
 									;
+
+									if (same_instance && current_time - other.second.time_last_heartbeat > 35.0) {
+										old_address_of_this_instance = other.first;
+										continue;
+									}
 
 									if (same_instance) {
 										static uint64_t last_logged_ms = 0;
@@ -1027,6 +1042,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 										send_back(ack);
 										return;
 									}
+								}
+
+								if (old_address_of_this_instance.has_value()) {
+									LOG("The %x of key %x moved from %x to %x.", label, augs::bytes_to_hex(public_key).substr(0, 8), ::ToString(*old_address_of_this_instance), ip_str);
+									server_list.erase(*old_address_of_this_instance);
+									moved_here = true;
 								}
 							}
 
@@ -1097,7 +1118,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							if (is_new_server) {
 								server_entry.meta.time_hosted = current_time;
 
-								if (typed_request.show_on_server_list) {
+								if (moved_here) {
+									MSR_LOG("A listed server moved to %x - no notification.", ip_str);
+								}
+								else if (typed_request.show_on_server_list) {
 									if (!typed_request.suppress_new_community_server_webhook) {
 										MSR_LOG("New server sent a heartbeat from %x. Sending a notification.", ip_str);
 										push_new_server_webhook(from, typed_request, false);
