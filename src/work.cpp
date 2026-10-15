@@ -5786,6 +5786,12 @@ work_result work(
 #endif
 		};
 
+		/*
+			A Steam invite or a steam://run/<app>//<target>/ link: the app has "Use launch command line" set in Steamworks,
+			so Steam hands the friend's "connect" only here (and to NewUrlLaunchParameters while running), never as
+			arguments - it is read only as what to join, so no invite can pass the game a flag.
+		*/
+
 		const auto steam_cli = steam_get_launch_command_line_string();
 
 		/*
