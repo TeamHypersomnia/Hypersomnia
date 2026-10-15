@@ -331,6 +331,10 @@ async function pre_run_cg() {
           if (user && Module.ccall) {
             window.CrazyGames.SDK.user.getUserToken().then(passCrazyGamesToken).catch(e => console.log("Token retrieval failed:", e));
           }
+          // Signed out on the portal: the game drops the account and its cert - the next person in this tab plays as a guest
+          else if (!user && Module.ccall) {
+            Module.ccall('on_crazygames_signed_out', null, [], []);
+          }
         });
       }
 

@@ -974,7 +974,9 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		}
 
 		if (augs::exists(key_path) && (key_damaged || now - key_unreadable_since > 2.0)) {
-#if PLATFORM_WEB
+#if WEB_ITCH
+			text_color("Your account key in this browser is damaged.\nStart a new account.", red);
+#elif PLATFORM_WEB
 			text_color("Your account key in this browser is damaged.\nRestore from your private key file, or start a new account.", red);
 #else
 			text_color("Your account.key file is damaged.\nRestore from your private key file, put back a copy you backed up and start the game again,\nor start a new account (the damaged file is kept as a backup).", red);
@@ -1027,11 +1029,19 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	*/
 
 	const bool import_clicked = [&]() {
+#if WEB_ITCH
+		/*
+			Never on itch.io: every itch.io game reads the browser storage the key would go to.
+		*/
+
+		return false;
+#else
 		/*
 			Not greyed during ranked - clicked, it says why it can not be done now, as the other buttons do.
 		*/
 
 		return colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange }, { " file...", white } });
+#endif
 	}();
 
 	const auto import_blocked = import_clicked ? account_change_blocked() : std::nullopt;
@@ -1960,6 +1970,20 @@ void settings_gui_state::perform(
 
 		if (ImGui::BeginPopupModal("Your account key is damaged##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			perform_account_manage_pane(window);
+
+			/*
+				What went wrong (a file that is no key, a save that failed, the game open in another tab) - here, as no
+				other modal can open over this one.
+			*/
+
+			if (account_message.has_value()) {
+				ImGui::Separator();
+				text_color(*account_message, orange);
+
+				if (ImGui::Button("OK##DamagedMessage")) {
+					account_message.reset();
+				}
+			}
 
 #if !PLATFORM_WEB
 			ImGui::Separator();

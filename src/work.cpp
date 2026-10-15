@@ -347,7 +347,18 @@ void web_sdk_loading_stop() {
 	});
 }
 
+/*
+	Signed out on the CrazyGames portal while the game runs: the next person in this tab is not to play as them.
+*/
+
+std::atomic<bool> crazygames_signed_out = false;
+
 extern "C" {
+	EMSCRIPTEN_KEEPALIVE
+	void on_crazygames_signed_out() {
+		crazygames_signed_out.store(true);
+	}
+
 	EMSCRIPTEN_KEEPALIVE
 	void on_ad_started() {
 		ad_state = ad_state_type::PLAYING;
@@ -2137,6 +2148,11 @@ work_result work(
 		const auto now = augs::steady_secs();
 
 #if PLATFORM_WEB
+		if (crazygames_signed_out.exchange(false) && params.is_crazygames) {
+			LOG("Signed out on CrazyGames. Logging out.");
+			social_log_out();
+		}
+
 		/*
 			The CrazyGames token expires sooner than a cert - refreshed when it has, at most every 30 s,
 			so the loop renewing the cert always has a valid one.
