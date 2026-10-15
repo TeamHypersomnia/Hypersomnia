@@ -6,6 +6,8 @@
 #include "application/setups/client/connect_target.h"
 #include "application/main/favorite_servers.h"
 #include "application/gui/browse_servers_gui.h"
+#include "augs/misc/imgui/simple_popup.h"
+#include "augs/misc/imgui/long_input_text_with_dots.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "3rdparty/include_httplib.h"
@@ -859,7 +861,8 @@ void browse_servers_gui_state::show_server_list(
 			if (star_hovered && ImGui::IsMouseClicked(0)) {
 				if (is_favorite) {
 					if (manual_favorite) {
-						in.favorites.remove_manual(*key, s.favorite_address);
+						forget_unlisted = std::make_pair(*key, s.favorite_address);
+						forget_unlisted_name = std::string(s.heartbeat.server_name);
 					}
 					else {
 						in.favorites.remove(*key, s.get_instance_label());
@@ -2018,6 +2021,34 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		refresh_server_list(in);
 	}
 
+	if (std::exchange(server_details.forget_requested, false)) {
+		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
+			forget_unlisted = std::make_pair(*key, selected_server.favorite_address);
+			forget_unlisted_name = std::string(selected_server.heartbeat.server_name);
+		}
+	}
+
+	/*
+		Forgetting a favorite added by hand loses what was typed in - asked first.
+	*/
+
+	if (forget_unlisted.has_value()) {
+		auto popup = simple_popup { "Forget a server", typesafe_sprintf("Forget \"%x\"?", forget_unlisted_name), "" };
+
+		const auto buttons = std::vector<simple_popup::button> {
+			{ "Forget", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
+			{ "Cancel", rgba::zero, rgba::zero }
+		};
+
+		if (const auto result = popup.perform(buttons)) {
+			if (result == 1) {
+				in.favorites.remove_manual(forget_unlisted->first, forget_unlisted->second);
+			}
+
+			forget_unlisted.reset();
+		}
+	}
+
 	if (std::exchange(server_details.edit_requested, false)) {
 		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
 			add_server_open = true;
@@ -2056,13 +2087,31 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 #if !PLATFORM_WEB
 			/*
-				"<address>,0x<key>[,<name>]" pasted into any of the fields fills them all - before the field takes it
-				(the key's and the name's would cut it short).
+				A paste (Ctrl+V) taken whole before a field takes it, and the field left - "<address>,0x<key>[,<name>]"
+				into any fills them all (the key's and the name's would cut it short); a key into the key's field; an
+				address into the address's, then on to the key's if it has no good key yet. Anything else is pasted as usual.
 			*/
 
 			if (const auto& io = ImGui::GetIO(); (io.KeyCtrl || io.KeySuper) && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
 				if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
-					take_server_identifiers(clipboard);
+					const auto pasted = std::string(clipboard);
+
+					if (connect_target::find_server_identifiers(pasted).has_value()) {
+						take_server_identifiers(pasted);
+					}
+					else if (add_server_key_active && connect_target::key_of(pasted).has_value()) {
+						add_server_key = connect_target::trimmed(pasted);
+						augs::imgui::stop_editing_text();
+					}
+					else if (add_server_address_active && ::is_pasted_address(pasted)) {
+						add_server_address = connect_target::trimmed(pasted);
+						augs::imgui::stop_editing_text();
+						/*
+							On to the key's field only when it has no good key yet.
+						*/
+
+						add_server_focus_key_next = !connect_target::key_of(add_server_key).has_value();
+					}
 				}
 			}
 #endif
@@ -2084,7 +2133,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				};
 
 				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address, std::array<char, 260>());
+				add_server_address_active = ImGui::IsItemActive();
+
+				if (std::exchange(add_server_focus_key_next, false)) {
+					ImGui::SetKeyboardFocusHere();
+				}
+
 				field("Public key##add_server", "64 hex digits - from the server's admin", add_server_key, std::array<char, 67>());
+				add_server_key_active = ImGui::IsItemActive();
 				field("Server name (optional)##add_server", "", add_server_name, std::array<char, max_server_name_length_v + 1>());
 			}
 
@@ -2110,7 +2166,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				const bool the_edited_one = editing_unlisted.has_value() && key == editing_unlisted->first && address == editing_unlisted->second;
 
 				if (key.has_value() && !the_edited_one && in.favorites.contains_manual(*key, address)) {
-					return { "Among your favorites already - adding it renames it.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
+					return { "Already in your favorites.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
 				}
 
 				return { " ", white };
@@ -2130,6 +2186,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			if (note == " " && as_autopasted) {
 				checkmark_line("Auto-pasted from clipboard", green);
 			}
+			else if (note == " " && address_ok && key.has_value() && !editing_unlisted.has_value()) {
+				checkmark_line("OK", green);
+			}
 #if !PLATFORM_WEB
 			else if (note == " " && !editing_unlisted.has_value()) {
 				text_disabled("\"ip,key,name\" in clipboard auto-fills these.");
@@ -2141,7 +2200,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			ImGui::Separator();
 
-			const bool can_add = address_ok && key.has_value();
+			/*
+				Not twice - the one being edited saved as it was is fine.
+			*/
+
+			const bool the_edited_one = editing_unlisted.has_value() && key == editing_unlisted->first && address == editing_unlisted->second;
+			const bool already_there = key.has_value() && !the_edited_one && in.favorites.contains_manual(*key, address);
+			const bool can_add = address_ok && key.has_value() && !already_there;
 
 			const bool add_clicked = [&]() {
 				auto scope = maybe_disabled_cols(!can_add);
@@ -2375,9 +2440,16 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 	const auto target = invite_target::of(in.address, in.server_key, in.listed);
 	const auto rdonly_flags = ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_AutoSelectAll;
 
-	auto row = [&](const std::string& label, std::string value, const bool hidden) {
+	/*
+		A key shown shortened in the middle, all of it when clicked (see long_input_text_with_dots).
+	*/
+
+	auto row = [&](const std::string& label, std::string value, const bool hidden, const bool expanding = false) {
 		if (hidden) {
 			text_disabled("(hidden)");
+		}
+		else if (expanding) {
+			long_input_text_with_dots<67>("##" + label, value, ImGuiInputTextFlags_ReadOnly);
 		}
 		else {
 			input_text("##" + label, value, rdonly_flags);
@@ -2404,7 +2476,7 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 	}
 
 	if (target.key.has_value()) {
-		row("Server public key", "0x" + augs::bytes_to_hex(*target.key), false);
+		row("Server public key", "0x" + augs::bytes_to_hex(*target.key), false, true);
 	}
 	else {
 		text_color("The server's key is not known - a join is not verified.", orange);
@@ -2691,7 +2763,7 @@ bool server_details_gui_state::perform(
 
 				if (ImGui::Button("Remove from favorites")) {
 					if (manual) {
-						favorites->remove_manual(*key, entry.favorite_address);
+						forget_requested = true;
 					}
 					else {
 						favorites->remove(*key, entry.get_instance_label());
@@ -2860,12 +2932,12 @@ bool server_details_gui_state::perform(
 	*/
 
 	if (const auto key = entry.get_public_key()) {
-		auto shown = "0x" + augs::bytes_to_hex(*key);
-		input_text("##Server key", shown, rdonly_flags);
+		auto full = "0x" + augs::bytes_to_hex(*key);
+		long_input_text_with_dots<67>("##Server key", full, ImGuiInputTextFlags_ReadOnly);
 
 		ImGui::SameLine();
 
-		copy_icon_button("ServerKey", shown);
+		copy_icon_button("ServerKey", full);
 
 		ImGui::SameLine();
 

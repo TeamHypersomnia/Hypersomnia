@@ -22,8 +22,9 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
    and build there with `nice -n 19 ninja -j10`. Generated sources go into the build dir, so parallel builds don't clash.
    **While implementing and testing, build and test only `build/Debug-x64-clang-claude`** (the fast Debug native one,
    no debug info - like the user's `cmkdf`). The Steam, headless, web and CrazyGames variants only when the change touches
-   their code (`#if` paths, headless-only sources, web or Steam APIs), or before a release / to check a Release build -
-   rebuilding all five for every small fix made the iterations too slow.
+   their code (`#if` paths, headless-only sources, web or Steam APIs) - and even then only once, literally at the end of
+   the batch, after the user has tested; never in the middle of iterating. Rebuilding all five for every small fix made
+   the iterations too slow.
 3. **Never `pkill -f <pattern>` (or `pgrep -f`) in a command whose own text contains the pattern** - it kills your own shell
    (exit 144). Put the kill in a script file and run the script, or kill by exact PID.
 4. **Port 3000 is the user's local hypersomnia.io** (the site repo, `node app.js`, its `private/mmr.db`). Never post to it.

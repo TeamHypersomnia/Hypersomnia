@@ -60,10 +60,12 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 	bool show_ips = false;
 
 	/*
-		Edit pressed for a favorite added by hand - the server browser opens its dialog.
+		Edit or Remove from favorites pressed for a favorite added by hand - the server browser opens its dialog,
+		or asks whether to forget it.
 	*/
 
 	bool edit_requested = false;
+	bool forget_requested = false;
 
 	void open() {
 		show_ips = false;
@@ -185,12 +187,27 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::optional<std::pair<augs::ed25519_public_key_type, std::string>> editing_unlisted;
 
 	/*
+		A favorite added by hand about to be forgotten (its key and address) - asked first, with its name.
+	*/
+
+	std::optional<std::pair<augs::ed25519_public_key_type, std::string>> forget_unlisted;
+	std::string forget_unlisted_name;
+
+	/*
 		What the clipboard filled in when the dialog opened (address, key, name) - "Auto-pasted from clipboard"
 		shows while they are as filled.
 	*/
 
 	std::optional<std::array<std::string, 3>> add_server_autopasted;
 	std::string add_server_last_clipboard;
+
+	/*
+		Which field had the keyboard last frame - a paste there is taken whole.
+	*/
+
+	bool add_server_address_active = false;
+	bool add_server_key_active = false;
+	bool add_server_focus_key_next = false;
 	uint32_t times_window_activated = 0;
 
 	std::optional<std::string> requested_connection;

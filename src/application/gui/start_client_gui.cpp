@@ -1,9 +1,11 @@
 #include <thread>
 #include <future>
 #include "application/gui/start_client_gui.h"
+#include "application/network/address_utils.h"
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/imgui/long_input_text_with_dots.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 
 #include "augs/network/network_types.h"
@@ -280,21 +282,42 @@ bool start_client_gui_state::perform(
 			*/
 
 			const auto flags = ImGuiInputTextFlags_AutoSelectAll | (streamer_mode ? ImGuiInputTextFlags_Password : 0);
+			const auto key_label = std::string("Public key (64 hex digits)");
 
 #if !PLATFORM_WEB
 			/*
-				"<address>,0x<key>" pasted into either field fills both - before the field takes it (the key's would cut
-				it short).
+				A paste (Ctrl+V) taken whole before a field takes it, and the field left - "<address>,0x<key>" into
+				either fills both; a key into the key's field; an address into the address's, then on to the key's if it has no good key yet.
 			*/
 
 			if (const auto& io = ImGui::GetIO(); (io.KeyCtrl || io.KeySuper) && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
 				if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
-					take_server_identifiers(clipboard);
+					const auto pasted = std::string(clipboard);
+					const bool key_field_active = long_input_text_with_dots_active(key_label);
+
+					if (take_server_identifiers(pasted)) {
+					}
+					else if (key_field_active && connect_target::key_of(pasted).has_value()) {
+						custom_key = connect_target::trimmed(pasted);
+						augs::imgui::stop_editing_text();
+					}
+					else if (address_field_active && ::is_pasted_address(pasted)) {
+						custom_address = connect_target::trimmed(pasted);
+						augs::imgui::stop_editing_text();
+						/*
+							On to the key's field only when it has no good key yet.
+						*/
+
+						if (with_key && !connect_target::key_of(custom_key).has_value()) {
+							long_input_text_with_dots_focus(key_label);
+						}
+					}
 				}
 			}
 #endif
 
 			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
+			address_field_active = ImGui::IsItemActive();
 
 			/*
 				One line under the fields for what is wrong - always there, so the layout never jumps.
@@ -302,40 +325,10 @@ bool start_client_gui_state::perform(
 
 			if (with_key) {
 				/*
-					The key on lines of its own, as many as it takes to show all of it (a key has no spaces to wrap at -
-					it is broken into lines as wide as the field; the breaks are never part of the key).
+					One line like the address's, the key shortened in the middle - all of it while the field is active.
 				*/
 
-				text("Public key (64 hex digits)");
-
-				{
-					const auto& style = ImGui::GetStyle();
-					const auto field_width = ImGui::GetContentRegionAvail().x;
-					const auto char_width = ImGui::CalcTextSize("0").x;
-					const auto per_line = std::max(std::size_t(8), static_cast<std::size_t>((field_width - 2 * style.FramePadding.x - char_width) / char_width));
-
-					auto shown = std::string();
-
-					for (std::size_t i = 0; i < custom_key.size(); i += per_line) {
-						if (i > 0) {
-							shown += '\n';
-						}
-
-						shown += custom_key.substr(i, per_line);
-					}
-
-					const auto lines = std::max(std::size_t(1), (custom_key.size() + per_line - 1) / per_line);
-					const auto height = lines * ImGui::GetTextLineHeight() + 2 * style.FramePadding.y;
-
-					std::array<char, 200> buf {};
-					std::copy_n(shown.data(), std::min(shown.size(), buf.size() - 1), buf.data());
-
-					if (ImGui::InputTextMultiline("##custom_key", buf.data(), buf.size(), ImVec2(field_width, height), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_NoHorizontalScroll)) {
-						auto edited = std::string(buf.data());
-						std::erase(edited, '\n');
-						custom_key = edited.substr(0, 66);
-					}
-				}
+				long_input_text_with_dots<67>(key_label, custom_key);
 
 				/*
 					The line under the fields: what is wrong, else that they came from the clipboard (until one is
@@ -350,6 +343,9 @@ bool start_client_gui_state::perform(
 				}
 				else if (as_autopasted) {
 					checkmark_line("Auto-pasted from clipboard", green);
+				}
+				else if (!custom_address.empty() && typed_key.has_value()) {
+					checkmark_line("OK", green);
 				}
 				else {
 #if PLATFORM_WEB
@@ -368,8 +364,10 @@ bool start_client_gui_state::perform(
 				if (favorites_kept) {
 					const auto address = connect_target::trimmed(custom_address);
 
-					if (typed_key.has_value() && favorites.contains_manual(*typed_key, address)) {
-						text_color("Already in favorites", green);
+					if (const auto favorite = typed_key.has_value() ? favorites.find_manual(*typed_key, address) : nullptr) {
+						text_color("Already in favorites:", green);
+						ImGui::SameLine();
+						text_disabled(favorite->name);
 					}
 					else {
 						const bool can_add = !address.empty() && typed_key.has_value();

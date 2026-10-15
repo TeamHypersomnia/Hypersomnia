@@ -7,6 +7,7 @@
 #include "application/setups/client/client_vars.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/graphics/texture.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "augs/graphics/renderer.h"
@@ -49,6 +50,12 @@ public:
 
 	bool with_key = true;
 	std::string custom_key;
+
+	/*
+		Which field had the keyboard last frame - a paste there is taken whole (see perform).
+	*/
+
+	bool address_field_active = false;
 
 	/*
 		Auto-paste: the clipboard taken last (a clipboard is taken once - the fields the player changed since stay),

@@ -144,14 +144,18 @@ public:
 		return find(key, label) != nullptr;
 	}
 
-	bool contains_manual(const augs::ed25519_public_key_type& key, const std::string& address) const {
+	const favorite_server* find_manual(const augs::ed25519_public_key_type& key, const std::string& address) const {
 		for (const auto& s : servers) {
 			if (s.manual && s.key == key && s.address == address) {
-				return true;
+				return &s;
 			}
 		}
 
-		return false;
+		return nullptr;
+	}
+
+	bool contains_manual(const augs::ed25519_public_key_type& key, const std::string& address) const {
+		return find_manual(key, address) != nullptr;
 	}
 
 	/*

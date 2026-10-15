@@ -29,6 +29,13 @@ std::optional<augs::path_type> find_demo_path(const client_connect_string&);
 std::optional<netcode_address_t> find_netcode_addr(const client_connect_string& ip);
 std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port& in);
 
+/*
+	Pasted text that is surely an address: what looks like an IP (digits, dots and colons, or [ipv6]) only a valid
+	one, else a hostname of letters, digits, dots and dashes with an optional :port.
+*/
+
+bool is_pasted_address(const std::string& text);
+
 #if BUILD_NATIVE_SOCKETS
 resolve_address_result resolve_address(const host_with_default_port& in);
 std::future<resolve_address_result> async_resolve_address(const host_with_default_port& in);

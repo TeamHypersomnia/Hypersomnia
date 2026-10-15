@@ -522,6 +522,45 @@ yojimbo::Address to_yojimbo_addr(const netcode_address_t& t) {
 	return yojimbo::Address(t.data.ipv6, t.port);
 }
 
+bool is_pasted_address(const std::string& text) {
+	const auto first = text.find_first_not_of(" \t\r\n");
+	const auto last = text.find_last_not_of(" \t\r\n");
+
+	if (first == std::string::npos) {
+		return false;
+	}
+
+	const auto in = text.substr(first, last - first + 1);
+
+	const bool ip_like = in[0] == '[' || in.find_first_not_of("0123456789.:") == std::string::npos;
+
+	if (ip_like) {
+		return ::find_netcode_addr(client_connect_string(in)).has_value();
+	}
+
+	const auto colon = in.rfind(':');
+	const auto host = colon == std::string::npos ? in : in.substr(0, colon);
+	const auto port = colon == std::string::npos ? std::string() : in.substr(colon + 1);
+
+	if (colon != std::string::npos && (port.empty() || port.size() > 5 || port.find_first_not_of("0123456789") != std::string::npos)) {
+		return false;
+	}
+
+	if (host.empty() || host.front() == '.' || host.front() == '-') {
+		return false;
+	}
+
+	for (const auto c : host) {
+		const bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
+
+		if (!ok) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 std::optional<netcode_address_t> find_netcode_addr(const host_with_default_port& in) {
 	const auto& input = in.address;
 	const auto default_port = in.default_port;
