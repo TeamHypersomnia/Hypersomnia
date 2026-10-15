@@ -2079,9 +2079,22 @@ invite_target invite_target::of(
 	auto out = invite_target();
 	out.key = key;
 
+	auto is_internal_address = [](const std::string& joined) {
+		if (const auto ip = ::find_netcode_addr(joined)) {
+			return ::is_internal(*ip);
+		}
+
+		return false;
+	};
+
 	if (listed != nullptr) {
 		out.native_address = listed->get_invite_address();
 		out.web_id = listed->get_web_connect_string();
+
+		if (is_internal_address(address)) {
+			out.local_address = address;
+		}
+
 		return out;
 	}
 
@@ -2095,10 +2108,7 @@ invite_target invite_target::of(
 	auto web_id = client_connect_string(address);
 	cut_preffix(web_id, "rtc:");
 	out.web_id = web_id;
-
-	if (const auto ip = ::find_netcode_addr(web_id)) {
-		out.local_network_only = ::is_internal(*ip);
-	}
+	out.local_network_only = is_internal_address(web_id);
 
 	return out;
 }
@@ -2178,6 +2188,10 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 	row("Browser join link", ::get_browser_join_link(connect_target { target.web_id, target.key, std::string() }.to_string()), hide);
 	row("Steam join link", ::get_steam_join_link(target.join_string()), hide);
 	row("Address", target.native_address, hide);
+
+	if (!target.local_address.empty()) {
+		row("Local network address", target.local_address, hide);
+	}
 
 	if (target.key.has_value()) {
 		row("Server public key", "0x" + augs::bytes_to_hex(*target.key), false);

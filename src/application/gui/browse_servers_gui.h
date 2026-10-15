@@ -97,6 +97,12 @@ struct invite_target {
 	std::optional<augs::ed25519_public_key_type> key;
 	bool local_network_only = false;
 
+	/*
+		Joined over the local network while the list knows the public address - for others in the same network.
+	*/
+
+	std::string local_address;
+
 	static invite_target of(const std::string& address, const std::optional<augs::ed25519_public_key_type>& key, const server_list_entry* listed);
 
 	std::string join_string() const;
