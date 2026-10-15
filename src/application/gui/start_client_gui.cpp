@@ -55,6 +55,8 @@ bool start_client_gui_state::perform(
 
 #if PLATFORM_WEB
 	(void)window;
+	(void)streamer_mode;
+	(void)favorites;
 #endif
 
 #if WEB_LOWEND
@@ -69,6 +71,13 @@ bool start_client_gui_state::perform(
 		return false;
 	}
 
+	bool result = false;
+
+	/*
+		No unlisted servers in a browser: it reaches a server only through the server list's signalling (WebRTC).
+	*/
+
+#if !PLATFORM_WEB
 	/*
 		An unlisted server's "<address>,0x<key>" (see connect_target::find_server_identifiers) - from the clipboard
 		when the window opens (the web build has no clipboard to read), or pasted into the address field.
@@ -91,7 +100,6 @@ bool start_client_gui_state::perform(
 		return false;
 	};
 
-#if !PLATFORM_WEB
 	{
 		/*
 			A clipboard is taken once - the fields changed since stay until another one is copied.
@@ -115,11 +123,8 @@ bool start_client_gui_state::perform(
 			}
 		}
 	}
-#endif
 
 	take_server_identifiers(custom_address);
-
-	bool result = false;
 
 	/*
 		Unlisted server: its address and the key it must have (as Server details shows it, with 0x, or bare) -
@@ -139,15 +144,20 @@ bool start_client_gui_state::perform(
 	}();
 
 	const bool custom_key_invalid = with_key && !typed_key.has_value();
+#endif
 
 	{
 		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
 		do_pretty_tabs(current_tab, [](const start_client_tab_type t) -> std::optional<std::string> {
+#if !PLATFORM_WEB
 			if (t == start_client_tab_type::CUSTOM_ADDRESS) {
 				return "Unlisted server";
 			}
+#else
+			(void)t;
+#endif
 
 			return std::nullopt;
 		});
@@ -240,6 +250,7 @@ bool start_client_gui_state::perform(
 				text(typesafe_sprintf("Choose demo to replay (from %x).", DEMOS_DIR));
 			}
 		}
+#if !PLATFORM_WEB
 		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
@@ -390,6 +401,7 @@ bool start_client_gui_state::perform(
 				ImGui::Separator();
 			}
 		}
+#endif
 		else if (current_tab == start_client_tab_type::BEST_SERVER) {
 			if (!best_server.has_value()) {
 				auto cs = scoped_style_color(ImGuiCol_FrameBg, rgba(255,255,255,0));
@@ -470,12 +482,6 @@ bool start_client_gui_state::perform(
 			ImGui::SameLine();
 			text_disabled("You can later rewatch your match in Replay tab.");
 
-			if (const bool show_browser_tip = false) {
-				if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
-					text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
-				}
-			}
-
 			//text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 		}
 	}
@@ -500,10 +506,14 @@ bool start_client_gui_state::perform(
 			}
 		}
 		else {
+#if PLATFORM_WEB
+			const bool custom_addr_empty = false;
+#else
 			const bool custom_addr_empty = 
 				current_tab == start_client_tab_type::CUSTOM_ADDRESS
 				&& (custom_address.empty() || custom_key_invalid)
 			;
+#endif
 
 			const bool best_still_unresolved = 
 				current_tab == start_client_tab_type::BEST_SERVER
@@ -521,9 +531,11 @@ bool start_client_gui_state::perform(
 						}
 
 						break;
+#if !PLATFORM_WEB
 					case start_client_tab_type::CUSTOM_ADDRESS:
 						into_connect_string = custom_target.to_string();
 						break;
+#endif
 					default:
 						break;
 				}

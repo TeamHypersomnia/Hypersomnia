@@ -1527,6 +1527,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	/*
+		No unlisted servers in a browser: it reaches a server only through the server list's signalling (WebRTC).
+	*/
+
+#if !PLATFORM_WEB
+	/*
 		A white plus where the star is, "Add a server" where the name is - one row of the table's columns.
 	*/
 
@@ -1609,8 +1614,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		next_columns(num_columns - 2);
 	};
+#endif
 
+#if PLATFORM_WEB
+	const bool add_row_pinned_now = false;
+#else
 	const bool add_row_pinned_now = current_tab == browser_tab::FAVORITES && add_server_row_pinned;
+#endif
 	auto column_widths = std::array<float, num_columns>();
 	auto table_width = 0.0f;
 
@@ -1763,7 +1773,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", tournaments.size());
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", officials.size());
 		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", communities.size());
+#if !PLATFORM_WEB
 		const auto unlisted_label = typesafe_sprintf("Unlisted (%x)", unlisted_favorites.size());
+#endif
 
 		auto separate_with_label_only = [&](const auto& label, const auto& color) {
 			text_disabled("\n\n");
@@ -1821,9 +1833,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				section(community_servers_label, orange, "community", communities, "");
 			}
 
+#if !PLATFORM_WEB
 			if (!unlisted_favorites.empty()) {
 				section(unlisted_label, white, "unlisted", unlisted_favorites, "");
 			}
+#endif
 
 			if (first_section) {
 				do_column_labels(std::string("Favorites"), std::optional<rgba>());
@@ -1833,11 +1847,16 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 						text_disabled("No favorite servers match the applied filters.");
 					}
 					else {
+#if PLATFORM_WEB
+						text_disabled("No favorite servers yet. Click the star next to a server.");
+#else
 						text_disabled("No favorite servers yet. Click the star next to a server, or add an unlisted one below.");
+#endif
 					}
 				});
 			}
 
+#if !PLATFORM_WEB
 			/*
 				The last row: adding a server by hand - pinned below the table instead once the table scrolls
 				(decided by the last frame's height, the same with the row inside or not - no flicker).
@@ -1853,6 +1872,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			add_server_row_pinned = pin_next;
+#endif
 			return;
 		}
 
@@ -1875,6 +1895,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	do_list_view(false);
 
+#if !PLATFORM_WEB
 	if (add_row_pinned_now) {
 		/*
 			A child like the table's, so the columns line up with it.
@@ -1889,6 +1910,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		draw_add_server_row();
 		ImGui::Columns(1);
 	}
+#endif
 
 	{
 		auto child = scoped_child("buttons view");
@@ -2021,6 +2043,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		refresh_server_list(in);
 	}
 
+#if !PLATFORM_WEB
 	if (std::exchange(server_details.forget_requested, false)) {
 		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
 			forget_unlisted = std::make_pair(*key, selected_server.favorite_address);
@@ -2248,6 +2271,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 		}
 	}
+#endif
 
 	if (requested_connection.has_value()) {
 		in.client_connect = *requested_connection;

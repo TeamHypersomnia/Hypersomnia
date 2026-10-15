@@ -5115,7 +5115,9 @@ work_result work(
 				}
 				else {
 					start_client_gui.open();
+#if !PLATFORM_WEB
 					start_client_gui.current_tab = start_client_tab_type::CUSTOM_ADDRESS;
+#endif
 				}
 
 				break;
