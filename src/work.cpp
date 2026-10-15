@@ -82,6 +82,7 @@
 
 #include "application/gui/headless_map_catalogue.h"
 #include "augs/window_framework/platform_utils.h"
+#include "application/gui/gui_state.h"
 
 #if HEADLESS
 
@@ -953,6 +954,38 @@ work_result work(
 	WEBSTATIC auto& last_saved_config = *last_saved_config_ptr;
 
 	/*
+		What the menus remember (see gui_state.h) - written along with the runtime prefs from the main thread
+		(change_with_save, exit), only when it changed.
+	*/
+
+	WEBSTATIC const auto gui_state_path = USER_DIR / "gui_state.json";
+
+	WEBSTATIC auto menus_state = [&]() {
+		try {
+			return augs::from_json_file<gui_state>(gui_state_path);
+		}
+		catch (...) {
+			return gui_state();
+		}
+	}();
+
+	WEBSTATIC auto last_saved_menus_state = menus_state;
+
+	WEBSTATIC auto save_gui_state = [&]() {
+		if (menus_state == last_saved_menus_state) {
+			return;
+		}
+
+		try {
+			augs::save_as_json(menus_state, gui_state_path);
+			last_saved_menus_state = menus_state;
+		}
+		catch (const std::exception& e) {
+			LOG("Could not save %x: %x", gui_state_path, e.what());
+		}
+	};
+
+	/*
 		The ranked instances' vars changed at runtime (RCON): what they differ by from the layers under them (see
 		ranked_vars_of), kept in runtime_prefs.json as "instance_vars": { "ranked": ... } - a JSON object, empty when none.
 	*/
@@ -1025,6 +1058,7 @@ work_result work(
 		setter(last_saved_config);
 
 		save_runtime_prefs();
+		save_gui_state();
 	};
 	(void)change_with_save;
 
@@ -1905,6 +1939,8 @@ work_result work(
 		if (update) {
 			save_runtime_prefs();
 		}
+
+		save_gui_state();
 	});
 
 	WEBSTATIC atlas_profiler atlas_performance;
@@ -3235,7 +3271,6 @@ work_result work(
 	};
 
 #if BUILD_NETWORKING
-	WEBSTATIC const auto server_browser_tab_path = USER_DIR / "server_browser_tab.txt";
 	WEBSTATIC const auto server_list_cache_path = CACHE_DIR / "server_list.bin";
 
 	WEBSTATIC auto get_browse_servers_input = [&]() {
@@ -3246,7 +3281,7 @@ work_result work(
 			config.faction_view,
 			config.streamer_mode && config.streamer_mode_flags.community_servers,
 			favorites,
-			server_browser_tab_path,
+			menus_state.server_browser_tab,
 			server_list_cache_path
 		};
 	};

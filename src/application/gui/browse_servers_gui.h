@@ -35,10 +35,10 @@ struct browse_servers_input {
 	favorite_servers& favorites;
 
 	/*
-		Where the last chosen tab is remembered.
+		The tab remembered in gui_state.json - read on the first look, kept up to date.
 	*/
 
-	const augs::path_type& last_tab_path;
+	browser_tab& remembered_tab;
 
 	/*
 		The last server list downloaded - shown at once on the next start, while a fresh one downloads.
@@ -142,13 +142,16 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	void update_favorite_only_list(const favorite_servers&);
 
+	/*
+		Remembered in gui_state.json. Local only while there are local servers (seen in the last frame).
+	*/
+
 	browser_tab current_tab = browser_tab::FAVORITES;
+	bool had_local_servers = false;
 	bool tab_loaded = false;
 	bool shown_once = false;
 	double first_shown_at = 0.0;
 	bool local_tab_precedence_pending = true;
-
-	void save_tab(const augs::path_type&) const;
 
 	/*
 		Add a server (the Favorites tab).

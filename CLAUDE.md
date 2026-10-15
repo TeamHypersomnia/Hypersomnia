@@ -254,6 +254,8 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 
 - Some of the existing code might not follow the above principles, do not edit it to make it consistent unless explicitly asked.
 
+- New files the game reads or writes (user data, caches, state) are always JSON, read and written through an introspected struct (`augs::from_json_file`, `augs::save_as_json`) - never a hand-parsed `.txt` format.
+
 - Use `::` prefix for all global function calls that are defined in the same file but outside of any namespace. This makes it clear the function is global and not a member of any class or namespace.
 	```cpp
 	const auto result = ::my_global_function(arg1, arg2);

@@ -754,15 +754,7 @@ static void name_column_row(const std::function<void()> content) {
 	next_columns(num_columns - 2);
 }
 
-void browse_servers_gui_state::save_tab(const augs::path_type& path) const {
-	try {
-		augs::create_directories_for(path);
-		augs::save_as_text(path, std::to_string(static_cast<int>(current_tab)));
-	}
-	catch (const std::exception& e) {
-		LOG("Could not save the server browser's tab to %x: %x", path, e.what());
-	}
-}
+
 
 void browse_servers_gui_state::select_server(const server_list_entry& s) {
 	selected_server = s;
@@ -1177,25 +1169,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		return false;
 	}
 
-	if (!tab_loaded) {
-		tab_loaded = true;
-
-		/*
-			The last chosen tab - Favorites if none was saved.
-		*/
-
-		try {
-			const auto saved = augs::file_to_string(in.last_tab_path);
-			const auto index = std::atoi(saved.c_str());
-
-			if (index >= 0 && index < static_cast<int>(browser_tab::COUNT)) {
-				current_tab = static_cast<browser_tab>(index);
-			}
-		}
-		catch (...) {
-		}
-	}
-
 	/*
 		What went wrong with the server list - above all the tabs, which show what they can meanwhile.
 	*/
@@ -1204,48 +1177,70 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		text_color(error_message, red);
 	}
 
+	if (!std::exchange(tab_loaded, true)) {
+		/*
+			The remembered tab - All instead of an empty Favorites.
+		*/
+
+		current_tab = in.remembered_tab;
+
+		if (current_tab == browser_tab::FAVORITES && in.favorites.all().empty()) {
+			current_tab = browser_tab::ALL;
+		}
+	}
+
 	{
 		const auto previous_tab = current_tab;
 
-#if WEB_CRAZYGAMES
 		/*
-			No Favorites tab - see favorites_kept.
+			Local, All, Favorites - Local only while there are local servers, Favorites not on CrazyGames
+			(see favorites_kept).
 		*/
 
+		auto shown_tabs = std::vector<browser_tab>();
+
+		if (had_local_servers) {
+			shown_tabs.push_back(browser_tab::LOCAL);
+		}
+
+		shown_tabs.push_back(browser_tab::ALL);
+
+		if (favorites_kept) {
+			shown_tabs.push_back(browser_tab::FAVORITES);
+		}
+
+		if (std::find(shown_tabs.begin(), shown_tabs.end(), current_tab) == shown_tabs.end()) {
+			current_tab = browser_tab::ALL;
+		}
+
+		auto labels = std::vector<const char*>();
+		int index = 0;
+
+		for (std::size_t i = 0; i < shown_tabs.size(); ++i) {
+			labels.push_back(shown_tabs[i] == browser_tab::LOCAL ? "Local" : shown_tabs[i] == browser_tab::ALL ? "All" : "Favorites");
+
+			if (shown_tabs[i] == current_tab) {
+				index = static_cast<int>(i);
+			}
+		}
+
 		{
-			static const char* labels[] = { "Local", "Official", "Community", "All" };
-			static const browser_tab tabs[] = { browser_tab::LOCAL, browser_tab::OFFICIAL, browser_tab::COMMUNITY, browser_tab::ALL };
+			auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
+			ImGui::TabLabels(labels.data(), static_cast<int>(labels.size()), index, nullptr);
+		}
 
-			if (current_tab == browser_tab::FAVORITES) {
-				current_tab = browser_tab::OFFICIAL;
-			}
+		current_tab = shown_tabs[index];
 
-			int index = 0;
-
-			for (int i = 0; i < 4; ++i) {
-				if (tabs[i] == current_tab) {
-					index = i;
-				}
-			}
-
-			{
-				auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
-				ImGui::TabLabels(labels, 4, index, nullptr);
-			}
-
-			current_tab = tabs[index];
-
+		{
 			auto sep = scoped_style_color(ImGuiCol_Separator, ImGui::GetStyle().Colors[ImGuiCol_Button]);
 			ImGui::Separator();
 		}
-#else
-		do_pretty_tabs(current_tab);
-#endif
 
 		if (current_tab != previous_tab) {
 			local_tab_precedence_pending = false;
-			save_tab(in.last_tab_path);
 		}
+
+		in.remembered_tab = current_tab;
 	}
 
 	thread_local ImGuiTextFilter filter;
@@ -1452,6 +1447,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	/*
 		Only right after the first opening - never switching the tab under the cursor later.
 	*/
+
+	had_local_servers = has_local_servers;
 
 	if (local_tab_precedence_pending && augs::steady_secs() - first_shown_at > 2.0) {
 		local_tab_precedence_pending = false;
@@ -1727,7 +1724,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			section(local_servers_label, green, "local", locals, has_local_servers ? "" : "No servers found on your local network.");
 		}
 
-		if (t == browser_tab::OFFICIAL || t == browser_tab::ALL) {
+		if (t == browser_tab::ALL) {
 			if (has_tournament_servers) {
 				section(tournament_servers_label, cyan, "tournament", tournaments, "");
 			}
@@ -1735,7 +1732,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			section(official_servers_label, yellow, "official", officials, has_official_servers ? "" : "No official servers are online at the time.");
 		}
 
-		if (t == browser_tab::COMMUNITY || t == browser_tab::ALL) {
+		if (t == browser_tab::ALL) {
 			section(community_servers_label, orange, "community", communities, has_community_servers ? "" : "No community servers are online at the time.");
 		}
 	};
