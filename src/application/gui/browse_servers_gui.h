@@ -79,6 +79,7 @@ struct invite_to_join_input {
 
 	std::string address;
 	std::optional<augs::ed25519_public_key_type> server_key;
+	std::string server_label;
 
 	const server_list_entry* listed;
 	favorite_servers& favorites;
@@ -244,7 +245,7 @@ public:
 		The list entry of this key, if the list (or the cached one) has it.
 	*/
 
-	const server_list_entry* find_entry_by_key(const augs::ed25519_public_key_type&) const;
+	const server_list_entry* find_entry_by_key(const augs::ed25519_public_key_type&, const std::string& label = "") const;
 
 #if BUILD_NATIVE_SOCKETS
 	void advance_ping_logic();

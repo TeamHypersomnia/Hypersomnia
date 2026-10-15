@@ -150,7 +150,7 @@ work_result run_tournament(const run_tournament_input& in) {
 		threads.reserve(matches.size());
 
 		/*
-			Parallel matches are servers of their own: each its own key (ranked, numbered from instance_number).
+			Parallel matches are servers of their own: the host's key, each its label - t1, t2...
 		*/
 
 		uint16_t match_index = 0;
@@ -177,7 +177,6 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.server_name = match.server_name;
 			this_config.server.shutdown_after_one_match = true;
 			this_config.server.ranked.autostart_when = ranked_autostart_type::ALWAYS;
-			this_config.server_private.instance_number = static_cast<uint16_t>(in.config_pattern.server_private.instance_number + this_match_index);
 
 			auto canon_server_vars = in.canon_config_with_confd.server;
 			canon_server_vars.ranked.autostart_when = ranked_autostart_type::ALWAYS;
@@ -290,6 +289,7 @@ work_result run_tournament(const run_tournament_input& in) {
 
 			threads.emplace_back([
 				match_ptr,
+				this_match_index,
 				this_config = std::move(this_config),
 				canon_server_vars = std::move(canon_server_vars),
 				roster = std::move(roster),
@@ -337,7 +337,9 @@ work_result run_tournament(const run_tournament_input& in) {
 #if CRASH_RECOVERY
 						in.recovery_worker,
 #endif
-						std::string("")
+						std::string(""),
+						server_temp_var_overrides(),
+						::make_instance_label(server_instance_type::TOURNAMENT, static_cast<uint16_t>(this_match_index + 1))
 					);
 
 					if (candidate->is_running()) {

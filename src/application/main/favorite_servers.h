@@ -11,14 +11,16 @@
 #include "augs/string/hex.h"
 
 /*
-	The player's favorite servers, each by its public key - who the server is - with the name it had and the address
-	it was last at: only a hint where to look when the server list does not have it (the masterserver down, the server
-	listed elsewhere or not at all). In the order they were added.
-	One line per server: the key in hex, a tab, the address, a tab, the name.
+	The player's favorite servers, each by its public key - who the server is - and its instance label (a host's
+	instances share the key, see server_instance_label.h), with the name it had and the address it was last at: only a
+	hint where to look when the server list does not have it (the masterserver down, the server listed elsewhere or not
+	at all). In the order they were added.
+	One line per server: the key in hex, a tab, the label, a tab, the address, a tab, the name.
 */
 
 struct favorite_server {
 	augs::ed25519_public_key_type key = {};
+	std::string label;
 	std::string address;
 	std::string name;
 };
@@ -39,15 +41,26 @@ class favorite_servers {
 					line.pop_back();
 				}
 
-				const auto first_tab = line.find('\t');
-				const auto second_tab = first_tab == std::string::npos ? std::string::npos : line.find('\t', first_tab + 1);
+				auto fields = std::vector<std::string>();
+				std::size_t from = 0;
 
-				if (first_tab != 64 || second_tab == std::string::npos) {
+				while (fields.size() < 3) {
+					const auto tab = line.find('\t', from);
+
+					if (tab == std::string::npos) {
+						break;
+					}
+
+					fields.push_back(line.substr(from, tab - from));
+					from = tab + 1;
+				}
+
+				if (fields.size() != 3 || fields[0].size() != 64) {
 					continue;
 				}
 
-				if (const auto key = augs::hex_to_array<32>(line.substr(0, 64))) {
-					servers.push_back({ *key, line.substr(first_tab + 1, second_tab - first_tab - 1), line.substr(second_tab + 1) });
+				if (const auto key = augs::hex_to_array<32>(fields[0])) {
+					servers.push_back({ *key, fields[1], fields[2], line.substr(from) });
 				}
 			}
 		}
@@ -59,7 +72,7 @@ class favorite_servers {
 		std::string content;
 
 		for (const auto& s : servers) {
-			content += augs::bytes_to_hex(s.key) + "\t" + s.address + "\t" + s.name + "\n";
+			content += augs::bytes_to_hex(s.key) + "\t" + s.label + "\t" + s.address + "\t" + s.name + "\n";
 		}
 
 		try {
@@ -92,27 +105,42 @@ public:
 		return servers;
 	}
 
-	const favorite_server* find(const augs::ed25519_public_key_type& key) const {
+	/*
+		That instance, else a favorite of the host whose instance is not known yet (added by hand with an address,
+		no label) - a label not known here (e.g. a join by the key alone) takes the host's first favorite.
+	*/
+
+	const favorite_server* find(const augs::ed25519_public_key_type& key, const std::string& label = "") const {
+		const favorite_server* unlabeled = nullptr;
+
 		for (const auto& s : servers) {
-			if (s.key == key) {
+			if (s.key != key) {
+				continue;
+			}
+
+			if (label.empty() || s.label == label) {
 				return &s;
+			}
+
+			if (s.label.empty() && unlabeled == nullptr) {
+				unlabeled = &s;
 			}
 		}
 
-		return nullptr;
+		return unlabeled;
 	}
 
-	bool contains(const augs::ed25519_public_key_type& key) const {
-		return find(key) != nullptr;
+	bool contains(const augs::ed25519_public_key_type& key, const std::string& label) const {
+		return find(key, label) != nullptr;
 	}
 
 	/*
 		Added, or its name and address brought up to date (an empty one keeps what it was).
 	*/
 
-	void set(const augs::ed25519_public_key_type& key, const std::string& address, const std::string& name) {
+	void set(const augs::ed25519_public_key_type& key, const std::string& label, const std::string& address, const std::string& name) {
 		for (auto& s : servers) {
-			if (s.key == key) {
+			if (s.key == key && s.label == label) {
 				const auto new_address = address.empty() ? s.address : one_line(address);
 				const auto new_name = name.empty() ? s.name : one_line(name);
 
@@ -126,7 +154,7 @@ public:
 			}
 		}
 
-		servers.push_back({ key, one_line(address), one_line(name) });
+		servers.push_back({ key, one_line(label), one_line(address), one_line(name) });
 		save();
 	}
 
@@ -134,14 +162,35 @@ public:
 		Only what is known already - a server not among the favorites is not added by being seen.
 	*/
 
-	void update_if_favorite(const augs::ed25519_public_key_type& key, const std::string& address, const std::string& name) {
-		if (contains(key)) {
-			set(key, address, name);
+	void update_if_favorite(const augs::ed25519_public_key_type& key, const std::string& label, const std::string& address, const std::string& name) {
+		const auto found = find(key, label);
+
+		if (found == nullptr) {
+			return;
 		}
+
+		/*
+			A favorite of the host learns its instance on joining.
+		*/
+
+		auto found_label = found->label;
+
+		if (found_label.empty() && !label.empty()) {
+			for (auto& s : servers) {
+				if (&s == found) {
+					s.label = one_line(label);
+				}
+			}
+
+			found_label = one_line(label);
+			save();
+		}
+
+		set(key, found_label, address, name);
 	}
 
-	void remove(const augs::ed25519_public_key_type& key) {
-		std::erase_if(servers, [&](const auto& s) { return s.key == key; });
+	void remove(const augs::ed25519_public_key_type& key, const std::string& label) {
+		std::erase_if(servers, [&](const auto& s) { return s.key == key && (s.label == label || s.label.empty()); });
 		save();
 	}
 };

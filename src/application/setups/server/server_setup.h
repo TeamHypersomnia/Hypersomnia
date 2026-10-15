@@ -282,6 +282,14 @@ class server_setup :
 #endif
 	bool suppress_community_server_webhook_this_run = false;
 	std::string name_suffix;
+	instance_label_type instance_label;
+
+public:
+	std::string get_instance_label() const {
+		return std::string(instance_label);
+	}
+
+private:
 	server_temp_var_overrides overrides;
 
 	/*
@@ -501,7 +509,8 @@ public:
 		server_recovery_worker& recovery_worker,
 #endif
 		const std::string& name_suffix = "",
-		const server_temp_var_overrides& initial_overrides = server_temp_var_overrides()
+		const server_temp_var_overrides& initial_overrides = server_temp_var_overrides(),
+		const instance_label_type& instance_label = instance_label_type()
 	);
 
 	~server_setup();

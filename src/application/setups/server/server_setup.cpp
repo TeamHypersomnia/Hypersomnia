@@ -915,15 +915,12 @@ server_setup::server_setup(
 	server_recovery_worker& recovery_worker,
 #endif
 	const std::string& name_suffix,
-	const server_temp_var_overrides& initial_overrides
+	const server_temp_var_overrides& initial_overrides,
+	const instance_label_type& instance_label
 ) :
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
-	this_server_key(server_key::instance_seed(
-		server_key::obtain(KEYS_DIR / server_key::file_name),
-		server_key::kind_of(canon_with_confd_vars.ranked.is_ranked_server()),
-		private_initial_vars.instance_number
-	)),
+	this_server_key(server_key::obtain(KEYS_DIR / server_key::file_name)),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),
@@ -955,6 +952,13 @@ server_setup::server_setup(
 	server_time(server_setup::get_current_time()),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run),
 	name_suffix(name_suffix),
+	/*
+		A single server not started by a launcher of instances: c1, or r1 when ranked.
+	*/
+	instance_label(
+		!instance_label.empty() ? instance_label :
+		::make_instance_label(canon_with_confd_vars.ranked.is_ranked_server() ? server_instance_type::RANKED : server_instance_type::CASUAL, 1)
+	),
 	overrides(initial_overrides)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
@@ -2948,6 +2952,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.domain = vars.domain;
+	heartbeat.instance_label = instance_label;
 	heartbeat.validate();
 
 	if (!heartbeat.is_valid()) {
@@ -3482,6 +3487,7 @@ server_public_vars server_setup::make_public_vars() const {
 	pub.arena = vars.arena;
 	pub.game_mode = vars.game_mode;
 	pub.server_name = get_server_name();
+	pub.instance_label = instance_label;
 
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;

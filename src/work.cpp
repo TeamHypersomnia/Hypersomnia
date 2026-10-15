@@ -755,40 +755,11 @@ work_result work(
 			return work_result::FAILURE;
 		}
 
-		const auto server_seed = server_key::obtain(path);
-		const auto& pattern = config;
-
 		/*
-			The keys of the instances this config runs - one for a single server, "ranked 0: <key>" lines for several.
+			One key for all the instances of this host.
 		*/
 
-		/*
-			As many as start - see the multi-instance start below.
-		*/
-
-		const auto num_ranked = std::min(uint16_t(20u), pattern.num_ranked_servers);
-		const auto num_casual = std::min(uint16_t(20u), pattern.num_casual_servers);
-		const auto first = pattern.server_private.instance_number;
-
-		if (num_ranked == 0 && num_casual == 0) {
-			/*
-				The kind as the server takes it: from the config files, not runtime_prefs.
-			*/
-
-			const bool ranked = canon_config_with_confd.server.ranked.is_ranked_server();
-			std::cout << server_key::public_key_hex(server_key::instance_seed(server_seed, server_key::kind_of(ranked), first)) << std::endl;
-			return work_result::SUCCESS;
-		}
-
-		auto print_kind = [&](const server_key::instance_kind kind, const uint16_t count) {
-			for (uint16_t i = 0; i < count; ++i) {
-				const auto number = static_cast<uint16_t>(first + i);
-				std::cout << server_key::kind_name(kind) << " " << number << ": " << server_key::public_key_hex(server_key::instance_seed(server_seed, kind, number)) << std::endl;
-			}
-		};
-
-		print_kind(server_key::instance_kind::CASUAL, num_casual);
-		print_kind(server_key::instance_kind::RANKED, num_ranked);
+		std::cout << server_key::public_key_hex(server_key::obtain(path)) << std::endl;
 		return work_result::SUCCESS;
 	}
 
@@ -1284,8 +1255,7 @@ work_result work(
 			auto this_config = config_pattern;
 
 			/*
-				The instance's vars as the config files give them (no runtime_prefs) - its key's kind comes from
-				these, so a ranked autostart changed over RCON never changes the key.
+				The instance's vars as the config files give them (no runtime_prefs).
 			*/
 
 			auto canon_server_vars = canon_config_with_confd.server;
@@ -1307,13 +1277,13 @@ work_result work(
 			LOG_NVPS(this_config.server.server_name, server_name_suffix);
 
 			/*
-				Each instance its own key, by its kind and number: the casual ones and the ranked ones count from the
-				configured instance_number each.
+				All instances share the host's key - each its label: c1, c2..., r1, r2...
 			*/
 
-			if (type != SINGLE) {
-				this_config.server_private.instance_number = static_cast<uint16_t>(config_pattern.server_private.instance_number + index - 1);
-			}
+			const auto this_instance_label =
+				type == SINGLE ? instance_label_type() :
+				::make_instance_label(type == RANKED ? server_instance_type::RANKED : server_instance_type::CASUAL, index)
+			;
 
 			this_config.server_start.port = port_counter++;
 
@@ -1369,7 +1339,9 @@ work_result work(
 #if CRASH_RECOVERY
 				recovery_worker,
 #endif
-				server_name_suffix
+				server_name_suffix,
+				server_temp_var_overrides(),
+				this_instance_label
 			);
 
 			/*
@@ -2097,7 +2069,7 @@ work_result work(
 			*/
 
 			const auto address = [&]() -> std::string {
-				if (const auto listed = browse_servers_gui.find_entry_by_key(key)) {
+				if (const auto listed = browse_servers_gui.find_entry_by_key(key, client.get_server_instance_label())) {
 					return listed->get_invite_address();
 				}
 
@@ -2112,7 +2084,7 @@ work_result work(
 				return joined;
 			}();
 
-			favorites.update_if_favorite(key, address, client.get_server_name());
+			favorites.update_if_favorite(key, client.get_server_instance_label(), address, client.get_server_name());
 		}
 	};
 
@@ -2396,7 +2368,7 @@ work_result work(
 				const auto last_join = connect_target::parse(config.client_connect);
 
 				if (!last_join.key.has_value() && !client.connected_through_localhost_fallback() && last_join.address == client.get_connect_string()) {
-					const auto with_key = connect_target { last_join.address, server_key }.to_string();
+					const auto with_key = connect_target { last_join.address, server_key, std::string() }.to_string();
 
 					change_with_save([&](auto& cfg) {
 						cfg.client_connect = with_key;
@@ -2638,12 +2610,15 @@ work_result work(
 			return std::nullopt;
 		}
 
-		auto make = [&](std::string name, std::string address, const auto key, const bool hosting) {
+		auto make = [&](std::string name, std::string address, const auto key, std::string label, const bool hosting) {
+			const auto listed = key.has_value() ? browse_servers_gui.find_entry_by_key(*key, label) : nullptr;
+
 			return invite_to_join_input {
 				std::move(name),
 				std::move(address),
 				key,
-				key.has_value() ? browse_servers_gui.find_entry_by_key(*key) : nullptr,
+				std::move(label),
+				listed,
 				favorites,
 				config.streamer_mode,
 				hosting
@@ -2655,11 +2630,11 @@ work_result work(
 				return std::nullopt;
 			}
 
-			return make(client->get_server_name(), client->get_connect_string(), client->get_invite_server_key(), false);
+			return make(client->get_server_name(), client->get_connect_string(), client->get_invite_server_key(), client->get_server_instance_label(), false);
 		}
 
 		if (const auto server = std::get_if<server_setup>(std::addressof(*current_setup))) {
-			return make(std::string(server->get_server_name()), server->get_connect_string(), server->get_server_public_key(), true);
+			return make(std::string(server->get_server_name()), server->get_connect_string(), server->get_server_public_key(), server->get_instance_label(), true);
 		}
 
 		return std::nullopt;
@@ -3063,7 +3038,7 @@ work_result work(
 			if (found != nullptr) {
 				connect_string = found->get_my_connect_string();
 			}
-			else if (const auto favorite = favorites.find(*target.key); favorite != nullptr && !favorite->address.empty()) {
+			else if (const auto favorite = favorites.find(*target.key, target.label); favorite != nullptr && !favorite->address.empty()) {
 				connect_string = favorite->address;
 			}
 			else if (list_coming) {
@@ -3221,7 +3196,7 @@ work_result work(
 		*/
 
 		if (target.key.has_value()) {
-			auto next = connect_target { std::string(connect_string), target.key };
+			auto next = connect_target { std::string(connect_string), target.key, std::string() };
 
 #if !PLATFORM_WEB
 			if (found != nullptr && !found->get_domain_with_port().empty()) {
@@ -6414,7 +6389,7 @@ work_result work(
 					visit_current_setup([&]<typename S>(const S& setup) {
 						if constexpr(std::is_same_v<client_setup, remove_cref<S>>) {
 							const auto key = setup.get_server_public_key();
-							return key.has_value() && favorites.contains(*key);
+							return key.has_value() && favorites.contains(*key, setup.get_server_instance_label());
 						}
 						else {
 							return false;

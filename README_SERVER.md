@@ -178,13 +178,15 @@ If your server has a domain pointing to it, set `domain` in the `server` section
 
 ### The server key
 
-Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). From it, each server instance gets a key of its own - by its kind (casual, ranked - tournaments too - or aura) and number (``instance_number`` in ``server_private``; with ``num_casual_servers`` / ``num_ranked_servers`` the next ones count on from it). Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Print the public keys with:
+Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). One key per host: all the instances it runs (``num_casual_servers``, ``num_ranked_servers``, tournament matches) share it and differ by their labels - ``c1``, ``c2``, ``r1``, ``t1`` - shown on the server list. Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Players can join a given instance with ``c2-<key>``, or any of them with the key alone. Print the public key with:
 
 ```sh
 ./Hypersomnia-Headless.AppImage --print-server-key
 ```
 
-Back ``server.key`` up and keep it private. Moving a server to another host (or splitting instances between hosts): copy ``server.key`` and keep the numbers - the keys stay the same. Players know a server by its key: a server with another one (e.g. reinstalled without the file) is not the server they added to their favorites.
+Back ``server.key`` up and keep it private. Moving a server to another host: copy ``server.key`` - the key stays the same. Players know a server by its key: a server with another one (e.g. reinstalled without the file) is not the server they added to their favorites. Hosts in different regions should have different keys.
+
+One key, one password: players save a server's password under its key, so all the instances of one key should have the same password (or none). Instances that need different passwords need different keys.
 
 ### Official servers
 

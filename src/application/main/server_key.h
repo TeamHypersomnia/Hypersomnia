@@ -11,8 +11,8 @@
 
 /*
 	Every server's Ed25519 key: one secret, server.key in KEYS_DIR (see all_paths.h), created on the first start and never
-	overwritten - and from it a key for each instance, by its kind and number (see instance_seed). The clients seal their
-	handshakes to that key, and the masterserver and hypersomnia.io know an official server by it.
+	overwritten - one per host, shared by all its instances (they differ by their labels - see server_instance_label.h).
+	The clients seal their handshakes to that key, and the masterserver and hypersomnia.io know an official server by it.
 	The same format as the account keys - see identity_key.h.
 */
 
@@ -49,63 +49,6 @@ namespace server_key {
 
 	inline bool damaged(const augs::path_type& path) {
 		return augs::exists(path) && !identity_key::load(path).has_value();
-	}
-
-	/*
-		The kind of a server instance, a byte of its key's derivation: casual, ranked (tournaments too) or aura -
-		each kind of progress counts its instances on its own.
-	*/
-
-	enum class instance_kind : uint8_t {
-		CASUAL = 0,
-		RANKED = 1,
-		AURA = 2
-	};
-
-	/*
-		One key per server, all from one server.key - as many wallets from one seed: instance number N of a kind has its own
-		key, the same on any host and port. Moving instances elsewhere (or splitting them between hosts) keeps their keys:
-		copy server.key and set their numbers (instance_number).
-	*/
-
-	inline augs::ed25519_seed_type instance_seed(const augs::ed25519_seed_type& server_seed, const instance_kind kind, const uint16_t number) {
-		const auto tag = std::string_view("hs-instance-v1");
-
-		uint8_t message[32];
-		std::size_t n = 0;
-
-		for (const auto c : tag) {
-			message[n++] = static_cast<uint8_t>(c);
-		}
-
-		message[n++] = static_cast<uint8_t>(kind);
-		message[n++] = static_cast<uint8_t>(number & 0xff);
-		message[n++] = static_cast<uint8_t>(number >> 8);
-
-		auto out = augs::ed25519_seed_type();
-
-		crypto_generichash(
-			out.data(),
-			out.size(),
-			message,
-			n,
-			server_seed.data(),
-			server_seed.size()
-		);
-
-		return out;
-	}
-
-	inline std::string kind_name(const instance_kind kind) {
-		switch (kind) {
-			case instance_kind::RANKED: return "ranked";
-			case instance_kind::AURA: return "aura";
-			default: return "casual";
-		}
-	}
-
-	inline instance_kind kind_of(const bool ranked) {
-		return ranked ? instance_kind::RANKED : instance_kind::CASUAL;
 	}
 
 	inline std::string public_key_hex(const augs::ed25519_seed_type& seed) {

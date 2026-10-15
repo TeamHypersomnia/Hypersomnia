@@ -2429,7 +2429,7 @@ std::string client_setup::get_steam_join_command_line() const {
 		Where the server is and its key - a friend joins exactly this server, the masterserver not needed.
 	*/
 
-	return connect_target { get_connect_string(), get_invite_server_key() }.to_string();
+	return connect_target { get_connect_string(), get_invite_server_key(), std::string() }.to_string();
 }
 
 std::optional<augs::ed25519_public_key_type> client_setup::get_invite_server_key() const {
@@ -2446,12 +2446,12 @@ std::optional<augs::ed25519_public_key_type> client_setup::get_invite_server_key
 
 void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
 	/*
-		Friends on the same server are one group whichever way each joined (an IP, a domain, rtc:) - the server's key
-		tells the server.
+		Friends on the same server are one group whichever way each joined (an IP, a domain, rtc:) - the server's key and
+		its instance label tell the server (a host's instances share the key).
 	*/
 
 	const auto server_key = get_server_public_key();
-	const auto player_group_identifier = server_key.has_value() ? augs::bytes_to_hex(*server_key) : get_connect_string();
+	const auto player_group_identifier = server_key.has_value() ? get_server_instance_label() + "-" + augs::bytes_to_hex(*server_key) : get_connect_string();
 
 	::get_arena_steam_rich_presence_pairs(
 		pairs,

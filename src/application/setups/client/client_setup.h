@@ -1080,6 +1080,10 @@ public:
 		return std::string(sv_public_vars.server_name);
 	}
 
+	std::string get_server_instance_label() const {
+		return std::string(sv_public_vars.instance_label);
+	}
+
 	std::string get_scoreboard_caption() const;
 	void do_rcon_gui(bool force = false);
 

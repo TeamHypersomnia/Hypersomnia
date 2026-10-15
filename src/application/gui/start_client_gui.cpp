@@ -73,16 +73,18 @@ bool start_client_gui_state::perform(
 		Custom server: where it is and, if expected, its key (as Server details shows it, with 0x, or bare).
 	*/
 
-	const auto typed_key = [&]() {
-		auto hex = custom_key;
-		cut_preffix(hex, "0x");
-		return connect_target::key_of(hex);
-	}();
+	/*
+		Also one instance of a host: "c2-<key>".
+	*/
+
+	const auto typed = connect_target::parse(custom_key);
+	const auto typed_key = typed.address.empty() ? typed.key : std::nullopt;
 
 	const auto custom_target = [&]() {
 		if (by_public_key) {
 			auto out = connect_target();
 			out.key = typed_key;
+			out.label = typed.label;
 			return out;
 		}
 
@@ -102,8 +104,8 @@ bool start_client_gui_state::perform(
 		Where a key alone would lead: the server list, else a favorite's last address.
 	*/
 
-	const auto listed = typed_key.has_value() ? server_browser.find_entry_by_connect_string(augs::bytes_to_hex(*typed_key)) : nullptr;
-	const auto favorite = typed_key.has_value() ? favorites.find(*typed_key) : nullptr;
+	const auto listed = typed_key.has_value() ? server_browser.find_entry_by_key(*typed_key, typed.label) : nullptr;
+	const auto favorite = typed_key.has_value() ? favorites.find(*typed_key, typed.label) : nullptr;
 
 	const auto favorite_address = [&]() -> std::string {
 		if (listed != nullptr) {
@@ -278,7 +280,9 @@ bool start_client_gui_state::perform(
 				}
 			}
 
-			if (custom_target.key.has_value() && favorites.contains(*custom_target.key)) {
+			const auto favorite_label = listed != nullptr ? listed->get_instance_label() : custom_target.label;
+
+			if (custom_target.key.has_value() && favorites.contains(*custom_target.key, favorite_label)) {
 				text_color("Already in favorites", green);
 			}
 			else {
@@ -289,7 +293,7 @@ bool start_client_gui_state::perform(
 
 					if (ImGui::Button("Add to favorites") && can_add) {
 						const auto name = listed != nullptr ? std::string(listed->heartbeat.server_name) : std::string();
-						favorites.set(*custom_target.key, favorite_address, name);
+						favorites.set(*custom_target.key, favorite_label, favorite_address, name);
 					}
 				}
 

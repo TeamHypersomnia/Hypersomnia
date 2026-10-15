@@ -7,6 +7,7 @@
 #include "application/nat/nat_type.h"
 #include "hypersomnia_version.h"
 #include "application/masterserver/server_request_signature.h"
+#include "application/masterserver/server_instance_label.h"
 
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);
 bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
@@ -73,6 +74,7 @@ struct server_heartbeat {
 	uint8_t zoom_hundredths = 100;
 
 	host_string_type domain;
+	instance_label_type instance_label;
 	heartbeat_nonce_type ack_nonce = {};
 	std::optional<server_request_signature> signature;
 	// END GEN INTROSPECTOR

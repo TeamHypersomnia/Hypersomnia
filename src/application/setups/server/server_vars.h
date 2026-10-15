@@ -4,6 +4,7 @@
 #include "augs/network/network_simulator_settings.h"
 #include "augs/templates/maybe.h"
 #include "augs/misc/constant_size_string.h"
+#include "application/masterserver/server_instance_label.h"
 #include "augs/network/network_types.h"
 #include "augs/misc/constant_size_vector.h"
 #include "application/network/host_with_default_port.h"
@@ -54,6 +55,7 @@ struct server_public_vars {
 
 	address_string_type external_arena_files_provider;
 	server_name_type server_name;
+	instance_label_type instance_label;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_public_vars&) const = default;
@@ -341,8 +343,6 @@ struct server_private_vars {
 	std::vector<std::string> identity_broker_public_keys;
 
 	admin_profiles_type admin_profiles;
-
-	uint16_t instance_number = 0;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_private_vars& b) const = default;
