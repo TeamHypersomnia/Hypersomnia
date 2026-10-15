@@ -2132,12 +2132,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 #if !PLATFORM_WEB
 			else if (note == " " && !editing_unlisted.has_value()) {
-				text_disabled("\"ip,key,name\" in clipboard auto-fills these");
+				text_disabled("\"ip,key,name\" in clipboard auto-fills these.");
 			}
 #endif
 			else {
 				text_color(note, note_color);
 			}
+
+			ImGui::Separator();
 
 			const bool can_add = address_ok && key.has_value();
 

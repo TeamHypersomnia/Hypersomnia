@@ -242,31 +242,37 @@ bool start_client_gui_state::perform(
 			base::acquire_keyboard_once();
 
 			/*
-				The dimmed hints choose their radio button too.
+				IP with key or only IP: tabs like the window's, each a name and a dimmed note - the buttons draw no text
+				of their own, the two colors are drawn over them.
 			*/
 
-			if (ImGui::RadioButton("IP with key", with_key)) {
-				with_key = true;
-			}
+			{
+				static const char* const names[] = { "IP with key", "Only IP address" };
+				static const char* const notes[] = { "(recommended)", "(insecure)" };
+				static const char* labels[] = { "IP with key (recommended)", "Only IP address (insecure)" };
 
-			ImGui::SameLine();
-			text_disabled("(recommended)");
+				const auto name_color = ImGui::GetColorU32(ImGuiCol_Text);
+				const auto note_color = ImGui::GetColorU32(ImGuiCol_TextDisabled);
 
-			if (ImGui::IsItemClicked()) {
-				with_key = true;
-			}
+				int index = with_key ? 0 : 1;
 
-			ImGui::SameLine();
+				{
+					auto padding = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto p = ImGui::GetStyle().FramePadding; p.x *= 4; return p; }());
+					auto no_text = scoped_style_color(ImGuiCol_Text, rgba(0, 0, 0, 0));
 
-			if (ImGui::RadioButton("Only IP address", !with_key)) {
-				with_key = false;
-			}
+					ImGui::TabLabels(labels, 2, index, nullptr, [&](const int i) {
+						const auto at = ImVec2(ImGui::GetItemRectMin().x + ImGui::GetStyle().FramePadding.x, ImGui::GetItemRectMin().y + ImGui::GetStyle().FramePadding.y);
+						const auto note_x = at.x + ImGui::CalcTextSize(names[i]).x + ImGui::CalcTextSize(" ").x;
 
-			ImGui::SameLine();
-			text_disabled("(insecure)");
+						ImGui::GetWindowDrawList()->AddText(at, name_color, names[i]);
+						ImGui::GetWindowDrawList()->AddText(ImVec2(note_x, at.y), note_color, notes[i]);
+					});
+				}
 
-			if (ImGui::IsItemClicked()) {
-				with_key = false;
+				with_key = index == 0;
+
+				auto separator = scoped_style_color(ImGuiCol_Separator, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+				ImGui::Separator();
 			}
 
 			/*
@@ -315,9 +321,11 @@ bool start_client_gui_state::perform(
 #if PLATFORM_WEB
 					text(" ");
 #else
-					text_disabled("\"ip,key\" in clipboard auto-fills these");
+					text_disabled("\"ip,key\" in clipboard auto-fills these.");
 #endif
 				}
+
+				ImGui::Separator();
 
 				/*
 					A favorite added by hand - the address and the key as given (see favorite_servers.h).
@@ -347,6 +355,7 @@ bool start_client_gui_state::perform(
 			}
 			else {
 				text_color("Not verified - anyone at this address could answer.", orange);
+				ImGui::Separator();
 			}
 		}
 		else if (current_tab == start_client_tab_type::BEST_SERVER) {
