@@ -2075,8 +2075,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 					as long as a server's own.
 				*/
 
+				/*
+					A click into a field selects all of it - to paste over at once.
+				*/
+
 				auto field = [](const std::string& label, const char* const hint, std::string& value, auto buf) {
-					input_text_with_hint(buf, label, hint, value);
+					input_text_with_hint(buf, label, hint, value, ImGuiInputTextFlags_AutoSelectAll);
 				};
 
 				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address, std::array<char, 260>());
@@ -2126,6 +2130,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			if (note == " " && as_autopasted) {
 				checkmark_line("Auto-pasted from clipboard", green);
 			}
+#if !PLATFORM_WEB
+			else if (note == " " && !editing_unlisted.has_value()) {
+				text_disabled("\"ip,key,name\" in clipboard auto-fills these");
+			}
+#endif
 			else {
 				text_color(note, note_color);
 			}

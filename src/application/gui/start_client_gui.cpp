@@ -241,12 +241,21 @@ bool start_client_gui_state::perform(
 		else if (current_tab == start_client_tab_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
+			/*
+				The dimmed hints choose their radio button too.
+			*/
+
 			if (ImGui::RadioButton("IP with key", with_key)) {
 				with_key = true;
 			}
 
 			ImGui::SameLine();
 			text_disabled("(recommended)");
+
+			if (ImGui::IsItemClicked()) {
+				with_key = true;
+			}
+
 			ImGui::SameLine();
 
 			if (ImGui::RadioButton("Only IP address", !with_key)) {
@@ -256,7 +265,15 @@ bool start_client_gui_state::perform(
 			ImGui::SameLine();
 			text_disabled("(insecure)");
 
-			const auto flags = streamer_mode ? ImGuiInputTextFlags_Password : 0; 
+			if (ImGui::IsItemClicked()) {
+				with_key = false;
+			}
+
+			/*
+				A click into a field selects all of it - to paste over at once.
+			*/
+
+			const auto flags = ImGuiInputTextFlags_AutoSelectAll | (streamer_mode ? ImGuiInputTextFlags_Password : 0);
 
 #if !PLATFORM_WEB
 			/*
@@ -278,7 +295,7 @@ bool start_client_gui_state::perform(
 			*/
 
 			if (with_key) {
-				input_text<67>("Public key (64 hex digits)", custom_key);
+				input_text<67>("Public key (64 hex digits)", custom_key, ImGuiInputTextFlags_AutoSelectAll);
 
 				/*
 					The line under the fields: what is wrong, else that they came from the clipboard (until one is
@@ -288,11 +305,18 @@ bool start_client_gui_state::perform(
 				const bool key_error = !custom_key.empty() && custom_key_invalid;
 				const bool as_autopasted = autopasted.has_value() && autopasted->first == custom_address && autopasted->second == custom_key;
 
-				if (!key_error && as_autopasted) {
+				if (key_error) {
+					text_color("The key should be 64 hex digits.", orange);
+				}
+				else if (as_autopasted) {
 					checkmark_line("Auto-pasted from clipboard", green);
 				}
 				else {
-					text_color(key_error ? "The key should be 64 hex digits." : " ", orange);
+#if PLATFORM_WEB
+					text(" ");
+#else
+					text_disabled("\"ip,key\" in clipboard auto-fills these");
+#endif
 				}
 
 				/*
