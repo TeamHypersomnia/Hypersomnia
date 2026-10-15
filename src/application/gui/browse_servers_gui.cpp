@@ -2054,6 +2054,19 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				ImGui::SetKeyboardFocusHere();
 			}
 
+#if !PLATFORM_WEB
+			/*
+				"<address>,0x<key>[,<name>]" pasted into any of the fields fills them all - before the field takes it
+				(the key's and the name's would cut it short).
+			*/
+
+			if (const auto& io = ImGui::GetIO(); (io.KeyCtrl || io.KeySuper) && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
+				if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
+					take_server_identifiers(clipboard);
+				}
+			}
+#endif
+
 			{
 				auto width = scoped_item_width(ImGui::CalcTextSize("9").x * 66);
 

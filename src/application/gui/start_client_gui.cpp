@@ -258,6 +258,19 @@ bool start_client_gui_state::perform(
 
 			const auto flags = streamer_mode ? ImGuiInputTextFlags_Password : 0; 
 
+#if !PLATFORM_WEB
+			/*
+				"<address>,0x<key>" pasted into either field fills both - before the field takes it (the key's would cut
+				it short).
+			*/
+
+			if (const auto& io = ImGui::GetIO(); (io.KeyCtrl || io.KeySuper) && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
+				if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
+					take_server_identifiers(clipboard);
+				}
+			}
+#endif
+
 			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
 
 			/*
