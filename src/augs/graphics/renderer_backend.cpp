@@ -157,7 +157,7 @@ namespace augs {
 			GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, platform->elements_buffer_size, nullptr, get_gl_draw_mode()));
 
 			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, platform->special_buffer_id));
-			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * 10000, nullptr, get_gl_draw_mode()));
+			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * 3 * 10000, nullptr, get_gl_draw_mode()));
 #endif
 
 #if BUILD_OPENGL
@@ -198,7 +198,7 @@ namespace augs {
 				if (specials) {
 					enable_special_vertex_attribute();
 					GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.special_buffer_id));
-					GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials+offset, get_gl_draw_mode()));
+					GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials + offset * 3, get_gl_draw_mode()));
 				}
 
 				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));

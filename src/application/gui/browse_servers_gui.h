@@ -12,6 +12,7 @@
 #include "view/faction_view_settings.h"
 #include "application/gui/server_list_entry.h"
 #include "application/gui/browser_tab.h"
+#include "application/gui/unlisted_server_fields.h"
 #include "augs/misc/ed25519.h"
 
 #include <chrono>
@@ -126,6 +127,8 @@ struct invite_to_join_gui_state : public standard_window_mixin<invite_to_join_gu
 	using base = standard_window_mixin<invite_to_join_gui_state>;
 	using base::base;
 
+	bool forget_asked = false;
+
 	void perform(const invite_to_join_input&);
 };
 
@@ -147,7 +150,12 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	*/
 
 	std::vector<server_list_entry> favorite_only_list;
-	std::vector<server_list_entry*> favorite_only_shown;
+
+	/*
+		Of them the ones added by hand that pass the filters - the Unlisted section.
+	*/
+
+	std::vector<server_list_entry*> unlisted_shown;
 
 #if BUILD_NATIVE_SOCKETS
 	std::unordered_map<std::string, std::future<resolve_address_result>> favorite_resolutions;
@@ -174,11 +182,10 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	bool add_server_open = false;
 	bool add_server_row_pinned = false;
 
+	unlisted_server_fields add_server;
+
 	bool cache_loaded = false;
 	void load_cached_list_once(const browse_servers_input&);
-	std::string add_server_name;
-	std::string add_server_address;
-	std::string add_server_key;
 
 	/*
 		The same dialog editing a favorite added by hand: its key and address before the edit.
@@ -193,21 +200,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::optional<std::pair<augs::ed25519_public_key_type, std::string>> forget_unlisted;
 	std::string forget_unlisted_name;
 
-	/*
-		What the clipboard filled in when the dialog opened (address, key, name) - "Auto-pasted from clipboard"
-		shows while they are as filled.
-	*/
-
-	std::optional<std::array<std::string, 3>> add_server_autopasted;
-	std::string add_server_last_clipboard;
-
-	/*
-		Which field had the keyboard last frame - a paste there is taken whole.
-	*/
-
-	bool add_server_address_active = false;
-	bool add_server_key_active = false;
-	bool add_server_focus_key_next = false;
 	uint32_t times_window_activated = 0;
 
 	std::optional<std::string> requested_connection;

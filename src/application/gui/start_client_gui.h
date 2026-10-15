@@ -7,7 +7,6 @@
 #include "application/setups/client/client_vars.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
-#include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/graphics/texture.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "augs/graphics/renderer.h"
@@ -15,6 +14,7 @@
 #include "hypersomnia_version.h"
 #include "application/setups/client/demo_file.h"
 #include "application/gui/start_client_tab_type.h"
+#include "application/gui/unlisted_server_fields.h"
 
 namespace augs {
 	class window;
@@ -42,28 +42,13 @@ public:
 	demo_choice_result_type demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
 
 	augs::path_type demo_path;
-	std::string custom_address;
 
 	/*
-		Custom server: its address and the key it must have - or the address only, with nothing verifying who answers.
+		Unlisted server: its address and the key it must have - or the address only, with nothing verifying who answers.
 	*/
 
 	bool with_key = true;
-	std::string custom_key;
-
-	/*
-		Which field had the keyboard last frame - a paste there is taken whole (see perform).
-	*/
-
-	bool address_field_active = false;
-
-	/*
-		Auto-paste: the clipboard taken last (a clipboard is taken once - the fields the player changed since stay),
-		and the address and key it filled in - "Auto-pasted from clipboard" shows while they are as filled.
-	*/
-
-	std::string last_autopasted_clipboard;
-	std::optional<std::pair<std::string, std::string>> autopasted;
+	unlisted_server_fields custom;
 
 	/*
 		When the clipboard is looked at: the window opening, the window or the game getting the focus back (e.g. after

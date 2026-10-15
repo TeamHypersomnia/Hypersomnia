@@ -20,6 +20,7 @@
 #endif
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/private_file.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/misc/date_time.h"
 #include "augs/persistent_filesystem.h"
@@ -116,52 +117,6 @@ namespace identity_key {
 		}
 	}
 
-	/*
-		The key is never left half-written and never overwrites a file:
-		it is written to a temporary file next to it (readable by the owner only from the start),
-		flushed to the disk, and only then linked under its name - which fails if that name is taken.
-	*/
-
-	static bool write_and_sync(const augs::path_type& path, const std::string& content) {
-#if PLATFORM_UNIX
-		const auto fd = ::open(path.string().c_str(), O_WRONLY | O_CREAT | O_EXCL, 0600);
-
-		if (fd < 0) {
-			return false;
-		}
-
-		const auto written = ::write(fd, content.data(), content.size());
-		const bool synced = ::fsync(fd) == 0;
-		::close(fd);
-
-		return synced && written == static_cast<decltype(written)>(content.size());
-#elif defined(_WIN32)
-		std::FILE* const file = ::_wfopen(path.c_str(), L"wbx");
-
-		if (file == nullptr) {
-			return false;
-		}
-
-		const auto written = std::fwrite(content.data(), 1, content.size(), file);
-		const bool synced = std::fflush(file) == 0 && ::_commit(::_fileno(file)) == 0;
-		std::fclose(file);
-
-		return synced && written == content.size();
-#else
-		std::FILE* const file = std::fopen(path.string().c_str(), "wbx");
-
-		if (file == nullptr) {
-			return false;
-		}
-
-		const auto written = std::fwrite(content.data(), 1, content.size(), file);
-		const bool flushed = std::fflush(file) == 0;
-		std::fclose(file);
-
-		return flushed && written == content.size();
-#endif
-	}
-
 	static void sync_directory_of(const augs::path_type& path) {
 #if PLATFORM_UNIX
 		const auto fd = ::open(path.parent_path().string().c_str(), O_RDONLY | O_DIRECTORY);
@@ -245,6 +200,12 @@ namespace identity_key {
 		return true;
 	}
 
+	/*
+		The key is never left half-written and never overwrites a file:
+		it is written to a temporary file next to it (readable by the owner only from the start),
+		flushed to the disk, and only then linked under its name - which fails if that name is taken.
+	*/
+
 	static bool write_private_file(const augs::path_type& path, const std::string& content) {
 		std::error_code ec;
 		std::filesystem::create_directories(path.parent_path(), ec);
@@ -252,7 +213,7 @@ namespace identity_key {
 		auto temporary = path;
 		temporary += ".tmp-" + std::to_string(std::random_device()());
 
-		if (!write_and_sync(temporary, content)) {
+		if (!augs::write_new_private_file(temporary, content)) {
 			std::filesystem::remove(temporary, ec);
 			return false;
 		}

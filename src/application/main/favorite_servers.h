@@ -8,6 +8,7 @@
 #include "augs/misc/ed25519.h"
 #include "augs/string/hex.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "application/setups/client/connect_target.h"
 
 /*
 	The player's favorite servers, each by its public key - who the server is - in the order they were added.
@@ -77,7 +78,8 @@ class favorite_servers {
 				}
 
 				if (const auto key = augs::hex_to_array<32>(hex)) {
-					servers.push_back({ *key, e.manual ? std::string() : e.label, e.address, e.name, e.manual, !e.manual && e.official });
+					const auto address = connect_target::without_default_port(e.address);
+					servers.push_back({ *key, e.manual ? std::string() : e.label, address, e.name, e.manual, !e.manual && e.official });
 				}
 			}
 		}
@@ -144,7 +146,13 @@ public:
 		return find(key, label) != nullptr;
 	}
 
-	const favorite_server* find_manual(const augs::ed25519_public_key_type& key, const std::string& address) const {
+	/*
+		An address of one added by hand is kept and compared in one form (see connect_target::without_default_port).
+	*/
+
+	const favorite_server* find_manual(const augs::ed25519_public_key_type& key, const std::string& any_address) const {
+		const auto address = connect_target::without_default_port(any_address);
+
 		for (const auto& s : servers) {
 			if (s.manual && s.key == key && s.address == address) {
 				return &s;
@@ -166,10 +174,12 @@ public:
 	void set(
 		const augs::ed25519_public_key_type& key,
 		const std::string& label,
-		const std::string& address,
+		const std::string& any_address,
 		const std::string& name,
 		const std::optional<bool> official
 	) {
+		const auto address = connect_target::without_default_port(any_address);
+
 		for (auto& s : servers) {
 			if (!s.manual && s.key == key && s.label == label) {
 				const auto new_address = address.empty() ? s.address : address;
@@ -195,7 +205,8 @@ public:
 		Added by hand - the name the address if none given. The same address and key again only renames it.
 	*/
 
-	void add_manual(const augs::ed25519_public_key_type& key, const std::string& address, const std::string& name) {
+	void add_manual(const augs::ed25519_public_key_type& key, const std::string& any_address, const std::string& name) {
+		const auto address = connect_target::without_default_port(any_address);
 		const auto shown_name = name.empty() ? address : name;
 
 		for (auto& s : servers) {
@@ -229,27 +240,21 @@ public:
 
 	/*
 		One added by hand, changed in place (Edit in Server details) - the name the address if none given.
-		Changed to the address and key of another one added by hand: the two become one.
+		Never to another one's address and key - the dialog does not save that.
 	*/
 
 	void edit_manual(
 		const augs::ed25519_public_key_type& old_key,
-		const std::string& old_address,
+		const std::string& any_old_address,
 		const augs::ed25519_public_key_type& key,
-		const std::string& address,
+		const std::string& any_address,
 		const std::string& name
 	) {
-		const auto is_old = [&](const auto& s) { return s.manual && s.key == old_key && s.address == old_address; };
-		const bool same_place = old_key == key && old_address == address;
-
-		if (!same_place && contains_manual(key, address)) {
-			std::erase_if(servers, is_old);
-			add_manual(key, address, name);
-			return;
-		}
+		const auto old_address = connect_target::without_default_port(any_old_address);
+		const auto address = connect_target::without_default_port(any_address);
 
 		for (auto& s : servers) {
-			if (is_old(s)) {
+			if (s.manual && s.key == old_key && s.address == old_address) {
 				s.key = key;
 				s.address = address;
 				s.name = name.empty() ? address : name;
@@ -264,7 +269,8 @@ public:
 		save();
 	}
 
-	void remove_manual(const augs::ed25519_public_key_type& key, const std::string& address) {
+	void remove_manual(const augs::ed25519_public_key_type& key, const std::string& any_address) {
+		const auto address = connect_target::without_default_port(any_address);
 		std::erase_if(servers, [&](const auto& s) { return s.manual && s.key == key && s.address == address; });
 		save();
 	}

@@ -274,6 +274,47 @@ namespace augs {
 			}
 		}
 
+		/*
+			A line after a filled gold star - something among the favorites.
+		*/
+
+		inline void star_line(const std::string& label, const rgba col) {
+			const auto size = ImGui::GetTextLineHeight();
+			const auto pos = ImGui::GetCursorScreenPos();
+
+			/*
+				Lowered with the text after AlignTextToFramePadding (a line as tall as a button's).
+			*/
+
+			const auto text_offset = ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset;
+			const auto center = ImVec2(pos.x + size / 2, pos.y + text_offset + size / 2);
+
+			star_shape(ImGui::GetWindowDrawList(), center, size * 0.45f, ImGui::GetColorU32(ImVec4(rgba(255, 200, 0, 255))), true);
+
+			status_icon_gap(size);
+			ImGui::TextColored(ImVec4(col), "%s", label.c_str());
+		}
+
+		/*
+			A button with a gold star before its label (e.g. Add to favorites) - spaces keep the star's room.
+		*/
+
+		inline bool star_button(const std::string& label) {
+			const auto size = ImGui::GetTextLineHeight();
+			const auto room = size + ImGui::GetStyle().ItemInnerSpacing.x;
+			const auto num_spaces = static_cast<std::size_t>(std::ceil(room / ImGui::CalcTextSize(" ").x));
+
+			const bool clicked = ImGui::Button((std::string(num_spaces, ' ') + label).c_str());
+
+			const auto& padding = ImGui::GetStyle().FramePadding;
+			const auto rect_min = ImGui::GetItemRectMin();
+			const auto center = ImVec2(rect_min.x + padding.x + size / 2, rect_min.y + padding.y + size / 2);
+
+			star_shape(ImGui::GetWindowDrawList(), center, size * 0.45f, ImGui::GetColorU32(ImVec4(rgba(255, 200, 0, 255))), true);
+
+			return clicked;
+		}
+
 		inline void spinner_line(const std::string& label, const rgba col) {
 			const auto size = ImGui::GetTextLineHeight();
 

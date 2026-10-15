@@ -1,14 +1,15 @@
 #pragma once
 #include <chrono>
 #include <filesystem>
-#include <fstream>
 #include <map>
 #include <optional>
 #include <vector>
 #include <string>
+#include <system_error>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
+#include "augs/filesystem/private_file.h"
 #include "augs/misc/ed25519.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/readwrite/json_readwrite.h"
@@ -53,29 +54,36 @@ class server_passwords {
 			entries.push_back({ key, password });
 		}
 
+		/*
+			Readable by this user only, like account.key - written whole under a temporary name, then put in place.
+		*/
+
+		auto temporary = path;
+		temporary += ".tmp-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+
 		try {
 			augs::create_directories_for(path);
-
-			/*
-				Readable by this user only, like account.key - the file written next to it is made so before the
-				passwords go in, then put in its place.
-			*/
-
-			auto temporary = path;
-			temporary += ".tmp-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
-
-			{
-				auto created = std::ofstream(temporary, std::ios::trunc);
-			}
-
-			std::filesystem::permissions(temporary, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write, std::filesystem::perm_options::replace);
-			augs::save_as_text(temporary, augs::to_json_string(entries));
-			std::filesystem::rename(temporary, path);
-			augs::sync_if_persistent(path);
 		}
-		catch (const std::exception& e) {
-			LOG("Could not save the server passwords to %x: %x", path, e.what());
+		catch (...) {
 		}
+
+		auto ec = std::error_code();
+
+		if (!augs::write_new_private_file(temporary, augs::to_json_string(entries))) {
+			LOG("Could not save the server passwords to %x.", path);
+			std::filesystem::remove(temporary, ec);
+			return;
+		}
+
+		std::filesystem::rename(temporary, path, ec);
+
+		if (ec) {
+			LOG("Could not save the server passwords to %x: %x", path, ec.message());
+			std::filesystem::remove(temporary, ec);
+			return;
+		}
+
+		augs::sync_if_persistent(path);
 	}
 
 public:

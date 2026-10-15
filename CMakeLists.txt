@@ -543,6 +543,7 @@ if(BUILD_NETWORKING)
 		list(APPEND HYPERSOMNIA_NETWORKING_CPPS
 		"src/application/setups/client/client_setup.cpp"
 		"src/application/gui/browse_servers_gui.cpp"
+		"src/application/gui/unlisted_server_fields.cpp"
 		)
 	endif()
 endif()
@@ -781,6 +782,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/cosmos/cosmic_entropy.cpp"
 	"src/game/cosmos/data_living_one_step.cpp"
 	"src/augs/filesystem/directory.cpp"
+	"src/augs/filesystem/private_file.cpp"
 	"src/augs/misc/timing/delta.cpp"
 	"src/augs/misc/timing/stepped_timing.cpp"
 	"src/game/components/car_component.cpp"

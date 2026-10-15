@@ -120,8 +120,12 @@ struct server_list_entry {
 		listed server's address and key is a row of its own.
 	*/
 
+	/*
+		A favorite starred on the list is the same server on the list or off it; one added by hand is its key at its address.
+	*/
+
 	bool same_server(const server_list_entry& b) const {
-		if (favorite_only != b.favorite_only || unlisted != b.unlisted || favorite_address != b.favorite_address) {
+		if (unlisted != b.unlisted || (unlisted && favorite_address != b.favorite_address)) {
 			return false;
 		}
 

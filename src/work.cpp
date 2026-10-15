@@ -2622,7 +2622,7 @@ work_result work(
 
 				const auto last_join = connect_target::parse(config.client_connect);
 
-				if (!last_join.key.has_value() && !client.connected_through_localhost_fallback() && last_join.address == client.get_connect_string()) {
+				if (!last_join.key.has_value() && !client.connected_through_localhost_fallback() && last_join.address == connect_target::without_default_port(client.get_connect_string())) {
 					const auto with_key = connect_target { last_join.address, server_key }.to_string();
 
 					change_with_save([&](auto& cfg) {

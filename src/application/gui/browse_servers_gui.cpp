@@ -410,6 +410,14 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 		reselect_after_refresh = selected_server;
 	}
 
+#if BUILD_NATIVE_SOCKETS
+	/*
+		The favorites' domains resolved anew - one that did not resolve may now.
+	*/
+
+	favorite_resolved.clear();
+#endif
+
 	selected_server = {};
 
 	LOG("Launching future_response");
@@ -484,7 +492,7 @@ std::string server_list_entry::get_invite_address() const {
 	}
 
 	const auto ip = ::ToString(address);
-	return is_behind_nat() ? "rtc:" + ip : ip;
+	return is_behind_nat() ? "rtc:" + ip : connect_target::without_default_port(ip);
 }
 
 std::string server_list_entry::get_web_connect_string() const {
@@ -843,9 +851,21 @@ void browse_servers_gui_state::show_server_list(
 		if (key.has_value() && favorites_kept) {
 			const auto star_size = ImGui::GetTextLineHeight();
 			const auto star_pos = ImGui::GetCursorScreenPos();
-			const auto star_max = ImVec2(star_pos.x + star_size, star_pos.y + star_size);
 
-			star_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) && ImGui::IsMouseHoveringRect(star_pos, star_max);
+			/*
+				The whole star column of the row, the gaps between the rows halved - never a pixel of the row's own tooltip
+				between two stars.
+			*/
+
+			const auto& spacing = ImGui::GetStyle().ItemSpacing;
+			const auto column_left = ImGui::GetWindowPos().x + ImGui::GetColumnOffset() - ImGui::GetScrollX();
+			const auto hover_min = ImVec2(column_left, star_pos.y - spacing.y / 2 - 0.5f);
+			const auto hover_max = ImVec2(column_left + ImGui::GetColumnWidth(), star_pos.y + star_size + spacing.y / 2 + 0.5f);
+
+			star_hovered =
+				ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)
+				&& ImGui::IsMouseHoveringRect(hover_min, hover_max, false)
+			;
 
 			const auto star_color = [&]() {
 				if (is_favorite) {
@@ -872,7 +892,13 @@ void browse_servers_gui_state::show_server_list(
 					in.favorites.add_manual(*key, s.favorite_address, std::string(s.heartbeat.server_name));
 				}
 				else {
-					in.favorites.set(*key, s.get_instance_label(), ::favorite_address_of(s), ::favorite_name_of(s), s.is_official_server());
+					in.favorites.set(
+						*key,
+						s.get_instance_label(),
+						::favorite_address_of(s),
+						::favorite_name_of(s),
+						s.is_official_server()
+					);
 				}
 			}
 
@@ -1158,6 +1184,32 @@ void browse_servers_gui_state::advance_list(const browse_servers_input& in) {
 	}
 }
 
+/*
+	Forgetting a favorite asked first: true once Forget is clicked, false on Cancel, none while it asks.
+	Its name may be its address - not shown to a stream.
+*/
+
+static std::optional<bool> ask_to_forget(const std::string& name, const bool streamer_mode) {
+	const auto question =
+		streamer_mode || name.empty() ?
+		std::string("Forget this server?") :
+		typesafe_sprintf("Forget \"%x\"?", name)
+	;
+
+	auto popup = simple_popup { "Forget a server", question, "" };
+
+	const auto buttons = std::vector<simple_popup::button> {
+		{ "Forget", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
+		{ "Cancel", rgba::zero, rgba::zero }
+	};
+
+	if (const auto result = popup.perform(buttons)) {
+		return result == 1;
+	}
+
+	return std::nullopt;
+}
+
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	using namespace httplib_utils;
 
@@ -1378,7 +1430,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
-	favorite_only_shown.clear();
+	unlisted_shown.clear();
 
 	for (auto& s : favorite_only_list) {
 		if (!passes_filter(s, std::string(s.heartbeat.server_name))) {
@@ -1404,7 +1456,20 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			continue;
 		}
 
-		favorite_only_shown.push_back(&s);
+		/*
+			Starred on the list but not on it now (or no list): on the Favorites tab where it was last seen, official
+			or community, sorted along with the listed ones. The ones added by hand go under Unlisted.
+		*/
+
+		if (!s.unlisted) {
+			if (current_tab == browser_tab::FAVORITES) {
+				(s.meta.is_official ? official_server_list : community_server_list).push_back(&s);
+			}
+
+			continue;
+		}
+
+		unlisted_shown.push_back(&s);
 	}
 
 	{
@@ -1472,7 +1537,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				sort_range(tournament_server_list, make_comparator(cmps...));
 				sort_range(official_server_list, make_comparator(cmps...));
 				sort_range(community_server_list, make_comparator(cmps...));
-				sort_range(favorite_only_shown, make_comparator(cmps...));
+				sort_range(unlisted_shown, make_comparator(cmps...));
 			};
 
 			switch (c) {
@@ -1532,55 +1597,25 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 #if !PLATFORM_WEB
 	/*
-		A white plus where the star is, "Add a server" where the name is - one row of the table's columns.
-	*/
-
-	/*
-		An unlisted server's "<address>,0x<key>[,<name>]" (see connect_target::find_server_identifiers) - from the
-		clipboard when Add an unlisted server opens, or pasted into its Address.
-	*/
-
-	auto take_server_identifiers = [&](const std::string& text) {
-		if (const auto found = connect_target::find_server_identifiers(text)) {
-			add_server_address = found->address;
-			add_server_key = "0x" + augs::bytes_to_hex(found->key);
-
-			if (!found->name.empty()) {
-				add_server_name = found->name;
-			}
-
-			/*
-				Whatever field was being edited takes the new values at once.
-			*/
-
-			augs::imgui::stop_editing_text();
-		}
-	};
-
-	/*
-		The clipboard when Add an unlisted server opens, or when the game gets the focus back while it is open (e.g.
-		after copying in a browser) - a clipboard taken once; never while editing one.
+		The clipboard auto-pasted (see unlisted_server_fields.h) when Add an unlisted server opens, or when the game
+		gets the focus back while it is open (e.g. after copying in a browser) - never while editing one.
 	*/
 
 	auto autopaste_from_clipboard = [&]() {
-#if !PLATFORM_WEB
-		if (editing_unlisted.has_value()) {
-			return;
+		if (!editing_unlisted.has_value()) {
+			add_server.autopaste(ImGui::GetClipboardText());
 		}
-
-		if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr && clipboard != add_server_last_clipboard) {
-			if (connect_target::find_server_identifiers(clipboard).has_value()) {
-				add_server_last_clipboard = clipboard;
-				take_server_identifiers(clipboard);
-				add_server_autopasted = std::array<std::string, 3> { add_server_address, add_server_key, add_server_name };
-			}
-		}
-#endif
 	};
 
-	if (const bool focused_again = in.times_window_activated != std::exchange(times_window_activated, in.times_window_activated); focused_again && add_server_open) {
-		autopaste_from_clipboard();
+	if (const auto activated = in.times_window_activated; activated != std::exchange(times_window_activated, activated)) {
+		if (add_server_open) {
+			autopaste_from_clipboard();
+		}
 	}
+
+	/*
+		A white plus where the star is, "Add an unlisted server" where the name is - one row of the table's columns.
+	*/
 
 	auto draw_add_server_row = [&]() {
 		const auto size = ImGui::GetTextLineHeight();
@@ -1599,16 +1634,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (ImGui::Selectable("Add an unlisted server", false, ImGuiSelectableFlags_SpanAllColumns)) {
 			add_server_open = true;
 			editing_unlisted.reset();
-			add_server_autopasted.reset();
-			add_server_name.clear();
-			add_server_address.clear();
-			add_server_key.clear();
 
 			/*
 				A new dialog takes the clipboard as it is, even one taken before.
 			*/
 
-			add_server_last_clipboard.clear();
+			add_server = unlisted_server_fields();
 			autopaste_from_clipboard();
 		}
 
@@ -1747,34 +1778,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		const auto locals = shown(local_server_list);
 		const auto tournaments = shown(tournament_server_list);
-		auto officials = shown(official_server_list);
-		auto communities = shown(community_server_list);
-
-		/*
-			Starred on the list but not on it now (or no list): where it was last seen, official or community -
-			and the ones added by hand.
-		*/
-
-		auto unlisted_favorites = std::vector<server_list_entry*>();
-
-		for (const auto e : favorite_only_shown) {
-			if (e->unlisted) {
-				unlisted_favorites.push_back(e);
-			}
-			else if (e->meta.is_official) {
-				officials.push_back(e);
-			}
-			else {
-				communities.push_back(e);
-			}
-		}
+		const auto officials = shown(official_server_list);
+		const auto communities = shown(community_server_list);
 
 		const auto local_servers_label = typesafe_sprintf("Local servers (%x)", locals.size());
 		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", tournaments.size());
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", officials.size());
 		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", communities.size());
 #if !PLATFORM_WEB
-		const auto unlisted_label = typesafe_sprintf("Unlisted (%x)", unlisted_favorites.size());
+		const auto unlisted_label = typesafe_sprintf("Unlisted (%x)", unlisted_shown.size());
 #endif
 
 		auto separate_with_label_only = [&](const auto& label, const auto& color) {
@@ -1834,8 +1846,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 #if !PLATFORM_WEB
-			if (!unlisted_favorites.empty()) {
-				section(unlisted_label, white, "unlisted", unlisted_favorites, "");
+			if (!unlisted_shown.empty()) {
+				section(unlisted_label, white, "unlisted", unlisted_shown, "");
 			}
 #endif
 
@@ -2017,22 +2029,27 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 	
-	if (server_details.show && reselect_after_refresh.has_value() && !selected_server.is_set()) {
+	/*
+		Once the new list is in (or the edited favorite) - tried once, as it is now.
+	*/
+
+	if (reselect_after_refresh.has_value() && !refresh_in_progress()) {
 		auto reselect = [&](const auto& list) {
 			for (const auto& s : list) {
 				if (s.same_server(*reselect_after_refresh)) {
 					selected_server = s;
-					reselect_after_refresh.reset();
-					return;
+					return true;
 				}
 			}
+
+			return false;
 		};
 
-		reselect(displayed_list());
-
-		if (reselect_after_refresh.has_value()) {
+		if (server_details.show && !selected_server.is_set() && !reselect(displayed_list())) {
 			reselect(favorite_only_list);
 		}
+
+		reselect_after_refresh.reset();
 	}
 
 	/*
@@ -2052,20 +2069,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	/*
-		Forgetting a favorite added by hand loses what was typed in - asked first.
+		Forgetting a favorite added by hand loses what was typed in - asked first. Its name may be its address,
+		not shown to a stream.
 	*/
 
 	if (forget_unlisted.has_value()) {
-		auto popup = simple_popup { "Forget a server", typesafe_sprintf("Forget \"%x\"?", forget_unlisted_name), "" };
-
-		const auto buttons = std::vector<simple_popup::button> {
-			{ "Forget", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
-			{ "Cancel", rgba::zero, rgba::zero }
-		};
-
-		if (const auto result = popup.perform(buttons)) {
-			if (result == 1) {
+		if (const auto forget = ::ask_to_forget(forget_unlisted_name, in.streamer_mode); forget.has_value()) {
+			if (*forget) {
 				in.favorites.remove_manual(forget_unlisted->first, forget_unlisted->second);
+				selected_server = server_list_entry();
 			}
 
 			forget_unlisted.reset();
@@ -2076,12 +2088,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
 			add_server_open = true;
 			editing_unlisted = std::make_pair(*key, selected_server.favorite_address);
-			add_server_autopasted.reset();
-			add_server_address = selected_server.favorite_address;
-			add_server_key = "0x" + augs::bytes_to_hex(*key);
 
 			const auto name = std::string(selected_server.heartbeat.server_name);
-			add_server_name = name == selected_server.favorite_address ? std::string() : name;
+
+			add_server = unlisted_server_fields();
+			add_server.address = selected_server.favorite_address;
+			add_server.key = "0x" + augs::bytes_to_hex(*key);
+			add_server.name = name == selected_server.favorite_address ? std::string() : name;
 		}
 	}
 
@@ -2108,128 +2121,70 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				ImGui::SetKeyboardFocusHere();
 			}
 
-#if !PLATFORM_WEB
 			/*
-				A paste (Ctrl+V) taken whole before a field takes it, and the field left - "<address>,0x<key>[,<name>]"
-				into any fills them all (the key's and the name's would cut it short); a key into the key's field; an
-				address into the address's, then on to the key's if it has no good key yet. Anything else is pasted as usual.
+				A paste taken whole (see unlisted_server_fields.h) - the key's and the name's fields would cut it short.
 			*/
 
-			if (const auto& io = ImGui::GetIO(); (io.KeyCtrl || io.KeySuper) && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
-				if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
-					const auto pasted = std::string(clipboard);
-
-					if (connect_target::find_server_identifiers(pasted).has_value()) {
-						take_server_identifiers(pasted);
-					}
-					else if (add_server_key_active && connect_target::key_of(pasted).has_value()) {
-						add_server_key = connect_target::trimmed(pasted);
-						augs::imgui::stop_editing_text();
-					}
-					else if (add_server_address_active && ::is_pasted_address(pasted)) {
-						add_server_address = connect_target::trimmed(pasted);
-						augs::imgui::stop_editing_text();
-						/*
-							On to the key's field only when it has no good key yet.
-						*/
-
-						add_server_focus_key_next = !connect_target::key_of(add_server_key).has_value();
-					}
-				}
-			}
-#endif
+			add_server.take_paste();
 
 			{
 				auto width = scoped_item_width(ImGui::CalcTextSize("9").x * 66);
 
 				/*
 					A hostname is at most 253 characters, with ":port" 259; the key 64 hex digits with "0x"; the name
-					as long as a server's own.
-				*/
-
-				/*
-					A click into a field selects all of it - to paste over at once.
+					as long as a server's own. A click into a field selects all of it - to paste over at once.
 				*/
 
 				auto field = [](const std::string& label, const char* const hint, std::string& value, auto buf) {
 					input_text_with_hint(buf, label, hint, value, ImGuiInputTextFlags_AutoSelectAll);
 				};
 
-				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server_address, std::array<char, 260>());
-				add_server_address_active = ImGui::IsItemActive();
+				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server.address, std::array<char, 260>());
+				add_server.address_active = ImGui::IsItemActive();
 
-				if (std::exchange(add_server_focus_key_next, false)) {
+				if (std::exchange(add_server.focus_key_next, false)) {
 					ImGui::SetKeyboardFocusHere();
 				}
 
-				field("Public key##add_server", "64 hex digits - from the server's admin", add_server_key, std::array<char, 67>());
-				add_server_key_active = ImGui::IsItemActive();
-				field("Server name (optional)##add_server", "", add_server_name, std::array<char, max_server_name_length_v + 1>());
+				field("Public key##add_server", "64 hex digits - from the server's admin", add_server.key, std::array<char, 67>());
+				add_server.key_active = ImGui::IsItemActive();
+				field("Server name (optional)##add_server", "", add_server.name, std::array<char, max_server_name_length_v + 1>());
 			}
 
 			/*
-				The key as Server details shows it (with 0x) or bare.
+				"<address>,0x<key>" typed into the address's field (or pasted there not with Ctrl+V) is split too.
 			*/
 
-			take_server_identifiers(add_server_address);
+			add_server.take(add_server.address);
 
-			const auto key = connect_target::key_of(add_server_key);
-			const auto address = connect_target::trimmed(add_server_address);
-			const bool address_ok = !address.empty() && !connect_target::parse(address).key.has_value();
-
-			/*
-				One line for what is wrong or worth knowing - always there, so the layout never jumps.
-			*/
-
-			const auto [note, note_color] = [&]() -> std::pair<std::string, rgba> {
-				if (!add_server_key.empty() && !key.has_value()) {
-					return { "The key should be 64 hex digits.", orange };
-				}
-
-				const bool the_edited_one = editing_unlisted.has_value() && key == editing_unlisted->first && address == editing_unlisted->second;
-
-				if (key.has_value() && !the_edited_one && in.favorites.contains_manual(*key, address)) {
-					return { "Already in your favorites.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
-				}
-
-				return { " ", white };
-			}();
-
-			/*
-				Nothing wrong: the same line says the fields came from the clipboard, until one is changed.
-			*/
-
-			const bool as_autopasted =
-				add_server_autopasted.has_value()
-				&& (*add_server_autopasted)[0] == add_server_address
-				&& (*add_server_autopasted)[1] == add_server_key
-				&& (*add_server_autopasted)[2] == add_server_name
-			;
-
-			if (note == " " && as_autopasted) {
-				checkmark_line("Auto-pasted from clipboard", green);
-			}
-			else if (note == " " && address_ok && key.has_value() && !editing_unlisted.has_value()) {
-				checkmark_line("OK", green);
-			}
-#if !PLATFORM_WEB
-			else if (note == " " && !editing_unlisted.has_value()) {
-				text_disabled("\"ip,key,name\" in clipboard auto-fills these.");
-			}
-#endif
-			else {
-				text_color(note, note_color);
-			}
-
-			ImGui::Separator();
+			const auto key = add_server.typed_key();
+			const auto address = add_server.typed_address();
 
 			/*
 				Not twice - the one being edited saved as it was is fine.
 			*/
 
-			const bool the_edited_one = editing_unlisted.has_value() && key == editing_unlisted->first && address == editing_unlisted->second;
+			const bool the_edited_one =
+				editing_unlisted.has_value()
+				&& key == editing_unlisted->first
+				&& address == editing_unlisted->second
+			;
+
 			const bool already_there = key.has_value() && !the_edited_one && in.favorites.contains_manual(*key, address);
-			const bool can_add = address_ok && key.has_value() && !already_there;
+			const bool can_add = add_server.ready() && !already_there;
+
+			const auto already_there_note = std::make_pair(
+				std::string("Already in your favorites."),
+				rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled])
+			);
+
+			add_server.status_line(
+				already_there ? std::make_optional(already_there_note) : std::nullopt,
+				!editing_unlisted.has_value(),
+				"\"ip,key,name\" in clipboard auto-fills these."
+			);
+
+			ImGui::Separator();
 
 			const bool add_clicked = [&]() {
 				auto scope = maybe_disabled_cols(!can_add);
@@ -2237,7 +2192,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}();
 
 			if (can_add && add_clicked) {
-				const auto name = connect_target::trimmed(add_server_name);
+				const auto name = connect_target::trimmed(add_server.name);
 
 				if (editing_unlisted.has_value()) {
 					in.favorites.edit_manual(editing_unlisted->first, editing_unlisted->second, *key, address, name);
@@ -2386,8 +2341,8 @@ invite_target invite_target::of(
 		out.native_address = listed->get_invite_address();
 		out.web_id = listed->get_web_connect_string();
 
-		if (is_internal_address(address) && address != out.native_address) {
-			out.local_address = address;
+		if (const auto joined = connect_target::without_default_port(address); is_internal_address(address) && joined != out.native_address) {
+			out.local_address = joined;
 		}
 
 		return out;
@@ -2398,10 +2353,19 @@ invite_target invite_target::of(
 		an IP is a WebRTC id for the browser as it is.
 	*/
 
-	out.native_address = address;
+	out.native_address = connect_target::without_default_port(address);
 
 	auto web_id = client_connect_string(address);
 	cut_preffix(web_id, "rtc:");
+
+	/*
+		A server's WebRTC id is its IP always with the port - the default one too.
+	*/
+
+	if (const auto ip = ::find_netcode_addr(web_id)) {
+		web_id = ::ToString(*ip);
+	}
+
 	out.web_id = web_id;
 	out.local_network_only = is_internal_address(web_id);
 
@@ -2435,16 +2399,27 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 		ImGui::SameLine();
 
 		if (in.favorites.contains(*in.server_key, in.server_label)) {
-			checkmark_line("In favorites", green);
+			star_line("In favorites", green);
 			ImGui::SameLine();
 
-			if (ImGui::Button("Remove")) {
-				in.favorites.remove(*in.server_key, in.server_label);
+			if (ImGui::Button("Forget")) {
+				forget_asked = true;
+			}
+
+			if (forget_asked) {
+				if (const auto forget = ::ask_to_forget(in.server_name, in.streamer_mode); forget.has_value()) {
+					if (*forget) {
+						in.favorites.remove(*in.server_key, in.server_label);
+					}
+
+					forget_asked = false;
+				}
 			}
 		}
-		else if (ImGui::Button("Add to favorites")) {
+		else if (star_button("Add to favorites")) {
 			const auto target = invite_target::of(in.address, in.server_key, in.listed);
-			in.favorites.set(*in.server_key, in.server_label, target.native_address, in.server_name, in.listed != nullptr && in.listed->is_official_server());
+			const auto official = in.listed != nullptr ? std::make_optional(in.listed->is_official_server()) : std::nullopt;
+			in.favorites.set(*in.server_key, in.server_label, target.native_address, in.server_name, official);
 		}
 	}
 
@@ -2566,7 +2541,9 @@ const server_list_entry* browse_servers_gui_state::find_entry_by_connect_string(
 				return &s;
 			}
 
-			if (s.get_native_connect_string(true) == in) {
+			const auto native = connect_target::without_default_port(s.get_native_connect_string(true));
+
+			if (native == connect_target::without_default_port(in)) {
 				return &s;
 			}
 		}
@@ -2794,12 +2771,18 @@ bool server_details_gui_state::perform(
 					}
 				}
 			}
-			else if (ImGui::Button("Add to favorites")) {
+			else if (star_button("Add to favorites")) {
 				if (manual) {
 					favorites->add_manual(*key, entry.favorite_address, std::string(entry.heartbeat.server_name));
 				}
 				else {
-					favorites->set(*key, entry.get_instance_label(), ::favorite_address_of(entry), ::favorite_name_of(entry), entry.is_official_server());
+					favorites->set(
+						*key,
+						entry.get_instance_label(),
+						::favorite_address_of(entry),
+						::favorite_name_of(entry),
+						entry.is_official_server()
+					);
 				}
 			}
 		}
@@ -2814,8 +2797,13 @@ bool server_details_gui_state::perform(
 	auto heartbeat = entry.heartbeat;
 	const auto& internal_addr = heartbeat.internal_network_address;
 
-	auto external_address = ::ToString(entry.address);
-	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
+	auto external_address = connect_target::without_default_port(::ToString(entry.address));
+
+	auto internal_address =
+		internal_addr ?
+		connect_target::without_default_port(::ToString(*internal_addr)) :
+		std::string("Unknown yet")
+	;
 
 	text_disabled("Join:");
 
@@ -3132,8 +3120,8 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 
 			const bool same_address =
 				(entry.address.type != NETCODE_ADDRESS_NONE && s.address == entry.address)
-				|| s.get_my_connect_string() == f.address
-				|| s.get_native_connect_string(true) == f.address
+				|| connect_target::without_default_port(s.get_my_connect_string()) == f.address
+				|| connect_target::without_default_port(s.get_native_connect_string(true)) == f.address
 			;
 
 			if (same_address && s.get_public_key() != f.key) {

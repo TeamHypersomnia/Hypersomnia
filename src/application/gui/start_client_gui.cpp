@@ -78,35 +78,15 @@ bool start_client_gui_state::perform(
 	*/
 
 #if !PLATFORM_WEB
-	/*
-		An unlisted server's "<address>,0x<key>" (see connect_target::find_server_identifiers) - from the clipboard
-		when the window opens (the web build has no clipboard to read), or pasted into the address field.
-	*/
-
-	auto take_server_identifiers = [&](const std::string& text) {
-		if (const auto found = connect_target::find_server_identifiers(text)) {
-			custom_address = found->address;
-			custom_key = "0x" + augs::bytes_to_hex(found->key);
-			with_key = true;
-
-			/*
-				Whatever field was being edited takes the new values at once.
-			*/
-
-			augs::imgui::stop_editing_text();
-			return true;
-		}
-
-		return false;
-	};
-
 	{
 		/*
-			A clipboard is taken once - the fields changed since stay until another one is copied.
+			The clipboard auto-pasted (see unlisted_server_fields.h): when the window opens, when it or the game gets
+			the focus back (e.g. after copying in a browser), when the Unlisted server tab is chosen.
 		*/
 
 		const bool focused_now = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-		const bool game_focused_again = window.get_times_activated() != std::exchange(times_window_activated, window.get_times_activated());
+		const auto times_activated = window.get_times_activated();
+		const bool game_focused_again = times_activated != std::exchange(times_window_activated, times_activated);
 		const bool focus_gained = (focused_now && !was_focused) || game_focused_again;
 		const bool unlisted_tab_entered = current_tab == start_client_tab_type::CUSTOM_ADDRESS && tab_last_frame != current_tab;
 
@@ -114,27 +94,30 @@ bool start_client_gui_state::perform(
 		tab_last_frame = current_tab;
 
 		if (ImGui::IsWindowAppearing() || focus_gained || unlisted_tab_entered) {
-			if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr && clipboard != last_autopasted_clipboard) {
-				if (take_server_identifiers(clipboard)) {
-					last_autopasted_clipboard = clipboard;
-					autopasted = std::make_pair(custom_address, custom_key);
-					current_tab = start_client_tab_type::CUSTOM_ADDRESS;
-				}
+			if (custom.autopaste(ImGui::GetClipboardText())) {
+				with_key = true;
+				current_tab = start_client_tab_type::CUSTOM_ADDRESS;
 			}
 		}
 	}
 
-	take_server_identifiers(custom_address);
+	/*
+		"<address>,0x<key>" typed into the address's field (or pasted there not with Ctrl+V) is split too.
+	*/
+
+	if (custom.take(custom.address)) {
+		with_key = true;
+	}
 
 	/*
 		Unlisted server: its address and the key it must have (as Server details shows it, with 0x, or bare) -
 		or the address only, verifying nothing.
 	*/
 
-	const auto typed_key = connect_target::key_of(custom_key);
+	const auto typed_key = custom.typed_key();
 
 	const auto custom_target = [&]() {
-		auto out = connect_target::parse(custom_address);
+		auto out = connect_target::parse(custom.address);
 
 		if (with_key) {
 			out.key = typed_key;
@@ -143,7 +126,16 @@ bool start_client_gui_state::perform(
 		return out;
 	}();
 
-	const bool custom_key_invalid = with_key && !typed_key.has_value();
+	/*
+		The name only as auto-pasted with the address and the key - none of them changed since.
+	*/
+
+	const auto custom_name = custom.is_autopasted() ? custom.name : std::string();
+	const auto custom_favorite =
+		with_key && typed_key.has_value() ?
+		favorites.find_manual(*typed_key, custom.typed_address()) :
+		nullptr
+	;
 #endif
 
 	{
@@ -270,11 +262,19 @@ bool start_client_gui_state::perform(
 				int index = with_key ? 0 : 1;
 
 				{
-					auto padding = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto p = ImGui::GetStyle().FramePadding; p.x *= 4; return p; }());
+					const auto wider_padding = []() {
+						auto p = ImGui::GetStyle().FramePadding;
+						p.x *= 4;
+						return p;
+					}();
+
+					auto padding = scoped_style_var(ImGuiStyleVar_FramePadding, wider_padding);
 					auto no_text = scoped_style_color(ImGuiCol_Text, rgba(0, 0, 0, 0));
 
 					ImGui::TabLabels(labels, 2, index, nullptr, [&](const int i) {
-						const auto at = ImVec2(ImGui::GetItemRectMin().x + ImGui::GetStyle().FramePadding.x, ImGui::GetItemRectMin().y + ImGui::GetStyle().FramePadding.y);
+						const auto& frame_padding = ImGui::GetStyle().FramePadding;
+						const auto rect_min = ImGui::GetItemRectMin();
+						const auto at = ImVec2(rect_min.x + frame_padding.x, rect_min.y + frame_padding.y);
 						const auto note_x = at.x + ImGui::CalcTextSize(names[i]).x + ImGui::CalcTextSize(" ").x;
 
 						ImGui::GetWindowDrawList()->AddText(at, name_color, names[i]);
@@ -295,76 +295,30 @@ bool start_client_gui_state::perform(
 			const auto flags = ImGuiInputTextFlags_AutoSelectAll | (streamer_mode ? ImGuiInputTextFlags_Password : 0);
 			const auto key_label = std::string("Public key (64 hex digits)");
 
-#if !PLATFORM_WEB
 			/*
-				A paste (Ctrl+V) taken whole before a field takes it, and the field left - "<address>,0x<key>" into
-				either fills both; a key into the key's field; an address into the address's, then on to the key's if it has no good key yet.
+				A paste taken whole (see unlisted_server_fields.h) - only while this window has the keyboard.
 			*/
 
-			if (const auto& io = ImGui::GetIO(); (io.KeyCtrl || io.KeySuper) && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
-				if (const auto clipboard = ImGui::GetClipboardText(); clipboard != nullptr) {
-					const auto pasted = std::string(clipboard);
-					const bool key_field_active = long_input_text_with_dots_active(key_label);
+			custom.key_active = with_key && long_input_text_with_dots_active(key_label);
 
-					if (take_server_identifiers(pasted)) {
-					}
-					else if (key_field_active && connect_target::key_of(pasted).has_value()) {
-						custom_key = connect_target::trimmed(pasted);
-						augs::imgui::stop_editing_text();
-					}
-					else if (address_field_active && ::is_pasted_address(pasted)) {
-						custom_address = connect_target::trimmed(pasted);
-						augs::imgui::stop_editing_text();
-						/*
-							On to the key's field only when it has no good key yet.
-						*/
-
-						if (with_key && !connect_target::key_of(custom_key).has_value()) {
-							long_input_text_with_dots_focus(key_label);
-						}
-					}
-				}
+			if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && custom.take_paste()) {
+				with_key = true;
 			}
-#endif
 
-			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
-			address_field_active = ImGui::IsItemActive();
-
-			/*
-				One line under the fields for what is wrong - always there, so the layout never jumps.
-			*/
+			input_text<300>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom.address, flags);
+			custom.address_active = ImGui::IsItemActive();
 
 			if (with_key) {
+				if (std::exchange(custom.focus_key_next, false)) {
+					long_input_text_with_dots_focus(key_label);
+				}
+
 				/*
 					One line like the address's, the key shortened in the middle - all of it while the field is active.
 				*/
 
-				long_input_text_with_dots<67>(key_label, custom_key);
-
-				/*
-					The line under the fields: what is wrong, else that they came from the clipboard (until one is
-					changed) - kept even when empty, so the layout never jumps.
-				*/
-
-				const bool key_error = !custom_key.empty() && custom_key_invalid;
-				const bool as_autopasted = autopasted.has_value() && autopasted->first == custom_address && autopasted->second == custom_key;
-
-				if (key_error) {
-					text_color("The key should be 64 hex digits.", orange);
-				}
-				else if (as_autopasted) {
-					checkmark_line("Auto-pasted from clipboard", green);
-				}
-				else if (!custom_address.empty() && typed_key.has_value()) {
-					checkmark_line("OK", green);
-				}
-				else {
-#if PLATFORM_WEB
-					text(" ");
-#else
-					text_disabled("\"ip,key\" in clipboard auto-fills these.");
-#endif
-				}
+				long_input_text_with_dots<67>(key_label, custom.key);
+				custom.status_line(std::nullopt, true, "\"ip,key\" in clipboard auto-fills these.");
 
 				ImGui::Separator();
 
@@ -373,21 +327,27 @@ bool start_client_gui_state::perform(
 				*/
 
 				if (favorites_kept) {
-					const auto address = connect_target::trimmed(custom_address);
+					if (custom_favorite != nullptr) {
+						/*
+							As tall as the line with Add to favorites it replaces - nothing below moves.
+						*/
 
-					if (const auto favorite = typed_key.has_value() ? favorites.find_manual(*typed_key, address) : nullptr) {
-						text_color("Already in favorites:", green);
-						ImGui::SameLine();
-						text_disabled(favorite->name);
+						ImGui::AlignTextToFramePadding();
+						star_line("Already in favorites", green);
+
+						if (!streamer_mode) {
+							ImGui::SameLine();
+							text_disabled(custom_favorite->name);
+						}
 					}
 					else {
-						const bool can_add = !address.empty() && typed_key.has_value();
+						const bool can_add = custom.ready();
 
 						{
 							auto scope = maybe_disabled_cols({}, !can_add);
 
-							if (ImGui::Button("Add to favorites") && can_add) {
-								favorites.add_manual(*typed_key, address, std::string());
+							if (star_button("Add to favorites") && can_add) {
+								favorites.add_manual(*typed_key, custom.typed_address(), custom_name);
 							}
 						}
 
@@ -511,7 +471,7 @@ bool start_client_gui_state::perform(
 #else
 			const bool custom_addr_empty = 
 				current_tab == start_client_tab_type::CUSTOM_ADDRESS
-				&& (custom_address.empty() || custom_key_invalid)
+				&& (custom.typed_address().empty() || (with_key && !typed_key.has_value()))
 			;
 #endif
 
@@ -534,6 +494,14 @@ bool start_client_gui_state::perform(
 #if !PLATFORM_WEB
 					case start_client_tab_type::CUSTOM_ADDRESS:
 						into_connect_string = custom_target.to_string();
+
+						if (custom_favorite != nullptr) {
+							into_displayed_connecting_server_name = custom_favorite->name;
+						}
+						else if (!custom_name.empty()) {
+							into_displayed_connecting_server_name = custom_name;
+						}
+
 						break;
 #endif
 					default:

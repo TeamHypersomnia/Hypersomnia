@@ -999,7 +999,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								stays, until its goodbye or its timeout.
 							*/
 
-							bool moved_here = false;
+							std::optional<netcode_address_t> moved_from;
 
 							{
 								const auto label = std::string(typed_request.instance_label);
@@ -1011,12 +1011,13 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								}
 
 								/*
-									An entry of this instance at another address not heard from for longer than a
-									heartbeat's interval is this server's own old address (its address changed - IPv4
-									and IPv6, a NAT mapping, a restart on another port): replaced, not waited out.
+									An entry of this instance at another address silent for longer than a few
+									heartbeats (one every 10 s by default) is this server's own old address (its address
+									changed - IPv4 and IPv6, a NAT mapping, a restart on another port): replaced, not
+									waited out until it times out (server_entry_timeout_secs).
 								*/
 
-								std::optional<netcode_address_t> old_address_of_this_instance;
+								const auto moved_after_silence_secs = 35.0;
 
 								for (const auto& other : server_list) {
 									const bool same_instance =
@@ -1025,8 +1026,8 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 										&& std::string(other.second.last_heartbeat.instance_label) == label
 									;
 
-									if (same_instance && current_time - other.second.time_last_heartbeat > 35.0) {
-										old_address_of_this_instance = other.first;
+									if (same_instance && current_time - other.second.time_last_heartbeat > moved_after_silence_secs) {
+										moved_from = other.first;
 										continue;
 									}
 
@@ -1044,11 +1045,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 									}
 								}
 
-								if (old_address_of_this_instance.has_value()) {
-									LOG("The %x of key %x moved from %x to %x.", label, augs::bytes_to_hex(public_key).substr(0, 8), ::ToString(*old_address_of_this_instance), ip_str);
-									server_list.erase(*old_address_of_this_instance);
-									moved_here = true;
-								}
 							}
 
 							/*
@@ -1077,6 +1073,35 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 									return;
 								}
 							}
+
+							/*
+								Moved: hosted since the old entry was, which goes only once the new one is taken.
+							*/
+
+							const auto moved_time_hosted = [&]() -> std::optional<double> {
+								if (!moved_from.has_value()) {
+									return std::nullopt;
+								}
+
+								const auto old = server_list.find(*moved_from);
+
+								if (old == server_list.end()) {
+									return std::nullopt;
+								}
+
+								const auto hosted = old->second.meta.time_hosted;
+
+								LOG(
+									"The %x of key %x moved from %x to %x.",
+									std::string(typed_request.instance_label),
+									augs::bytes_to_hex(public_key).substr(0, 8),
+									::ToString(*moved_from),
+									ip_str
+								);
+
+								server_list.erase(old);
+								return hosted;
+							}();
 
 							ack.accepted = true;
 							send_back(ack);
@@ -1116,9 +1141,9 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							;
 
 							if (is_new_server) {
-								server_entry.meta.time_hosted = current_time;
+								server_entry.meta.time_hosted = moved_time_hosted.value_or(current_time);
 
-								if (moved_here) {
+								if (moved_time_hosted.has_value()) {
 									MSR_LOG("A listed server moved to %x - no notification.", ip_str);
 								}
 								else if (typed_request.show_on_server_list) {

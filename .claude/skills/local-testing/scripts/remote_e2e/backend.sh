@@ -2,7 +2,7 @@
 # Test backend on arenaus, all inside ~/hs-test-backend: a test masterserver (UDP 18430, HTTP 18410/18420, signalling 18000)
 # and a copy of the site (port 13000) with its own clean database and broker key, both reading official_servers.d.
 # A real Steam Web API key in ~/hs-test-backend/steam_web_api_key (0600) lets the broker verify Steam tickets - delete it after the test.
-# Usage: backend.sh start|stop|status|broker_key
+# Usage: backend.sh start|stop|status|broker_key      (SECS=<s> - how long it runs, 2 h by default)
 B=$HOME/hs-test-backend
 export LD_LIBRARY_PATH=$B/lib
 
@@ -31,7 +31,7 @@ start)
 EOF
 
 	cd $B/hypersomnia
-	setsid nohup timeout 7200 $B/Hypersomnia --masterserver --appdata-dir $B/ms --no-update-on-launch > $B/ms.out 2>&1 < /dev/null &
+	setsid nohup timeout ${SECS:-7200} $B/Hypersomnia --masterserver --appdata-dir $B/ms --no-update-on-launch > $B/ms.out 2>&1 < /dev/null &
 	echo $! > $B/ms.pid
 
 	# A new session secret every start, readable only here - fake_steam_session.sh signs cookies with it
@@ -45,9 +45,9 @@ EOF
 	fi
 
 	cd $B/page
-	PORT=13000 NODE_ENV=development SESSION_SECRET=$(cat $B/session_secret) OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
+	PORT=13000 NODE_ENV=development BASE_URL=http://$(curl -s -4 -m 5 ifconfig.me 2>/dev/null || hostname -I | cut -d" " -f1):13000 SESSION_SECRET=$(cat $B/session_secret) OFFICIAL_SERVERS_DIR=$B/official_servers.d SERVER_LIST_URL=http://127.0.0.1:18420/server_list_json \
 		BROKER_KEY_PATH=$B/broker.key STEAM_APIKEY=$(cat $B/steam_web_api_key 2>/dev/null) \
-		setsid nohup timeout 7200 $B/node/bin/node app.js > $B/site.out 2>&1 < /dev/null &
+		setsid nohup timeout ${SECS:-7200} $B/node/bin/node app.js > $B/site.out 2>&1 < /dev/null &
 	echo $! > $B/site.pid
 
 	sleep 5

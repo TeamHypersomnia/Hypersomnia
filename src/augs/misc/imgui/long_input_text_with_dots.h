@@ -4,6 +4,7 @@
 #include <string>
 #include "3rdparty/imgui/imgui.h"
 #include "3rdparty/imgui/imgui_internal.h"
+#include "augs/misc/scope_guard.h"
 
 /*
 	A text field for a long text of no spaces (e.g. a key): one line with the text shortened in the middle ("abc...xyz")
@@ -47,15 +48,37 @@ namespace augs {
 			inline ImGuiID state_id_of(const std::string& label) {
 				return ImGui::GetID((label + "##long_input_state").c_str());
 			}
+
+			inline ImGuiID drawn_frame_id_of(const std::string& label) {
+				return ImGui::GetID((label + "##long_input_drawn").c_str());
+			}
+
+			/*
+				A field not drawn last frame (its window closed, another tab) is idle, whatever it was left as.
+			*/
+
+			inline field_state state_of(const std::string& label) {
+				auto* const storage = ImGui::GetStateStorage();
+				const bool drawn_last_frame = storage->GetInt(drawn_frame_id_of(label), -2) >= ImGui::GetFrameCount() - 1;
+
+				if (!drawn_last_frame) {
+					return field_state::IDLE;
+				}
+
+				return static_cast<field_state>(storage->GetInt(state_id_of(label), static_cast<int>(field_state::IDLE)));
+			}
 		}
 
 		/*
+			The two below look the field up by its label in the current window and id stack - call them where the field
+			itself is drawn.
+
 			Whether the field with this label is being edited (expanded) - e.g. to take a paste whole before it does.
 		*/
 
 		inline bool long_input_text_with_dots_active(const std::string& label) {
 			using namespace long_input_text_detail;
-			return ImGui::GetStateStorage()->GetInt(state_id_of(label), static_cast<int>(field_state::IDLE)) != static_cast<int>(field_state::IDLE);
+			return state_of(label) != field_state::IDLE;
 		}
 
 		/*
@@ -77,21 +100,16 @@ namespace augs {
 
 			auto* const storage = ImGui::GetStateStorage();
 			const auto state_id = state_id_of(label);
-			auto state = static_cast<field_state>(storage->GetInt(state_id, static_cast<int>(field_state::IDLE)));
+			auto state = state_of(label);
 
 			/*
 				The state back into the window's storage whatever way this returns.
 			*/
 
-			struct store_on_return {
-				ImGuiStorage* storage;
-				ImGuiID id;
-				field_state& state;
-
-				~store_on_return() {
-					storage->SetInt(id, static_cast<int>(state));
-				}
-			} store { storage, state_id, state };
+			auto store = augs::scope_guard([&]() {
+				storage->SetInt(state_id, static_cast<int>(state));
+				storage->SetInt(drawn_frame_id_of(label), ImGui::GetFrameCount());
+			});
 
 			const auto& style = ImGui::GetStyle();
 			const auto width = ImGui::CalcItemWidth();
@@ -162,7 +180,7 @@ namespace augs {
 				const auto& wrap = *static_cast<const decltype(wrapped)*>(data->UserData);
 				auto text = std::string(data->Buf, data->BufTextLen);
 
-				int chars_before_cursor = 0;
+				auto chars_before_cursor = 0;
 
 				for (int i = 0; i < data->CursorPos; ++i) {
 					chars_before_cursor += text[i] != '\n';
@@ -192,7 +210,7 @@ namespace augs {
 					data->DeleteChars(0, data->BufTextLen);
 					data->InsertChars(0, new_text.c_str());
 
-					int cursor = 0;
+					auto cursor = 0;
 
 					for (int seen = 0; cursor < static_cast<int>(new_text.size()) && seen < chars_before_cursor; ++cursor) {
 						seen += new_text[cursor] != '\n';
@@ -208,34 +226,74 @@ namespace augs {
 				ImGui::SetKeyboardFocusHere();
 			}
 
+			/*
+				Copied (Ctrl+C, Ctrl+X) without the line breaks - they are only how it shows. What ImGui copies is
+				taken before it does (a cut leaves no selection) and put into the clipboard anew after, never read
+				back from it (some platforms' clipboards are written later).
+			*/
+
+			const auto copied_unbroken = [&]() {
+				const auto& io = ImGui::GetIO();
+				const auto field_id = ImGui::GetID(label.c_str());
+
+				const bool copy_pressed =
+					(io.KeyCtrl || io.KeySuper)
+					&& (ImGui::IsKeyPressed(ImGuiKey_C, false) || ImGui::IsKeyPressed(ImGuiKey_X, false))
+				;
+
+				const bool copying =
+					copy_pressed
+					&& !(flags & ImGuiInputTextFlags_Password)
+					&& ImGui::GetActiveID() == field_id
+				;
+
+				auto out = std::string();
+
+				if (!copying) {
+					return out;
+				}
+
+				if (const auto* const text_state = ImGui::GetInputTextState(field_id); text_state != nullptr) {
+					const auto whole = !text_state->HasSelection();
+					const auto from = whole ? 0 : std::min(text_state->GetSelectionStart(), text_state->GetSelectionEnd());
+					const auto to = whole ? text_state->CurLenW : std::max(text_state->GetSelectionStart(), text_state->GetSelectionEnd());
+
+					for (auto i = from; i < to; ++i) {
+						if (const auto c = text_state->TextW[i]; c != '\n') {
+							out += static_cast<char>(c);
+						}
+					}
+				}
+
+				return out;
+			}();
+
+			/*
+				Enter leaves it as it leaves a field of one line (CtrlEnterForNewLine - and no line break is ever kept).
+			*/
+
+			const auto multiline_flags =
+				(flags & ~ImGuiInputTextFlags_AutoSelectAll)
+				| ImGuiInputTextFlags_NoHorizontalScroll
+				| ImGuiInputTextFlags_CallbackEdit
+				| ImGuiInputTextFlags_CtrlEnterForNewLine
+			;
+
 			const bool changed = ImGui::InputTextMultiline(
 				label.c_str(),
 				buf.data(),
 				buf.size(),
 				ImVec2(width, height),
-				(flags & ~ImGuiInputTextFlags_AutoSelectAll) | ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_CallbackEdit | ImGuiInputTextFlags_CtrlEnterForNewLine,
+				multiline_flags,
 				rewrap_on_edit,
 				&wrapped
 			);
 
-			/*
-				Copied (Ctrl+C, Ctrl+X) without the line breaks - they are only how it shows.
-			*/
-
-			if (const auto& io = ImGui::GetIO(); ImGui::IsItemActive() && (io.KeyCtrl || io.KeySuper) && (ImGui::IsKeyPressed(ImGuiKey_C, false) || ImGui::IsKeyPressed(ImGuiKey_X, false))) {
-				if (const auto copied = ImGui::GetClipboardText(); copied != nullptr) {
-					auto unbroken = std::string(copied);
-
-					if (unbroken.find('\n') != std::string::npos) {
-						std::erase(unbroken, '\n');
-						ImGui::SetClipboardText(unbroken.c_str());
-					}
-				}
+			if (!copied_unbroken.empty()) {
+				ImGui::SetClipboardText(copied_unbroken.c_str());
 			}
 
 			/*
-				Enter leaves it as it leaves a field of one line (CtrlEnterForNewLine - and no line break is ever kept).
-
 				What follows on the same line (a label, an icon) sits as by a field of one line - not a few pixels higher.
 			*/
 
@@ -257,7 +315,7 @@ namespace augs {
 			}
 
 			if (state == field_state::SELECTING) {
-				if (const auto text_state = ImGui::GetInputTextState(ImGui::GetItemID())) {
+				if (const auto text_state = ImGui::GetInputTextState(ImGui::GetItemID()); text_state != nullptr) {
 					text_state->SelectAll();
 					text_state->SelectedAllMouseLock = true;
 				}

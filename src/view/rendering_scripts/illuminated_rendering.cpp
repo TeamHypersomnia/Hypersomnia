@@ -1137,6 +1137,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shaders.illuminated, U::light_resolve, light_resolved && use ? 2 : 0);
 	};
 
+	auto unbind_resolved_light = [&]() {
+		renderer.set_active_texture(8);
+		augs::graphics::texture::set_current_to_none(renderer);
+		renderer.set_active_texture(0);
+	};
+
 	auto resolve_light = [&]() {
 		if (!fbos.resolved_light.has_value()) {
 			return;
@@ -1148,6 +1154,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		ensure_eq(static_cast<std::size_t>(0), renderer.get_triangle_count());
 
+		/*
+			The illuminated shader samples unit 8 even in this pass - left bound to the last frame's
+			resolved light, it would be read while drawn into (WebGL drops such a draw as a feedback loop).
+		*/
+
+		unbind_resolved_light();
 		fbos.resolved_light->set_as_current(renderer);
 		renderer.set_overwriting_blending();
 		set_uniform(shaders.illuminated, U::light_resolve, 1);
@@ -1341,6 +1353,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	*/
 
 	use_resolved_light(false);
+	unbind_resolved_light();
 
 	overlay_smoke_texture();
 
