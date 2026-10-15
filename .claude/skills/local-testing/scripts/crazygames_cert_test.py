@@ -28,7 +28,9 @@ def cert(token):
         req = urllib.request.Request(f'{url}/cert?session={session}&crazygames=header', headers={ 'X-CrazyGames-Token': token })
         r = urllib.request.urlopen(req)
         raw = bytes.fromhex(json.loads(r.read())['cert'])
-        return 200, raw[2:2 + raw[1]].decode()
+        n = raw[1]
+        cert.not_after = int.from_bytes(raw[2 + n + 32 + 8:2 + n + 32 + 16], 'little', signed=True)
+        return 200, raw[2:2 + n].decode()
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode()
 
@@ -42,6 +44,10 @@ def check(name, got, want_status, want_body=None):
     if not ok: failed.append(name)
 
 check('valid token', cert(jwt(good)), 200, 'crazygames_cgUser_123')
+check('a cert lasts no longer than its token', (200 if cert.not_after <= good['exp'] else 0, ''), 200)
+short = { **good, 'exp': now + 600 }
+cert(jwt(short))
+check('a cert of a 10-minute token ends with it', (200 if cert.not_after == short['exp'] else 0, str(cert.not_after - now)), 200)
 check('another game', cert(jwt({**good, 'gameId': 'other'})), 401)
 check('expired', cert(jwt({**good, 'exp': now - 10})), 401)
 other = __import__('cryptography.hazmat.primitives.asymmetric.rsa', fromlist=['rsa']).generate_private_key(65537, 2048)

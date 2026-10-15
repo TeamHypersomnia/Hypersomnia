@@ -9,7 +9,8 @@ umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
-T=$S/keys_test
+# A fresh directory every run - never removed recursively
+T=$S/keys_test_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 GAME=$REPO/hypersomnia
 # The broker: a site copy running on this port (see broker.sh), or empty for none
@@ -18,7 +19,6 @@ BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1
-rm -rf $T
 mkdir -p $T/official_servers.d
 
 for port in 18000 18410 18420 18430 10000 10002 10004; do

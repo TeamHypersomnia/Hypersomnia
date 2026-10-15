@@ -8,14 +8,15 @@ export ALSOFT_DRIVERS=null VISUAL=true
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/disconnects
+# A fresh directory every run - never removed recursively
+T=$S/disconnects_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 CASES=${CASES:-"shutdown killed frozen full elsewhere password afk client_frozen client_killed client_quit"}
 PORT=10060
 mkdir -p $T
 
 server() { # name port slots extra-server-json extra-top-json
-	rm -rf $T/srv_$1; mkdir -p $T/srv_$1/user/conf.d
+	mkdir -p $T/srv_$1/user/conf.d
 	cat > $T/srv_$1/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": $2, "slots": $3 },
   "server": { "server_name": "disc $1", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
@@ -27,7 +28,7 @@ J
 }
 
 client_dir() { # dir nickname
-	rm -rf $1; mkdir -p $1/user/conf.d $1/cache
+	mkdir -p $1/user/conf.d $1/cache
 	cat > $1/user/conf.d/test.json <<J
 { "identity_broker_url": "http://127.0.0.1:1", "window": { "fullscreen": false, "size": [1280, 720] }, "client": { "nickname": "$2" } }
 J
@@ -45,7 +46,7 @@ game_pid() {
 
 film() { # case connect secs - frames every 0.5 s, each named by seconds since start
 	local C=$T/c_$1 F=$T/frames_$1
-	rm -rf $F; mkdir -p $F
+	mkdir -p $F
 	Xvfb :92 -screen 0 1280x720x24 > /dev/null 2>&1 &
 	local XV=$!
 	sleep 1
@@ -105,7 +106,7 @@ for CASE in $CASES; do
 			film $CASE 127.0.0.1:$PORT 20
 			wait
 			srv_log $CASE
-			kill $(game_pid $T/c_elsewhere_twin) $SPID 2> /dev/null; rm -rf $T/c_elsewhere_twin
+			kill $(game_pid $T/c_elsewhere_twin) $SPID 2> /dev/null
 			;;
 		password)
 			server $CASE $PORT 8 '' ', "server_private": { "server_password": "sekret" }'

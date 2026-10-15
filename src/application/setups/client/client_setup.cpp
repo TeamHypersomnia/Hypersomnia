@@ -2000,6 +2000,20 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
+		else if (nickname_refused) {
+			/*
+				Never connected - the nickname can not be used (see the constructor).
+			*/
+
+			text("Failed to join %x", get_displayed_connecting_server_name());
+			text_color(last_disconnect_reason, orange);
+			text("\nChange it in Settings - Account - Info.");
+			ImGui::Separator();
+
+			if (ImGui::Button("Go back")) {
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
+		}
 		else if (!connect_called && !is_replaying()) {
 			/*
 				The frame before the game connects.
