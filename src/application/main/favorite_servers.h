@@ -206,6 +206,38 @@ public:
 		}
 	}
 
+	/*
+		One added by hand, changed in place (Edit in Server details) - the name the address if none given.
+		Changed to the address and key of another one added by hand: the two become one.
+	*/
+
+	void edit_manual(
+		const augs::ed25519_public_key_type& old_key,
+		const std::string& old_address,
+		const augs::ed25519_public_key_type& key,
+		const std::string& address,
+		const std::string& name
+	) {
+		const auto is_old = [&](const auto& s) { return s.manual && s.key == old_key && s.address == old_address; };
+		const bool same_place = old_key == key && old_address == address;
+
+		if (!same_place && contains_manual(key, address)) {
+			std::erase_if(servers, is_old);
+			add_manual(key, address, name);
+			return;
+		}
+
+		for (auto& s : servers) {
+			if (is_old(s)) {
+				s.key = key;
+				s.address = address;
+				s.name = name.empty() ? address : name;
+				save();
+				return;
+			}
+		}
+	}
+
 	void remove(const augs::ed25519_public_key_type& key, const std::string& label) {
 		std::erase_if(servers, [&](const auto& s) { return !s.manual && s.key == key && s.label == label; });
 		save();

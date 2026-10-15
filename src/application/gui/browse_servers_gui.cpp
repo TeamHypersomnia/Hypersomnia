@@ -1507,6 +1507,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		if (ImGui::Selectable("Add an unlisted server", false, ImGuiSelectableFlags_SpanAllColumns)) {
 			add_server_open = true;
+			editing_unlisted.reset();
 			add_server_name.clear();
 			add_server_address.clear();
 			add_server_key.clear();
@@ -1913,19 +1914,34 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
+	if (std::exchange(server_details.edit_requested, false)) {
+		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
+			add_server_open = true;
+			editing_unlisted = std::make_pair(*key, selected_server.favorite_address);
+			add_server_address = selected_server.favorite_address;
+			add_server_key = "0x" + augs::bytes_to_hex(*key);
+
+			const auto name = std::string(selected_server.heartbeat.server_name);
+			add_server_name = name == selected_server.favorite_address ? std::string() : name;
+		}
+	}
+
 	{
 		/*
 			Add an unlisted server to the favorites by hand: where it is and its key - both needed; the name optional
 			(the address if none). Never matched against the server list (see favorite_servers.h).
+			The same dialog edits one (Edit in its Server details).
 		*/
 
 		if (add_server_open) {
 			center_next_window(ImGuiCond_Appearing);
 		}
 
+		const auto dialog_title = editing_unlisted.has_value() ? "Edit an unlisted server###unlisted_server" : "Add an unlisted server###unlisted_server";
+
 		if (auto popup = cond_scoped_modal_popup(
 			add_server_open,
-			"Add an unlisted server",
+			dialog_title,
 			nullptr,
 			ImGuiWindowFlags_AlwaysAutoResize
 		)) {
@@ -1967,7 +1983,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 					return { "The key should be 64 hex digits.", orange };
 				}
 
-				if (key.has_value() && in.favorites.contains_manual(*key, address)) {
+				const bool the_edited_one = editing_unlisted.has_value() && key == editing_unlisted->first && address == editing_unlisted->second;
+
+				if (key.has_value() && !the_edited_one && in.favorites.contains_manual(*key, address)) {
 					return { "Among your favorites already - adding it renames it.", rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]) };
 				}
 
@@ -1980,18 +1998,34 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			const bool add_clicked = [&]() {
 				auto scope = maybe_disabled_cols(!can_add);
-				return ImGui::Button("Add server");
+				return ImGui::Button(editing_unlisted.has_value() ? "Save" : "Add server");
 			}();
 
 			if (can_add && add_clicked) {
-				in.favorites.add_manual(*key, address, connect_target::trimmed(add_server_name));
+				const auto name = connect_target::trimmed(add_server_name);
+
+				if (editing_unlisted.has_value()) {
+					in.favorites.edit_manual(editing_unlisted->first, editing_unlisted->second, *key, address, name);
+
+					/*
+						The selected row was the one before the edit.
+					*/
+
+					selected_server = server_list_entry();
+				}
+				else {
+					in.favorites.add_manual(*key, address, name);
+				}
+
 				add_server_open = false;
+				editing_unlisted.reset();
 			}
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape)) {
 				add_server_open = false;
+				editing_unlisted.reset();
 			}
 		}
 	}
@@ -2485,6 +2519,18 @@ bool server_details_gui_state::perform(
 			;
 
 			if (is_favorite) {
+				/*
+					Only a favorite added by hand is edited - the list's ones are as the list has them.
+				*/
+
+				if (manual) {
+					if (ImGui::Button("Edit")) {
+						edit_requested = true;
+					}
+
+					ImGui::SameLine();
+				}
+
 				if (ImGui::Button("Remove from favorites")) {
 					if (manual) {
 						favorites->remove_manual(*key, entry.favorite_address);

@@ -53,6 +53,12 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 
 	bool show_ips = false;
 
+	/*
+		Edit pressed for a favorite added by hand - the server browser opens its dialog.
+	*/
+
+	bool edit_requested = false;
+
 	void open() {
 		show_ips = false;
 		base::open();
@@ -165,6 +171,12 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::string add_server_name;
 	std::string add_server_address;
 	std::string add_server_key;
+
+	/*
+		The same dialog editing a favorite added by hand: its key and address before the edit.
+	*/
+
+	std::optional<std::pair<augs::ed25519_public_key_type, std::string>> editing_unlisted;
 
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;
