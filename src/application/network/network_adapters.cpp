@@ -770,6 +770,18 @@ bool client_adapter::connected_through_localhost_fallback() const {
 	return client.GetServerAddressIndex() > 0;
 }
 
+double client_adapter::secs_since_last_packet() const {
+	if (client.IsDisconnected()) {
+		return 0.0;
+	}
+
+	if (auto* const s = client.GetClientDetail()) {
+		return s->time - s->last_packet_receive_time;
+	}
+
+	return 0.0;
+}
+
 int client_adapter::get_disconnect_reason() const {
 	return client.GetDisconnectReason();
 }

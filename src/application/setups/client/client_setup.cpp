@@ -824,6 +824,7 @@ client_setup::client_setup(
 			);
 
 			set_disconnect_reason(reason);
+			nickname_refused = true;
 		}
 		else if (!is_nickname_valid_characters(get_nickname())) {
 			const auto reason = typesafe_sprintf(
@@ -832,6 +833,7 @@ client_setup::client_setup(
 			);
 
 			set_disconnect_reason(reason);
+			nickname_refused = true;
 		}
 		else {
 			if (!pending_pre_connection_handshake()) {
@@ -2082,7 +2084,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 					text_color("This server's key was not verified (joined by its address) - don't type a password you use elsewhere.", orange);
 				}
 
-				input_text("Server password", password_retry_input, flags);
+				input_text<65>("Server password", password_retry_input, flags);
 
 				const bool enter_pressed =
 					ImGui::IsItemFocused()
@@ -2425,6 +2427,14 @@ void client_setup::wait_for_demo_flush() {
 	}
 }
 
+double client_setup::secs_since_last_server_packet() const {
+	return adapter->secs_since_last_packet();
+}
+
+bool client_setup::webrtc_channel_closed() const {
+	return is_webrtc() && webrtc_client != nullptr && webrtc_client->is_ready() && webrtc_client->is_error();
+}
+
 std::string client_setup::get_steam_join_command_line() const {
 	/*
 		Where the server is and its key - a friend joins exactly this server, the masterserver not needed.
@@ -2434,6 +2444,15 @@ std::string client_setup::get_steam_join_command_line() const {
 }
 
 std::optional<augs::ed25519_public_key_type> client_setup::get_invite_server_key() const {
+	/*
+		Joined a server on this machine in the remote one's place (the localhost fallback): its key is not the remote
+		address' - no key to invite with.
+	*/
+
+	if (connected_through_localhost_fallback()) {
+		return std::nullopt;
+	}
+
 	if (const auto key = get_server_public_key()) {
 		return key;
 	}
@@ -2481,11 +2500,14 @@ std::string client_setup::get_connect_string() const {
 
 std::optional<augs::ed25519_public_key_type> client_setup::get_server_public_key() const {
 	/*
-		Kept once the handshake proved it - a kick (e.g. for a wrong password) destroys the client that knew it.
+		Kept once the handshake proved it (connected - a challenge before that may be anyone's) - a kick (e.g. for a
+		wrong password) destroys the client that knew it.
 	*/
 
-	if (const auto key = adapter->get_server_public_key()) {
-		server_public_key_seen = key;
+	if (adapter->is_connected()) {
+		if (const auto key = adapter->get_server_public_key()) {
+			server_public_key_seen = key;
+		}
 	}
 
 	return server_public_key_seen;

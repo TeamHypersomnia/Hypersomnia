@@ -149,6 +149,12 @@ class client_setup :
 	/* The rest is client-specific */
 	bool connect_called = false;
 
+	/*
+		The nickname was refused before connecting - the reason is shown, no connection is made.
+	*/
+
+	bool nickname_refused = false;
+
 	const packaged_official_content& official;
 
 	simulation_receiver receiver;
@@ -825,7 +831,7 @@ public:
 			return;
 		}
 		else {
-			if (!connect_called) {
+			if (!connect_called && !nickname_refused) {
 				connect();
 			}
 		}
@@ -891,12 +897,29 @@ public:
 				&& is_connected()
 			;
 
-			if (server_went_silent) {
-				LOG("No steps from the server for 10 seconds - disconnecting.");
+			/*
+				Before the game (the welcome, the first snapshot, a download): no steps yet, but the server's keepalives
+				come all the time.
+			*/
+
+			const bool silent_before_game =
+				state != client_state_type::IN_GAME
+				&& is_connected()
+				&& secs_since_last_server_packet() > 10.0
+			;
+
+			if (server_went_silent || silent_before_game) {
+				LOG("Nothing from the server for 10 seconds - disconnecting.");
 				set_disconnect_reason("Nothing came from the server for 10 seconds.\nThe server may be down, or your connection may have dropped.");
 				disconnect();
 			}
 #endif
+
+			if (is_connected() && webrtc_channel_closed()) {
+				LOG("The WebRTC data channel closed - disconnecting.");
+				set_disconnect_reason("The connection to the server was closed.");
+				disconnect();
+			}
 		}
 	}
 
@@ -906,6 +929,13 @@ public:
 	}
 
 	void reset_afk_timer();
+
+	/*
+		Over WebRTC: the data channel was open and closed since - the server is gone.
+	*/
+
+	bool webrtc_channel_closed() const;
+	double secs_since_last_server_packet() const;
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
 

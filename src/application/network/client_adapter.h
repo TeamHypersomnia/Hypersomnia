@@ -95,6 +95,12 @@ public:
 
 	int get_disconnect_reason() const;
 
+	/*
+		Since the last packet from the server, by netcode's clock - 0 when not connected.
+	*/
+
+	double secs_since_last_packet() const;
+
 	template <class H>
 	void advance(
 		const net_time_t client_time, 

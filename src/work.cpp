@@ -3400,6 +3400,23 @@ work_result work(
 		if (target.key.has_value()) {
 			auto next = connect_target { std::string(connect_string), target.key, std::string() };
 
+			/*
+				Never an address in this player's network (a server found on the LAN is short-lived there): its public
+				one from the list, else the key alone (with its instance label).
+			*/
+
+			{
+				auto ip = std::string(connect_string);
+				cut_preffix(ip, "rtc:");
+
+				const bool this_machine = begins_with(ip, "127.") || begins_with(ip, "[::1]") || begins_with(ip, "localhost");
+
+				if (const auto parsed = ::find_netcode_addr(ip); parsed.has_value() && ::is_internal(*parsed) && !this_machine) {
+					next.address = found != nullptr ? found->get_invite_address() : std::string();
+					next.label = found != nullptr ? found->get_instance_label() : target.label;
+				}
+			}
+
 #if !PLATFORM_WEB
 			if (found != nullptr && !found->get_domain_with_port().empty()) {
 				next.address = found->get_domain_with_port();

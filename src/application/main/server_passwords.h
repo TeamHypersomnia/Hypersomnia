@@ -70,6 +70,14 @@ public:
 	}
 
 	void set(const augs::ed25519_public_key_type& server_key, const std::string& password) {
+		/*
+			Longer than a handshake carries (64 bytes): never saved - it would block the server for good.
+		*/
+
+		if (password.size() > 64) {
+			return;
+		}
+
 		if (password.find('\n') != std::string::npos) {
 			return;
 		}

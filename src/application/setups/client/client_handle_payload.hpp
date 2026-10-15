@@ -211,7 +211,7 @@ message_handler_result client_setup::handle_payload(
 				std::string reason_str;
 
 				if (msg.size() > 0) {
-					reason_str = "\n\n" + reason_str;
+					reason_str = "\n\n" + msg;
 				}
 
 				set_disconnect_reason(typesafe_sprintf(

@@ -95,6 +95,9 @@ struct cmd_line_params {
 	}
 
 	void parse(const int argc, const char* const * const argv, const int start_i) {
+		const auto default_type = type;
+		bool started_by_invite = false;
+
 		for (int i = start_i; i < argc; ++i) {
 			const auto a = std::string(argv[i]);
 
@@ -303,7 +306,37 @@ struct cmd_line_params {
 				*/
 
 				set_connect(a);
+				started_by_invite = true;
 			}
+		}
+
+		/*
+			Started by a Steam invite: the "connect" is the friend's text - if Steam splits it at spaces, the rest would
+			come as flags. None that changes where the game reads or writes, what it trusts, or what it runs is taken then.
+		*/
+
+		if (started_by_invite) {
+			const bool dropped =
+				type != default_type
+				|| !apply_config.empty()
+				|| !tournament.empty()
+				|| !live_log_path.empty()
+				|| !appdata_dir.empty()
+				|| calling_cwd.has_value()
+				|| as_service
+			;
+
+			if (dropped) {
+				LOG("Started by an invite: ignoring the flags that change the paths, the config or the mode.");
+			}
+
+			type = default_type;
+			apply_config.clear();
+			tournament.clear();
+			live_log_path.clear();
+			appdata_dir.clear();
+			calling_cwd.reset();
+			as_service = false;
 		}
 	}
 

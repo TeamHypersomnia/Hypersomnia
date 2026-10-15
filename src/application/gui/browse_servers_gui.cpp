@@ -312,7 +312,11 @@ std::optional<std::pair<std::string, server_list_entry>> browse_servers_gui_stat
 			ImGui::SetKeyboardFocusHere();
 		}
 
-		input_text("Password##server_password_prompt", password_prompt_input, flags);
+		/*
+			At most what a handshake carries - a longer one would never get in.
+		*/
+
+		input_text<65>("Password##server_password_prompt", password_prompt_input, flags);
 
 		const bool enter_pressed =
 			ImGui::IsItemFocused()

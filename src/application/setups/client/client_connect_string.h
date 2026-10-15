@@ -22,12 +22,16 @@ inline std::string find_webrtc_id(client_connect_string s) {
 	return s;
 #endif
 
-	if (::is_official_webrtc_id(s)) {
-		return s;
+	/*
+		An address first: localhost:port and [ipv6]:port also have a ':' and no '.', like an official server's alias.
+	*/
+
+	if (begins_with(s, "localhost") || s.find('[') != std::string::npos) {
+		return "";
 	}
 
-	if (begins_with(s, "localhost")) {
-		return "";
+	if (::is_official_webrtc_id(s)) {
+		return s;
 	}
 
 	if (s.find_first_of(".:[]") != std::string::npos) {

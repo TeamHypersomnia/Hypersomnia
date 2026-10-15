@@ -108,8 +108,12 @@ bool start_client_gui_state::perform(
 	const auto favorite = typed_key.has_value() ? favorites.find(*typed_key, typed.label) : nullptr;
 
 	const auto favorite_address = [&]() -> std::string {
+		/*
+			Its public address - never one in this player's network.
+		*/
+
 		if (listed != nullptr) {
-			return listed->get_my_connect_string();
+			return listed->get_invite_address();
 		}
 
 		if (favorite != nullptr) {

@@ -22,6 +22,9 @@ namespace httplib_utils {
 #if BUILD_OPENSSL
 		auto http_client_ptr = std::make_unique<http_client_type>(scheme_host_port.c_str());
 #else
+#if IS_PRODUCTION_BUILD
+#error "A production build needs BUILD_OPENSSL - without it https silently becomes http (the server list, certs, tickets)."
+#endif
 		auto addr =  scheme_host_port;
 
 		if (begins_with(addr, "https")) {
