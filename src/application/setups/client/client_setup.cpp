@@ -1707,6 +1707,7 @@ void client_setup::do_rcon_gui(const bool force) {
 	};
 
 	auto& rcon_gui = client_gui.rcon;
+	rcon_gui.instance_label = get_server_instance_label();
 
 	if (!is_replaying()) {
 		if (is_connected()) {

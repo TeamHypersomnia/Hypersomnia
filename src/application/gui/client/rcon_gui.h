@@ -13,6 +13,12 @@ struct rcon_gui_state {
 	server_vars edited_sv_vars;
 
 	server_runtime_info runtime_info;
+
+	/*
+		The instance connected to (c1, r1...) - its vars are those of every instance of its kind.
+	*/
+
+	std::string instance_label;
 	custom_game_commands_string_type custom_commands_text;
 	bool request_execute_custom_game_commands = false;
 

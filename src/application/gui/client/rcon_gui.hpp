@@ -157,6 +157,34 @@ void perform_rcon_gui(
 					break;
 				}
 
+				/*
+					Several instances of a host: only the first of each kind saves its changes - for all of that kind,
+					from the next restart of the server.
+				*/
+
+				if (!state.instance_label.empty() && state.instance_label[0] == 't') {
+					text_disabled("A tournament match - the changes last until it ends.");
+				}
+				else if (!state.instance_label.empty()) {
+					const bool first_of_kind = state.instance_label == "c1" || state.instance_label == "r1";
+					const bool ranked = state.instance_label[0] == 'r';
+
+					if (first_of_kind) {
+						text_disabled(typesafe_sprintf(
+							"Saved for all %x instances of this server - the others take them after a restart.",
+							ranked ? "ranked" : "casual"
+						));
+					}
+					else {
+						text_disabled(typesafe_sprintf(
+							"Only for this instance (%x) until a restart. To change all %x instances, edit them on %x.",
+							state.instance_label,
+							ranked ? "ranked" : "casual",
+							ranked ? "r1" : "c1"
+						));
+					}
+				}
+
 				[[fallthrough]];
 
 			case rcon_pane::ARENAS:
