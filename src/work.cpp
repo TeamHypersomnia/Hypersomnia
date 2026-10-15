@@ -817,10 +817,17 @@ work_result work(
 		}
 
 		/*
-			One key for all the instances of this host.
+			One key for all the instances of this host - never one for this run only (a key that could not be saved).
 		*/
 
-		std::cout << server_key::public_key_hex(server_key::obtain(path)) << std::endl;
+		const auto seed = identity_key::load_or_create(path);
+
+		if (!seed.has_value()) {
+			std::cerr << "ERROR: could not read or create " << path.string() << "." << std::endl;
+			return work_result::FAILURE;
+		}
+
+		std::cout << server_key::public_key_hex(*seed) << std::endl;
 		return work_result::SUCCESS;
 	}
 
@@ -1532,11 +1539,17 @@ work_result work(
 		};
 
 		/*
-			Every instance's key comes from server.key - a damaged one starts nothing (tournament matches neither).
+			All the instances' key is server.key - a damaged one starts nothing (tournament matches neither), and neither
+			does one that can not be saved (a key for this run only would not be this server).
 		*/
 
 		if (server_key::damaged(KEYS_DIR / server_key::file_name)) {
 			LOG("ERROR: %x is there but can not be read - not starting. Restore it, or move it away to make a new key.", KEYS_DIR / server_key::file_name);
+			return work_result::FAILURE;
+		}
+
+		if (!identity_key::load_or_create(KEYS_DIR / server_key::file_name).has_value()) {
+			LOG("ERROR: could not create %x - not starting. Make %x writable.", KEYS_DIR / server_key::file_name, KEYS_DIR);
 			return work_result::FAILURE;
 		}
 
@@ -2504,6 +2517,12 @@ work_result work(
 	WEBSTATIC double ranked_record_written_at = -1000.0;
 	WEBSTATIC double outside_ranked_match_since = -1.0;
 
+	/*
+		Abandoned: no record is written until the connection ends, and then it goes - nothing to come back to.
+	*/
+
+	WEBSTATIC bool ranked_match_abandoned = false;
+
 	WEBSTATIC auto maintain_ranked_match_record = [&]() {
 #if BUILD_NETWORKING
 		const auto now = augs::steady_secs();
@@ -2521,6 +2540,26 @@ work_result work(
 		[&](client_setup& client) {
 			if (!client.is_connected() || client.is_replaying()) {
 				outside_ranked_match_since = -1.0;
+
+				if (std::exchange(ranked_match_abandoned, false)) {
+					augs::remove_file(RANKED_MATCH_PATH);
+				}
+
+				/*
+					The server refused the rejoin for good (the match ended, or it was another account's) - not tried at
+					every start until the record runs out.
+				*/
+
+				const auto& reason = client.get_last_disconnect_reason();
+				const bool rejoin_refused = reason.find("Joined too late") != std::string::npos || reason.find("wrong match") != std::string::npos;
+
+				if (rejoin_refused && augs::exists(RANKED_MATCH_PATH)) {
+					if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH); record.has_value() && record->connect == client.get_connect_string()) {
+						LOG("The rejoin to %x was refused - forgetting it.", record->connect);
+						augs::remove_file(RANKED_MATCH_PATH);
+					}
+				}
+
 				return;
 			}
 
@@ -2546,7 +2585,7 @@ work_result work(
 				}
 			}
 
-			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value()) {
+			if (const auto budget = client.ranked_rejoin_budget(); budget.has_value() && server_key.has_value() && !ranked_match_abandoned) {
 				outside_ranked_match_since = -1.0;
 
 				if (now - ranked_record_written_at > 10.0) {
@@ -6293,6 +6332,7 @@ work_result work(
 								*/
 
 								augs::remove_file(RANKED_MATCH_PATH);
+								ranked_match_abandoned = true;
 
 								abandon_pending_op = std::nullopt;
 							}

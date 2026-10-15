@@ -1084,6 +1084,10 @@ public:
 		return std::string(sv_public_vars.instance_label);
 	}
 
+	const std::string& get_last_disconnect_reason() const {
+		return last_disconnect_reason;
+	}
+
 	std::string get_scoreboard_caption() const;
 	void do_rcon_gui(bool force = false);
 

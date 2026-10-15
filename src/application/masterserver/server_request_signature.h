@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <sodium.h>
 
 /*
 	Every request a server sends the masterserver (a heartbeat or a goodbye) is signed with its key (server.key).
@@ -26,13 +27,21 @@ using heartbeat_nonce_type = std::array<uint8_t, 8>;
 
 inline masterserver_cookie_type web_session_cookie(const std::string& webrtc_id) {
 	auto out = masterserver_cookie_type();
-	out.fill(0);
+
+	/*
+		A hash of the whole id - two ids with the same beginning never share it.
+	*/
 
 	const auto tag = std::string("hs-ws:") + webrtc_id;
 
-	for (std::size_t i = 0; i < out.size() && i < tag.size(); ++i) {
-		out[i] = static_cast<uint8_t>(tag[i]);
-	}
+	crypto_generichash(
+		out.data(),
+		out.size(),
+		reinterpret_cast<const unsigned char*>(tag.data()),
+		tag.size(),
+		nullptr,
+		0
+	);
 
 	return out;
 }

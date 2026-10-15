@@ -330,6 +330,23 @@ std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, 
 }
 
 // Function to get the IANA time zone name based on locationId
+/*
+	An official server's id is its time zone's key, or that key with "-<anything>" for one of several hosts there
+	("de-2", "us-central-2") - the same rule as the site's.
+*/
+
+static std::string zone_key_of(const std::string& locationId) {
+	for (const auto key : { "au", "ru", "de", "us-central", "pl", "ch", "nl" }) {
+		const auto k = std::string(key);
+
+		if (locationId == k || locationId.rfind(k + "-", 0) == 0) {
+			return k;
+		}
+	}
+
+	return "";
+}
+
 std::string getTimeZoneName(const std::string& locationId) {
     if (locationId == "au") {
         return "Australia/Sydney";
@@ -355,7 +372,9 @@ std::string getTimeZoneName(const std::string& locationId) {
 #undef max
 // MSVC supports C++20 chrono 
 
-double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
+double augs::date_time::get_secs_until_next_weekend_evening(const std::string& given_location_id) {
+	const auto locationId = ::zone_key_of(given_location_id);
+
 	using namespace std::chrono;
     using clock = system_clock;
     using namespace std::chrono_literals;
@@ -401,7 +420,9 @@ double augs::date_time::get_secs_until_next_weekend_evening(const std::string& l
 double web_get_secs_until_next_weekend_evening(const char*);
 #endif
 
-double augs::date_time::get_secs_until_next_weekend_evening(const std::string& locationId) {
+double augs::date_time::get_secs_until_next_weekend_evening(const std::string& given_location_id) {
+	const auto locationId = ::zone_key_of(given_location_id);
+
 #if PLATFORM_WEB
 	return web_get_secs_until_next_weekend_evening(locationId.c_str());
 #endif

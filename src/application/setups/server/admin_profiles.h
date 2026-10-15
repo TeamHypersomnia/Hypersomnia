@@ -50,7 +50,11 @@ inline std::optional<admin_profile> find_admin_profile(const admin_profiles_type
 	}
 
 	for (const auto& entry : profiles) {
-		if (::normalize_account_id(entry.account) != account_id) {
+		/*
+			A profile with a mistyped rcon level gives nothing - not even its badge, which would look like a working one.
+		*/
+
+		if (!::is_valid_admin_profile(entry) || ::normalize_account_id(entry.account) != account_id) {
 			continue;
 		}
 

@@ -316,7 +316,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data, const bool is_web) {
 		const auto ip_str = ::ToString(from);
 
-		if (is_banned_notifications(from)) {
+		if (is_banned_notifications(from) || is_banned_notifications_name(data.server_name)) {
 			return;
 		}
 
@@ -330,10 +330,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 
 			new_server_notifications.push_back(now);
-		}
-
-		if (is_banned_notifications_name(data.server_name)) {
-			return;
 		}
 
 		const auto passed = since_launch.get<std::chrono::seconds>();
@@ -980,6 +976,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 									LOG("Ignoring a badly signed heartbeat from %x.", ip_str);
 								}
 
+								/*
+									Not accepted - the server says so in its log.
+								*/
+
+								send_back(ack);
 								return;
 							}
 

@@ -1061,7 +1061,7 @@ server_setup::server_setup(
 	LOG("Server key: %x (%x)", server_key::public_key_hex(this_server_key), KEYS_DIR / server_key::file_name);
 
 	if (private_initial_vars.admin_profiles.empty()) {
-		LOG("No admin_profiles: only the localhost can access rcon.");
+		LOG("No admin_profiles: nobody connected can use RCON (a host from the game always can).");
 	}
 
 	if (dedicated == std::nullopt) {
@@ -2153,6 +2153,15 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		return;
 	}
 
+	/*
+		Players told apart by nicknames only (e.g. a LAN tournament): nobody vouched for those accounts.
+	*/
+
+	if (vars.authenticate_with_nicknames) {
+		LOG("push_report_match_webhook: nickname authentication, not reporting.");
+		return;
+	}
+
 	auto get_clan_of = [this](const mode_player_id id) -> std::string {
 		if (auto c = find_client_state(id)) {
 			return c->settings.public_settings.clan;
@@ -2513,6 +2522,15 @@ bool server_setup::handle_masterserver_response(
 				if (!resent_heartbeat_for_cookie) {
 					resent_heartbeat_for_cookie = true;
 					when_last_sent_heartbeat_to_server_list = 0;
+				}
+				else if (server_time - when_logged_heartbeat_refused > 60.0) {
+					/*
+						Refused even with a fresh cookie: the list is full, or the masterserver could not verify the
+						signature - this server is not on the list.
+					*/
+
+					when_logged_heartbeat_refused = server_time;
+					LOG("WARNING: the masterserver does not list this server (its list is full, or it refused the heartbeat's signature).");
 				}
 			}
 			else {
@@ -5512,19 +5530,7 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 		return rcon_level_type::DENIED;
 	}();
 
-	if (profile_level == rcon_level_type::MASTER) {
-		LOG("Authorized the admin profile %x for master rcon.", c.cert_account);
-		return rcon_level_type::MASTER;
-	}
-
-	if (profile_level == rcon_level_type::BASIC) {
-		LOG("Authorized the admin profile %x for basic rcon.", c.cert_account);
-		return rcon_level_type::BASIC;
-	}
-
-	LOG("RCON disabled for this client.");
-
-	return rcon_level_type::DENIED;
+	return profile_level;
 }
 
 static constexpr uint32_t max_wrong_passwords_per_minute_v = 5;
@@ -6013,7 +6019,16 @@ void server_setup::ban(const client_id_type& id, const std::string& reason, cons
 		entry.ip = get_client_ip_for_bans(id);
 	}
 
-	save_ban(entry);
+	/*
+		Nothing to tell this player by (e.g. a WebRTC player with no known address, not signed in): only kicked.
+	*/
+
+	if (entry.account.empty() && entry.ip.empty()) {
+		LOG("Not saving a ban of %x - no account and no address to recognize them by.", entry.nickname);
+	}
+	else {
+		save_ban(entry);
+	}
 
 	LOG("Banned %x (account: %x, ip: %x) %x. Reason: %x", entry.nickname, entry.account, entry.ip, minutes == 0 ? std::string("for good") : typesafe_sprintf("for %x minutes", minutes), reason);
 

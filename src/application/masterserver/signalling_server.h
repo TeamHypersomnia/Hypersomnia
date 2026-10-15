@@ -476,9 +476,16 @@ private:
 					dest_id = *target;
 				}
 
+				/*
+					Only the masterserver says what the source's alias is - never one the sender put in.
+				*/
+
 				if (const auto target = key_or_default(webrtc_id_aliases, source_id); target != "") {
 					LOG("Source '%x' aliased to '%x'", source_id, target);
 					message["alias"] = target;
+				}
+				else {
+					message.erase("alias");
 				}
 			}
 

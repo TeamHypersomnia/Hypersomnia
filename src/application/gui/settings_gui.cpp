@@ -2158,7 +2158,7 @@ void settings_gui_state::perform(
 						text_disabled("If set, clients must provide this password to connect to the server.\nLeave empty to allow anyone to join.");
 					}
 
-					text_disabled("Rcon is given by admin_profiles in the server config: account ids (steam_..., key_...) with their level.\nSee README_SERVER.md.");
+					text_disabled("Hosting from the game, only you have RCON.\nA dedicated server gives it by admin_profiles in its config: account ids (steam_..., key_...)\nwith their level - see README_SERVER.md.");
 
 					break;
 				}

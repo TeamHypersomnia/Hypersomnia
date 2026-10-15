@@ -47,5 +47,9 @@ inline std::string normalize_account_id(const std::string& written) {
 		return "key_" + lowercase(id);
 	}
 
+	if (id.size() == 68 && id.rfind("key_", 0) == 0 && is_hex_key(id.substr(4))) {
+		return "key_" + lowercase(id.substr(4));
+	}
+
 	return id;
 }
