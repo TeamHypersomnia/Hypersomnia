@@ -931,6 +931,15 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::webrtc_signalling_payload>) {
+						/*
+							Only from a server on the list - a spoofed source could otherwise make offers in a listed
+							server's name.
+						*/
+
+						if (!found_in(server_list, from)) {
+							return;
+						}
+
 						signalling.relay_message_from_native(
 							typed_request,
 							::ToString(from)

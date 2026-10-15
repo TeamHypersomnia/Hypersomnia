@@ -326,15 +326,32 @@ private:
 				if (!std::holds_alternative<std::string>(data))
 					return;
 
-				auto json_message = nlohmann::json::parse(std::get<std::string>(data));
+				/*
+					Anything a peer relays can be anything - never a reason to crash.
+				*/
+
+				auto json_message = nlohmann::json::parse(std::get<std::string>(data), nullptr, false);
+
+				if (json_message.is_discarded() || !json_message.is_object()) {
+					return;
+				}
 
 				const auto your_id_key = "your_id";
 
-				if (json_message.contains(your_id_key) && json_message[your_id_key].is_string()) {
+				/*
+					The id only from the masterserver itself - a relayed message always has the sender's "id".
+				*/
+
+				if (!json_message.contains("id") && json_message.contains(your_id_key) && json_message[your_id_key].is_string()) {
 					self->set_this_server_id(std::string(json_message[your_id_key]));
 				}
 				else {
-					handle_message(self, json_message);
+					try {
+						handle_message(self, json_message);
+					}
+					catch (const std::exception& e) {
+						LOG("Ignoring a malformed signalling message: %x", e.what());
+					}
 				}
 			}
         });
@@ -3065,6 +3082,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		if (webrtc_server && webrtc_server->is_ready()) {
 			LOG("Sending heartbeat through websocket to signalling server. Bytes: %x", heartbeat_bytes);
 			webrtc_server->send_ws(heartbeat_buffer);
+			sent_any_heartbeat = true;
 		}
 		else {
 			LOG("Can't send heartbeat, websocket connection to signalling server is not ready.");
@@ -3112,7 +3130,11 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 	auto& when_last = when_last_sent_heartbeat_to_server_list;
 
 	const auto since_last = server_time - when_last;
-	const auto send_every = std::clamp(vars.send_heartbeat_to_server_list_once_every_secs, 1u, 60u);
+	/*
+		Under the masterserver's cookie lifetime (30 s) - a later heartbeat would need a new cookie every time.
+	*/
+
+	const auto send_every = std::clamp(vars.send_heartbeat_to_server_list_once_every_secs, 1u, 25u);
 
 	const bool send_for_the_first_time = !has_sent_any_heartbeats();
 
@@ -5577,10 +5599,21 @@ static constexpr std::size_t max_wrong_password_addresses_v = 4096;
 
 /*
 	Wrong passwords per address (an IPv6 /64, see address_for_bans) - only slowing down guessing, not sealing it:
-	peers without an address are not counted, and a full table takes no new addresses until its records go stale.
+	peers without an address count together, and a full table takes no new addresses until its records go stale.
 */
 
-bool server_setup::too_many_wrong_passwords(const std::string& address) const {
+/*
+	Peers with no address (relayed through TURN, or the browser's WebRTC) share one record - guessing through a relay is
+	slowed down for all of them together, never left unlimited.
+*/
+
+static std::string wrong_passwords_key(const std::string& address) {
+	return address.empty() ? std::string("(no address)") : address;
+}
+
+bool server_setup::too_many_wrong_passwords(const std::string& given_address) const {
+	const auto address = ::wrong_passwords_key(given_address);
+
 	if (const auto record = mapped_or_nullptr(wrong_passwords, address)) {
 		return server_time - record->since < 60.0 && record->count >= max_wrong_passwords_per_minute_v;
 	}
@@ -5588,10 +5621,8 @@ bool server_setup::too_many_wrong_passwords(const std::string& address) const {
 	return false;
 }
 
-void server_setup::note_wrong_password(const std::string& address) {
-	if (address.empty()) {
-		return;
-	}
+void server_setup::note_wrong_password(const std::string& given_address) {
+	const auto address = ::wrong_passwords_key(given_address);
 
 	if (wrong_passwords.size() >= max_wrong_password_addresses_v && !found_in(wrong_passwords, address)) {
 		erase_if(wrong_passwords, [&](const auto& entry) { return server_time - entry.second.since >= 60.0; });

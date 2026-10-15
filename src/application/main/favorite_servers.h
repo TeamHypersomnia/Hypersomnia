@@ -19,6 +19,16 @@
 	the player gave the name (Add a server): that one is kept, never brought up to date from the list or the server.
 */
 
+/*
+	On CrazyGames the game's files do not outlive the tab (no IndexedDB there) - no favorites are shown, none would stay.
+*/
+
+#if WEB_CRAZYGAMES
+inline constexpr bool favorites_kept = false;
+#else
+inline constexpr bool favorites_kept = true;
+#endif
+
 struct favorite_server {
 	augs::ed25519_public_key_type key = {};
 	std::string label;

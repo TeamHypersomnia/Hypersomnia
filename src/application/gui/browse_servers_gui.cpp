@@ -812,7 +812,7 @@ void browse_servers_gui_state::show_server_list(
 		const bool is_favorite = key.has_value() && in.favorites.contains(*key, s.get_instance_label());
 		bool star_hovered = false;
 
-		if (key.has_value()) {
+		if (key.has_value() && favorites_kept) {
 			const auto star_size = ImGui::GetTextLineHeight();
 			const auto star_pos = ImGui::GetCursorScreenPos();
 			const auto star_max = ImVec2(star_pos.x + star_size, star_pos.y + star_size);
@@ -1197,7 +1197,40 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	{
 		const auto previous_tab = current_tab;
 
+#if WEB_CRAZYGAMES
+		/*
+			No Favorites tab - see favorites_kept.
+		*/
+
+		{
+			static const char* labels[] = { "Local", "Official", "Community", "All" };
+			static const browser_tab tabs[] = { browser_tab::LOCAL, browser_tab::OFFICIAL, browser_tab::COMMUNITY, browser_tab::ALL };
+
+			if (current_tab == browser_tab::FAVORITES) {
+				current_tab = browser_tab::OFFICIAL;
+			}
+
+			int index = 0;
+
+			for (int i = 0; i < 4; ++i) {
+				if (tabs[i] == current_tab) {
+					index = i;
+				}
+			}
+
+			{
+				auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
+				ImGui::TabLabels(labels, 4, index, nullptr);
+			}
+
+			current_tab = tabs[index];
+
+			auto sep = scoped_style_color(ImGuiCol_Separator, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+			ImGui::Separator();
+		}
+#else
 		do_pretty_tabs(current_tab);
+#endif
 
 		if (current_tab != previous_tab) {
 			local_tab_precedence_pending = false;
@@ -2079,7 +2112,7 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 
 	text(in.server_name.empty() ? std::string("This server") : in.server_name);
 
-	if (in.server_key.has_value()) {
+	if (in.server_key.has_value() && favorites_kept) {
 		ImGui::SameLine();
 
 		if (in.favorites.contains(*in.server_key, in.server_label)) {
@@ -2129,7 +2162,7 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 
 	const bool hide = in.streamer_mode;
 
-	row("Browser join link", ::get_browser_join_link(target.web_id), hide);
+	row("Browser join link", ::get_browser_join_link(connect_target { target.web_id, target.key, std::string() }.to_string()), hide);
 	row("Steam join link", ::get_steam_join_link(target.join_string()), hide);
 	row("Address", target.native_address, hide);
 
@@ -2394,7 +2427,7 @@ bool server_details_gui_state::perform(
 		ImGui::SameLine();
 	}
 
-	if (favorites != nullptr) {
+	if (favorites != nullptr && favorites_kept) {
 		if (const auto key = entry.get_public_key()) {
 			if (favorites->contains(*key, entry.get_instance_label())) {
 				if (ImGui::Button("Remove from favorites")) {
@@ -2440,7 +2473,7 @@ bool server_details_gui_state::perform(
 	};
 
 	auto do_browser_join_link = [&](bool acquire) {
-		auto link = ::get_browser_join_link(entry.get_web_connect_string());
+		auto link = ::get_browser_join_link(connect_target { entry.get_web_connect_string(), entry.get_public_key(), std::string() }.to_string());
 
 		if (acquire) {
 			acquire_keyboard_once();

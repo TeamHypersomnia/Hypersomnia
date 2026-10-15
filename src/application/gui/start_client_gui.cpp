@@ -286,23 +286,25 @@ bool start_client_gui_state::perform(
 
 			const auto favorite_label = listed != nullptr ? listed->get_instance_label() : custom_target.label;
 
-			if (custom_target.key.has_value() && favorites.contains(*custom_target.key, favorite_label)) {
-				text_color("Already in favorites", green);
-			}
-			else {
-				const bool can_add = !favorite_address.empty() && custom_target.key.has_value();
-
-				{
-					auto scope = maybe_disabled_cols({}, !can_add);
-
-					if (ImGui::Button("Add to favorites") && can_add) {
-						const auto name = listed != nullptr ? std::string(listed->heartbeat.server_name) : std::string();
-						favorites.set(*custom_target.key, favorite_label, favorite_address, name);
-					}
+			if (favorites_kept) {
+				if (custom_target.key.has_value() && favorites.contains(*custom_target.key, favorite_label)) {
+					text_color("Already in favorites", green);
 				}
+				else {
+					const bool can_add = !favorite_address.empty() && custom_target.key.has_value();
 
-				ImGui::SameLine();
-				text_disabled("To quickly connect in the future");
+					{
+						auto scope = maybe_disabled_cols({}, !can_add);
+
+						if (ImGui::Button("Add to favorites") && can_add) {
+							const auto name = listed != nullptr ? std::string(listed->heartbeat.server_name) : std::string();
+							favorites.set(*custom_target.key, favorite_label, favorite_address, name);
+						}
+					}
+
+					ImGui::SameLine();
+					text_disabled("To quickly connect in the future");
+				}
 			}
 		}
 		else if (current_tab == start_client_tab_type::BEST_SERVER) {

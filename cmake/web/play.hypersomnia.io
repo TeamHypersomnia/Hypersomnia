@@ -8,8 +8,9 @@ server {
         # Try to serve file directly, then directories, then fall back to Hypersomnia.html
         try_files $uri $uri/ /Hypersomnia.html;
 
-        # Allow embedding in iframes from any origin
-		add_header Content-Security-Policy "frame-ancestors *" always;
+        # Embedded only by our own pages and the portals we are on - an iframe anywhere else would join the attacker's
+        # server with the player's key and account (and could trick a click on the key export)
+		add_header Content-Security-Policy "frame-ancestors 'self' https://hypersomnia.io https://*.hypersomnia.io https://*.crazygames.com https://*.itch.io https://*.itch.zone" always;
 
         # Add Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers
 		add_header Cross-Origin-Resource-Policy "cross-origin" always;

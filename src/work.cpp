@@ -6609,7 +6609,7 @@ work_result work(
 					visit_current_setup([&]<typename S>(const S& setup) {
 						if constexpr(std::is_same_v<client_setup, remove_cref<S>>) {
 							const auto key = setup.get_server_public_key();
-							return key.has_value() && favorites.contains(*key, setup.get_server_instance_label());
+							return favorites_kept && key.has_value() && favorites.contains(*key, setup.get_server_instance_label());
 						}
 						else {
 							return false;

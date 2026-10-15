@@ -196,20 +196,42 @@ struct webrtc_client_detail {
 
 				LOG("Sender id: '%x' (alias: '%x') (expected: '%x')", sender_id, alias, self->dest_server_id);
 
+				/*
+					What the server sent may be anything - a field of another type is ignored, never a crash (on the web
+					an exception here would end the tab).
+				*/
+
+				auto has_string = [](const nlohmann::json& j, const char* key) {
+					return j.is_object() && j.contains(key) && j[key].is_string();
+				};
+
 				if (self->dest_server_id == sender_id || self->dest_server_id == alias) {
 					if (message["type"] == "answer") {
-						main_thread_queue::execute([&]() {		
-							pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
-							self->has_description = true;
+						if (!has_string(message, "description")) {
+							return;
+						}
 
-							for (auto& candidate : self->pending_candidates) {
-								pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+						main_thread_queue::execute([&]() {		
+							try {
+								pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "answer"));
+								self->has_description = true;
+
+								for (auto& candidate : self->pending_candidates) {
+									pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+								}
+							}
+							catch (const std::exception& e) {
+								LOG("Ignoring a malformed answer: %x", e.what());
 							}
 
 							self->pending_candidates.clear();
 						});
 					}
 					else if (message["type"] == "candidate") {
+						if (!has_string(message, "candidate") || !has_string(message, "mid")) {
+							return;
+						}
+
 						if (!self->has_description) {
 							LOG("Candidate arrived too early. Saving.");
 							self->pending_candidates.push_back(message);
@@ -217,7 +239,12 @@ struct webrtc_client_detail {
 						}
 
 						main_thread_queue::execute([&]() {		
-							pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+							try {
+								pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+							}
+							catch (const std::exception& e) {
+								LOG("Ignoring a malformed candidate: %x", e.what());
+							}
 						});
 					}
 				}
@@ -848,7 +875,11 @@ std::string client_setup::get_browser_location() const {
 		return "";
 	}
 
-	return typesafe_sprintf("game/%x", connect_string);
+	/*
+		With the server's key: a reload (or the link shared from the address bar) joins verified.
+	*/
+
+	return typesafe_sprintf("game/%x", connect_target { connect_string, get_invite_server_key(), std::string() }.to_string());
 }
 
 void client_setup::connect() {

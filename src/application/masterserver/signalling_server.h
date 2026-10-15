@@ -236,11 +236,24 @@ private:
 											return;
 										}
 
+										/*
+											The list is written anew only when what it shows changed - not for every heartbeat.
+										*/
+
+										auto without_signature = [](server_heartbeat h) {
+											h.signature.reset();
+											return h;
+										};
+
+										const bool changed = !(without_signature(peer->last_heartbeat) == without_signature(hb));
+
 										peer->last_heartbeat = hb;
 										peer->time_last_heartbeat = unix_time;
 										peer->time_last_correct_message = augs::high_precision_secs();
 
-										dirty = true;
+										if (changed) {
+											dirty = true;
+										}
 									}
 									else {
 										LOG("Wrong peer id: %x", webrtc_id);
@@ -465,6 +478,16 @@ private:
 	}
 
 	void relay_message(peer_map& peers, nlohmann::json message, webrtc_id_type source_id) {
+		/*
+			Only the masterserver tells a peer its id.
+		*/
+
+		if (!message.is_object()) {
+			return;
+		}
+
+		message.erase("your_id");
+
 		if (message.contains("id") && message["id"].is_string()) {
 			std::string dest_id = message["id"];
 
@@ -545,7 +568,11 @@ private:
 		}
 
 		config.bindAddress = bind_address; 
-		config.maxMessageSize = 1000;
+		/*
+			As much as a native server's heartbeat may take (a full server's players).
+		*/
+
+		config.maxMessageSize = 4096;
 
 		return config;
 	}
@@ -572,6 +599,14 @@ private:
 			auto& recvd_messages = target->recvd_messages;
 
 			if (!found_in(recvd_messages, guid)) {
+				/*
+					The resends of one message come within seconds - an old guid is no longer needed.
+				*/
+
+				if (recvd_messages.size() >= 4096) {
+					recvd_messages.clear();
+				}
+
 				recvd_messages.emplace(guid);
 
 				return true;
