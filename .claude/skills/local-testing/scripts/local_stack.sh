@@ -48,9 +48,9 @@ server_conf() {
 mkconf $1 <<EOF
 {
   "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
-  "server_start": { "ip": "0.0.0.0", "port": $2, "slots": 16 },
+  "instances": { "ranked": $([ "$4" = NEVER ] && echo 0 || echo 1) }, "server_start": { "ip": "0.0.0.0", "port": $2, "slots": 16 },
   "server": { "server_name": "$3", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
-              "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$4" },
+              "suppress_new_community_server_webhook": true, "ranked": { "start_when": "${4/NEVER/ALWAYS}" },
               "webrtc_port_range_begin": $5, "webrtc_port_range_end": $(($5 + 50)) },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" }
 }

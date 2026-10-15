@@ -162,7 +162,7 @@ A good start would be:
     ]
   },
 
-  "num_casual_servers": 1, // explained later
+  "instances": { "casual": 1 } // explained later
 }
 ```
 
@@ -178,7 +178,7 @@ If your server has a domain pointing to it, set `domain` in the `server` section
 
 ### The server key
 
-Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). One key per host: all the instances it runs (``num_casual_servers``, ``num_ranked_servers``, tournament matches) share it and differ by their labels - ``c1``, ``c2``, ``r1``, ``t1`` - shown on the server list. Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Players can join a given instance with ``c2-<key>``, or any of them with the key alone. Print the public key with:
+Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). One key per host: all the instances it runs (``instances``, tournament matches) share it and differ by their labels - ``c1``, ``c2``, ``r1``, ``t1`` - shown on the server list. Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Players can join a given instance with ``c2-<key>``, or any of them with the key alone. Print the public key with:
 
 ```sh
 ./Hypersomnia-Headless.AppImage --print-server-key
@@ -231,13 +231,28 @@ With these settings, you will only need to expose UDP ports ``8412`` and ``9000`
 
 ## Many server instances
 
-By default there will be only one server instance and it will exactly match your ``conf.d/`` files.
+By default there will be only one casual server instance and it will exactly match your ``conf.d/`` files.
 
-However, you can easily manage multiple server instances by adding:
+However, you can easily manage multiple server instances - casual and ranked - by adding:
 
 ```json
-"num_ranked_servers": 4,
-"num_casual_servers": 1
+"instances": {
+  "casual": 1,
+  "ranked": 4
+}
+```
+
+Only a ranked instance plays ranked matches - ``server.ranked.start_when`` (``ALWAYS``, ``TEAMS_EQUAL``, ``SERVER_FULL``) is when its match starts.
+
+The ranked instances run with the ``server`` vars with ``instance_vars.ranked`` over them - any of its fields, e.g.:
+
+```json
+"instance_vars": {
+  "ranked": {
+    "friendly_fire": true,
+    "client_network_timeout_secs": 1.5
+  }
+}
 ```
 
 This will result in:
@@ -258,14 +273,12 @@ ports:
   - '9001:9001/udp'
 ```
 
-The server instances will also get unique server names - with added ``#1``, ``#2``, etc. suffixes.
+The server instances will also get unique server names - with added ``#1``, ``#2``, etc. suffixes - and labels on the server list: ``c1``, ``c2``... and ``r1``, ``r2``...
 
-The process first creates Ranked servers, then Casual server instances, so in case of US servers, Ranked ones will have ports ``8000-8004`` and the Casual one will be at ``8005``.
-
-Casual server instances will be run with exactly the same configuration as Ranked instances, except their ``server.ranked.autostart_when`` variable will be set to ``"NEVER"``. This disables the entire ranked logistics.
+The process first creates the Casual instances, then the Ranked ones, so with the settings above and ``port`` 8000 the Casual one will be at ``8000`` and the Ranked ones at ``8001-8004``.
 
 If you restart/shutdown just one server instance from the panel, all servers will follow.
-So that the runtime changes to config vars propagate to the ``config.json`` file, connect to the first Casual server to tweak them - or first Ranked server instance if there are no Casual servers. Changes to other instances will be ephemeral and only persist for the current server run.
+The runtime changes to config vars are kept in ``runtime_prefs.json`` when made on the first instance of a kind: on ``c1`` they go to the ``server`` section (and so reach the ranked instances too), on ``r1`` to ``instance_vars.ranked``. Changes to other instances only last for the current server run.
 
 ## CLI flags
 

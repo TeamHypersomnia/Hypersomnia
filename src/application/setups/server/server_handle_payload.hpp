@@ -65,7 +65,7 @@ message_handler_result server_setup::handle_payload(
 			nor for CrazyGames guests (a new account at every reload). The platform is the client's word - enough here.
 		*/
 
-		if (vars.requires_authentication()) {
+		if (requires_authentication()) {
 			const auto platform = payload.get_platform_type();
 			const bool guest_account = c.cert_account.rfind("key_", 0) == 0;
 

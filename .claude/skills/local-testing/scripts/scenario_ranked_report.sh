@@ -18,12 +18,12 @@ umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/ranked_report
+# A fresh directory every run - never removed recursively
+T=$S/ranked_report_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 [ -n "$BROKER_URL" ] && [ -n "$BROKER_PUBLIC_KEY" ] || { echo "start broker.sh and export BROKER_URL, BROKER_PUBLIC_KEY"; exit 1; }
 if ss -tuln | grep -q ":10060 "; then echo "port 10060 busy, abort"; exit 1; fi
 
-rm -rf $T
 mkdir -p $T/server/user/conf.d $T/server/user/downloads/arenas
 
 # The test map: a copy of de_cyberaqua with tiny rules
@@ -60,10 +60,10 @@ ID_B=$(account_id bob)
 [ -n "$STEAM_BOB" ] && ID_B=steam
 
 cat > $T/server/user/conf.d/test.json <<J
-{ "server_start": { "ip": "0.0.0.0", "port": 10060, "slots": 16 },
+{ "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": 10060, "slots": 16 },
   "server": { "server_name": "[PL] Report test", "arena": "de_e2e_short", "game_mode": "bomb_defusal", "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "sync_all_external_arenas_on_startup": false,
-              "ranked": { "autostart_when": "TEAMS_EQUAL", "countdown_time": 2 },
+              "ranked": { "start_when": "TEAMS_EQUAL", "countdown_time": 2 },
               "move_to_spectators_if_afk_for_secs": 999999, "kick_if_afk_for_secs": 999999,
               "webrtc_port_range_begin": 19600, "webrtc_port_range_end": 19605 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" } }

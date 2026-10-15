@@ -342,28 +342,19 @@
         "game_mode": "",
         "ranked": {
             /*
-                Note you can always host a "ranked" match locally -
-                even if you don't report winners/losers to the MMR database.
-
-                It will still make the match behave like a proper tournament match.
-                For example:
+                Only for ranked instances ("instances" below) - a casual one never starts a ranked match.
+                A ranked match:
                 - The server becomes unjoinable after starting the match.
                 - Match will be frozen for a while when someone disonnects mid-way, allowing them to rejoin.
                 You may absolutely use it on some LAN torunaments.
             */
-            "autostart_when": "NEVER",
-            // "TEAMS_EQUAL | SERVER_FULL | SERVER_FULL_EQUAL_TEAMS | ALWAYS"
-            // Only "NEVER" and "ALWAYS" are implemented right now.
+            "start_when": "ALWAYS", // or: "TEAMS_EQUAL" | "SERVER_FULL"
             "countdown_time": 40,
             "rejoin_time_limit": 120,
             "max_rejoins": 5,
             "match_unfreezes_in_secs": 5,
             "freeze_match_on_disconnect": true,
-            "dump_server_recovery_state_every_round": true, // dedicated servers only. Dumps a snapshot at the start of each LIVE ranked round so a crash can resume the match.
-            "overrides": {
-                "friendly_fire": true,
-                "client_network_timeout_secs": 1.5
-            }
+            "dump_server_recovery_state_every_round": true // dedicated servers only. Dumps a snapshot at the start of each LIVE ranked round so a crash can resume the match.
         },
         "friendly_fire": false,
         "bots": true, // Can override with "/bots 0" in-game.
@@ -432,15 +423,28 @@
     },
 
     /*
-        For spawning multiple server instances within a single process.
-        Applies only to the dedicated server.
-
-        If both 0, will just create a single instance according to the config.
-        For casual server instances, "ranked" fields will just be reset.
+        The instances of a dedicated server, all in one process, on consecutive ports from server_start.port.
+        None given: one casual instance. Their labels on the server list: c1, c2... and r1, r2...
+        A host from the game is always one casual instance.
     */
 
-	"num_ranked_servers": 0,
-	"num_casual_servers": 0,
+    "instances": {
+        "casual": 0,
+        "ranked": 0
+    },
+
+    /*
+        The vars of each kind of instance: "server" above, with these over it (any of its fields).
+        Changed over RCON on a ranked instance, the changes are kept here, in runtime_prefs.json.
+    */
+
+    "instance_vars": {
+        "ranked": {
+            "friendly_fire": true,
+            "client_network_timeout_secs": 1.5,
+            "allow_setting_zoom": false
+        }
+    },
 
     // Put this in the user folder (~/.config/Hypersomnia/user) to launch a tournament.
     // Dedicated-server only (Linux)!

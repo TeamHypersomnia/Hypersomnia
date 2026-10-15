@@ -30,7 +30,7 @@ struct server_recovery_target {
 	  - dump_now() rewrites it on every ROUND_START mode notification while the
 	    match is effectively LIVE (mode.ranked_state == LIVE). "Effectively LIVE"
 	    means the mode itself, not the server config; a config flip alone (admin
-	    sets ranked.autostart_when=NEVER mid-match through rcon) does NOT stop
+	    turns dump_server_recovery_state_every_round off mid-match through rcon) does NOT stop
 	    the dumps as long as the current match is still actually running.
 	  - update_live_state() runs every tick and deletes the file on the exact tick
 	    the match stops being effectively LIVE, by spotting the ranked_live: true

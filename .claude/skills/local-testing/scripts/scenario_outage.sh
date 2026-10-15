@@ -20,9 +20,9 @@ mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
 server_conf() {
 mkconf $1 <<J
-{ "server_start": { "ip": "0.0.0.0", "port": $2, "slots": 16 },
+{ "instances": { "ranked": $([ "$3" = NEVER ] && echo 0 || echo 1) }, "server_start": { "ip": "0.0.0.0", "port": $2, "slots": 16 },
   "server": { "server_name": "$1", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1",
-              "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$3" },
+              "suppress_new_community_server_webhook": true, "ranked": { "start_when": "${3/NEVER/ALWAYS}" },
               "webrtc_port_range_begin": $(($2 + 9400)), "webrtc_port_range_end": $(($2 + 9405)) },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "http://127.0.0.1:1/report_match" } }
 J

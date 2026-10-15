@@ -282,6 +282,7 @@ class server_setup :
 #endif
 	bool suppress_community_server_webhook_this_run = false;
 	std::string name_suffix;
+	server_instance_type instance_type = server_instance_type::CASUAL;
 	instance_label_type instance_label;
 
 public:
@@ -510,7 +511,8 @@ public:
 #endif
 		const std::string& name_suffix = "",
 		const server_temp_var_overrides& initial_overrides = server_temp_var_overrides(),
-		const instance_label_type& instance_label = instance_label_type()
+		server_instance_type instance_type = server_instance_type::CASUAL,
+		uint16_t instance_number = 1
 	);
 
 	~server_setup();
@@ -997,6 +999,7 @@ public:
 	void handle_client_chat_command(client_id_type, const ::client_requested_chat&);
 
 	bool is_ranked_server() const;
+	bool requires_authentication() const;
 
 	bool recovered_from_crash() const {
 		return recovered_from_crash_flag;

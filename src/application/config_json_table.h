@@ -156,8 +156,7 @@ struct config_json_table {
 
 	server_listen_input server_start;
 
-	uint16_t num_ranked_servers = 0;
-	uint16_t num_casual_servers = 0;
+	server_instance_counts instances;
 	augs::path_type tournament_file;
 
 	server_vars server;

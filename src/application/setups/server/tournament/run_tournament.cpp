@@ -115,10 +115,10 @@ work_result run_tournament(const run_tournament_input& in) {
 
 	/*
 		The per-stage runner. Builds one server_setup per match, all in this
-		process as separate threads, just like the existing num_ranked_servers
-		path. Each instance is configured with:
+		process as separate threads, just like the ranked instances.
+		Each instance is a TOURNAMENT one (ranked, label t1, t2...) with the ranked vars and:
 		    - vars.shutdown_after_one_match = true (graceful exit after summary intermission)
-		    - vars.ranked.autostart_when = ALWAYS (start as soon as both teams join)
+		    - vars.ranked.start_when = ALWAYS (start as soon as both teams join)
 		    - per-match assigned_teams (team_a -> RESISTANCE, team_b -> METROPOLIS)
 		    - per-match arena/mode from tournament_config.arenas
 		    - per-match server_name from coordinator
@@ -176,10 +176,10 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.game_mode = ::get_second_word(match.arena_and_mode);
 			this_config.server.server_name = match.server_name;
 			this_config.server.shutdown_after_one_match = true;
-			this_config.server.ranked.autostart_when = ranked_autostart_type::ALWAYS;
+			this_config.server.ranked.start_when = ranked_start_type::ALWAYS;
 
 			auto canon_server_vars = in.canon_config_with_confd.server;
-			canon_server_vars.ranked.autostart_when = ranked_autostart_type::ALWAYS;
+			canon_server_vars.ranked.start_when = ranked_start_type::ALWAYS;
 			this_config.server.webrtc_udp_mux = true;
 			this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
 			this_config.server.daily_autoupdate = false;
@@ -339,7 +339,8 @@ work_result run_tournament(const run_tournament_input& in) {
 #endif
 						std::string(""),
 						server_temp_var_overrides(),
-						::make_instance_label(server_instance_type::TOURNAMENT, static_cast<uint16_t>(this_match_index + 1))
+						server_instance_type::TOURNAMENT,
+						static_cast<uint16_t>(this_match_index + 1)
 					);
 
 					if (candidate->is_running()) {

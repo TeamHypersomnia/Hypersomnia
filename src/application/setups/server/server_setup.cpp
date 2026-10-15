@@ -916,7 +916,8 @@ server_setup::server_setup(
 #endif
 	const std::string& name_suffix,
 	const server_temp_var_overrides& initial_overrides,
-	const instance_label_type& instance_label
+	const server_instance_type instance_type,
+	const uint16_t instance_number
 ) :
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
@@ -952,13 +953,8 @@ server_setup::server_setup(
 	server_time(server_setup::get_current_time()),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run),
 	name_suffix(name_suffix),
-	/*
-		A single server not started by a launcher of instances: c1, or r1 when ranked.
-	*/
-	instance_label(
-		!instance_label.empty() ? instance_label :
-		::make_instance_label(canon_with_confd_vars.ranked.is_ranked_server() ? server_instance_type::RANKED : server_instance_type::CASUAL, 1)
-	),
+	instance_type(instance_type),
+	instance_label(::make_instance_label(instance_type, instance_number)),
 	overrides(initial_overrides)
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
@@ -1005,7 +1001,7 @@ server_setup::server_setup(
 			is empty on first_time and would fail the second rechoose too.
 		*/
 		const bool recovery_enabled =
-			initial_vars.ranked.is_ranked_server()
+			is_ranked_server()
 			&& initial_vars.ranked.dump_server_recovery_state_every_round
 		;
 
@@ -1506,7 +1502,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}, only_connected_v);
 
-	if (vars.requires_authentication() && !ip.empty()) {
+	if (requires_authentication() && !ip.empty()) {
 		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
 			return get_client_ip_for_bans(other_id) == ip;
 		});
@@ -1545,7 +1541,7 @@ void server_setup::apply_authentication(
 #else
 	auto new_id = authenticated;
 
-	if (begins_with(new_id, "steam_") && from_nickname == false && !vars.requires_authentication()) {
+	if (begins_with(new_id, "steam_") && from_nickname == false && !requires_authentication()) {
 		/*
 			For testing so we can use just a single steam account on casual servers
 		*/
@@ -1554,7 +1550,7 @@ void server_setup::apply_authentication(
 	}
 #endif
 
-	const bool required = vars.requires_authentication();
+	const bool required = requires_authentication();
 	const auto client_id = to_client_id(player_id);
 
 	if (new_id.empty()) {
@@ -2825,7 +2821,16 @@ game_mode_name_type server_setup::get_current_game_mode_name() const {
 }
 
 bool server_setup::is_ranked_server() const {
-	return vars.ranked.autostart_when != ranked_autostart_type::NEVER;
+	return instance_type == server_instance_type::RANKED || instance_type == server_instance_type::TOURNAMENT;
+}
+
+/*
+	Nickname-auth ranked servers (e.g. tournaments) authenticate clients by their declared nickname, not by a cert -
+	so non-Steam clients do not filter them out of the server browser as ranked-with-auth.
+*/
+
+bool server_setup::requires_authentication() const {
+	return is_ranked_server() && !vars.authenticate_with_nicknames;
 }
 
 void server_setup::send_heartbeat_to_server_list() {
@@ -3307,7 +3312,7 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 		id,
 		game_channel_type::RELIABLE_MESSAGES,
 
-		server_auth_state { level, vars.requires_authentication() }
+		server_auth_state { level, requires_authentication() }
 	);
 
 	/*
@@ -3424,12 +3429,12 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.all_authenticated = all_authenticated;
 	out.all_not_banned = all_not_banned;
 
-	if (!vars.requires_authentication()) {
+	if (!requires_authentication()) {
 		out.all_authenticated = true;
 		out.all_not_banned = true;
 	}
 
-	out.friendly_fire = vars.get_friendly_fire();
+	out.friendly_fire = vars.friendly_fire;
 	out.freeze_time = vars.freeze_time;
 	out.zoom_override = vars.zoom_override;
 
@@ -3440,6 +3445,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.zoom_override.value = ::sanitize_zoom_override(out.zoom_override.value);
 	out.apply_zoom_immediately = apply_zoom_immediately;
 	out.ranked = vars.ranked;
+	out.is_ranked = is_ranked_server();
 
 	out.force_short_match = has_browser_clients_playing;
 	out.allow_overtime = vars.allow_overtime;
@@ -6585,7 +6591,7 @@ void server_setup::handle_client_chat_command(
 	const bool integrated = is_integrated() && id == get_integrated_client_id();
 
 	if (!integrated) {
-		if (vars.requires_authentication() && !cli.is_authenticated()) {
+		if (requires_authentication() && !cli.is_authenticated()) {
 			LOG("Unauthenticated for a chat command.");
 			return;
 		}
@@ -6729,7 +6735,7 @@ void server_setup::handle_client_chat_command(
 				return;
 			}
 
-			const bool allowed = zoom ? vars.get_allow_setting_zoom() : vars.get_allow_setting_speed();
+			const bool allowed = zoom ? vars.allow_setting_zoom : vars.allow_setting_speed;
 
 			if (!allowed) {
 				broadcast_info(typesafe_sprintf("Changing %x is disabled on this server.", zoom ? "zoom" : "speed"), chat_target_type::INFO_CRITICAL);

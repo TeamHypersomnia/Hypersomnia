@@ -44,7 +44,7 @@ EOF
 	cat > $E/server/user/conf.d/test.json <<EOF
 {
   "tournament_file": "$E/tournament.json",
-  "server_start": { "ip": "0.0.0.0", "port": 9005, "slots": 16 },
+  "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": 9005, "slots": 16 },
   "webrtc_signalling_server_url": "ws://${ARENAUS_IP:-154.12.226.211}:18000",
   "server": {
     "server_name": "[PL] E2E ranked",
@@ -52,7 +52,7 @@ EOF
     "arena": "de_cyberaqua",
     "notified_server_list": "${ARENAUS_IP:-154.12.226.211}:18430",
     "suppress_new_community_server_webhook": true,
-    "ranked": { "autostart_when": "ALWAYS", "countdown_time": 5, "max_rejoins": 0 },
+    "ranked": { "start_when": "ALWAYS", "countdown_time": 5, "max_rejoins": 0 },
     "move_to_spectators_if_afk_for_secs": 999999,
     "kick_if_afk_for_secs": 999999,
     "freeze_time": false,

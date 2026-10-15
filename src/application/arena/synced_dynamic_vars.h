@@ -56,6 +56,7 @@ struct synced_dynamic_vars {
 	bool shutdown_after_one_match = false;
 	augs::maybe<uint32_t> max_team_score;
 	server_ranked_vars ranked;
+	bool is_ranked = false;
 	bots_request bots_override;
 	difficulty_type bot_override_difficulty = difficulty_type::PROGRESSIVE;
 	real32 logic_speed = 1.f;
@@ -66,7 +67,7 @@ struct synced_dynamic_vars {
 	bool operator==(const synced_dynamic_vars&) const = default;
 
 	bool is_ranked_server() const {
-		return ranked.is_ranked_server();
+		return is_ranked;
 	}
 
 	/*

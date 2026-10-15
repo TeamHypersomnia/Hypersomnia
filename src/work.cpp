@@ -623,6 +623,18 @@ work_result work(
 	WEBSTATIC auto& canon_config = *canon_config_ptr;
 	WEBSTATIC auto& canon_config_with_confd = *canon_config_with_confd_ptr;
 
+	/*
+		The config files in the order they were applied - their "instance_vars" go over "server" for each kind of
+		instance (see ranked_vars_of). The runtime ones (runtime_prefs, --apply-config) are not the canon.
+	*/
+
+	struct config_layer {
+		augs::path_type path;
+		bool runtime = false;
+	};
+
+	WEBSTATIC auto config_layers = std::vector<config_layer> { { canon_config_path, false } };
+
 	WEBSTATIC auto config_ptr = [&]() {
 		auto result = std::make_unique<config_json_table>(canon_config);
 
@@ -644,6 +656,7 @@ work_result work(
 				if (config_file.extension() == ".json") {
 					LOG("Applying config: %x", config_file);
 					result->load_patch(config_file);
+					config_layers.push_back({ config_file, false });
 				}
 				else {
 					LOG("Skipping non-json file: %x", config_file);
@@ -658,12 +671,14 @@ work_result work(
 		if (augs::exists(runtime_prefs_path)) {
 			LOG("Applying config: %x", runtime_prefs_path);
 			result->load_patch(runtime_prefs_path);
+			config_layers.push_back({ runtime_prefs_path, true });
 		}
 
 		if (!params.apply_config.empty()) {
 			const auto cli_config_path = CALLING_CWD / params.apply_config;
 			LOG("Applying config: %x", cli_config_path);
 			result->load_patch(cli_config_path);
+			config_layers.push_back({ cli_config_path, true });
 		}
 
 		if (params.daily_autoupdate) {
@@ -686,6 +701,41 @@ work_result work(
 	LOG("Loaded all user configs.");
 
 	WEBSTATIC auto& config = *config_ptr;
+
+	/*
+		A ranked instance's vars: the given "server" vars with each config file's "instance_vars": { "ranked": ... }
+		over them, in the order the files were applied - the canon ones only, or the runtime ones too.
+	*/
+
+	WEBSTATIC auto ranked_vars_of = [&](const server_vars& base, const bool with_runtime) {
+		auto out = base;
+
+		for (const auto& layer : config_layers) {
+			if (layer.runtime && !with_runtime) {
+				continue;
+			}
+
+			try {
+				constexpr auto flags = rapidjson::kParseDefaultFlags | rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag;
+				const auto doc = augs::json_document_from<flags>(augs::file_to_string(layer.path));
+
+				if (doc.IsObject() && doc.HasMember("instance_vars") && doc["instance_vars"].IsObject()) {
+					const auto& instance_vars = doc["instance_vars"];
+
+					if (instance_vars.HasMember("ranked") && instance_vars["ranked"].IsObject()) {
+						augs::read_json(instance_vars["ranked"], out);
+					}
+				}
+			}
+			catch (const std::exception& e) {
+				LOG("ERROR: could not read instance_vars from %x: %x", layer.path, e.what());
+			}
+		}
+
+		return out;
+	};
+
+	(void)ranked_vars_of;
 
 	{
 		augs::unique_lock<augs::mutex> lock(log_mutex);
@@ -891,11 +941,79 @@ work_result work(
 	WEBSTATIC auto last_saved_config_ptr = std::make_unique<config_json_table>(config);
 	WEBSTATIC auto& last_saved_config = *last_saved_config_ptr;
 
+	/*
+		The ranked instances' vars changed at runtime (RCON): what they differ by from the layers under them (see
+		ranked_vars_of), kept in runtime_prefs.json as "instance_vars": { "ranked": ... } - a JSON object, empty when none.
+	*/
+
+	WEBSTATIC auto runtime_ranked_patch = [&]() -> std::string {
+		if (!augs::exists(runtime_prefs_path)) {
+			return std::string();
+		}
+
+		try {
+			constexpr auto flags = rapidjson::kParseDefaultFlags | rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag;
+			const auto doc = augs::json_document_from<flags>(augs::file_to_string(runtime_prefs_path));
+
+			if (doc.IsObject() && doc.HasMember("instance_vars") && doc["instance_vars"].IsObject() && doc["instance_vars"].HasMember("ranked")) {
+				rapidjson::StringBuffer buffer;
+				rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+				doc["instance_vars"]["ranked"].Accept(writer);
+				return buffer.GetString();
+			}
+		}
+		catch (...) {
+		}
+
+		return std::string();
+	}();
+
+	/*
+		The servers of one process save from their threads.
+	*/
+
+	WEBSTATIC std::mutex runtime_prefs_mutex;
+
+	WEBSTATIC auto save_runtime_prefs = [&]() {
+		last_saved_config.save_patch(canon_config_with_confd, runtime_prefs_path, true);
+
+		const bool has_ranked_patch = !runtime_ranked_patch.empty() && runtime_ranked_patch != "{}";
+
+		if (!has_ranked_patch) {
+			return;
+		}
+
+		try {
+			auto content = augs::file_to_string(runtime_prefs_path);
+			const auto last_brace = content.rfind('}');
+			const auto first_brace = content.find('{', content.find("*/") == std::string::npos ? 0 : content.find("*/"));
+
+			if (last_brace == std::string::npos || first_brace == std::string::npos) {
+				return;
+			}
+
+			const auto body = content.substr(first_brace + 1, last_brace - first_brace - 1);
+			const bool any_member = body.find_first_not_of(" \t\r\n") != std::string::npos;
+
+			auto indented = runtime_ranked_patch;
+
+			for (std::size_t i = 0; (i = indented.find('\n', i)) != std::string::npos; i += 1) {
+				indented.insert(i + 1, "        ");
+			}
+
+			content.insert(last_brace, std::string(any_member ? ",\n" : "\n") + "    \"instance_vars\": {\n        \"ranked\": " + indented + "\n    }\n");
+			augs::save_as_text(runtime_prefs_path, content);
+		}
+		catch (const std::exception& e) {
+			LOG("ERROR: could not save the ranked instances' vars to %x: %x", runtime_prefs_path, e.what());
+		}
+	};
+
 	WEBSTATIC auto change_with_save = [&](auto setter) {
 		setter(config);
 		setter(last_saved_config);
 
-		last_saved_config.save_patch(canon_config_with_confd, runtime_prefs_path, true);
+		save_runtime_prefs();
 	};
 	(void)change_with_save;
 
@@ -1224,9 +1342,35 @@ work_result work(
 		auto write_vars_to_disk = [&](const server_vars& new_vars) {
 			LOG("Writing server_vars to disk.");
 
+			auto lock = std::lock_guard<std::mutex>(runtime_prefs_mutex);
+
 			change_with_save([&](auto& cfg) {
 				cfg.server = new_vars;
 			});
+		};
+
+		/*
+			A ranked instance's: only what it differs by from the vars under it - the casual ones with the canon's
+			instance_vars.ranked - so a later change of the casual vars still reaches it.
+		*/
+
+		auto write_ranked_vars_to_disk = [&](const server_vars& new_vars) {
+			LOG("Writing the ranked server_vars to disk.");
+
+			auto lock = std::lock_guard<std::mutex>(runtime_prefs_mutex);
+
+			const auto under = ranked_vars_of(config.server, false);
+
+			/*
+				Not what the launcher sets for each instance anyway.
+			*/
+
+			auto kept = new_vars;
+			kept.webrtc_udp_mux = under.webrtc_udp_mux;
+			kept.webrtc_port_range_begin = under.webrtc_port_range_begin;
+
+			runtime_ranked_patch = augs::to_json_diff_string(kept, under);
+			save_runtime_prefs();
 		};
 
 		auto make_next_worker_input = [&](const uint16_t index, const instance_type type) {
@@ -1255,23 +1399,14 @@ work_result work(
 			auto this_config = config_pattern;
 
 			/*
-				The instance's vars as the config files give them (no runtime_prefs).
+				The instance's vars as the config files give them (no runtime_prefs) - a ranked one's with instance_vars.ranked.
 			*/
 
 			auto canon_server_vars = canon_config_with_confd.server;
 
-			/*
-				SINGLE instance respects the autostart_when value from the config.
-				Multi-instance RANKED/CASUAL types force it.
-			*/
-			if (type != SINGLE) {
-				this_config.server.ranked.autostart_when =
-					type == RANKED ?
-					ranked_autostart_type::ALWAYS :
-					ranked_autostart_type::NEVER
-				;
-
-				canon_server_vars.ranked.autostart_when = this_config.server.ranked.autostart_when;
+			if (type == RANKED) {
+				this_config.server = ranked_vars_of(config_pattern.server, true);
+				canon_server_vars = ranked_vars_of(canon_config_with_confd.server, false);
 			}
 
 			LOG_NVPS(this_config.server.server_name, server_name_suffix);
@@ -1280,10 +1415,7 @@ work_result work(
 				All instances share the host's key - each its label: c1, c2..., r1, r2...
 			*/
 
-			const auto this_instance_label =
-				type == SINGLE ? instance_label_type() :
-				::make_instance_label(type == RANKED ? server_instance_type::RANKED : server_instance_type::CASUAL, index)
-			;
+			const auto this_instance_type = type == RANKED ? server_instance_type::RANKED : server_instance_type::CASUAL;
 
 			this_config.server_start.port = port_counter++;
 
@@ -1299,7 +1431,11 @@ work_result work(
 				this_config.server_start.port
 			);
 
-			auto write_or_not = std::function<void(const server_vars&)>(write_vars_to_disk);
+			/*
+				Only a casual instance's vars are the "server" section of runtime_prefs.
+			*/
+
+			auto write_or_not = type == RANKED ? std::function<void(const server_vars&)>(write_ranked_vars_to_disk) : std::function<void(const server_vars&)>(write_vars_to_disk);
 			bool should_suppress_webhook = params.suppress_server_webhook;
 			
 			const bool pick_random_map =
@@ -1316,7 +1452,14 @@ work_result work(
 				this_config.server.daily_autoupdate = false;
 
 				should_suppress_webhook = true;
-				write_or_not = nullptr;
+
+				/*
+					The first instance of each kind saves its kind's vars.
+				*/
+
+				if (!(type == RANKED && index == 1)) {
+					write_or_not = nullptr;
+				}
 			}
 
 			if (pick_random_map) {
@@ -1341,7 +1484,8 @@ work_result work(
 #endif
 				server_name_suffix,
 				server_temp_var_overrides(),
-				this_instance_label
+				this_instance_type,
+				index
 			);
 
 			/*
@@ -1413,10 +1557,20 @@ work_result work(
 
 				const auto state_file_path = USER_DIR / "tournament.ongoing.json";
 
+				/*
+					The matches are ranked instances: the ranked vars.
+				*/
+
+				auto ranked_pattern = config_pattern;
+				ranked_pattern.server = ranked_vars_of(config_pattern.server, true);
+
+				auto ranked_canon = canon_config_with_confd;
+				ranked_canon.server = ranked_vars_of(canon_config_with_confd.server, false);
+
 				auto runner_in = run_tournament_input {
 					*official,
-					config_pattern,
-					canon_config_with_confd,
+					ranked_pattern,
+					ranked_canon,
 					params,
 #if CRASH_RECOVERY
 					recovery_worker,
@@ -1431,8 +1585,8 @@ work_result work(
 		}
 #endif
 
-		const auto num_ranked = std::min(uint16_t(20u), config_pattern.num_ranked_servers);
-		const auto num_casual = std::min(uint16_t(20u), config_pattern.num_casual_servers);
+		const auto num_ranked = std::min(uint16_t(20u), config_pattern.instances.ranked);
+		const auto num_casual = std::min(uint16_t(20u), config_pattern.instances.casual);
 
 		const auto num_total = num_ranked + num_casual;
 
@@ -1732,7 +1886,7 @@ work_result work(
 		}
 
 		if (update) {
-			last_saved_config.save_patch(canon_config_with_confd, runtime_prefs_path, true);
+			save_runtime_prefs();
 		}
 	});
 

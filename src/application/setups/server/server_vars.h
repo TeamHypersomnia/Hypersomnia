@@ -61,9 +61,12 @@ struct server_public_vars {
 	bool operator==(const server_public_vars&) const = default;
 };
 
-enum class ranked_autostart_type {
-	// GEN INTROSPECTOR enum class ranked_autostart_type
-	NEVER,
+/*
+	When a ranked instance starts its match - see server_instance_label.h for what makes an instance ranked.
+*/
+
+enum class ranked_start_type {
+	// GEN INTROSPECTOR enum class ranked_start_type
 	TEAMS_EQUAL,
 	SERVER_FULL,
 	ALWAYS,
@@ -81,31 +84,17 @@ enum class arena_cycle_type {
 	// END GEN INTROSPECTOR
 };
 
-struct server_ranked_overrides_vars {
-	static constexpr bool force_read_field_by_field = true;
-
-	// GEN INTROSPECTOR struct server_ranked_overrides_vars
-	bool friendly_fire = true;
-	float client_network_timeout_secs = 1.0f;
-	bool allow_setting_speed = true;
-	bool allow_setting_zoom = false;
-	// END GEN INTROSPECTOR
-
-	bool operator==(const server_ranked_overrides_vars&) const = default;
-};
-
 struct server_ranked_vars {
 	static constexpr bool force_read_field_by_field = true;
 
 	// GEN INTROSPECTOR struct server_ranked_vars
-	ranked_autostart_type autostart_when = ranked_autostart_type::NEVER;
+	ranked_start_type start_when = ranked_start_type::ALWAYS;
 	uint16_t countdown_time = 40;
 	uint16_t rejoin_time_limit = 150;
 	uint8_t max_rejoins = 1;
 	uint8_t match_unfreezes_in_secs = 5;
 	bool freeze_match_on_disconnect = true;
 	bool dump_server_recovery_state_every_round = true;
-	server_ranked_overrides_vars overrides;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_ranked_vars&) const = default;
@@ -116,10 +105,6 @@ struct server_ranked_vars {
 		}
 
 		return rejoin_time_limit;
-	}
-
-	bool is_ranked_server() const {
-		return autostart_when != ranked_autostart_type::NEVER;
 	}
 };
 
@@ -134,11 +119,8 @@ struct server_vars {
 	bool operator==(const server_vars&) const = default;
 
 	/*
-		Fields marked private in the GEN INTROSPECTOR block below are overridable
-		in ranked mode via ranked.overrides.*. Read them via getters
-		(get_friendly_fire / get_client_network_timeout_secs / get_allow_setting_speed / get_allow_setting_zoom) so the right value
-		is picked depending on the server mode. Direct write access is granted
-		only to introspection and the settings GUIs.
+		The vars of a casual instance; a ranked one's are these with the config's instance_vars.ranked over them
+		(see instance_vars.h).
 	*/
 
 	// GEN INTROSPECTOR struct server_vars
@@ -147,19 +129,15 @@ struct server_vars {
 
 	server_ranked_vars ranked;
 
-private:
 	bool friendly_fire = false;
-public:
 	bool freeze_time = true;
 	bool bots = true;
 
 	real32 game_speed = 0.75f;
 	augs::maybe<real32> bullet_speed = augs::maybe<real32>::disabled(1.f);
 	augs::maybe<real32> zoom_override = augs::maybe<real32>::disabled(BALANCE_ZOOM_OUT);
-private:
 	bool allow_setting_speed = true;
 	bool allow_setting_zoom = true;
-public:
 	difficulty_type bot_difficulty = difficulty_type::PROGRESSIVE;
 	bot_quota bot_quota;
 
@@ -203,9 +181,7 @@ public:
 	uint32_t move_to_spectators_if_afk_for_secs = 120;
 	uint32_t kick_if_afk_for_secs = 7200;
 	float web_client_network_timeout_secs = 1.5f;
-private:
 	float client_network_timeout_secs = 3.0f;
-public:
 	bool authenticate_with_nicknames = false;
 	uint32_t max_ranked_players_per_ip = 2;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
@@ -238,10 +214,6 @@ public:
 	// END GEN INTROSPECTOR
 
 	float get_client_network_timeout_secs(const bool is_browser) const {
-		if (ranked.is_ranked_server()) {
-			return ranked.overrides.client_network_timeout_secs;
-		}
-
 		if (is_browser) {
 			return web_client_network_timeout_secs;
 		}
@@ -256,45 +228,19 @@ public:
 	real32 calc_bullet_speed(const real32 considered_game_speed) const {
 		return bullet_speed.is_enabled ? bullet_speed.value : considered_game_speed;
 	}
+};
 
-	bool get_allow_setting_speed() const {
-		if (ranked.is_ranked_server()) {
-			return ranked.overrides.allow_setting_speed;
-		}
+/*
+	The instances of a dedicated server - none given: one casual instance.
+*/
 
-		return allow_setting_speed;
-	}
+struct server_instance_counts {
+	// GEN INTROSPECTOR struct server_instance_counts
+	uint16_t casual = 0;
+	uint16_t ranked = 0;
+	// END GEN INTROSPECTOR
 
-	bool get_allow_setting_zoom() const {
-		if (ranked.is_ranked_server()) {
-			return ranked.overrides.allow_setting_zoom;
-		}
-
-		return allow_setting_zoom;
-	}
-
-	bool get_friendly_fire() const {
-		if (ranked.is_ranked_server()) {
-			return ranked.overrides.friendly_fire;
-		}
-
-		return friendly_fire;
-	}
-
-	bool requires_authentication() const {
-		/*
-			Nickname-auth ranked servers (e.g. tournaments) authenticate clients
-			by their declared nickname, not by a Steam ticket. They must not be
-			treated as requiring Steam authentication - otherwise non-Steam
-			clients filter them out of the server browser as ranked-with-auth.
-		*/
-
-		if (authenticate_with_nicknames) {
-			return false;
-		}
-
-		return ranked.is_ranked_server();
-	}
+	bool operator==(const server_instance_counts&) const = default;
 };
 
 struct url_and_key_pair {

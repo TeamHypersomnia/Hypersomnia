@@ -48,9 +48,9 @@ if [[ "$CONNECT" == ranked* ]]; then RANKED=TEAMS_EQUAL; NAME="[PL] Ranked test"
 mkconf server <<EOF
 {
   "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
-  "server_start": { "ip": "0.0.0.0", "port": 10002, "slots": 16 },
+  "instances": { "ranked": $([ "$RANKED" = NEVER ] && echo 0 || echo 1) }, "server_start": { "ip": "0.0.0.0", "port": 10002, "slots": 16 },
   "server": { "server_name": "$NAME", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
-              "suppress_new_community_server_webhook": true, "ranked": { "autostart_when": "$RANKED" },
+              "suppress_new_community_server_webhook": true, "ranked": { "start_when": "${RANKED/NEVER/ALWAYS}" },
               "webrtc_port_range_begin": 19000, "webrtc_port_range_end": 19050 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" }
 }

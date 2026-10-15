@@ -4920,7 +4920,7 @@ void do_server_vars_section(
 			break;
 		}
 		case server_vars_section::RANKED: {
-			revertable_enum("Start ranked when...", vars.ranked.autostart_when);
+			revertable_enum("Start ranked when...", vars.ranked.start_when);
 			revertable_slider("Countdown time", vars.ranked.countdown_time, uint16_t(3u), uint16_t(300u));
 			revertable_slider("Rejoin time limit", vars.ranked.rejoin_time_limit, uint16_t(0u), uint16_t(600u));
 			revertable_slider("Max rejoins", vars.ranked.max_rejoins, uint8_t(0u), uint8_t(20u));
@@ -4929,17 +4929,6 @@ void do_server_vars_section(
 
 			revertable_checkbox("Authenticate with nicknames", vars.authenticate_with_nicknames);
 			tooltip_on_hover("Players are told apart by their nicknames instead of Steam accounts,\nso anyone can play without Steam - but anyone with the same nickname\ncan take the place of a disconnected player.\nOtherwise, authenticating Steam players needs a Steam Web API key in the server config.");
-
-			text("Overrides in ranked matches:");
-
-			{
-				auto indent = scoped_indent();
-
-				revertable_checkbox("Allow /speed command##ranked", vars.ranked.overrides.allow_setting_speed);
-				revertable_checkbox("Allow /zoom command##ranked", vars.ranked.overrides.allow_setting_zoom);
-				revertable_checkbox("Friendly fire##ranked", vars.ranked.overrides.friendly_fire);
-				revertable_slider("Client network timeout secs##ranked", scope_cfg.ranked.overrides.client_network_timeout_secs, 0.2f, 10.0f);
-			}
 
 
 			break;
