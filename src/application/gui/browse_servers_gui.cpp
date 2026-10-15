@@ -1147,17 +1147,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	update_favorite_only_list(in.favorites);
 
-	if (selected_server.unlisted) {
-		server_details.perform(selected_server, in.faction_view, in.streamer_mode, std::addressof(in.favorites));
-	}
-
 	if (!show) {
-		/*
-			Edit is only there while the browser is - the dialog is its.
-		*/
-
-		server_details.edit_requested = false;
-
 		/*
 			Local servers take the first look in a run only - not a later one.
 		*/
@@ -1925,10 +1915,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
-	if (const bool listed = !selected_server.unlisted) {
-		if (server_details.perform(selected_server, in.faction_view, in.streamer_mode, std::addressof(in.favorites))) {
-			refresh_server_list(in);
-		}
+	/*
+		Server details only with the browser.
+	*/
+
+	if (server_details.perform(selected_server, in.faction_view, in.streamer_mode, std::addressof(in.favorites))) {
+		refresh_server_list(in);
 	}
 
 	if (std::exchange(server_details.edit_requested, false)) {
