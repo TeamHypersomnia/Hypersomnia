@@ -10,7 +10,8 @@ umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
-T=$S/rtc_test
+# A fresh directory every run - never removed recursively
+T=$S/rtc_test_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 GAME=$REPO/hypersomnia
 BROKER_URL=${BROKER_URL:-}
@@ -18,7 +19,6 @@ BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1
-rm -rf $T
 mkdir -p $T/official_servers.d
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
@@ -65,7 +65,7 @@ curl -s http://127.0.0.1:18420/server_list_json | python3 -c "
 import json,sys
 for e in json.load(sys.stdin): print(' ', e['name'], e['ip'], 'webrtc_id=', e.get('webrtc_id'), 'official=', e.get('is_official'), 'ranked=', e.get('is_ranked'))"
 
-timeout 30 xvfb-run -a nice -n 10 $BIN --connect "rtc:ranked-pl" --appdata-dir $T/c_rtc --no-update-on-launch > $T/c_rtc.out 2>&1
+timeout 30 xvfb-run -a nice -n 10 $BIN --connect "rtc:ranked-pl:1" --appdata-dir $T/c_rtc --no-update-on-launch > $T/c_rtc.out 2>&1
 
 echo "=== client"
 grep -hE "WebRTC|Connecting as|identity cert|client connected to server|Received initial|last_disconnect_reason" $T/c_rtc.out | sed 's/^\[[0-9:]*\] //' | head -10

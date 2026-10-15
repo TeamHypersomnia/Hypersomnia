@@ -82,7 +82,7 @@ for e in json.load(sys.stdin): print(' ', e['name'], 'webrtc_id=', e.get('webrtc
 cat <<EOF
 
 Running for $HOURS h. Logs: $T/{ms,ranked,casual}.out
-  Web, ranked:   http://localhost:8765/game/ranked-pl
+  Web, ranked:   http://localhost:8765/game/ranked-pl:1
   Web, casual:   http://localhost:8765/game/de
   Web, list:     http://localhost:8765/
   Broker:        $BROKER_URL (key $BROKER_PUBLIC_KEY)

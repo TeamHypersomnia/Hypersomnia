@@ -39,7 +39,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 |---|---|
 | `broker.sh start\|stop\|sql` | A scratch copy of the site on 13500 as the identity broker and report endpoint, with its own broker key; prints `BROKER_URL` and `BROKER_PUBLIC_KEY` to export for the scenarios |
 | `scenario_keys.sh` | Master with `official_servers.d` (servers official by their `--print-server-key`), official casual (de) + ranked (pl) + community servers, 3 CLI clients: signed heartbeats, every client self-signed (unlinked keys never ask the broker) and taken by ranked too, `.keys/account.key` 0600. `COMMUNITY_PASSWORD`, `KEEP_RUNNING`, `*_SECS` |
-| `scenario_webrtc_ranked.sh` | Native client over WebRTC (`--connect rtc:ranked-pl`) through the local signalling server to the official ranked server by its alias, with a broker cert |
+| `scenario_webrtc_ranked.sh` | Native client over WebRTC (`--connect rtc:ranked-pl:1` - a ranked instance's alias has its number) through the local signalling server to the official ranked server by its alias, with a broker cert |
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`) over WebRTC with a cert from the local broker; screenshot in `$SCRATCH/web_test/screen.png` |
 | `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: self-signed plays casual and is told ranked needs an account; a broker cert plays both |
 | `scenario_crazygames.sh` | The CrazyGames build in Chromium with a stubbed SDK (`crazygames_sdk_stub.py`, token signed by `CG_KEY`) joins an official ranked server over WebRTC as `crazygames_...` |
@@ -209,7 +209,7 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
   the real Steam Web API key (`STEAM_API_KEY_FILE=<file> broker.sh start` locally, or `~/hs-test-backend/steam_web_api_key` on arenaus,
   0600, never printed; `shred -u` it right after the test). The game servers never ask Steam anything.
 - The web build in the e2e: `USER_FILES=<dir> prepare_web.sh` with `<dir>/conf.d/test.json` holding the test master's and broker's
-  URLs (an IP does not fit in place in `Hypersomnia.data`). Join with `/game/ranked-pl`.
+  URLs (an IP does not fit in place in `Hypersomnia.data`). Join with `/game/ranked-pl:1`.
 - CrazyGames: `VARIANT=crazygames build_web.sh`; the broker checks the JWT with `CRAZYGAMES_PUBLIC_KEY_PEM` (a test key pair) and
   `CRAZYGAMES_GAME_ID`.
 - Steam verifies a Web API ticket only for an identity of at most 31 characters. `steam_tickets.py` gets tickets

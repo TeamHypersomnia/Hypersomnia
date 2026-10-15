@@ -8,7 +8,8 @@ umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/cg_test
+# A fresh directory every run - never removed recursively
+T=$S/cg_test_$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 CG_BUILD=${CG_BUILD:-$REPO/build/Release-Web-clang-claude-web-crazygames}
 CG_GAME_ID=${CG_GAME_ID:-hypersomnia-test}
@@ -20,7 +21,6 @@ for port in 18000 18410 18420 18430 10002 8766 9334; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port busy, abort"; exit 1; fi
 done
 
-rm -rf $T
 mkdir -p $T/official_servers.d
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
@@ -53,7 +53,7 @@ Xvfb :82 -screen 0 1280x800x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
 DISPLAY=:82 NODE_PATH=$PW PW_ROUTES="{\"https://sdk.crazygames.com/crazygames-sdk-v3.js\": \"$T/cg_sdk_stub.js\"}" \
-	timeout $((WAIT + 10)) node "$HERE/pw_driver.js" http://127.0.0.1:8766/game/ranked-pl 9334 > $T/pw.out 2>&1 &
+	timeout $((WAIT + 10)) node "$HERE/pw_driver.js" http://127.0.0.1:8766/game/ranked-pl:1 9334 > $T/pw.out 2>&1 &
 sleep $WAIT
 curl -s "localhost:9334/shot?f=$T/screen.png" > /dev/null
 
