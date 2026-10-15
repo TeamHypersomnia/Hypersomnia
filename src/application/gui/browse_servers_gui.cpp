@@ -1919,7 +1919,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}();
 
 			if (can_add && add_clicked) {
-				in.favorites.set(*key, label, add_server_address, add_server_name);
+				in.favorites.set(*key, label, add_server_address, add_server_name, true);
 				add_server_open = false;
 			}
 

@@ -15,7 +15,8 @@
 	instances share the key, see server_instance_label.h), with the name it had and the address it was last at: only a
 	hint where to look when the server list does not have it (the masterserver down, the server listed elsewhere or not
 	at all). In the order they were added.
-	One line per server: the key in hex, a tab, the label, a tab, the address, a tab, the name.
+	One line per server: the key in hex, a tab, the label, a tab, the address, a tab, the name - and a tab and "named" when
+	the player gave the name (Add a server): that one is kept, never brought up to date from the list or the server.
 */
 
 struct favorite_server {
@@ -23,6 +24,7 @@ struct favorite_server {
 	std::string label;
 	std::string address;
 	std::string name;
+	bool named_by_player = false;
 };
 
 class favorite_servers {
@@ -60,7 +62,15 @@ class favorite_servers {
 				}
 
 				if (const auto key = augs::hex_to_array<32>(fields[0])) {
-					servers.push_back({ *key, fields[1], fields[2], line.substr(from) });
+					auto name = line.substr(from);
+					const auto marker = std::string("\tnamed");
+					const bool named = name.size() >= marker.size() && name.compare(name.size() - marker.size(), marker.size(), marker) == 0;
+
+					if (named) {
+						name.resize(name.size() - marker.size());
+					}
+
+					servers.push_back({ *key, fields[1], fields[2], name, named });
 				}
 			}
 		}
@@ -72,7 +82,7 @@ class favorite_servers {
 		std::string content;
 
 		for (const auto& s : servers) {
-			content += augs::bytes_to_hex(s.key) + "\t" + s.label + "\t" + s.address + "\t" + s.name + "\n";
+			content += augs::bytes_to_hex(s.key) + "\t" + s.label + "\t" + s.address + "\t" + s.name + (s.named_by_player ? "\tnamed" : "") + "\n";
 		}
 
 		try {
@@ -138,15 +148,24 @@ public:
 		Added, or its name and address brought up to date (an empty one keeps what it was).
 	*/
 
-	void set(const augs::ed25519_public_key_type& key, const std::string& label, const std::string& address, const std::string& name) {
+	void set(
+		const augs::ed25519_public_key_type& key,
+		const std::string& label,
+		const std::string& address,
+		const std::string& name,
+		const bool named_by_player = false
+	) {
 		for (auto& s : servers) {
 			if (s.key == key && s.label == label) {
 				const auto new_address = address.empty() ? s.address : one_line(address);
-				const auto new_name = name.empty() ? s.name : one_line(name);
+				const bool keep_name = name.empty() || (s.named_by_player && !named_by_player);
+				const auto new_name = keep_name ? s.name : one_line(name);
+				const bool new_named = s.named_by_player || named_by_player;
 
-				if (new_address != s.address || new_name != s.name) {
+				if (new_address != s.address || new_name != s.name || new_named != s.named_by_player) {
 					s.address = new_address;
 					s.name = new_name;
+					s.named_by_player = new_named;
 					save();
 				}
 
@@ -154,7 +173,7 @@ public:
 			}
 		}
 
-		servers.push_back({ key, one_line(label), one_line(address), one_line(name) });
+		servers.push_back({ key, one_line(label), one_line(address), one_line(name), named_by_player });
 		save();
 	}
 
