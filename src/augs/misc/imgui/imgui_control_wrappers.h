@@ -25,6 +25,17 @@
 
 namespace augs {
 	namespace imgui {
+		/*
+			Text fields' values were just set from outside (e.g. a paste split into several fields): no field stays
+			being edited, and none writes back what it held while edited - else the field that was active would put
+			its old text over the new value on the next frame.
+		*/
+
+		inline void stop_editing_text() {
+			ImGui::ClearActiveID();
+			ImGui::GetCurrentContext()->InputTextDeactivatedState.ID = 0;
+		}
+
 		namespace detail {
 			template <class T, class F>
 			decltype(auto) direct_or_convert(T& into, F callback) {

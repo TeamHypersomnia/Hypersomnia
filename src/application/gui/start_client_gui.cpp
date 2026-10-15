@@ -79,10 +79,10 @@ bool start_client_gui_state::perform(
 			with_key = true;
 
 			/*
-				No field stays being edited - it would keep showing what was pasted into it, commas and all.
+				Whatever field was being edited takes the new values at once.
 			*/
 
-			ImGui::ClearActiveID();
+			augs::imgui::stop_editing_text();
 			return true;
 		}
 
