@@ -7551,3 +7551,5 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - lagodniejsza interpolacja tych markerow szczegolnie dla melee
 - upewnij sie ze te stampy naprawic te kurwa invalid filenames i jebane stampy w projectach z menu, czy to jest naprawione czy juz nie robia sie neon stampy kurwa a plikach projektu nigdy i nie lądują nigdy generowane pliki tam
 	- loaded from autosave jako toast bardzo widoczny z gory ktory znika zaraz a nie kurwa cos co trzeba kliknac okejke modal jebany bo to wkurwia
+- ranked: sensowna konfiguracja
+- ranked: sensowna konfiguracja

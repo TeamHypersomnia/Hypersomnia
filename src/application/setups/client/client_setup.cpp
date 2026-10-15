@@ -2078,14 +2078,14 @@ custom_imgui_result client_setup::perform_custom_imgui(
 								identity.expected_key_source == expected_server_key_source::REJOINED_MATCH
 								? std::string("The server's key is different from the one of the match you are rejoining.\n"
 									"Usually the server was just reinstalled - but someone could also be impersonating it!")
-								: std::string("The server at this address has another key than the one you chose.\n"
+								: std::string("The server at this address has a different key than the one you chose.\n"
 									"Usually the server was just reinstalled - but someone could also be impersonating it!\n"
 									"If it was reinstalled, add it to your favorites anew.")
 							);
 							break;
 
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_VERSION_MISMATCH:
-							set_disconnect_reason("The server runs another version of the game.\nUpdate the game, or wait for the server to be updated.");
+							set_disconnect_reason("The server runs a different version of the game.\nUpdate the game, or wait for the server to be updated.");
 							break;
 
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_CONNECTION_DENIED:
@@ -2126,7 +2126,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				*/
 
 				if (!identity.expected_server_public_key.has_value()) {
-					text_color("This server's key was not verified (joined by its address) - don't type a password you use elsewhere.", orange);
+					text_color("This server's key was not verified (joined by its address).\nDon't type a password you use elsewhere.", orange);
 				}
 
 				input_text<65>("Server password", password_retry_input, flags);

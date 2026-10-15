@@ -1945,7 +1945,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				if (key.has_value() && !add_server_address.empty()) {
 					if (const auto listed = find_entry_by_connect_string(add_server_address); listed != nullptr && listed->get_public_key() != key) {
-						return { typesafe_sprintf("The server list has \"%x\" at this address - with another key.", std::string(listed->heartbeat.server_name)), orange };
+						return { typesafe_sprintf("The server list has \"%x\" at this address -\nwith a different key.", std::string(listed->heartbeat.server_name)), orange };
 					}
 				}
 
@@ -2126,7 +2126,10 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 		ImGui::SameLine();
 
 		if (in.favorites.contains(*in.server_key, in.server_label)) {
-			if (ImGui::Button("Remove from favorites")) {
+			checkmark_line("In favorites", green);
+			ImGui::SameLine();
+
+			if (ImGui::Button("Remove")) {
 				in.favorites.remove(*in.server_key, in.server_label);
 			}
 		}

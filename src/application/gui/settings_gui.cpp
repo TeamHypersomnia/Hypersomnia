@@ -1251,7 +1251,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 
 			if (no_save_dialog_note) {
-				text_color("No file dialog on this system (install zenity) - copy account.key yourself (Show key file in folder).", orange);
+				text_color("No file dialog on this system (install zenity).\nCopy account.key yourself (Show key file in folder).", orange);
 			}
 #else
 			(void)window;
@@ -1727,7 +1727,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				*/
 
 				if (::web_tab_was_blocked() != 0) {
-					text_color("The browser blocked the new tab - click Open it again, or open this page yourself:", orange);
+					text_color("The browser blocked the new tab - click Open it again,\nor open this page yourself:", orange);
 					text_disabled(steam_link_url_cached);
 					ImGui::SameLine();
 					copy_icon_button("LinkUrl", steam_link_url_cached);

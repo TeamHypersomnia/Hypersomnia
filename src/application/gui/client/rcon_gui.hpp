@@ -263,7 +263,7 @@ void perform_rcon_gui(
 				}
 
 				ImGui::Separator();
-				text_disabled("A ban holds the player's account and address. The bans are in server_bans.json in the server's user folder.");
+				text_disabled("A ban holds the player's account and address.\nThe bans are in server_bans.json in the server's user folder.");
 
 				break;
 
