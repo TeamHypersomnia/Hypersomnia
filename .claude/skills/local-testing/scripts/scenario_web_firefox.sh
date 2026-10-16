@@ -20,6 +20,8 @@ CONNECT=${1:-pl}
 BROKER_URL=${BROKER_URL:-http://127.0.0.1:13500}
 BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 WAIT=${2:-120}
+# MAP=<arena in hypersomnia/user/downloads/arenas>: the server plays it, the browser downloads it (EXT=<provider url>,
+# e.g. a slow one - the browser downloads only from an external provider);
 # TAB_AWAY=<s>: the game's tab left for another one that long, then back (screen_back.png); KILL_SERVER=1: see the end
 EXTRA=$(( ${TAB_AWAY:-0} + ${KILL_SERVER:+30} + 0 ))
 
@@ -51,7 +53,7 @@ mkconf server <<EOF
 {
   "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
   "instances": { "ranked": $([ "$RANKED" = NEVER ] && echo 0 || echo 1) }, "server_start": { "ip": "0.0.0.0", "port": 10002, "slots": 16 },
-  "server": { "server_name": "$NAME", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:18430",
+  "server": { "server_name": "$NAME", "arena": "${MAP:-de_cyberaqua}", "external_arena_files_provider": "${EXT:-}", "notified_server_list": "127.0.0.1:18430",
               "suppress_new_community_server_webhook": true, "ranked": { "start_when": "${RANKED/NEVER/ALWAYS}" },
               "webrtc_port_range_begin": 19000, "webrtc_port_range_end": 19050 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" }
@@ -68,6 +70,11 @@ user_pref("media.autoplay.default", 0);
 user_pref("devtools.console.stdout.content", true);
 user_pref("media.volume_scale", "0.0");
 EOF
+
+if [ -n "$MAP" ]; then
+	mkdir -p $T/server/user/downloads/arenas
+	cp -r $GAME/user/downloads/arenas/$MAP $T/server/user/downloads/arenas/
+fi
 
 cd $GAME
 # Official by its public key

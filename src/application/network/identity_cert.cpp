@@ -2,6 +2,7 @@
 #if BUILD_NETWORKING
 #include <sodium.h>
 #endif
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/string/hex.h"
 #include "application/network/identity_cert.h"
@@ -221,9 +222,10 @@ namespace identity_cert {
 		auto signature = augs::ed25519_signature_type();
 		std::memcpy(signature.data(), session_signature, signature.size());
 
-		const auto binding = std::string_view(reinterpret_cast<const char*>(connection_binding), 32);
+		const auto binding = std::string_view(reinterpret_cast<const char*>(connection_binding), NETCODE_BINDING_BYTES);
+		const auto signed_message = std::string(NETCODE_SESSION_SIGNATURE_TAG) + std::string(binding);
 
-		if (!augs::ed25519_verify(c.session_public_key, binding, signature)) {
+		if (!augs::ed25519_verify(c.session_public_key, signed_message, signature)) {
 			return fail(verify_failure::BAD_SESSION_SIGNATURE);
 		}
 
@@ -399,8 +401,15 @@ TEST_CASE("Identity cert verification") {
 	binding.fill(0x42);
 
 	const auto binding_view = std::string_view(reinterpret_cast<const char*>(binding.data()), binding.size());
-	const auto session_signature = *augs::ed25519_sign(session_seed, binding_view);
-	const auto foreign_signature = *augs::ed25519_sign(other_seed, binding_view);
+	const auto signed_message = std::string(NETCODE_SESSION_SIGNATURE_TAG) + std::string(binding_view);
+	const auto session_signature = *augs::ed25519_sign(session_seed, signed_message);
+	const auto foreign_signature = *augs::ed25519_sign(other_seed, signed_message);
+
+	/*
+		The bare binding signed (as before the tag) is no session signature.
+	*/
+
+	const auto untagged_signature = *augs::ed25519_sign(session_seed, binding_view);
 
 	auto broker_cert = identity_cert::cert();
 	broker_cert.account = "steam_76561198000000000";
@@ -429,6 +438,7 @@ TEST_CASE("Identity cert verification") {
 		auto other_binding = binding;
 		other_binding[0] ^= 1;
 		REQUIRE(!identity_cert::verify(broker_cert, brokers, 1700003600, other_binding.data(), session_signature.data()).has_value());
+		REQUIRE(!identity_cert::verify(broker_cert, brokers, 1700003600, binding.data(), untagged_signature.data()).has_value());
 	}
 
 	SECTION("A changed account voids the broker's signature, and a steam account can not be self-signed") {

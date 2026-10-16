@@ -778,9 +778,12 @@ work_result work(
 		&& config.masterserver.report_rtc_errors_to_webhook
 	;
 
-	const bool verbose_rtc_log = 
-		params.type == app_type::MASTERSERVER
-	;
+	/*
+		Verbose WebRTC logs (every TCP chunk of every connection) only when debugging the signalling by hand - one
+		connection sending junk would fill the masterserver's log otherwise.
+	*/
+
+	const bool verbose_rtc_log = false;
 
 	WEBSTATIC auto network_raii = augs::network_raii(
 		report_rtc_errors,
