@@ -366,6 +366,23 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 public:
 	/*
+		The nickname and avatar a restored key last played with, given to both configs (the caller saves them).
+		True when anything changed.
+	*/
+
+	bool apply_imported_profile(
+		const identity_session::account_profile& profile,
+		config_json_table& config,
+		config_json_table& last_saved_config
+	);
+
+	/*
+		Settings open with a message: the key was unlinked elsewhere.
+	*/
+
+	void tell_unlinked_elsewhere(const std::string& steam_name);
+
+	/*
 		Any modal of the Account settings - another modal waits while one is open (two would close each other every frame).
 	*/
 

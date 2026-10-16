@@ -730,6 +730,62 @@ static void link_avatar_and_name(const std::string& name, const bool has_avatar)
 	text(name);
 }
 
+bool settings_gui_state::apply_imported_profile(
+	const identity_session::account_profile& profile,
+	config_json_table& config,
+	config_json_table& last_saved_config
+) {
+	auto change = [&](const auto& setter) {
+		setter(config.client);
+		setter(last_saved_config.client);
+	};
+
+	bool changed = false;
+
+	if (!profile.name.empty()) {
+		change([&](auto& client) {
+			client.nickname = profile.name;
+		});
+
+		changed = true;
+	}
+
+	if (!profile.avatar.empty()) {
+		try {
+			auto image = augs::image();
+			image.from_bytes_stbi(profile.avatar, "imported avatar");
+			image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
+			image.save_as_png(CACHED_AVATAR);
+
+			change([&](auto& client) {
+				client.avatar_image_path = CACHED_AVATAR;
+			});
+
+			avatar_changed = true;
+			changed = true;
+		}
+		catch (...) {
+			LOG("Could not read the imported key's avatar.");
+		}
+	}
+
+	return changed;
+}
+
+void settings_gui_state::tell_unlinked_elsewhere(const std::string& steam_name) {
+	open();
+	active_pane = settings_pane::ACCOUNT;
+
+	const auto linked_to = steam_name.empty() ? std::string("a Steam account") : "the Steam account " + steam_name;
+
+	account_message =
+		"This key is no longer linked to " + linked_to + " -\n"
+		"it was unlinked elsewhere (on another computer or on hypersomnia.io).\n\n"
+		"Your progress now counts towards your key account.\n"
+		"To link it again: Link with Steam."
+	;
+}
+
 void settings_gui_state::perform_import_modal(
 	config_json_table& config,
 	config_json_table& last_saved_config,
@@ -759,16 +815,6 @@ void settings_gui_state::perform_import_modal(
 	if (!ImGui::BeginPopupModal("Restore from private key##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		return;
 	}
-
-	/*
-		Saved right away, without the other unsaved changes of the settings.
-	*/
-
-	auto save_client_profile = [&](const auto& change) {
-		change(config.client);
-		change(last_saved_config.client);
-		last_saved_config.save_patch(canon_config_with_confd, config_path_for_saving, true);
-	};
 
 	const auto check = identity != nullptr ? identity->get_link_check() : identity_session::link_check_state::FAILED;
 	const auto& profile = identity != nullptr ? identity->get_link_check_profile() : identity_session::account_profile();
@@ -840,28 +886,16 @@ void settings_gui_state::perform_import_modal(
 		if (!import_profile_applied) {
 			import_profile_applied = true;
 
-			if (!profile.name.empty()) {
-				save_client_profile([&](auto& client) {
-					client.nickname = profile.name;
-				});
+			/*
+				Saved right away, without the other unsaved changes of the settings.
+			*/
+
+			if (apply_imported_profile(profile, config, last_saved_config)) {
+				last_saved_config.save_patch(canon_config_with_confd, config_path_for_saving, true);
 			}
 
-			if (!profile.avatar.empty()) {
-				try {
-					auto image = augs::image();
-					image.from_bytes_stbi(profile.avatar, "imported avatar");
-					image.scale(vec2u::square(static_cast<unsigned>(max_avatar_side_v)));
-					image.save_as_png(CACHED_AVATAR);
-
-					save_client_profile([&](auto& client) {
-						client.avatar_image_path = CACHED_AVATAR;
-					});
-
-					avatar_changed = true;
-				}
-				catch (...) {
-					LOG("Could not read the imported key's avatar.");
-				}
+			if (identity != nullptr) {
+				identity->imported_profile_applied();
 			}
 		}
 
@@ -1036,6 +1070,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 			if (identity != nullptr) {
 				identity->set_key(imported, keys_dir);
+				identity->mark_imported();
 				identity->start_link_check(identity_input.broker_url);
 			}
 

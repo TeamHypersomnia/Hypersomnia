@@ -49,6 +49,22 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	cert_file = new_cert_file;
 	profile_file = keys_dir / "steam_profile.json";
+	import_marker_file = keys_dir / "imported_key.json";
+	imported_profile.reset();
+	unlinked_elsewhere.reset();
+
+	import_profile_pending = [&]() {
+		if (!augs::exists(import_marker_file)) {
+			return false;
+		}
+
+		try {
+			return augs::from_json_file<imported_key_marker>(import_marker_file).account == key_account();
+		}
+		catch (...) {
+			return false;
+		}
+	}();
 
 	forget_cert();
 
@@ -80,6 +96,24 @@ void identity_session::recheck_link_quietly() {
 	key_check_quiet = true;
 	key_check_next_at = last_now + key_recheck_delay_secs;
 	key_recheck_until = last_now + link_page_lifetime_secs;
+}
+
+void identity_session::mark_imported() {
+	import_profile_pending = true;
+	imported_profile.reset();
+
+	try {
+		augs::save_as_json_atomic(imported_key_marker { key_account() }, import_marker_file);
+	}
+	catch (...) {
+		LOG("Could not save %x - the restored key's nickname and avatar are asked for only in this run.", import_marker_file);
+	}
+}
+
+void identity_session::imported_profile_applied() {
+	import_profile_pending = false;
+	imported_profile.reset();
+	augs::remove_file(import_marker_file);
 }
 
 void identity_session::on_key_created() {
@@ -532,7 +566,12 @@ void identity_session::advance(const input& in, const double now) {
 
 			if (cert_saved || (broker_cert.has_value() && !is_key_account(broker_cert->account))) {
 				LOG("The key is no longer linked to a Steam account.");
+				unlinked_elsewhere = profile.name;
 				on_unlinked();
+			}
+
+			if (import_profile_pending) {
+				imported_profile = answer->profile;
 			}
 
 			last_attempt_failed = false;
@@ -563,7 +602,12 @@ void identity_session::advance(const input& in, const double now) {
 		if (answer.has_value()) {
 			/*
 				A cert for the account: Steam (a linked key, the Steam build), CrazyGames.
+				A restored key found linked plays with the Steam profile - nothing of its own to wait for.
 			*/
+
+			if (import_profile_pending && key_can_be_linked) {
+				imported_profile_applied();
+			}
 
 			last_attempt_failed = false;
 			last_error.clear();

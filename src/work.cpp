@@ -6352,6 +6352,25 @@ work_result work(
 					settings_gui.ask_whether_link_is_theirs();
 				}
 
+				if (!in_a_game) {
+					if (const auto steam_name = identity->take_unlinked_elsewhere()) {
+						settings_gui.tell_unlinked_elsewhere(*steam_name);
+					}
+				}
+
+				/*
+					A restored key whose nickname and avatar did not come at the import (hypersomnia.io not reached):
+					written once it answers, out of a game - the import modal does it itself while open.
+				*/
+
+				if (const auto& imported = identity->get_imported_profile(); imported.has_value() && !in_a_game && !settings_gui.account_modal_open(false)) {
+					if (settings_gui.apply_imported_profile(*imported, config, last_saved_config)) {
+						save_runtime_prefs();
+					}
+
+					identity->imported_profile_applied();
+				}
+
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;
 

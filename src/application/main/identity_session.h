@@ -34,6 +34,18 @@
 	It goes only when the broker answers with the key's own account - the key was unlinked on the site.
 */
 
+/*
+	imported_key.json next to account.key: a key restored from a file whose nickname and avatar (the ones it last played
+	with, kept by hypersomnia.io) have not come yet - hypersomnia.io was not reached at the import. Asked at every start
+	(the quiet check) until it answers.
+*/
+
+struct imported_key_marker {
+	// GEN INTROSPECTOR struct imported_key_marker
+	std::string account;
+	// END GEN INTROSPECTOR
+};
+
 class identity_session {
 public:
 	enum class provider_type {
@@ -114,6 +126,12 @@ private:
 
 	bool crazygames_token_refused = false;
 	bool linked_quietly = false;
+
+	std::optional<std::string> unlinked_elsewhere;
+
+	augs::path_type import_marker_file;
+	bool import_profile_pending = false;
+	std::optional<account_profile> imported_profile;
 
 	std::optional<identity_cert::cert> unconfirmed_cert;
 	account_profile unconfirmed_profile;
@@ -256,6 +274,25 @@ public:
 	bool take_linked_quietly() {
 		return std::exchange(linked_quietly, false);
 	}
+
+	/*
+		The key was unlinked elsewhere (on another computer, or on hypersomnia.io) - the game tells the player, once.
+		The name of the Steam account it was linked to, if known.
+	*/
+
+	std::optional<std::string> take_unlinked_elsewhere() {
+		return std::exchange(unlinked_elsewhere, std::nullopt);
+	}
+
+	/*
+		A restored key (see imported_key_marker): mark_imported right after the import; once hypersomnia.io answers that
+		the key is not linked, its profile is here until the game writes it to the config (imported_profile_applied).
+		A linked key needs none - its Steam profile is used.
+	*/
+
+	void mark_imported();
+	const std::optional<account_profile>& get_imported_profile() const { return imported_profile; }
+	void imported_profile_applied();
 
 	/*
 		The broker answered 401 to a CrazyGames token: the game asks CrazyGames for a new one.
