@@ -35,6 +35,13 @@ void do_game_speed_tooltip();
 void do_bullet_speed_tooltip();
 
 /*
+	Right after the game speed slider: a green "Original Hypersomnia experience"
+	while both the game and the bullet speed are at 1x.
+*/
+
+void do_original_speed_badge(real32 game_speed, const augs::maybe<real32>& bullet_speed);
+
+/*
 	The server settings come in sections - shown as tabs in the settings,
 	and as panes with folded sections in the rcon - see do_server_vars.
 */

@@ -2616,6 +2616,7 @@ void settings_gui_state::perform(
 
 					const bool game_speed_changed = revertable_slider("Singleplayer game speed", config.singleplayer_game_speed, min_logic_speed_v, max_logic_speed_slider_v, "%.2fx");
 					config.singleplayer_game_speed = ::sanitize_logic_speed(config.singleplayer_game_speed);
+					::do_original_speed_badge(config.singleplayer_game_speed, config.singleplayer_bullet_speed);
 
 					::do_bullet_speed_slider(
 						"Singleplayer bullet speed",
@@ -4952,6 +4953,17 @@ void do_game_speed_tooltip() {
 	);
 }
 
+void do_original_speed_badge(const real32 game_speed, const augs::maybe<real32>& bullet_speed) {
+	using namespace augs::imgui;
+
+	const auto effective_bullet_speed = bullet_speed.is_enabled ? bullet_speed.value : game_speed;
+
+	if (game_speed == 1.f && effective_bullet_speed == 1.f) {
+		ImGui::SameLine();
+		text_color("* Original Hypersomnia experience", green);
+	}
+}
+
 void do_bullet_speed_tooltip() {
 	augs::imgui::tooltip_on_hover(
 		"Separate setting for bullet speeds.\n\n"
@@ -5106,6 +5118,7 @@ void do_server_vars_section(
 			const bool game_speed_changed = revertable_slider("Game speed", vars.game_speed, min_logic_speed_v, max_logic_speed_slider_v, "%.2fx");
 			vars.game_speed = ::sanitize_logic_speed(vars.game_speed);
 			::do_game_speed_tooltip();
+			::do_original_speed_badge(vars.game_speed, vars.bullet_speed);
 
 			::do_bullet_speed_slider("Bullet speed", vars.game_speed, vars.bullet_speed, game_speed_changed);
 			::do_bullet_speed_tooltip();

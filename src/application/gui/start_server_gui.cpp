@@ -156,6 +156,7 @@ as well as to test your skills in a laggy environment.
 
 		into_vars.game_speed = ::sanitize_logic_speed(into_vars.game_speed);
 		::do_game_speed_tooltip();
+		::do_original_speed_badge(into_vars.game_speed, into_vars.bullet_speed);
 
 		{
 			auto scope = scoped_text_color(new_feature_color);
