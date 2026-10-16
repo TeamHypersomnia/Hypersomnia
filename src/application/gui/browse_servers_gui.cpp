@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "augs/string/hex.h"
 #include "augs/misc/future.h"
+#include "view/format_multiplier.h"
 
 #include "application/setups/client/connect_target.h"
 #include "application/main/favorite_servers.h"
@@ -3010,6 +3011,22 @@ bool server_details_gui_state::perform(
 	}
 
 	input_text("Server version", version, rdonly_flags);
+
+	if (heartbeat.speed_hundredths > 0 && heartbeat.bullet_speed_hundredths > 0) {
+		auto mult = [](const uint8_t hundredths) {
+			return ::format_multiplier(hundredths / 100.f);
+		};
+
+		text("Speeds: " + mult(heartbeat.speed_hundredths));
+		ImGui::SameLine();
+		text_disabled("(game)");
+		ImGui::SameLine(0, 0);
+		text(",");
+		ImGui::SameLine();
+		text(mult(heartbeat.bullet_speed_hundredths));
+		ImGui::SameLine();
+		text_disabled("(bullets)");
+	}
 
 	perform_online_players(entry, faction_view, streamer_mode);
 	return false;
