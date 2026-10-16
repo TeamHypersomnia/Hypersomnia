@@ -360,8 +360,15 @@ void world_camera::tick(
 				wherever no camera zoom area covers the player.
 				Sanitize, as these values come from arbitrary map files.
 			*/
-			const auto default_zoom = default_zoom_override.has_value() ? *default_zoom_override : cosm.get_common_significant().default_zoom;
+			const auto map_default_zoom = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
+			const auto default_zoom = default_zoom_override.has_value() ? *default_zoom_override : map_default_zoom;
 			target_area_zoom_mult = std::clamp(default_zoom, 0.2f, 4.0f);
+
+			/*
+				The server's override scales the map's camera zoom areas too,
+				so they keep their ratio to the default (default 0.5x, area 1x, override 1x -> area 2x).
+			*/
+			const auto area_zoom_scale = target_area_zoom_mult / map_default_zoom;
 
 			if (forced_area_zoom.has_value()) {
 				/* E.g. chosen with the zoom pads at the shooting range. */
@@ -370,7 +377,7 @@ void world_camera::tick(
 			else if (entity_to_chase.alive()) {
 				if (const auto tr = entity_to_chase.find_logic_transform()) {
 					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos); area_zoom.has_value()) {
-						target_area_zoom_mult = std::clamp(*area_zoom, 0.2f, 4.0f);
+						target_area_zoom_mult = std::clamp(*area_zoom * area_zoom_scale, 0.2f, 4.0f);
 					}
 
 #if ZOOM_IN_DURING_BUY_TIME
