@@ -42,6 +42,7 @@ namespace identity_cert {
 
 		write_i64(out, c.not_before);
 		write_i64(out, c.not_after);
+		out.push_back(static_cast<std::byte>(c.proof));
 
 		return out;
 	}
@@ -71,7 +72,7 @@ namespace identity_cert {
 			return std::nullopt;
 		}
 
-		const auto expected_size = 2 + account_length + 32 + 8 + 8 + 64;
+		const auto expected_size = 2 + account_length + 32 + 8 + 8 + 1 + 64;
 
 		if (size != expected_size) {
 			return std::nullopt;
@@ -91,6 +92,15 @@ namespace identity_cert {
 
 		out.not_after = read_i64(p);
 		p += 8;
+
+		const auto proof = static_cast<uint8_t>(*p);
+		p += 1;
+
+		if (proof >= static_cast<uint8_t>(proof_type::COUNT)) {
+			return std::nullopt;
+		}
+
+		out.proof = static_cast<proof_type>(proof);
 
 		std::memcpy(out.signature.data(), p, 64);
 
@@ -363,12 +373,13 @@ TEST_CASE("Identity cert matches the broker's format") {
 	c.session_public_key = session_public_key;
 	c.not_before = 1700000000;
 	c.not_after = 1700007200;
+	c.proof = identity_cert::proof_type::STEAM_TICKET;
 	c.signature = *augs::ed25519_sign(broker_seed, identity_cert::signed_message(c));
 
 	const auto expected = std::string(
-		"0117737465616d5f37363536313139383030303030303030300bbc346a57667c380120bd9c7fd7e51d2c5fdfea37cd2f5bf405b2c6bf6f2d78"
-		"00f1536500000000200d546500000000301a73c6e6345b51e50cfa48fb92972004431f34f3c8f37077b6c5c91b9c4cb9de5a0606bf0ffa59746a"
-		"9908dcca455125b897be83444ee99374135bc0136c00"
+		"0217737465616d5f37363536313139383030303030303030300bbc346a57667c380120bd9c7fd7e51d2c5fdfea37cd2f5bf405b2c6bf6f2d78"
+		"00f1536500000000200d54650000000001fda8b046d7649da980a0b7feeeb7aa85ddafa81b21591ac83b5973be94b4c6acf62a60003bb34ad5"
+		"fc55d3ff08bc9a218e184f68c5462f2e48e1b8108123c600"
 	);
 
 	REQUIRE(augs::bytes_to_hex(identity_cert::to_bytes(c)) == expected);

@@ -27,7 +27,7 @@ namespace identity_cert {
 	inline constexpr std::string_view cert_tag = "hs-cert-v1";
 	inline constexpr std::string_view cert_request_tag = "hs-cert-req-v1";
 
-	inline constexpr uint8_t format_version = 1;
+	inline constexpr uint8_t format_version = 2;
 	inline constexpr std::size_t max_account_length = 80;
 	inline constexpr std::size_t max_password_length = 64;
 
@@ -36,6 +36,19 @@ namespace identity_cert {
 	*/
 
 	inline constexpr int64_t clock_margin_secs = 10 * 60;
+
+	/*
+		What proved the account to the broker - in the signed cert, so that a server can tell a Steam account proven by
+		Steam itself from one proven by a key linked to it (a link that someone tricked its owner into confirming).
+	*/
+
+	enum class proof_type : uint8_t {
+		ACCOUNT_KEY,
+		STEAM_TICKET,
+		CRAZYGAMES_TOKEN,
+
+		COUNT
+	};
 
 	struct cert {
 		std::string account;
@@ -48,6 +61,8 @@ namespace identity_cert {
 		int64_t not_before = 0;
 		int64_t not_after = 0;
 
+		proof_type proof = proof_type::ACCOUNT_KEY;
+
 		augs::ed25519_signature_type signature = {};
 
 		bool operator==(const cert&) const = default;
@@ -55,7 +70,7 @@ namespace identity_cert {
 
 	/*
 		version (1), account length (1), account, session public key (32),
-		not_before and not_after (8 each, little endian), signature (64).
+		not_before and not_after (8 each, little endian), proof (1), signature (64).
 	*/
 
 	std::vector<std::byte> to_bytes(const cert&);

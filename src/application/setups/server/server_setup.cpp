@@ -1352,6 +1352,21 @@ static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const ser
 }
 
 /*
+	A Steam account is an admin only when Steam itself proved it (the Steam build's ticket) - a key linked to it proves
+	only that key (someone may have tricked the account's owner into confirming a link). Such a cert counts as the key's
+	own account, key_<the key that signed this connection>: an admin with both in admin_profiles gets in either way.
+*/
+
+static std::string admin_account_of(const identity_cert::cert& c) {
+	const bool steam_proven_by_a_key =
+		begins_with(c.account, "steam_")
+		&& c.proof != identity_cert::proof_type::STEAM_TICKET
+	;
+
+	return steam_proven_by_a_key ? identity_cert::key_account(c.session_public_key) : c.account;
+}
+
+/*
 	Reads what the client sealed into its handshake - see identity_cert.h - right as it connects.
 	Nothing here waits for anything: the cert and the signature are checked with what the server has.
 */
@@ -1449,6 +1464,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	}
 
 	c.cert_account = verified->account;
+	c.admin_account = ::admin_account_of(*blob->identity);
 
 	/*
 		Where the nicknames are the accounts (tournaments), the cert only decides who may administer.
@@ -3431,7 +3447,7 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 void server_setup::update_badges() {
 	for_each_id_and_client([&](const auto id, auto& c) {
 		const bool integrated = is_integrated() && id == get_integrated_client_id();
-		const auto& account_id = integrated ? integrated_account_id : c.cert_account;
+		const auto& account_id = integrated ? integrated_account_id : c.admin_account;
 		const auto new_badge = clan_name_type([&]() {
 			const auto badge = calc_badge(account_id);
 
@@ -5608,7 +5624,7 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	*/
 
 	const auto profile_level = [&]() {
-		if (const auto profile = find_admin_profile_of(c.cert_account); profile.has_value()) {
+		if (const auto profile = find_admin_profile_of(c.admin_account); profile.has_value()) {
 			return profile->rcon_level;
 		}
 
@@ -5619,26 +5635,39 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 }
 
 static constexpr uint32_t max_wrong_passwords_per_minute_v = 5;
+static constexpr uint32_t max_wrong_passwords_of_keys_without_address_per_minute_v = 30;
 static constexpr std::size_t max_wrong_password_addresses_v = 4096;
 
 /*
 	Wrong passwords per address (an IPv6 /64, see address_for_bans) - only slowing down guessing, not sealing it;
 	a full table takes no new addresses until its records go stale.
 
-	Peers with no address (relayed through TURN, or a server in a browser) count by their account - never all of them
-	together, or five typos (or one script) would keep everyone with the right password out. A new account per guess
-	is still held back by the handshake budget.
+	Peers with no address (relayed through TURN, or a server in a browser) count by their account where an account costs
+	something (Steam, CrazyGames). Accounts of keys alone are free - a script would take a new one every few guesses -
+	so all of them count together, with more allowed, so that a few typos do not keep the others out.
 */
 
 static std::string wrong_passwords_key(const std::string& address, const std::string& account) {
-	return address.empty() ? "(no address) " + account : address;
+	if (!address.empty()) {
+		return address;
+	}
+
+	return begins_with(account, "key_") ? std::string("(no address, keys)") : "(no address) " + account;
+}
+
+static uint32_t max_wrong_passwords_of(const std::string& record_key) {
+	return
+		record_key == "(no address, keys)" ?
+		max_wrong_passwords_of_keys_without_address_per_minute_v :
+		max_wrong_passwords_per_minute_v
+	;
 }
 
 bool server_setup::too_many_wrong_passwords(const std::string& given_address, const std::string& account) const {
 	const auto address = ::wrong_passwords_key(given_address, account);
 
 	if (const auto record = mapped_or_nullptr(wrong_passwords, address)) {
-		return server_time - record->since < 60.0 && record->count >= max_wrong_passwords_per_minute_v;
+		return server_time - record->since < 60.0 && record->count >= ::max_wrong_passwords_of(address);
 	}
 
 	return false;
@@ -5683,7 +5712,7 @@ bool server_setup::is_authorized_for_access(const client_id_type& id) const {
 		An admin needs no password.
 	*/
 
-	return find_admin_profile_of(c.cert_account).has_value();
+	return find_admin_profile_of(c.admin_account).has_value();
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {

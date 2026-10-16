@@ -141,7 +141,7 @@ message_handler_result server_setup::handle_payload(
 
 		if (joining
 			&& too_many_wrong_passwords(guessing_address, c.cert_account)
-			&& !find_admin_profile_of(c.cert_account).has_value()
+			&& !find_admin_profile_of(c.admin_account).has_value()
 		) {
 			kick(client_id, "Too many wrong passwords. Try again in a minute.");
 			return continue_v;

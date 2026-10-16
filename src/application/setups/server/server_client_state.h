@@ -78,10 +78,15 @@ struct server_client_state {
 
 	/*
 		The account its cert proves, whatever authenticated_id is - e.g. a nick_ on a tournament server.
-		What the admin profiles are matched against.
 	*/
 
 	std::string cert_account;
+
+	/*
+		What the admin profiles (and the developer badge) are matched against - see admin_account_of in server_setup.
+	*/
+
+	std::string admin_account;
 
 	/*
 		The server password the client sealed into its handshake.
