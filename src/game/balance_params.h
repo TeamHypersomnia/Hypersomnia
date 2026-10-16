@@ -10,4 +10,4 @@
 	of the per-map default_zoom arena setting. Maps can still
 	override it, and camera_zoom areas take precedence locally.
 */
-constexpr float BALANCE_ZOOM_OUT = 0.8f;
+constexpr float BALANCE_ZOOM_OUT = 0.75f;

@@ -4588,9 +4588,9 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
-			gun_def.shot_cooldown_ms = 118.f;
+			gun_def.shot_cooldown_ms = 138.f;
 			gun_def.after_transfer_shot_cooldown_mult = 1.5f;
-			gun_def.burst_interval_ms = 85.f;
+			gun_def.burst_interval_ms = 105.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = true;
 
