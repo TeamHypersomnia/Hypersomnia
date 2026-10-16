@@ -14,6 +14,7 @@
 #include "application/setups/editor/resources/editor_explosive_resource.h"
 
 #include "application/setups/editor/resources/editor_material_resource.h"
+#include "application/setups/editor/resources/editor_decal_resource.h"
 
 #include "application/setups/editor/resources/editor_prefab_resource.h"
 #include "application/setups/editor/resources/editor_game_mode_resource.h"

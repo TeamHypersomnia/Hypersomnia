@@ -32,6 +32,7 @@ struct editor_official_resource_map {
 	Map<test_touch_collectibles, editor_touch_collectible_resource> touch_collectibles;
 
 	Map<test_scene_physical_material_id, editor_material_resource> materials;
+	Map<test_decal_decorations, editor_decal_resource> decals;
 
 	Map<editor_builtin_prefab_type, editor_prefab_resource> prefabs;
 	// END GEN INTROSPECTOR

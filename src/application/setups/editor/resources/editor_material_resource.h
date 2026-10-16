@@ -8,6 +8,20 @@
 #include "test_scenes/test_scene_physical_materials.h"
 
 struct editor_material_resource;
+struct editor_decal_resource;
+
+/*
+	Decals left on a surface of the material, picked at random from the set ones.
+*/
+
+struct editor_material_decal_variants {
+	// GEN INTROSPECTOR struct editor_material_decal_variants
+	editor_typed_resource_id<editor_decal_resource> variant_1;
+	editor_typed_resource_id<editor_decal_resource> variant_2;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_material_decal_variants&) const = default;
+};
 
 struct editor_collision_sound_def {
 	using bound = augs::bound<real32>;
@@ -48,6 +62,10 @@ struct editor_material_resource_editable {
 	bool silence_damager_destruction_sound = false;
 
 	editor_particle_effect damage_particles;
+
+	editor_material_decal_variants gunshot_decals;
+	editor_material_decal_variants melee_decals;
+	editor_material_decal_variants explosion_decals;
 
 	real32 unit_damage_for_effects = 30.f;
 	real32 max_ricochet_angle = 20.0f;

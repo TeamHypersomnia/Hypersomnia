@@ -19,6 +19,7 @@ struct editor_tool_resource;
 struct editor_touch_collectible_resource;
 
 struct editor_material_resource;
+struct editor_decal_resource;
 
 struct editor_prefab_resource;
 struct editor_game_mode_resource;
@@ -43,6 +44,7 @@ using internal_editor_resource_types = type_list<
 	editor_touch_collectible_resource,
 
 	editor_material_resource,
+	editor_decal_resource,
 
 	editor_prefab_resource,
 	editor_game_mode_resource

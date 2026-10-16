@@ -192,6 +192,9 @@ void allocate_flavours_and_assets_for_resource(
 
 		create_as(sound_decoration());
 	}
+	else if constexpr(std::is_same_v<editor_decal_resource, R>) {
+		/* Only the official decals for now - they keep their flavours from the test scene. */
+	}
 	else {
 		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
 	}
@@ -489,6 +492,9 @@ void setup_scene_object_from_resource(
 
 			//scene.template get<invariants::light>().is_new_light_attenuation = 1;
 		*/
+	}
+	else if constexpr(std::is_same_v<editor_decal_resource, R>) {
+		/* Only the official decals for now - they keep their flavours from the test scene. */
 	}
 	else {
 		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");

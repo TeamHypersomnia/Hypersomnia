@@ -15,6 +15,8 @@
 #include "application/setups/editor/resources/resource_traits.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/editor/defaults/editor_node_defaults.h"
+#include "application/setups/editor/editor_official_resource_map.hpp"
+#include "application/setups/editor/defaults/editor_resource_defaults.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
 #include "augs/window_framework/window.h"
 
@@ -516,6 +518,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			if (selectable_with_icon(in.necessary_images[assets::necessary_image_id::EDITOR_ICON_MATERIAL], "New Material", 1.0f, padding, white, icon_bg_cols, 0.f, pad_from_left)) {
 				create_resource_command<editor_material_resource> cmd;
 				cmd.created_resource.unique_name = "Unnamed material";
+				::setup_resource_defaults(cmd.created_resource.editable, in.setup.get_official_resource_map());
 
 				const auto id = in.setup.post_new_command(std::move(cmd)).get_resource_id();
 				(void)id;
@@ -622,7 +625,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
 	root.clear();
-	root.subfolders.resize(14);
+	root.subfolders.resize(15);
 	root.should_sort = false;
 
 	auto i = 0;
@@ -643,6 +646,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& area_markers_folder = root.subfolders[i++];
 
 	auto& materials_folder = root.subfolders[i++];
+	auto& decals_folder = root.subfolders[i++];
 
 	auto& prefabs_folder = root.subfolders[i++];
 	auto& game_modes_folder = root.subfolders[i++];
@@ -663,6 +667,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	area_markers_folder.name = "Zones";
 
 	materials_folder.name = "Materials";
+	decals_folder.name = "Decals";
 
 	prefabs_folder.name = "Prefabs";
 	game_modes_folder.name = "Game modes";
@@ -703,6 +708,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& area_markers_folder = root.subfolders[i++];
 
 	auto& materials_folder = root.subfolders[i++];
+	auto& decals_folder = root.subfolders[i++];
 
 	auto& prefabs_folder = root.subfolders[i++];
 	auto& game_modes_folder = root.subfolders[i++];
@@ -797,6 +803,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	handle(area_markers_folder, resources.get_pool_for<editor_area_marker_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	handle(materials_folder, resources.get_pool_for<editor_material_resource>(), assets::necessary_image_id::EDITOR_ICON_MATERIAL);
+	handle(decals_folder, resources.get_pool_for<editor_decal_resource>(), assets::necessary_image_id::EDITOR_ICON_MATERIAL);
 
 	handle(prefabs_folder, resources.get_pool_for<editor_prefab_resource>(), assets::necessary_image_id::SPELL_BORDER);
 	handle(game_modes_folder, resources.get_pool_for<editor_game_mode_resource>(), assets::necessary_image_id::EDITOR_TOOL_HOST_SERVER);

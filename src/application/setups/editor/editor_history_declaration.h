@@ -70,6 +70,7 @@ using editor_history_base = augs::history<
 	edit_resource_command<editor_point_marker_resource>,
 	edit_resource_command<editor_area_marker_resource>,
 	edit_resource_command<editor_material_resource>,
+	edit_resource_command<editor_decal_resource>,
 
 	edit_resource_command<editor_firearm_resource>,
 	edit_resource_command<editor_ammunition_resource>,

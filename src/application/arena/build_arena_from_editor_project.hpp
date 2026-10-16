@@ -188,6 +188,35 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 			else if constexpr(std::is_same_v<R, editor_material_resource>) {
 				auto& material = common.logical_assets.physical_materials.get(resource.scene_asset_id);
 				setup_scene_object(material);
+
+				/*
+					The official materials keep the decals of the test scene.
+				*/
+
+				if (!resource.official_tag.has_value()) {
+					auto to_decal_variants = [&](const editor_material_decal_variants& from) {
+						material_decal_variants out;
+
+						for (const auto& variant : { from.variant_1, from.variant_2 }) {
+							if (const auto decal = find_resource(variant)) {
+								const auto flavour_id = std::get<typed_entity_flavour_id<decal_decoration>>(decal->scene_flavour_id);
+
+								if (flavour_id.is_set()) {
+									out.push_back(flavour_id);
+								}
+							}
+						}
+
+						return out;
+					};
+
+					const auto& editable = resource.editable;
+					auto& decals = common.assets.material_decals[resource.scene_asset_id];
+
+					decals.gunshot_decals = to_decal_variants(editable.gunshot_decals);
+					decals.melee_decals = to_decal_variants(editable.melee_decals);
+					decals.explosion_decals = to_decal_variants(editable.explosion_decals);
+				}
 			}
 			else {
 				std::visit(

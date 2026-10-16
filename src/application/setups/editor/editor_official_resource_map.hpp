@@ -57,6 +57,9 @@ auto& editor_official_resource_map::get_container(S& self, const T& id) {
 	else if constexpr(std::is_same_v<T, test_scene_physical_material_id>) {
 		return self.materials;
 	}
+	else if constexpr(std::is_same_v<T, test_decal_decorations>) {
+		return self.decals;
+	}
 	else if constexpr(std::is_same_v<T, editor_builtin_prefab_type>) {
 		return self.prefabs;
 	}

@@ -15,6 +15,7 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/official/create_official_sprites.h"
 #include "application/setups/editor/official/create_official_materials.h"
+#include "application/setups/editor/official/create_official_decals.h"
 #include "application/setups/editor/official/create_official_lights.h"
 #include "application/setups/editor/official/create_official_sounds.h"
 #include "application/setups/editor/official/create_official_particles.h"
@@ -27,6 +28,7 @@ void create_official_resources(
 ) {
 	create_lights(initial_intercosm, pools);
 	create_materials(initial_intercosm, pools);
+	create_decals(initial_intercosm, pools);
 	create_particles(initial_intercosm, pools);
 
 	create_sounds(initial_intercosm, pools);

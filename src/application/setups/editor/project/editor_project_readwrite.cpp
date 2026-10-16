@@ -538,7 +538,9 @@ namespace editor_project_readwrite {
 			writer.Key("materials");
 			writer.StartArray();
 
-			const auto defaults = editor_material_resource_editable();
+			auto defaults = editor_material_resource_editable();
+			::setup_resource_defaults(defaults, officials_map);
+			::on_each_resource_id_in_object(defaults, stringify_resource_id);
 
 			auto write = [&](const auto& material) {
 				const auto& editable = material.editable;
@@ -947,6 +949,7 @@ namespace editor_project_readwrite {
 				editor_material_resource new_material;
 				new_material.unique_name = id;
 
+				::setup_resource_defaults(new_material.editable, officials_map);
 				augs::read_json(resource, new_material.editable);
 
 				auto& pool = loaded.resources.get_pool_for<editor_material_resource>();

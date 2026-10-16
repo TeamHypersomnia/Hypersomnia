@@ -8,6 +8,14 @@ void setup_resource_defaults(
 	if constexpr(std::is_same_v<editor_sprite_resource_editable, R>) {
 		resource.as_physical.material = o[test_scene_physical_material_id::METAL];
 	}
+	else if constexpr(std::is_same_v<editor_material_resource_editable, R>) {
+		/*
+			Bullet holes like on metal - other decals none.
+		*/
+
+		resource.gunshot_decals.variant_1 = o[test_decal_decorations::GUNSHOT_DECAL_1];
+		resource.gunshot_decals.variant_2 = o[test_decal_decorations::GUNSHOT_DECAL_2];
+	}
 }
 
 template <class F>

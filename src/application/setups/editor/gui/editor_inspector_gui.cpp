@@ -2029,6 +2029,19 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 
 	PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
 
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Decals")) {
+		text_disabled("Left on the surface, picked at random from the set ones.");
+
+		MULTIPROPERTY("Gunshot decal 1", gunshot_decals.variant_1);
+		MULTIPROPERTY("Gunshot decal 2", gunshot_decals.variant_2);
+		MULTIPROPERTY("Melee decal 1", melee_decals.variant_1);
+		MULTIPROPERTY("Melee decal 2", melee_decals.variant_2);
+		MULTIPROPERTY("Explosion decal 1", explosion_decals.variant_1);
+		MULTIPROPERTY("Explosion decal 2", explosion_decals.variant_2);
+
+		tooltip_on_hover("None set: explosions leave the melee decals.");
+	}
+
 	if (auto scope = augs::imgui::scoped_tree_node_ex("Silence damager")) {
 		MULTIPROPERTY("Silence damager impact sound", silence_damager_impact_sound);
 		tooltip_on_hover("Tick to silence the default melee impact/bullet penetration sound.");
@@ -2212,6 +2225,14 @@ EDIT_FUNCTION(editor_melee_resource_editable& insp, T& es) {
 	std::string result;
 
 	(void)insp; (void)es; (void)last_result;
+
+	return result;
+}
+
+EDIT_FUNCTION(editor_decal_resource_editable& insp, T& es) {
+	std::string result;
+
+	(void)insp; (void)es;
 
 	return result;
 }

@@ -4079,6 +4079,7 @@ template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;
 template struct edit_resource_command<editor_material_resource>;
+template struct edit_resource_command<editor_decal_resource>;
 template struct edit_resource_command<editor_particles_resource>;
 template struct edit_resource_command<editor_wandering_pixels_resource>;
 template struct edit_resource_command<editor_point_marker_resource>;
