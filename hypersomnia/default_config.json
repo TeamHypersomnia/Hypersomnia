@@ -628,6 +628,7 @@
         "increase_inside_alpha_when_selected": false,
         "colorize_inside_when_selected": true,
         "hide_unassigned_hotbar_buttons": true,
+        "show_bomb_in_hotbar": true,
         "autocollapse_hotbar_buttons": true,
         "primary_selected_color": [0, 255, 255, 255],
         "secondary_selected_color": [86, 156, 214, 255]

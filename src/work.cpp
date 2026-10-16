@@ -6634,6 +6634,17 @@ work_result work(
 							}
 
 							if (const auto it = mapped_or_nullptr(viewing_config.game_controls, key)) {
+								/*
+									The bomb is pulled out like from a numbered hotbar button,
+									so that holding another one with it wields both.
+								*/
+
+								if (*it == game_intent_type::WIELD_BOMB && should_draw_game_gui()) {
+									if (game_gui.control_wield_bomb(get_game_gui_subject(), was_pressed) && was_pressed) {
+										continue;
+									}
+								}
+
 								if (e.uses_mouse() && game_gui_effective) {
 									/* Leave it for the game gui */
 								}
@@ -6725,6 +6736,7 @@ work_result work(
 						viewing_config.hotbar,
 						viewing_config.drawing,
 						viewing_config.inventory_gui_controls,
+						key_or_default(viewing_config.game_controls, game_intent_type::WIELD_BOMB),
 						get_camera_eye(viewing_config),
 						get_drawer_for(chosen_renderer),
 						viewing_config.damage_indication.white_damage_highlight_secs

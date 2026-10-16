@@ -19,6 +19,10 @@ struct viewing_game_gui_context_dependencies {
 	const hotbar_settings hotbar;
 	const game_drawing_settings settings;
 	const inventory_gui_intent_map input_information;
+
+	/* The label of the bomb's hotbar button. */
+	const augs::event::keys::key wield_bomb_key;
+
 	const camera_eye camera;
 	const augs::drawer_with_default output;
 

@@ -206,6 +206,151 @@ bool game_gui_system::control_gui_world(
 	return false;
 }
 
+void game_gui_system::control_hotbar_button(
+	const const_entity_handle gui_entity,
+	const int hotbar_button_index,
+	const bool was_pressed
+) {
+	auto& gui = get_character_gui();
+
+	auto& currently_held_index = gui.currently_held_hotbar_button_index;
+
+	if (currently_held_index > -1) {
+		if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()) {
+			/* Clear currently held index because nothing is assigned already */
+			currently_held_index = -1;
+		}
+	}
+
+	if (gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity)) {
+		/* Something is assigned to that button */
+		if (was_pressed) {
+			const bool wants_dual_wield = currently_held_index > -1;
+
+			if (wants_dual_wield) {
+				auto akimbo_setup = gui.get_setup_from_button_indices(
+					gui_entity, 
+					currently_held_index, 
+					hotbar_button_index
+				);
+
+				/*
+					The bomb always goes to the primary hand, to be planted with the primary button.
+				*/
+
+				if (const auto in_secondary = gui_entity.get_cosmos()[akimbo_setup.hand_selections[1]]) {
+					if (::is_like_plantable_bomb(in_secondary)) {
+						akimbo_setup.switch_hands();
+					}
+				}
+
+				queue_wielding(gui_entity, akimbo_setup);
+
+				currently_held_index = -1;
+			}
+			else {
+				currently_held_index = hotbar_button_index;
+
+				auto new_setup = gui.get_setup_from_button_indices(
+					gui_entity, 
+					hotbar_button_index
+				);
+
+				const auto current_setup = wielding_setup::from_current(gui_entity);
+				bool skip_wield = false;
+				bool skip_save = false;
+
+				const auto& cosm = gui_entity.get_cosmos();
+
+				if (new_setup.equivalent_to_or_switched(cosm, current_setup)) {
+					auto is_nade_or_none = [&](auto h) {
+						if (cosm[h].dead()) {
+							return true;
+						}
+
+						return cosm[h].template has<components::hand_fuse>();
+					};
+					
+					if (is_nade_or_none(new_setup.hand_selections[0]) && is_nade_or_none(new_setup.hand_selections[1])) {
+						/* Wouldn't switch hands for grenades */
+						skip_wield = true;
+					}
+					else {
+						new_setup = current_setup;
+						new_setup.switch_hands();
+						skip_save = true;
+					}
+				}
+
+				if (!skip_wield) {
+					if (!skip_save) {
+						gui.save_as_last_setup(current_setup);
+					}
+
+					queue_wielding(gui_entity, new_setup);
+				}
+			}
+		}
+		else {
+			currently_held_index = -1;
+		}
+	}
+	else {
+		/* 
+			Corner case: 
+
+			What if we want to dual-wield two entities stacked into the same hotbar button?
+			We can communicate this by choosing an empty slot as the second one.
+		*/
+
+		const bool wants_dual_wield = currently_held_index > -1;
+
+		if (wants_dual_wield && was_pressed) {
+			int count = 0;
+			gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity, &count);
+
+			const bool held_is_stacked = count > 1;
+
+			if (held_is_stacked) {
+				const auto akimbo_setup = gui.get_setup_from_button_indices(
+					gui_entity, 
+					currently_held_index, 
+					currently_held_index
+				);
+
+				queue_wielding(gui_entity, akimbo_setup);
+
+				currently_held_index = -1;
+			}
+		}
+	}
+}
+
+bool game_gui_system::control_wield_bomb(
+	const const_entity_handle gui_entity,
+	const bool was_pressed
+) {
+	if (gui_entity.dead()
+		|| !gui_entity.has<components::item_slot_transfers>()
+		|| !gui_entity.has<components::sentience>()
+	) {
+		return false;
+	}
+
+	const auto bomb_index = character_gui::bomb_hotbar_button_index;
+
+	if (get_character_gui().hotbar_buttons[bomb_index].get_assigned_entity(gui_entity).dead()) {
+		return false;
+	}
+
+	/*
+		Like a numbered hotbar button - held together with another one, it wields both.
+	*/
+
+	control_hotbar_button(gui_entity, static_cast<int>(bomb_index), was_pressed);
+	return true;
+}
+
 void game_gui_system::control_hotbar_and_action_button(
 	const const_entity_handle gui_entity,
 	const inventory_gui_intent intent,
@@ -252,109 +397,9 @@ void game_gui_system::control_hotbar_and_action_button(
 
 		if (const auto hotbar_button_index = to_hotbar_index(i.intent);
 			hotbar_button_index >= 0 && 
-			static_cast<std::size_t>(hotbar_button_index) < gui.hotbar_buttons.size()
+			static_cast<std::size_t>(hotbar_button_index) < character_gui::num_numbered_hotbar_buttons
 		) {
-			auto& currently_held_index = gui.currently_held_hotbar_button_index;
-
-			if (currently_held_index > -1) {
-				if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()) {
-					/* Clear currently held index because nothing is assigned already */
-					currently_held_index = -1;
-				}
-			}
-
-			if (gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity)) {
-				/* Something is assigned to that button */
-				if (i.was_pressed()) {
-					const bool wants_dual_wield = currently_held_index > -1;
-
-					if (wants_dual_wield) {
-						const auto akimbo_setup = gui.get_setup_from_button_indices(
-							gui_entity, 
-							currently_held_index, 
-							hotbar_button_index
-						);
-
-						queue_wielding(gui_entity, akimbo_setup);
-
-						currently_held_index = -1;
-					}
-					else {
-						currently_held_index = hotbar_button_index;
-
-						auto new_setup = gui.get_setup_from_button_indices(
-							gui_entity, 
-							hotbar_button_index
-						);
-
-						const auto current_setup = wielding_setup::from_current(gui_entity);
-						bool skip_wield = false;
-						bool skip_save = false;
-
-						const auto& cosm = gui_entity.get_cosmos();
-
-						if (new_setup.equivalent_to_or_switched(cosm, current_setup)) {
-							auto is_nade_or_none = [&](auto h) {
-								if (cosm[h].dead()) {
-									return true;
-								}
-
-								return cosm[h].template has<components::hand_fuse>();
-							};
-							
-							if (is_nade_or_none(new_setup.hand_selections[0]) && is_nade_or_none(new_setup.hand_selections[1])) {
-								/* Wouldn't switch hands for grenades */
-								skip_wield = true;
-							}
-							else {
-								new_setup = current_setup;
-								new_setup.switch_hands();
-								skip_save = true;
-							}
-						}
-
-						if (!skip_wield) {
-							if (!skip_save) {
-								gui.save_as_last_setup(current_setup);
-							}
-
-							queue_wielding(gui_entity, new_setup);
-						}
-					}
-				}
-				else {
-					currently_held_index = -1;
-				}
-			}
-			else {
-				/* 
-					Corner case: 
-
-					What if we want to dual-wield two entities stacked into the same hotbar button?
-					We can communicate this by choosing an empty slot as the second one.
-				*/
-
-				const bool wants_dual_wield = currently_held_index > -1;
-
-				if (wants_dual_wield && i.was_pressed()) {
-					int count = 0;
-					gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity, &count);
-
-					const bool held_is_stacked = count > 1;
-
-					if (held_is_stacked) {
-						const auto akimbo_setup = gui.get_setup_from_button_indices(
-							gui_entity, 
-							currently_held_index, 
-							currently_held_index
-						);
-
-						queue_wielding(gui_entity, akimbo_setup);
-
-						currently_held_index = -1;
-					}
-				}
-			}
+			control_hotbar_button(gui_entity, hotbar_button_index, i.was_pressed());
 		}
 		else if (
 			const auto special_action_index = to_special_action_index(i.intent);
@@ -518,12 +563,27 @@ void game_gui_system::rebuild_layouts(
 	const auto& image_defs = context.get_image_metas();
 	auto& element = context.get_character_gui();
 
-	const bool hide_unassigned_hotbar_buttons = context.get_hotbar_settings().hide_unassigned_hotbar_buttons;
+	const auto& hotbar_cfg = context.get_hotbar_settings();
 
 	if (root_entity.has<components::item_slot_transfers>()) {
 		const auto screen_size = context.get_screen_size();
 
 		int max_hotbar_height = 55;
+
+		/*
+			The bomb's button only while the bomb is carried.
+		*/
+
+		const auto is_hotbar_button_shown = [&](const std::size_t i) {
+			const auto& hb = element.hotbar_buttons[i];
+			const bool assigned = hb.get_assigned_entity(root_entity).alive();
+
+			if (i == character_gui::bomb_hotbar_button_index) {
+				return hotbar_cfg.show_bomb_in_hotbar && assigned;
+			}
+
+			return assigned || !hotbar_cfg.hide_unassigned_hotbar_buttons;
+		};
 
 		{
 			int total_width = 0;
@@ -531,10 +591,8 @@ void game_gui_system::rebuild_layouts(
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 				const auto& hb = element.hotbar_buttons[i];
 
-				if (hide_unassigned_hotbar_buttons) {
-					if (const auto ent = hb.get_assigned_entity(root_entity); ent.dead()) {
-						continue;
-					}
+				if (!is_hotbar_button_shown(i)) {
+					continue;
 				}
 
 				const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
@@ -548,13 +606,13 @@ void game_gui_system::rebuild_layouts(
 
 			int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
-			const auto set_rc = [&](auto& hb) {
-				if (hide_unassigned_hotbar_buttons) {
-					if (const auto ent = hb.get_assigned_entity(root_entity); ent.dead()) {
-						hb.rc = {};
+			const auto set_rc = [&](const std::size_t i) {
+				auto& hb = element.hotbar_buttons[i];
 
-						return;
-					}
+				if (!is_hotbar_button_shown(i)) {
+					hb.rc = {};
+
+					return;
 				}
 
 				const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
@@ -565,7 +623,7 @@ void game_gui_system::rebuild_layouts(
 			};
 
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-				set_rc(element.hotbar_buttons[i]);
+				set_rc(i);
 			}
 
 			if (total_width == 0) {
@@ -765,7 +823,7 @@ void game_gui_system::rebuild_hotbar(const const_entity_handle subject) {
 	*/
 	std::size_t next_slot = 0;
 
-	for (std::size_t i = 0; i < buf_n && next_slot < hotbar.size(); ++i) {
+	for (std::size_t i = 0; i < buf_n && next_slot < character_gui::num_numbered_hotbar_buttons; ++i) {
 		const auto& c = buf[i];
 
 		if (c.stackable) {
@@ -787,6 +845,17 @@ void game_gui_system::rebuild_hotbar(const const_entity_handle subject) {
 
 		hotbar[next_slot++].assigned = c.id;
 	}
+
+	subject.for_each_contained_item_recursive(
+		[&](const auto& item) {
+			if (::is_like_plantable_bomb(item)) {
+				hotbar[character_gui::bomb_hotbar_button_index].assigned = item.get_id();
+				return recursive_callback_result::ABORT;
+			}
+
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
+		}
+	);
 
 	last_rebuilt_step = current_step;
 	last_rebuilt_subject = current_subject;

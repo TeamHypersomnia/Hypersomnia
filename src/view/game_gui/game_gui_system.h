@@ -116,6 +116,21 @@ public:
 		const game_gui_input_settings&
 	);
 
+	void control_hotbar_button(
+		const const_entity_handle root_entity,
+		int hotbar_button_index,
+		bool was_pressed
+	);
+
+	/*
+		Returns false when there is no bomb to pull out - then WIELD_BOMB goes to the game as an intent.
+	*/
+
+	bool control_wield_bomb(
+		const const_entity_handle root_entity,
+		bool was_pressed
+	);
+
 	void advance(
 		const game_gui_context context,
 		const augs::delta dt

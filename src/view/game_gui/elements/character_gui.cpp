@@ -207,7 +207,7 @@ wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setu
 				return std::nullopt;
 			};
 
-			for (std::size_t i = 0; i < hotbar_buttons.size(); ++i) {
+			for (std::size_t i = 0; i < num_numbered_hotbar_buttons; ++i) {
 				if (const auto wielding = try_wielding_item_from_hotbar_button_no(i)) {
 					return *wielding;
 				}

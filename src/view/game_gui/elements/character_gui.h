@@ -20,7 +20,15 @@
 struct game_gui_input_settings;
 
 struct character_gui {
-	std::array<hotbar_button, 10> hotbar_buttons;
+	/*
+		The last hotbar button is the bomb's - pulled out with WIELD_BOMB,
+		drawn at the right end only with hotbar_settings::show_bomb_in_hotbar.
+	*/
+
+	static constexpr std::size_t num_numbered_hotbar_buttons = 10;
+	static constexpr std::size_t bomb_hotbar_button_index = num_numbered_hotbar_buttons;
+
+	std::array<hotbar_button, num_numbered_hotbar_buttons + 1> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
 	std::array<value_bar, value_bar_count> value_bars;
 

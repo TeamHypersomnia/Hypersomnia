@@ -14,6 +14,8 @@
 #include "view/game_gui/game_gui_system.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/inventory/inventory_utils.h"
+#include "game/components/hand_fuse_component.h"
+#include "game/detail/explosive/like_explosive.h"
 
 void drag_and_drop_callback(
 	game_gui_context context, 
@@ -78,7 +80,16 @@ void drag_and_drop_callback(
 				Optimistically swap the local hotbar entity_ids too, so the change is visible on
 				the very next render frame instead of waiting up to one logical step.
 			*/
-			if (new_assigned_item.alive() && item_to_be_swapped.alive()) {
+			/*
+				The bomb's button is always the last one.
+			*/
+
+			const bool swaps_bomb = 
+				(new_assigned_item.alive() && ::is_like_plantable_bomb(new_assigned_item))
+				|| (item_to_be_swapped.alive() && ::is_like_plantable_bomb(item_to_be_swapped))
+			;
+
+			if (new_assigned_item.alive() && item_to_be_swapped.alive() && !swaps_bomb) {
 				context.get_game_gui_system().queue_swap_hotbar_buttons(
 					new_assigned_item.get_id(),
 					item_to_be_swapped.get_id()
@@ -141,7 +152,12 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 			const auto target_hotbar_button = context.template get_if<hotbar_button_in_character_gui>(drop_target_rect_id);
 			auto target_item = context.template get_if<item_button_in_item>(drop_target_rect_id);
 
-			if (target_hotbar_button != nullptr) {
+			const bool targets_bomb_button = 
+				target_hotbar_button != nullptr
+				&& static_cast<std::size_t>(target_hotbar_button.get_location().index) == character_gui::bomb_hotbar_button_index
+			;
+
+			if (target_hotbar_button != nullptr && !targets_bomb_button) {
 				const auto assigned_entity = target_hotbar_button->get_assigned_entity(owning_transfer_capability);
 				const auto hotbar_button_location = target_hotbar_button.get_location();
 

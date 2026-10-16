@@ -322,21 +322,28 @@ void hotbar_button::draw(
 				}
 				
 				if (has_assigned_entity && type == button_corner_type::LB_COMPLEMENT) {
-					const auto intent_for_this_button = 
-						static_cast<inventory_gui_intent_type>(
-							static_cast<int>(
-								inventory_gui_intent_type::HOTBAR_0
-							) + this_id.get_location().index
-						)
-					;
+					const auto button_index = this_id.get_location().index;
 
-					if (
-						const auto bound_key = key_or_default(
+					const auto bound_key = [&]() {
+						if (static_cast<std::size_t>(button_index) == character_gui::bomb_hotbar_button_index) {
+							return context.dependencies.wield_bomb_key;
+						}
+
+						const auto intent_for_this_button = 
+							static_cast<inventory_gui_intent_type>(
+								static_cast<int>(
+									inventory_gui_intent_type::HOTBAR_0
+								) + button_index
+							)
+						;
+
+						return key_or_default(
 							context.get_input_information(),
 							intent_for_this_button
 						);
-						bound_key != augs::event::keys::key::INVALID
-					) {
+					}();
+
+					if (bound_key != augs::event::keys::key::INVALID) {
 						const auto label_text = formatted_string{
 							key_to_string(bound_key).substr(0, 1),
 							label_style
