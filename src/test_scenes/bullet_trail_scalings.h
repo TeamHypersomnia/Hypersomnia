@@ -76,12 +76,17 @@ inline const auto& get_bullet_trail_scalings() {
 			Thinner segments widely spread look fiery, but alone get dominated by single pixel ones.
 			The trail's width is about 2 * spread + the thickest segment, kept as with spread 0.275 and full segments.
 			No neon tails.
-			HUNTER_ROUND_TRACE also contains Bulldup's line trail,
-			as it's cloned from STEEL_PROJECTILE_TRACE_PRECISE after it was added.
+			Hunter's trace has two line trails of its own - both scaled by its entry.
 		*/
 
-		{ E::STEEL_PROJECTILE_TRACE_PRECISE, {}, 1.f, 0.48f, 0.64f },
-		{ E::HUNTER_ROUND_TRACE, {}, 1.f, 0.48f, 0.64f }
+		{ E::BULLDUP2000_ROUND_TRACE, {}, 0.6f, 1.0f, 0.6f },
+		{ E::HUNTER_ROUND_TRACE, {}, 1.f, 1.0f, 0.75f },
+
+		/*
+			Awka (HPSR_ROUND) - unchanged for now. No rounds listed, so its neon is untouched too.
+		*/
+
+		{ E::AWKA_ROUND_TRACE, {}, 1.f, 1.0f, 1.0f }
 	};
 
 	return scalings;

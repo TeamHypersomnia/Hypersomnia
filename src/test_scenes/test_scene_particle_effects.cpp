@@ -13,6 +13,7 @@
 #include "augs/misc/enum/enum_map.h"
 #include "augs/string/format_enum.h"
 #include "augs/misc/pool/pool_allocate.h"
+#include "augs/templates/container_templates.h"
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/animation.h"
@@ -1688,7 +1689,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
+		auto& effect = acquire_effect(test_scene_particle_effect_id::BULLDUP2000_ROUND_TRACE);
 
 		{
 			particles_emission em;
@@ -1750,13 +1751,18 @@ void load_test_scene_particle_effects(
 
 	{
 		/*
-			Hunter's own trace - a clone of STEEL_PROJECTILE_TRACE_PRECISE (still used as-is by
-			Bilmer2000) so the sniper-only line trail below doesn't affect Bilmer2000's trail.
+			Hunter's own trace - the sparks of Bulldup's, with line trails of its own,
+			so that the two are configured apart - see bullet_trail_scalings.h.
 		*/
 		auto& effect = acquire_effect(test_scene_particle_effect_id::HUNTER_ROUND_TRACE);
-		effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
+		effect = acquire_effect(test_scene_particle_effect_id::BULLDUP2000_ROUND_TRACE);
 
-		/* White for most of the trail, colorizing to the standard shotgun orange at the far tail. */
+		erase_if(effect.emissions, [](const auto& em) { return em.is_bullet_trail; });
+
+		/* The wide, fiery one - white for most of the trail, colorizing to the standard shotgun orange at the far tail. */
+		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 0, 14, 0.07f, 50.f, white, 100.f, -19.f, 0.f, false, 300.f, 10.f);
+
+		/* The thin, long one - colorizing the same way. */
 		make_line_trail(effect, 5.5f, rgba(255, 100, 0, 255), true, 1, 7, 0.3f, standard_line_trail_fade_in_ms, white, 400.f, -18.f, 0.f, false, 300.f, 10.f, 8.f);
 	}
 	{
