@@ -10,6 +10,8 @@ Check out this [handy script to quickly deploy the `AppImage` as a service](http
   * [Prerequisites](#prerequisites)
   * [Example with `docker run`](#example-with-docker-run)
   * [Example with `docker compose`](#example-with-docker-compose)
+  * [Configuring via an environment variable](#configuring-via-an-environment-variable)
+  * [Passing the server private key via an environment variable](#passing-the-server-private-key-via-an-environment-variable)
 - [Manual `AppImage` setup](#manual-appimage-setup)
   * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
   * [libfuse](#libfuse)
@@ -83,8 +85,6 @@ services:
 
 It is recommended to use the `latest` tag and [`pull_policy` set to `daily`](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy) for the server to keep up with frequent updates.
 
-It is currently impossible to configure the server via environment variables.
-
 Since we're mounting a volume, the server will create the `conf.d/` directory at:
 
 ```bash
@@ -92,6 +92,54 @@ Since we're mounting a volume, the server will create the `conf.d/` directory at
 ```
 
 This is now the folder for your [`.json` configuration files](#configuration).
+
+## Configuring via an environment variable
+
+Instead of a file in `conf.d/`, you can pass the [configuration](#configuration) as JSON in the `HYPERSOMNIA_CONFIG` environment variable.
+It is exactly as if the config was the last file in `conf.d/` (see [Config loading order](#config-loading-order)):
+
+```yaml
+services:
+  hypersomnia-server:
+    image: ghcr.io/teamhypersomnia/hypersomnia-server:latest
+    pull_policy: daily
+    environment:
+      HYPERSOMNIA_SERVER_PRIVATE_KEY: "hypersomnia-key-v1:..."
+      HYPERSOMNIA_CONFIG: |
+        {
+          "server_start": { "port": 8412 },
+          "server": { "server_name": "My server", "arena": "de_cyberaqua" }
+        }
+    ports:
+      - '8412:8412/udp'
+      - '9000:9000/udp'
+    restart: unless-stopped
+```
+
+Or with `docker run`:
+
+```bash
+docker run --env HYPERSOMNIA_CONFIG='{ "server": { "server_name": "My server" } }' ...
+```
+
+No volume is needed then. When the container is recreated, only the downloaded maps (fetched again) and the runtime settings (`runtime_prefs.json`, e.g. vars tweaked through the administration panel) are lost - mount the volume as above to keep them too.
+
+## Passing the server private key via an environment variable
+
+The server's key is its identity on the server list and in the players' favorites.
+Without `HYPERSOMNIA_SERVER_PRIVATE_KEY` and without a volume, a new key is made every time the container is recreated - the server looks like a new one.
+
+To get a key, start the server once without `HYPERSOMNIA_SERVER_PRIVATE_KEY` and copy the one line of the key it made:
+
+```bash
+docker exec <container> cat /home/hypersomniac/.config/Hypersomnia/user/.keys/server.key
+# hypersomnia-key-v1:...
+```
+
+Then pass it in `HYPERSOMNIA_SERVER_PRIVATE_KEY` as above - `server.key` is then neither read nor made.
+With a volume, the same line is in `/opt/hypersomnia/.keys/server.key`.
+
+Keep the key secret - anyone with it can pose as your server. Note that environment variables are visible to whoever can run `docker inspect` on the host.
 
 # Manual `AppImage` setup
 
@@ -204,9 +252,10 @@ If you have a Discord server, you might want to setup a [Webhook](https://suppor
 
 1) ``default_config.json``, comes with the game.
 2) All configs inside ``~/.config/Hypersomnia/user/conf.d/``, in lexicographical order, if any.
-    - This means that if the vars you later tweak from the administration panel are already specified in ``conf.d/``, *they will be overridden every time the server starts.*
-3) ``~/.config/Hypersomnia/user/runtime_prefs.json``, if any.
-4) Config specified by ``--apply-config`` flag, if any.
+3) The ``HYPERSOMNIA_CONFIG`` [environment variable](#configuring-via-an-environment-variable), if set - as if it were the last file in ``conf.d/``.
+4) ``~/.config/Hypersomnia/user/runtime_prefs.json``, if any.
+    - This means that the vars you tweak from the administration panel *override* the ones in ``conf.d/`` and ``HYPERSOMNIA_CONFIG`` on every start - a later change to such a var in ``conf.d/`` has no effect until you remove it from ``runtime_prefs.json``.
+5) Config specified by ``--apply-config`` flag, if any.
 
 ## Ports
 
@@ -318,7 +367,7 @@ This will use ``./servers/1`` instead of ``~/.config/Hypersomnia`` and will thus
 
 ### --apply-config 
 
-Applies another config file *after* ``config.json`` and ``conf.d/``. **Can only use this flag once in the whole command.**
+Applies another config file *after* ``config.json``, ``conf.d/`` and ``runtime_prefs.json``. **Can only use this flag once in the whole command.**
 
 E.g. this:
 
@@ -329,6 +378,7 @@ nohup ./Hypersomnia-Headless.AppImage --apply-config ./some_config.json --appdat
 will read:
 
 - ``./servers/1/user/conf.d/``
+- ``HYPERSOMNIA_CONFIG``, if set
 - ``./servers/1/user/runtime_prefs.json``
 - ``./some_config.json``
 

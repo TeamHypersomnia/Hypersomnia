@@ -43,20 +43,26 @@ config_json_table::config_json_table(const augs::path_type& config_lua_path) {
 
 void config_json_table::load_patch(const augs::path_type& config_lua_path) {
 	try {
+		load_patch_from_string(augs::file_to_string(config_lua_path), config_lua_path);
+	}
+	catch (const augs::file_open_error& err) {
+		throw config_read_error(config_lua_path, err.what());
+	}
+}
+
+void config_json_table::load_patch_from_string(const std::string& json, const augs::path_type& source_name) {
+	try {
 		constexpr auto rapidjson_flags = 
 			rapidjson::kParseDefaultFlags |
 			rapidjson::kParseCommentsFlag | 
 			rapidjson::kParseTrailingCommasFlag
 		;
 
-		auto doc = augs::json_document_from<rapidjson_flags>(augs::file_to_string(config_lua_path));
+		auto doc = augs::json_document_from<rapidjson_flags>(json);
 		augs::read_json(doc, *this);
 	}
 	catch (const augs::json_deserialization_error& err) {
-		throw config_read_error(config_lua_path, err.what());
-	}
-	catch (const augs::file_open_error& err) {
-		throw config_read_error(config_lua_path, err.what());
+		throw config_read_error(source_name, err.what());
 	}
 }
 

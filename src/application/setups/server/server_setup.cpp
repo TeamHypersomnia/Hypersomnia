@@ -1075,7 +1075,7 @@ server_setup::server_setup(
 
 	reports.init(USER_DIR, get_instance_label(), this_server_key);
 
-	LOG("Server key: %x (%x)", server_key::public_key_hex(this_server_key), KEYS_DIR / server_key::file_name);
+	LOG("Server key: %x (%x)", server_key::public_key_hex(this_server_key), server_key::source_name(KEYS_DIR / server_key::file_name));
 
 	if (private_initial_vars.admin_profiles.empty()) {
 		LOG("No admin_profiles: nobody connected can use RCON (a host from the game always can).");

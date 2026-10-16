@@ -194,4 +194,5 @@ struct config_json_table {
 	) const;
 
 	void load_patch(const augs::path_type& config_lua_path);
+	void load_patch_from_string(const std::string& json, const augs::path_type& source_name);
 };

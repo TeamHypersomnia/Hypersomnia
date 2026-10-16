@@ -1,5 +1,6 @@
 #include <unordered_set>
 #include <cstdint>
+#include <cstdlib>
 /*
 	BEFORE YOU CONTINUE:
 
@@ -631,11 +632,13 @@ work_result work(
 	/*
 		The config files in the order they were applied - their "instance_vars" go over "server" for each kind of
 		instance (see ranked_vars_of). The runtime ones (runtime_prefs, --apply-config) are not the canon.
+		A layer with content (the HYPERSOMNIA_CONFIG environment variable) has no file - path only names it.
 	*/
 
 	struct config_layer {
 		augs::path_type path;
 		bool runtime = false;
+		std::string content = "";
 	};
 
 	WEBSTATIC auto config_layers = std::vector<config_layer> { { canon_config_path, false } };
@@ -670,6 +673,21 @@ work_result work(
 				return callback_result::CONTINUE;
 			}
 		);
+
+#if !PLATFORM_WEB
+		/*
+			The whole config as JSON in an environment variable - for containers without a mounted conf.d.
+			Applied over conf.d and counted with it as the canon.
+		*/
+
+		if (const auto env_config = std::getenv("HYPERSOMNIA_CONFIG"); env_config != nullptr && *env_config != '\0') {
+			const auto env_config_name = augs::path_type("HYPERSOMNIA_CONFIG");
+
+			LOG("Applying config from the environment variable: %x", env_config_name);
+			result->load_patch_from_string(env_config, env_config_name);
+			config_layers.push_back({ env_config_name, false, env_config });
+		}
+#endif
 
 		canon_config_with_confd = *result;
 
@@ -722,7 +740,9 @@ work_result work(
 
 			try {
 				constexpr auto flags = rapidjson::kParseDefaultFlags | rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag;
-				const auto doc = augs::json_document_from<flags>(augs::file_to_string(layer.path));
+				const auto doc = augs::json_document_from<flags>(
+					layer.content.empty() ? augs::file_to_string(layer.path) : layer.content
+				);
 
 				if (doc.IsObject() && doc.HasMember("instance_vars") && doc["instance_vars"].IsObject()) {
 					const auto& instance_vars = doc["instance_vars"];
@@ -822,7 +842,7 @@ work_result work(
 		const auto path = KEYS_DIR / server_key::file_name;
 
 		if (server_key::damaged(path)) {
-			std::cerr << "ERROR: " << path.string() << " is there but can not be read." << std::endl;
+			std::cerr << "ERROR: " << server_key::damaged_message(path) << std::endl;
 			return work_result::FAILURE;
 		}
 
@@ -830,7 +850,7 @@ work_result work(
 			One key for all the instances of this host - never one for this run only (a key that could not be saved).
 		*/
 
-		const auto seed = identity_key::load_or_create(path);
+		const auto seed = server_key::load_or_create(path);
 
 		if (!seed.has_value()) {
 			std::cerr << "ERROR: could not read or create " << path.string() << "." << std::endl;
@@ -1606,11 +1626,11 @@ work_result work(
 		*/
 
 		if (server_key::damaged(KEYS_DIR / server_key::file_name)) {
-			LOG("ERROR: %x is there but can not be read - not starting. Restore it, or move it away to make a new key.", KEYS_DIR / server_key::file_name);
+			LOG("ERROR: %x Not starting.", server_key::damaged_message(KEYS_DIR / server_key::file_name));
 			return work_result::FAILURE;
 		}
 
-		if (!identity_key::load_or_create(KEYS_DIR / server_key::file_name).has_value()) {
+		if (!server_key::load_or_create(KEYS_DIR / server_key::file_name).has_value()) {
 			LOG("ERROR: could not create %x - not starting. Make %x writable.", KEYS_DIR / server_key::file_name, KEYS_DIR);
 			return work_result::FAILURE;
 		}
