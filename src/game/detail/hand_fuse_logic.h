@@ -4,6 +4,7 @@
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/step_declaration.h"
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/inventory/wield_after_planting.hpp"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/messages/start_sound_effect.h"
 #include "game/detail/physics/shape_overlapping.hpp"
@@ -245,6 +246,10 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 			if (holder) {
 				if (const auto sentience = holder.template find<components::sentience>()) {
 					sentience->hand_flags = {};
+				}
+
+				if (fuse_def.is_like_plantable_bomb()) {
+					::wield_after_planting(step, holder);
 				}
 			}
 		}

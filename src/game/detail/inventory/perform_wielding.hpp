@@ -2,6 +2,9 @@
 #include <cstddef>
 #include "augs/templates/logically_empty.h"
 #include "game/components/melee_component.h"
+#include "game/components/hand_fuse_component.h"
+#include "game/components/item_slot_transfers_component.h"
+#include "game/detail/explosive/like_explosive.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/inventory/manage_shoulder_storage.hpp"
 
@@ -86,6 +89,28 @@ void perform_wielding(
 
 	const auto& selections = request.hand_selections;
 	const auto current_selection = wielding_setup::from_current(self);
+
+	{
+		/*
+			Remember what was wielded before the bomb, to wield it back once the bomb is planted - see wield_after_planting.
+		*/
+
+		auto has_bomb = [&](const auto& setup) {
+			for (const auto& h : setup.hand_selections) {
+				if (const auto item = cosm[h]; item.alive() && ::is_like_plantable_bomb(item)) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		if (has_bomb(request) && !has_bomb(current_selection)) {
+			if (const auto transfers = self.template find<components::item_slot_transfers>()) {
+				transfers->wield_after_planting = current_selection;
+			}
+		}
+	}
 
 	const auto first_held = cosm[current_selection.hand_selections[0]];
 	const auto second_held = cosm[current_selection.hand_selections[1]];
