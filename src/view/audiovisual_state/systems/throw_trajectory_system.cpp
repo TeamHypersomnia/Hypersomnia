@@ -854,6 +854,7 @@ namespace {
 			damping.sanitize();
 
 			in.explosive = true;
+			in.arming_source = arming_source;
 			in.speed = launch.speed;
 			in.angular_impulse = launch.angular_impulse;
 			in.floor_hits_when_thrown = fuse_def.floor_hits_when_thrown;
@@ -1138,7 +1139,13 @@ void throw_trajectory_system::advance(
 			return t.input.item == in->item;
 		});
 
-		const auto last_ptr = last != previous.end() ? std::addressof(*last) : nullptr;
+		const auto last_ptr = [&]() -> const throw_trajectory* {
+			if (last == previous.end() || last->input.arming_source != in->arming_source) {
+				return nullptr;
+			}
+
+			return std::addressof(*last);
+		}();
 
 		/*
 			Thrown melee weapons stop at characters, and dynamic obstacles might move,

@@ -57,6 +57,8 @@ enum class throw_silhouette_type : uint8_t {
 	see interpolation_system - so that they move smoothly at any frame rate.
 	Silhouettes are matched between the steps by their type and index - how many spacings along the trajectory they are -
 	and a silhouette that was not there in the previous step is not interpolated.
+	A grenade that switches how it is thrown - e.g. lobbed with the secondary button while aimed with the primary -
+	snaps to the new trajectory at once.
 */
 
 struct throw_silhouette {
@@ -115,6 +117,7 @@ struct throw_trajectory_input {
 	rng_seed_type nontemporal_seed = 0;
 	uint8_t num_falls = 0;
 	uint8_t floor_hits_when_thrown = 0;
+	uint8_t arming_source = 0;
 	damping_mults damping;
 	uint32_t max_steps = 0;
 	real32 min_speed = 0.f;
@@ -136,6 +139,7 @@ struct throw_trajectory_input {
 			&& nontemporal_seed == b.nontemporal_seed
 			&& num_falls == b.num_falls
 			&& floor_hits_when_thrown == b.floor_hits_when_thrown
+			&& arming_source == b.arming_source
 			&& damping.linear == b.damping.linear
 			&& damping.linear_axis_aligned == b.damping.linear_axis_aligned
 			&& damping.angular == b.damping.angular
