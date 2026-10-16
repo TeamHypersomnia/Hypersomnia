@@ -2259,15 +2259,6 @@ work_result work(
 
 		identity->advance(get_identity_input(), now);
 
-		/*
-			Linked without this device linking it (another of the player's devices - or someone who saw a link page's
-			address): the player is asked whether that Steam account is theirs.
-		*/
-
-		if (identity->take_linked_quietly()) {
-			settings_gui.ask_whether_link_is_theirs();
-		}
-
 #if !PLATFORM_WEB
 		if (is_steam_client) {
 			if (const auto steam_identity = identity->steam_identity_to_request()) {
@@ -4663,6 +4654,13 @@ work_result work(
 			if (result == 1) {
 				join_from_steam(std::exchange(steam_join_target, std::string()));
 			}
+			else {
+				/*
+					Not joined: the password the invite carried goes with it.
+				*/
+
+				next_connect_password = std::nullopt;
+			}
 
 			steam_join_target.clear();
 		}
@@ -4683,6 +4681,7 @@ work_result work(
 			if (would_abandon_ranked_match()) {
 				LOG("(Steam Callback) In a ranked match - not leaving it for: %x", address_string);
 				steam_join_target.clear();
+				next_connect_password = std::nullopt;
 				steam_join_popup = simple_popup { "Join a server", "Cannot leave a ranked match.", "" };
 				return;
 			}
@@ -4696,7 +4695,12 @@ work_result work(
 
 			if (hosting_or_editing) {
 				steam_join_target = address_string;
-				steam_join_popup = simple_popup { "Join a server", "Leave the game?\nYou will instead join:\n" + address_string, "" };
+				/*
+					The address (often the inviting player's home IP) never shown to a stream.
+				*/
+
+				const auto joined = config.streamer_mode ? std::string("the server you were invited to") : address_string;
+				steam_join_popup = simple_popup { "Join a server", "Leave the game?\nYou will instead join:\n" + joined, "" };
 				return;
 			}
 
@@ -6331,6 +6335,22 @@ work_result work(
 #endif
 				advance_identity();
 				sync_identity_with_settings();
+
+				/*
+					Linked without this device linking it (another of the player's devices - or someone who saw a link page's
+					address): the player is asked whether that Steam account is theirs - never over a game being played, only
+					once out of it (until then the key plays as itself).
+				*/
+
+#if BUILD_NETWORKING
+				const bool in_a_game = current_setup != nullptr && std::holds_alternative<client_setup>(*current_setup);
+#else
+				const bool in_a_game = false;
+#endif
+
+				if (!in_a_game && identity->take_linked_quietly()) {
+					settings_gui.ask_whether_link_is_theirs();
+				}
 
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;

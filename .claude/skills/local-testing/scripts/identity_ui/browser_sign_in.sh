@@ -10,8 +10,13 @@ URL=$(grep -E "/link_key/start" "${OPENED_URLS:-/tmp/hypersomnia-opened-urls}" |
 STATE=$(echo "$URL" | sed -E 's/.*[?&]state=([0-9a-f]+).*/\1/')
 export SESSION_SECRET=$(cat ${SESSION_SECRET_FILE:-$S/nettest/session_secret})
 COOKIE=$(python3 $(dirname "$0")/../fake_steam_session.py ${SITE_DIR:-$S/nettest/broker_site} $STEAM "Pythagoras of Samos" $STATE)
-PAGE=$(curl -s -o /dev/null -w "%{http_code}" -H "Cookie: $COOKIE" "$URL")
+# The page belongs to the browser that opened it first - its cookie goes with the [Link] too
+HEADERS=$(mktemp)
+PAGE=$(curl -s -o /dev/null -D $HEADERS -w "%{http_code}" -H "Cookie: $COOKIE" "$URL")
+BROWSER=$(grep -io "hs_link_browser=[0-9a-f]*" $HEADERS | head -1)
+rm -f $HEADERS
+[ -n "$BROWSER" ] && COOKIE="$COOKIE; $BROWSER"
 echo "confirm page: HTTP $PAGE"
 # [Link] posts what the page got: the state, the game's key, the device
 QUERY=${URL#*\?}
-curl -s -o /dev/null -w "result page: HTTP %{http_code}\n" -H "Cookie: $COOKIE" --data "$QUERY" "${URL%%\?*}"
+curl -s -o /dev/null -w "result page: HTTP %{http_code}\n" -H "Cookie: $COOKIE" -H "Origin: ${URL%%/link_key*}" --data "$QUERY" "${URL%%\?*}"

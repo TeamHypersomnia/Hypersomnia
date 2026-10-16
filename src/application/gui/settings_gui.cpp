@@ -1460,7 +1460,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	auto ask_to_confirm = [&](const bool found_elsewhere) {
 		linked_has_avatar = upload_link_avatar(identity->get_link_check_profile().avatar);
 		linked_name = identity->get_link_check_profile().name;
-		linked_account = identity->get_cert().has_value() ? identity->get_cert()->account : std::string();
+		linked_account = identity->get_account_to_confirm();
 		link_found_elsewhere = found_elsewhere;
 		link_confirm_error.clear();
 		link_flow = F::CONFIRM;
@@ -1471,9 +1471,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	*/
 
 	if (std::exchange(link_confirm_profile_wanted, false) && identity != nullptr) {
-		linked_has_avatar = upload_link_avatar(identity->get_profile().avatar);
-		linked_name = steam_name;
-		linked_account = steam_account;
+		linked_has_avatar = upload_link_avatar(identity->get_profile_to_confirm().avatar);
+		linked_name = identity->get_profile_to_confirm().name;
+		linked_account = identity->get_account_to_confirm();
 	}
 
 	/*
@@ -1737,7 +1737,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		if (link_flow == F::CONFIRM_UNLINKING) {
 			link_flow = error.empty() ? F::DECLINED : F::CONFIRM;
-			link_confirm_error = error.empty() ? std::string() : std::string("Unlinking failed - try again.");
+			link_confirm_error = error.empty() ? std::string() : "Unlinking failed: " + error.substr(0, error.find('\n'));
 			unlink_result.reset();
 		}
 	}
@@ -1929,15 +1929,37 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 						auto scope = maybe_disabled_cols(link_flow == F::CONFIRM_UNLINKING);
 
 						if (ImGui::Button("Cancel##LinkConfirm", ImVec2(120, 0)) && link_flow == F::CONFIRM) {
-							link_flow = F::CONFIRM_UNLINKING;
-							link_confirm_error.clear();
-							start_unlink();
-
-							if (!unlinking) {
-								link_flow = F::CONFIRM;
-								link_confirm_error = "Unlinking failed - try again.";
-								unlink_result.reset();
+							if (const auto reason = account_change_blocked()) {
+								link_confirm_error = *reason;
 							}
+							else {
+								link_flow = F::CONFIRM_UNLINKING;
+								link_confirm_error.clear();
+								start_unlink();
+
+								if (!unlinking) {
+									link_flow = F::CONFIRM;
+									link_confirm_error = "Unlinking failed - try again.";
+									unlink_result.reset();
+								}
+							}
+						}
+					}
+
+					/*
+						Unlinking failed (no connection, a clock far off): the question may wait - the key plays as
+						itself this run and is asked again at the next start. Never stuck with Link as the only way out.
+					*/
+
+					if (!link_confirm_error.empty() && link_flow == F::CONFIRM) {
+						ImGui::SameLine();
+
+						if (ImGui::Button("Not now##LinkConfirm", ImVec2(120, 0))) {
+							if (identity != nullptr) {
+								identity->drop_unconfirmed_link();
+							}
+
+							close();
 						}
 					}
 				}

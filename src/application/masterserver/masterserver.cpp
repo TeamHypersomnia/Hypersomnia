@@ -98,12 +98,19 @@ static bool is_acceptable_domain(const std::string& domain, const bool is_offici
 	}
 
 	/*
-		Not an IP passed for a domain (e.g. another server's) - no top-level domain is all digits.
+		Not an IP passed for a domain (e.g. another server's, also written in hex or as one number) - a domain has a dot
+		and its top-level part begins with a letter.
 	*/
 
-	const auto top_level = domain.substr(domain.rfind('.') == std::string::npos ? 0 : domain.rfind('.') + 1);
+	const auto last_dot = domain.rfind('.');
 
-	if (top_level.find_first_not_of("0123456789") == std::string::npos) {
+	const bool top_level_begins_with_letter =
+		last_dot != std::string::npos
+		&& last_dot + 1 < domain.size()
+		&& std::isalpha(static_cast<unsigned char>(domain[last_dot + 1]))
+	;
+
+	if (!top_level_begins_with_letter) {
 		return false;
 	}
 

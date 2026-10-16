@@ -26,7 +26,7 @@ start)
 		const ic = require("./src/identity_cert.js");
 		const seed = Buffer.from(require("fs").readFileSync("private/broker.key", "utf8").trim().split(":")[1], "hex");
 		console.log(ic.rawPublicKey(ic.privateKeyFromSeed(seed)).toString("hex"));')
-	(cd $B && PORT=$PORT NODE_ENV=development OFFICIAL_SERVERS_DIR=${OFFICIAL_SERVERS_DIR:-$B/private/official_servers.d} \
+	(cd $B && PORT=$PORT NODE_ENV=development BASE_URL=http://127.0.0.1:$PORT OFFICIAL_SERVERS_DIR=${OFFICIAL_SERVERS_DIR:-$B/private/official_servers.d} \
 		STEAM_APIKEY=$(cat ${STEAM_API_KEY_FILE:-/dev/null} 2>/dev/null) CRAZYGAMES_PUBLIC_KEY_PEM="${CRAZYGAMES_PUBLIC_KEY_PEM:-}" \
 		CRAZYGAMES_GAME_ID="${CRAZYGAMES_GAME_ID:-}" SESSION_SECRET="${SESSION_SECRET:-}" \
 		nohup node app.js --test > $B/site.out 2>&1 &)

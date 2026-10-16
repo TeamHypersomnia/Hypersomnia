@@ -114,6 +114,10 @@ private:
 
 	bool crazygames_token_refused = false;
 	bool linked_quietly = false;
+
+	std::optional<identity_cert::cert> unconfirmed_cert;
+	account_profile unconfirmed_profile;
+	double unconfirmed_received_at_wall = 0.0;
 	double retry_delay = 30.0;
 	double last_now = 0.0;
 	int attempts_finished = 0;
@@ -210,17 +214,44 @@ public:
 	void retry_now();
 
 	/*
-		A quiet check found the key linked (e.g. linked in another tab): the game uses the Steam name and avatar then,
-		as after linking here.
-	*/
-
-	/*
-		The player said the linked Steam account is theirs - from now on it is used at once after a restart.
+		A link this device did not know of: its cert waits aside until the player answers whether the Steam account is
+		theirs. Confirmed, it is the account from then on (and at once after a restart); not now, the key plays as
+		itself this run and is asked again at the next start.
 	*/
 
 	void confirm_link() {
+		if (unconfirmed_cert.has_value()) {
+			broker_cert = std::exchange(unconfirmed_cert, std::nullopt);
+			profile = std::exchange(unconfirmed_profile, account_profile());
+			cert_received_at = last_now;
+			cert_received_at_wall = unconfirmed_received_at_wall;
+		}
+
 		save_cert();
 	}
+
+	void drop_unconfirmed_link() {
+		unconfirmed_cert.reset();
+		unconfirmed_profile = {};
+	}
+
+	/*
+		The Steam account to confirm (its profile too) - else the account in use.
+	*/
+
+	std::string get_account_to_confirm() const {
+		const auto& cert = unconfirmed_cert.has_value() ? unconfirmed_cert : broker_cert;
+		return cert.has_value() ? cert->account : std::string();
+	}
+
+	const account_profile& get_profile_to_confirm() const {
+		return unconfirmed_cert.has_value() ? unconfirmed_profile : profile;
+	}
+
+	/*
+		A quiet check found the key linked to an account this device did not know of - the game asks the player
+		whether it is theirs (see confirm_link).
+	*/
 
 	bool take_linked_quietly() {
 		return std::exchange(linked_quietly, false);

@@ -7039,12 +7039,13 @@ faction_type server_setup::get_assigned_faction() const {
 	return get_assigned_faction(get_local_player_id());
 }
 
+/*
+	The same rule as the handshake's (the protocol version is major.minor - see work.cpp): a development build (0.0.0)
+	is compatible only with development builds.
+*/
+
 bool server_heartbeat::versions_compatible() const {
 	const auto client_version = hypersomnia_version().get_version_string();
-
-	if (hypersomnia_version().is_development_build()) {
-		return true;
-	}
 
 	int client_major = 0;
 	int client_minor = 0;

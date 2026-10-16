@@ -125,6 +125,8 @@ for t in 1 2 3 4 5 6; do
 done
 
 for i in $(seq 1 30); do grep -q "Starting ranked\|ranked match started\|Match started" $T/server.out && break; sleep 1; done
+# the rejoin record is written every 10 s of a match - killed before it, there is nothing to rejoin
+for i in $(seq 1 25); do [ -s $T/alice/user/ranked_match.json ] && break; sleep 1; done
 echo "alice's cert: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice.out | tail -1)"
 echo "alice's ranked_match.json: $(cat $T/alice/user/ranked_match.json 2>/dev/null)"
 DISPLAY=:96 import -window root $T/live.png

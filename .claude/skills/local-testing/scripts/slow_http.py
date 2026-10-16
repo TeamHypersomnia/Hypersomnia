@@ -5,7 +5,7 @@ Usage: slow_http.py <dir with arenas/> <port> <bytes per second>
 """
 import http.server, os, sys, time, socketserver
 
-root, port, rate = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
+root, port, rate = os.path.abspath(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):

@@ -224,6 +224,8 @@ void identity_session::delete_saved_cert() {
 void identity_session::on_unlinked() {
 	forget_cert();
 	delete_saved_cert();
+	unconfirmed_cert.reset();
+	unconfirmed_profile = {};
 	last_error.clear();
 	last_attempt_failed = false;
 }
@@ -569,11 +571,54 @@ void identity_session::advance(const input& in, const double now) {
 			next_attempt_at = 0.0;
 
 			/*
-				Linked quietly only when this device did not know it was linked - a quiet check of a key with
-				steam.cert only renews it.
+				Linked to an account this device did not know of (no steam.cert, or one of another Steam account): the
+				player is asked first, and until they say it is theirs the cert waits aside - no connection goes as that
+				account. A quiet check of a key with steam.cert of the same account only renews it.
 			*/
 
-			const bool knew_it_was_linked = cert_saved;
+			const bool knew_it_was_linked =
+				cert_saved
+				&& broker_cert.has_value()
+				&& broker_cert->account == answer->cert.account
+			;
+
+			/*
+				A renewal for another Steam account than the one in use (unlinked and linked again elsewhere since) is a
+				link this device did not know of too.
+			*/
+
+			const bool other_account_renewed =
+				!was_check
+				&& broker_cert.has_value()
+				&& broker_cert->account != answer->cert.account
+			;
+
+			if ((was_check || other_account_renewed) && !knew_it_was_linked && key_can_be_linked) {
+				if (cert_saved) {
+					LOG("The key is linked to another Steam account now.");
+					on_unlinked();
+				}
+
+				unconfirmed_cert = answer->cert;
+				unconfirmed_profile = answer->profile;
+				unconfirmed_received_at_wall = wall_now();
+
+				LOG("Received an identity cert for %x - waiting for the player to confirm the account.", answer->cert.account);
+
+				if (key_check_quiet || other_account_renewed) {
+					linked_quietly = true;
+				}
+
+				if (was_check) {
+					key_recheck_until = 0.0;
+
+					link_check = link_check_state::LINKED;
+					link_check_profile = answer->profile;
+					key_check_quiet = false;
+				}
+
+				return;
+			}
 
 			broker_cert = answer->cert;
 			profile = answer->profile;
@@ -586,19 +631,13 @@ void identity_session::advance(const input& in, const double now) {
 
 			/*
 				steam.cert: a valid one is used at once after a restart, and it tells a key that it is linked.
-				A link this device did not know of is saved only once the player says the account is theirs
-				(confirm_link) - unanswered, it is asked again at the next start.
 			*/
 
-			if ((in.provider == provider_type::STEAM && !was_check) || (was_check && knew_it_was_linked)) {
+			if (in.provider == provider_type::STEAM || was_check) {
 				save_cert();
 			}
 
 			if (was_check) {
-				if (key_check_quiet && !knew_it_was_linked) {
-					linked_quietly = true;
-				}
-
 				key_recheck_until = 0.0;
 
 				link_check = link_check_state::LINKED;

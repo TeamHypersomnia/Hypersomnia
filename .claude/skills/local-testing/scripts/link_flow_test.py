@@ -64,10 +64,12 @@ def signed_in_anew_for(state):
         sess['fresh_link_state'] = state
         db.execute('UPDATE sessions SET sess = ? WHERE sid = ?', (json.dumps(sess), sid))
 
-def confirm(state, cookie, signer=None, t=None, fresh=True):
-    # The confirm page's [Link]: links at once
+def confirm(state, cookie, signer=None, t=None, fresh=True, opened=True):
+    # The confirm page's [Link]: links at once - on the page this browser opened (the game opens it at once)
     if fresh: signed_in_anew_for(state)
-    return post('/link_key/start', fields(state, signer, t), cookie)
+    f = fields(state, signer, t)
+    if opened: get('/link_key/start?' + urllib.parse.urlencode(f), cookie)
+    return post('/link_key/start', f, cookie)
 
 def unlink(t=None, signer=None):
     # "Unlink from Steam..." in the game: one GET signed by the key, answered at once
@@ -91,7 +93,7 @@ db = sqlite3.connect(os.path.join(site_dir, 'private/mmr.db'))
 with db:
     db.execute('INSERT INTO sessions (sid, sess, expire) VALUES (?, ?, ?)', (sid, json.dumps(sess), expires.isoformat()))
 sig = base64.b64encode(hmac.new(secret, sid.encode(), hashlib.sha256).digest()).decode().rstrip('=')
-cookie = 'connect.sid=' + urllib.parse.quote('s:' + sid + '.' + sig, safe='')
+cookie = 'connect.sid=' + urllib.parse.quote('s:' + sid + '.' + sig, safe='') + '; hs_link_browser=' + secrets.token_hex(16)
 
 key = Ed25519PrivateKey.generate()
 pub = key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
@@ -110,7 +112,7 @@ start_query = urllib.parse.urlencode(fields(state))
 
 status, _, headers = get('/link_key/start?' + start_query, cookie)
 check('start signed in from before still goes to the Steam sign-in (a fresh one every link)', status == 302 and '/auth/steam' in headers.get('Location', ''), headers.get('Location', ''))
-status, _, headers = get('/link_key/start?' + start_query)
+status, _, headers = get('/link_key/start?' + urllib.parse.urlencode(fields(secrets.token_hex(16))))
 check('start without a session goes to the Steam sign-in', status == 302 and '/auth/steam' in headers.get('Location', ''))
 signed_in_anew_for(state)
 status, body, _ = get('/link_key/start?' + start_query, cookie)
@@ -199,7 +201,7 @@ with db:
     db.execute('DELETE FROM broker_bans WHERE account IN (?, ?)', ('steam_' + steam_id, 'key_' + pub))
 
 # A game whose clock is 2 minutes behind links, is unlinked on /profile, and links again right after (the slack);
-# a link page is good for 3 minutes, so a clock 5 minutes behind is told it is too old
+# a link page is good for 3 minutes from its first opening by the site's clock - a game's clock behind by minutes links
 behind = Ed25519PrivateKey.generate()
 behind_pub = behind.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
 status, body = link(behind, t=str(int(time.time()) - 120))
@@ -208,8 +210,8 @@ post('/profile/unlink_key', { 'key': 'key_' + behind_pub }, cookie)
 status, body = link(behind, t=str(int(time.time()) - 119))
 check('and links again right after a /profile unlink', status == 200, '%s %s' % (status, body[-300:]))
 far_behind = Ed25519PrivateKey.generate()
-status, body = link(far_behind, t=str(int(time.time()) - 300))
-check('a game 5 min behind is told the page is too old', status == 400 and 'too old' in body, '%s' % status)
+status, body = link(far_behind, t=str(int(time.time()) - 600))
+check('a game 10 min behind still links (the page counts from its first opening, by the site\'s clock)', status == 200, '%s' % status)
 
 # A banned Steam account posting someone else's key to /profile/unlink_key: that key is not its, nothing happens to it
 foreign = 'key_' + secrets.token_hex(32)
@@ -221,5 +223,18 @@ check('a foreign key posted to /profile/unlink_key is not banned', banned_foreig
 with db:
     db.execute('DELETE FROM broker_bans WHERE account IN (?, ?)', ('steam_' + steam_id, 'key_' + pub))
 
+
+# The link page belongs to the browser that opened it first: another one (a stream's viewer) is refused, also its [Link]
+first_state = secrets.token_hex(16)
+first_fields = fields(first_state, Ed25519PrivateKey.generate())
+get('/link_key/start?' + urllib.parse.urlencode(first_fields), cookie)
+viewer = cookie.split('; hs_link_browser=')[0] + '; hs_link_browser=' + secrets.token_hex(16)
+status, body, _ = get('/link_key/start?' + urllib.parse.urlencode(first_fields), viewer)
+check('a link page opened by another browser first is refused', status == 400 and 'another browser' in body, '%s' % status)
+signed_in_anew_for(first_state)
+status, body, _ = post('/link_key/start', first_fields, viewer)
+check('and its Link from another browser is refused', status == 400 and 'another browser' in body, '%s' % status)
+status, body, _ = post('/link_key/start', first_fields, viewer.split('; hs_link_browser=')[0])
+check('and with no browser cookie at all', status == 400, '%s' % status)
 print('%d failed' % len(failed))
 sys.exit(1 if failed else 0)
