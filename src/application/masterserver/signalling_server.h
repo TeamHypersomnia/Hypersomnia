@@ -392,6 +392,12 @@ public:
 	std::size_t max_web_peers = 8192;
 
 	/*
+		From one address (an IPv6 one as its network) - one script can not take every place, nor a server's WebRTC ids.
+	*/
+
+	std::size_t max_web_peers_per_address = 32;
+
+	/*
 		The masterserver's own checks of a heartbeat (e.g. a banned server name) - for the servers in browsers too.
 	*/
 
@@ -432,11 +438,28 @@ private:
 
 			known = addr.has_value() && parse(*addr);
 
-			if (peers.size() >= max_web_peers) {
+			const auto from_this_address = [&]() {
+				std::size_t n = 0;
+
+				if (known) {
+					for (const auto& other : peers) {
+						n += augs::network_of(other.second.ip_informational) == augs::network_of(address);
+					}
+				}
+
+				return n;
+			}();
+
+			if (peers.size() >= max_web_peers || from_this_address >= max_web_peers_per_address) {
 				static uint64_t last_logged_ms = 0;
 
 				if (::official_log_allowed(last_logged_ms)) {
-					LOG("Refusing a web peer from %x: %x peers already.", addr.has_value() ? *addr : std::string("?"), max_web_peers);
+					LOG(
+						"Refusing a web peer from %x: %x peers already (%x from this address).",
+						addr.has_value() ? *addr : std::string("?"),
+						peers.size(),
+						from_this_address
+					);
 				}
 
 				ws->close();

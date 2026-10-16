@@ -162,6 +162,8 @@ std::string resolve_address_result::report() const {
 			return typesafe_sprintf("Couldn't resolve %x: host unreachable.", host);
 		case resolve_result_type::INVALID_ADDRESS:
 			return typesafe_sprintf("Couldn't resolve %x: the address is invalid.", host);
+		case resolve_result_type::IPV6_NOT_SUPPORTED:
+			return typesafe_sprintf("%x is an IPv6 address - not supported.", host);
 		default:
 			return typesafe_sprintf("Couldn't resolve %x: unknown error.", host);
 	}
@@ -737,6 +739,15 @@ resolve_address_result client_adapter::connect(const client_connect_string& str,
 		if (resolved_addr.result != resolve_result_type::OK) {
 			return resolved_addr;
 		}
+
+		/*
+			The game's socket is IPv4 only - an IPv6 server would only time out.
+		*/
+
+		if (resolved_addr.addr.type == NETCODE_ADDRESS_IPV6) {
+			resolved_addr.result = resolve_result_type::IPV6_NOT_SUPPORTED;
+			return resolved_addr;
+		}
 	}
 
 	if (use_webrtc) {
@@ -965,6 +976,12 @@ bool server_adapter::send(
 
 std::size_t server_adapter::num_connected_clients() const {
 	return server.GetNumConnectedClients();
+}
+
+void server_adapter::set_refusing_new_clients(const bool refusing) {
+	if (const auto netcode_server = server.GetServerDetail()) {
+		netcode_server_set_refusing_new_clients(netcode_server, refusing ? 1 : 0);
+	}
 }
 
 netcode_address_t* server_adapter::get_client_address(const client_id_type& id) const {

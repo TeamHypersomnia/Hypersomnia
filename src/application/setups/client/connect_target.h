@@ -69,6 +69,15 @@ struct connect_target {
 	}
 
 	/*
+		What another program may have the game join (a Steam invite, a steam://run link from any page): never a demo -
+		that would be a path to any file, a network share too.
+	*/
+
+	static bool joinable_from_outside(const std::string& target) {
+		return trimmed(target).rfind(demo_address_preffix_v, 0) != 0;
+	}
+
+	/*
 		A key as the game shows it (with 0x) or bare.
 	*/
 
@@ -152,8 +161,19 @@ struct connect_target {
 	}
 
 	std::string to_string() const {
-		const auto shown_address = without_default_port(address);
+		return joined(without_default_port(address));
+	}
 
+	/*
+		For a browser: its address is a WebRTC id, the port a part of it - kept as it is.
+	*/
+
+	std::string to_web_string() const {
+		return joined(address);
+	}
+
+private:
+	std::string joined(const std::string& shown_address) const {
 		if (!key.has_value()) {
 			return shown_address;
 		}

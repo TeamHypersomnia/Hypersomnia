@@ -20,6 +20,8 @@ CONNECT=${1:-pl}
 BROKER_URL=${BROKER_URL:-http://127.0.0.1:13500}
 BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 WAIT=${2:-120}
+# TAB_AWAY=<s>: the game's tab left for another one that long, then back (screen_back.png); KILL_SERVER=1: see the end
+EXTRA=$(( ${TAB_AWAY:-0} + ${KILL_SERVER:+30} + 0 ))
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $S/web_test"); do kill $p; done
 for p in $(pgrep -f "webserve.py $WEB"); do kill $p; done
@@ -73,10 +75,10 @@ $BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]
 # "@KEY" in the connect string is the server's key - e.g. "pl,@KEY", as the site's Browser links are
 CONNECT=${CONNECT//@KEY/$(cat $T/official_servers.d/pl)}
 
-timeout $((WAIT + 60)) $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
+timeout $((WAIT + EXTRA + 60)) $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
 sleep 3
-timeout $((WAIT + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
-timeout $((WAIT + 50)) python3 "$HERE/webserve.py" $WEB 8765 > $T/web.out 2>&1 &
+timeout $((WAIT + EXTRA + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
+timeout $((WAIT + EXTRA + 50)) python3 "$HERE/webserve.py" $WEB 8765 > $T/web.out 2>&1 &
 sleep 14
 
 echo "=== list"
@@ -86,7 +88,7 @@ for e in json.load(sys.stdin): print(' ', e['name'], 'webrtc_id=', e.get('webrtc
 
 Xvfb :78 -screen 0 1280x720x24 > /dev/null 2>&1 &
 sleep 2
-DISPLAY=:78 timeout $WAIT firefox --no-remote --profile $T/ff --new-instance "http://localhost:8765/game/$CONNECT" > $T/firefox.out 2>&1 &
+DISPLAY=:78 timeout $((WAIT + EXTRA)) firefox --no-remote --profile $T/ff --new-instance "http://localhost:8765/game/$CONNECT" > $T/firefox.out 2>&1 &
 sleep $((WAIT - 10))
 DISPLAY=:78 import -window root $T/screen.png
 
@@ -94,6 +96,26 @@ echo "=== server"
 grep -hE "connected\. SID|requested nickname|Adding|Authenticated|did not verify|kicked|Reason|Ranked matches need" $T/server.out | sed 's/^\[[0-9:]*\] //' | head -10
 echo "=== browser console (game)"
 grep -E "identity cert|Connecting as|client connected|Received initial|WebRTC: DataChannel|last_disconnect_reason" $T/firefox.out | head -10
+
+if [ -n "$TAB_AWAY" ]; then
+	DISPLAY=:78 python3 "$HERE/xinput.py" key Control_L+t
+	echo "=== the game's tab in the background for $TAB_AWAY s"
+	sleep $TAB_AWAY
+	DISPLAY=:78 python3 "$HERE/xinput.py" key Control_L+w
+	sleep 8
+	DISPLAY=:78 import -window root $T/screen_back.png
+	echo "=== back: $(grep -cE 'disconnect|Disconnected|data channel closed' $T/firefox.out) disconnect lines"
+	grep -E "WebRTC: State|disconnect" $T/firefox.out | tail -4
+fi
+
+# KILL_SERVER=1: the server SIGKILLed in the game - the browser must say the connection is lost (screen_killed.png)
+if [ -n "$KILL_SERVER" ]; then
+	for p in $(pgrep -f "^$BIN --dedicated-server --appdata-dir $T/server "); do kill -9 $p; done
+	echo "=== server killed"
+	sleep 25
+	DISPLAY=:78 import -window root $T/screen_killed.png
+	grep -E "disconnect|Disconnected|closed|State: " $T/firefox.out | tail -5
+fi
 
 sleep 12
 for p in $(pgrep -f "^$BIN .*--appdata-dir $S/web_test"); do kill $p; done

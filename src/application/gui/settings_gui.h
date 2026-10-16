@@ -261,19 +261,28 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	/*
 		"Link with Steam..." runs in one dimmed modal, from asking whether the key is linked already to the result.
+		Linked, the player is asked whether that Steam account is theirs (CONFIRM) - whoever confirmed the page in the
+		browser may be someone who saw its address; Cancel unlinks it (CONFIRM_UNLINKING, then DECLINED).
 	*/
 
 	enum class link_flow_type {
 		IDLE,
 		CHECKING_BEFORE,
 		NEEDS_STEAM_SIGN_IN,
+		CONFIRM,
+		CONFIRM_UNLINKING,
+		DECLINED,
 		DONE
 	};
 
 	link_flow_type link_flow = link_flow_type::IDLE;
 	std::string link_flow_message;
 	std::string linked_name;
+	std::string linked_account;
 	bool linked_has_avatar = false;
+	bool link_found_elsewhere = false;
+	bool link_confirm_profile_wanted = false;
+	std::string link_confirm_error;
 	bool link_flow_succeeded = false;
 	bool link_flow_conflict = false;
 	bool link_flow_message_is_warning = false;
@@ -361,6 +370,13 @@ public:
 	*/
 
 	bool account_modal_open(bool with_message = true) const;
+
+	/*
+		The key turned out linked without this device linking it (asked quietly at the start): is that Steam account
+		the player's? Opens Settings - Account - Link with the question.
+	*/
+
+	void ask_whether_link_is_theirs();
 
 	bool is_steam_client = false;
 

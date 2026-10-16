@@ -81,6 +81,12 @@ struct webrtc_client_detail {
 	std::atomic<bool> ready = false;
 	std::atomic<bool> is_error_state = false;
 
+	/*
+		Since when the connection is "disconnected" - it may still come back, so only a few seconds of it are a loss.
+	*/
+
+	std::atomic<double> disconnected_since = -1.0;
+
 	bool has_description = false;
 	std::vector<nlohmann::json> pending_candidates;
 
@@ -93,7 +99,11 @@ struct webrtc_client_detail {
 
 	bool is_error() {
 		std::scoped_lock lock(ready_lk);
-		return is_error_state;
+
+		const double since = disconnected_since;
+		const bool disconnected_for_long = since >= 0.0 && augs::high_precision_secs() - since > 5.0;
+
+		return is_error_state || disconnected_for_long;
 	}
 
 	void set_error() {
@@ -274,6 +284,24 @@ struct webrtc_client_detail {
 				}
 
 				self->set_message(std::string("State: ") + std::to_string(int(state))); 
+
+				/*
+					A connection that failed or stays disconnected (the server died, the network went away) may leave
+					its data channel open - the browser's only sign of it.
+				*/
+
+				if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed) {
+					self->set_error();
+				}
+
+				if (state == rtc::PeerConnection::State::Disconnected) {
+					if (self->disconnected_since < 0.0) {
+						self->disconnected_since = augs::high_precision_secs();
+					}
+				}
+				else {
+					self->disconnected_since = -1.0;
+				}
 			}
 		);
 
@@ -917,6 +945,10 @@ void client_setup::connect() {
 
 		set_disconnect_reason(reason);
 		LOG("Address: \"%x\"", resolution.host);
+	}
+	else if (resolution.result == resolve_result_type::IPV6_NOT_SUPPORTED) {
+		set_disconnect_reason("IPv6 addresses are not supported yet.\nUse the server's IPv4 address.");
+		LOG("Address: \"%x\"", connect_string);
 	}
 	else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
 		const auto reason = typesafe_sprintf(
@@ -2090,6 +2122,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_CONNECTION_DENIED:
 							set_disconnect_reason("The server is full.");
+							break;
+
+						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_MATCH_IN_PROGRESS:
+							set_disconnect_reason("A ranked match is in progress there - only its players can rejoin.");
 							break;
 
 						default:

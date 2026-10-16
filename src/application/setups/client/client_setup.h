@@ -880,46 +880,45 @@ public:
 
 				client_time = std::max(client_time, current_time - advanced_dt);
 			}
+		}
 
 #if !PLATFORM_WEB
-			/*
-				Netcode timeouts are off (a hidden browser tab is paused, not dropped),
-				so a server that died or a network that went away would leave the game frozen for good.
-				The server sends a step every tick - 10 seconds without one is a lost connection.
-				Not on the web: a tab coming back would time out before reading what waits for it.
-			*/
+		/*
+			Netcode timeouts are off (a hidden browser tab is paused, not dropped),
+			so a server that died or a network that went away would leave the game frozen for good.
+			In the game the server sends a step every tick - 10 seconds without one is a lost connection.
+			Otherwise (the welcome, the first snapshot, a download, the stream paused for a new arena) no steps come,
+			but the server's keepalives come all the time.
+			Not on the web: a tab coming back would time out before reading what waits for it.
+		*/
 
-			const bool server_went_silent =
-				state == client_state_type::IN_GAME
-				&& !pause_solvable_stream
-				&& when_sent_last_referential_step > 0
-				&& current_time - when_sent_last_referential_step > 10.0
-				&& is_connected()
-			;
+		const bool steps_expected =
+			!downloading
+			&& state == client_state_type::IN_GAME
+			&& !pause_solvable_stream
+			&& when_sent_last_referential_step > 0
+		;
 
-			/*
-				Before the game (the welcome, the first snapshot, a download): no steps yet, but the server's keepalives
-				come all the time.
-			*/
+		const bool server_went_silent =
+			is_connected()
+			&& (
+				steps_expected ?
+				current_time - when_sent_last_referential_step > 10.0 :
+				secs_since_last_server_packet() > 10.0
+			)
+		;
 
-			const bool silent_before_game =
-				state != client_state_type::IN_GAME
-				&& is_connected()
-				&& secs_since_last_server_packet() > 10.0
-			;
-
-			if (server_went_silent || silent_before_game) {
-				LOG("Nothing from the server for 10 seconds - disconnecting.");
-				set_disconnect_reason("Nothing came from the server for 10 seconds.\nThe server may be down, or your connection may have dropped.");
-				disconnect();
-			}
+		if (server_went_silent) {
+			LOG("Nothing from the server for 10 seconds - disconnecting.");
+			set_disconnect_reason("Nothing came from the server for 10 seconds.\nThe server may be down, or your connection may have dropped.");
+			disconnect();
+		}
 #endif
 
-			if (is_connected() && webrtc_channel_closed()) {
-				LOG("The WebRTC data channel closed - disconnecting.");
-				set_disconnect_reason("The connection to the server was closed.");
-				disconnect();
-			}
+		if (is_connected() && webrtc_channel_closed()) {
+			LOG("The WebRTC data channel closed - disconnecting.");
+			set_disconnect_reason("The connection to the server was closed.");
+			disconnect();
 		}
 	}
 

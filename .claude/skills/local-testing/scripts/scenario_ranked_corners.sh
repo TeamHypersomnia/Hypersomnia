@@ -88,7 +88,8 @@ timeout 300 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launc
 sleep 8
 
 mkdir -p $T/alice/user/conf.d $T/bob/user/conf.d
-echo "{ \"identity_broker_url\": \"http://127.0.0.1:$PROXY\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"alice\" } }" > $T/alice/user/conf.d/test.json
+echo "{ \"identity_broker_url\": \"http://127.0.0.1:$PROXY\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"alice\" },
+  \"launch_at_startup\": \"MAIN_MENU\", \"skip_tutorial\": true, \"window\": { \"fullscreen\": false, \"size\": [1280, 720] } }" > $T/alice/user/conf.d/test.json
 echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"bob\" } }" > $T/bob/user/conf.d/test.json
 
 start_client() {
@@ -101,8 +102,17 @@ sleep 1
 
 # alice first gets her Steam cert (the proxy is up) - a key put in by hand is asked about once (as an import) -
 # and only then joins, as the Steam account
+# Settings where identity_ui's screenshots have them - the modal's [Link] at 493,472
+cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
 start_client alice 96 alice_first.out
-for i in $(seq 1 40); do grep -q "Saved the Steam cert\|identity cert for steam_\|Linked" $T/alice_first.out 2>/dev/null && [ -f $T/alice/user/.keys/steam.cert ] && break; sleep 1; done
+# The game asks whether the Steam account linked elsewhere is hers - [Link] (centered modal) saves steam.cert
+for i in $(seq 1 40); do grep -q "identity cert for steam_" $T/alice_first.out 2>/dev/null && break; sleep 1; done
+sleep 2
+for i in $(seq 1 10); do
+	[ -f $T/alice/user/.keys/steam.cert ] && break
+	DISPLAY=:96 python3 "$HERE/xinput.py" click 493 472
+	sleep 1
+done
 echo "alice's first start: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice_first.out | tail -1), steam.cert: $([ -f $T/alice/user/.keys/steam.cert ] && echo yes || echo no)"
 for p in $(pgrep -f -- "Hypersomnia --appdata-dir $T/alice "); do kill $p; done
 sleep 2
@@ -132,10 +142,21 @@ esac
 sleep 3
 for p in $(pgrep -f -- "Hypersomnia --connect 127.0.0.1:$PORT --appdata-dir $T/alice "); do kill -9 $p; done
 echo "alice killed at $(date +%T)"
-sleep 5
+# REJOIN_AFTER=0: back before the server counts her as gone - told "match in progress" at first, the rejoin tries again
+sleep ${REJOIN_AFTER:-5}
 start_client alice 96 alice_rejoin.out
 echo "alice started again at $(date +%T)"
 for t in 4 8 12 16; do sleep 4; DISPLAY=:96 import -window root $T/rejoin_$t.png; done
+
+# STRANGER=1: someone not in the match tries to join it - told the match is in progress
+if [ -n "$STRANGER" ]; then
+	mkdir -p $T/carol/user/conf.d
+	echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"carol\" } }" > $T/carol/user/conf.d/test.json
+	start_client carol 97 carol.out --connect 127.0.0.1:$PORT
+	sleep 15
+	DISPLAY=:97 import -window root $T/stranger.png
+	echo "=== the stranger: $(grep -ao 'A ranked match is in progress[^.]*' $T/carol.out | head -1)"
+fi
 
 for i in $(seq 1 180); do
 	grep -q "delivered (HTTP\|not delivered\|refused the match report" $T/server.out && break

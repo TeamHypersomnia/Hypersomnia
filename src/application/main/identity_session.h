@@ -145,14 +145,16 @@ private:
 	std::string link_check_error;
 
 	/*
-		Once a run, quietly, for a key without steam.cert (and not made just now): is it linked? A link made elsewhere
-		(another computer the key was copied from, a tab whose save failed) shows up so - the site knows.
-		Retried until it gets an answer, never shown - also after linking when the check that should follow failed.
+		Once a run, quietly, for every key (not made just now): is it linked? A link made elsewhere (another computer
+		the key was copied from, a tab whose save failed) shows up so, and an unlink on the site counts from the next
+		start - the site knows. Retried until it gets an answer, never shown.
+		A link page left open in the browser: asked every while until it is too old (key_recheck_until).
 	*/
 
 	bool key_check_wanted = false;
 	bool key_check_quiet = false;
 	double key_check_next_at = 0.0;
+	double key_recheck_until = 0.0;
 
 	input last_input;
 
@@ -211,6 +213,14 @@ public:
 		A quiet check found the key linked (e.g. linked in another tab): the game uses the Steam name and avatar then,
 		as after linking here.
 	*/
+
+	/*
+		The player said the linked Steam account is theirs - from now on it is used at once after a restart.
+	*/
+
+	void confirm_link() {
+		save_cert();
+	}
 
 	bool take_linked_quietly() {
 		return std::exchange(linked_quietly, false);
@@ -291,7 +301,8 @@ public:
 	}
 
 	/*
-		Linked on the site, but the check that should follow failed: asked again in the background until answered.
+		A link page left open in the browser (the link flow cancelled or hidden, or its wait over): asked quietly
+		every while for as long as the page can still be confirmed - a link made there is not missed until a restart.
 	*/
 
 	void recheck_link_quietly();

@@ -97,6 +97,16 @@ static bool is_acceptable_domain(const std::string& domain, const bool is_offici
 		return false;
 	}
 
+	/*
+		Not an IP passed for a domain (e.g. another server's) - no top-level domain is all digits.
+	*/
+
+	const auto top_level = domain.substr(domain.rfind('.') == std::string::npos ? 0 : domain.rfind('.') + 1);
+
+	if (top_level.find_first_not_of("0123456789") == std::string::npos) {
+		return false;
+	}
+
 	auto lowercase = domain;
 
 	for (auto& c : lowercase) {
@@ -697,10 +707,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 				/*
 					The dump does not say which official server an entry was -
-					its next signed heartbeat makes it official again.
+					its next signed heartbeat makes it official again. Until then neither an official alias nor domain.
 				*/
 
 				entry.meta.is_official = false;
+				entry.meta.domain = {};
+				entry.meta.webrtc_id = {};
 
 				server_list.try_emplace(address, std::move(entry));
 			}

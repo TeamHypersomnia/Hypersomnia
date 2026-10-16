@@ -1,4 +1,5 @@
 #include "3rdparty/yojimbo/include/yojimbo.h"
+#include "3rdparty/yojimbo/netcode/netcode.h"
 #undef write_bytes
 #undef read_bytes
 
@@ -48,6 +49,10 @@ void rtc_log_callback(rtc::LogLevel level, std::string message) {
 
 namespace augs {
 	namespace network {
+		void set_protocol_version(const std::string& version) {
+			netcode_set_version_info(version.c_str());
+		}
+
 		void enable_detailed_logs(const bool flag) {
 			yojimbo_log_level(flag ? YOJIMBO_LOG_LEVEL_DEBUG : YOJIMBO_LOG_LEVEL_INFO);
 		}

@@ -83,8 +83,10 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
   opens `<website>/link_key/start?state=..&key=..&sig=..&device=..&os=..` (the state signed with the key) in a new tab (native:
   in the browser); signed in through Steam anew (every link), the player confirms the Steam account on that page and the key is
   linked at once - the game asks for its cert every 3 s and sees the Steam account there (no redirect back, no local listener,
-  no code; the same natively, in a tab or an iframe). A refusal (another account's key, 32 keys) shows on the page only; the
-  game stops waiting after 15 min. Unlink from Steam is one signed GET `/link_key/unlink?t&key&sig`, answered at once.
+  no code; the same natively, in a tab or an iframe). The game then asks "Link to this Steam account?" (the profile link,
+  [Link] [Cancel] - Cancel unlinks; steam.cert is saved only after Link); linking moves no progress. A refusal (another
+  account's key, 32 keys) shows on the page only; the page is good for 3 min, then the game stops waiting.
+  Unlink from Steam is one signed GET `/link_key/unlink?t&key&sig`, answered at once.
 
 ## UI checks
 
@@ -103,9 +105,10 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `browser_sign_in.sh [steam id64]` (with `OPENED_URLS=<client>/opened_urls`) plays the player's browser for Link with Steam:
   opens the last `/link_key/start` URL signed in to Steam on the scratch site and clicks Link - the game then learns it by itself.
 - account.key is read only at the start and after Restore / Start a new account - a key swapped on disk counts from the
-  next start (restart the client to test it). Every start of a key without steam.cert (not one made just now) asks the broker
-  quietly whether it is linked ("Asking quietly whether the key is linked") - linked elsewhere, it plays as the Steam account;
-  never a modal. Not in the Steam build or CrazyGames.
+  next start (restart the client to test it). Every start (not of a key made just now) asks the broker quietly whether the key
+  is linked ("Asking quietly whether the key is linked") - unlinked on the site, it drops its steam.cert; linked elsewhere
+  (`link_key.py`), Settings open with "This key is linked to a Steam account - is it yours?" until answered. Not in the Steam
+  build or CrazyGames.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
   then Settings 155,555, Account 126,112 with Info 102,144 / Link with Steam 245,144 / Backup 385,144 - the panes' own fields
   move with their content, so screenshot first. Without it (the default 1280x720 layout): Info 307,278 / Link 440,278 / Backup 590,278,

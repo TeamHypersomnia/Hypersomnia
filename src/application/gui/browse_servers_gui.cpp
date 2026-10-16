@@ -379,6 +379,15 @@ void browse_servers_gui_state::load_cached_list_once(const browse_servers_input&
 
 		if (cache_error.empty()) {
 			LOG("Loaded %x servers from the cached server list.", cached.size());
+
+			/*
+				Its time to the next event was as of when it was downloaded - not known now.
+			*/
+
+			for (auto& entry : cached) {
+				entry.heartbeat.next_event_at = -1.0;
+			}
+
 			cached_list = std::move(cached);
 		}
 		else {
@@ -2045,7 +2054,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			return false;
 		};
 
-		if (server_details.show && !selected_server.is_set() && !reselect(displayed_list())) {
+		if (!selected_server.is_set() && !reselect(displayed_list())) {
 			reselect(favorite_only_list);
 		}
 
@@ -2466,7 +2475,7 @@ void invite_to_join_gui_state::perform(const invite_to_join_input& in) {
 
 	const bool hide = in.streamer_mode;
 
-	row("Browser join link", ::get_browser_join_link(connect_target { target.web_id, target.key }.to_string()), hide);
+	row("Browser join link", ::get_browser_join_link(connect_target { target.web_id, target.key }.to_web_string()), hide);
 	row("Steam join link", ::get_steam_join_link(target.join_string()), hide);
 	row("Address", target.native_address, hide);
 
@@ -2826,7 +2835,7 @@ bool server_details_gui_state::perform(
 	};
 
 	auto do_browser_join_link = [&](bool acquire) {
-		auto link = ::get_browser_join_link(connect_target { entry.get_web_connect_string(), entry.get_public_key() }.to_string());
+		auto link = ::get_browser_join_link(connect_target { entry.get_web_connect_string(), entry.get_public_key() }.to_web_string());
 
 		if (acquire) {
 			acquire_keyboard_once();

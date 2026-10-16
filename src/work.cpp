@@ -787,6 +787,19 @@ work_result work(
 		verbose_rtc_log
 	);
 
+	/*
+		The protocol is the game's major.minor - a patch release (3.1.0, 3.1.1) never breaks it, so they play together;
+		another one is told it is another version. A development build (0.0.0) plays only with development builds.
+	*/
+
+	{
+		const auto version = hypersomnia_version().get_version_string();
+		const auto major_minor = version.substr(0, version.find('.', version.find('.') + 1));
+
+		augs::network::set_protocol_version("HS" + major_minor);
+		LOG("Protocol version: HS%x", major_minor);
+	}
+
 #if PLATFORM_WEB
 	const auto random_seed = EM_ASM_INT_V({
 		return Module.getRandomValue();
@@ -1422,7 +1435,18 @@ work_result work(
 			kept.webrtc_udp_mux = under.webrtc_udp_mux;
 			kept.webrtc_port_range_begin = under.webrtc_port_range_begin;
 
-			runtime_ranked_patch = augs::to_json_diff_string(kept, under);
+			/*
+				Reset to the defaults (RCON's "reset to defaults" applies the canon's ranked vars): no patch at all - not
+				the canon's values pinned over the casual ones that may have changed since.
+			*/
+
+			auto canon_ranked = ranked_vars_of(canon_config_with_confd.server, false);
+			canon_ranked.webrtc_udp_mux = under.webrtc_udp_mux;
+			canon_ranked.webrtc_port_range_begin = under.webrtc_port_range_begin;
+
+			const bool reset_to_defaults = augs::to_json_diff_string(kept, canon_ranked) == "{}";
+
+			runtime_ranked_patch = reset_to_defaults ? std::string("{}") : augs::to_json_diff_string(kept, under);
 			save_runtime_prefs();
 		};
 
@@ -2232,10 +2256,13 @@ work_result work(
 
 		identity->advance(get_identity_input(), now);
 
-		if (identity->take_linked_quietly() && !config.client.use_account_profile) {
-			change_with_save([](auto& cfg) {
-				cfg.client.use_account_profile = true;
-			});
+		/*
+			Linked without this device linking it (another of the player's devices - or someone who saw a link page's
+			address): the player is asked whether that Steam account is theirs.
+		*/
+
+		if (identity->take_linked_quietly()) {
+			settings_gui.ask_whether_link_is_theirs();
 		}
 
 #if !PLATFORM_WEB
@@ -3452,14 +3479,15 @@ work_result work(
 		/*
 			The next launch joins the same server right away, without asking the masterserver: where it was joined and
 			its key - also an address on the local network (elsewhere it fails the key check, or times out).
-			A domain survives the server changing its IP.
+			An official server's domain survives the server changing its IP - a community server's is only what it
+			declares, never trusted to find it.
 		*/
 
 		if (target.key.has_value()) {
 			auto next = connect_target { std::string(connect_string), target.key };
 
 #if !PLATFORM_WEB
-			if (found != nullptr && !found->get_domain_with_port().empty()) {
+			if (found != nullptr && found->is_official_server() && !found->get_domain_with_port().empty()) {
 				next.address = found->get_domain_with_port();
 			}
 #endif
@@ -4588,24 +4616,88 @@ work_result work(
 	};
 
 #if !PLATFORM_WEB
-	WEBSTATIC auto process_steam_callbacks = [&]() {
-		auto connect_to = [&](const std::string& address_string) {
-			if (address_string.length() > 0) {
-				LOG("(Steam Callback) Joining server (length: %x): %x", address_string.length(), address_string);
+	/*
+		A Steam invite (or a steam://run link from a page) while playing: never out of a ranked match; out of a server
+		hosted here or the editor only once the player says so.
+	*/
 
-				config.client_connect = address_string;
+	WEBSTATIC auto steam_join_popup = std::optional<simple_popup>();
+	WEBSTATIC auto steam_join_target = std::string();
+
+	WEBSTATIC auto join_from_steam = [&](const std::string& address_string) {
+		LOG("(Steam Callback) Joining server (length: %x): %x", address_string.length(), address_string);
+
+		config.client_connect = address_string;
 
 #if BUILD_NETWORKING
-				/*
-					An invite has where the server is (rtc: if behind NAT) and its key - no waiting for the server list.
-				*/
+		/*
+			An invite has where the server is (rtc: if behind NAT) and its key - no waiting for the server list.
+		*/
 
-				start_client_setup();
+		start_client_setup();
 #endif
+	};
+
+	WEBSTATIC auto perform_steam_join_popup = [&]() {
+		if (!steam_join_popup.has_value()) {
+			return;
+		}
+
+		if (steam_join_target.empty()) {
+			if (steam_join_popup->perform()) {
+				steam_join_popup = std::nullopt;
 			}
-			else {
+
+			return;
+		}
+
+		if (const auto result = steam_join_popup->perform({
+			{ "Join", rgba(200, 80, 0, 255), rgba(25, 20, 0, 255) },
+			{ "Cancel", rgba::zero, rgba::zero }
+		})) {
+			steam_join_popup = std::nullopt;
+
+			if (result == 1) {
+				join_from_steam(std::exchange(steam_join_target, std::string()));
+			}
+
+			steam_join_target.clear();
+		}
+	};
+
+	WEBSTATIC auto process_steam_callbacks = [&]() {
+		auto connect_to = [&](const std::string& address_string) {
+			if (!connect_target::joinable_from_outside(address_string)) {
+				LOG("(Steam Callback) Ignoring a target that is not a server: %x", address_string);
+				return;
+			}
+
+			if (address_string.empty()) {
 				LOG("(Steam Callback) Server address was empty.");
+				return;
 			}
+
+			if (would_abandon_ranked_match()) {
+				LOG("(Steam Callback) In a ranked match - not leaving it for: %x", address_string);
+				steam_join_target.clear();
+				steam_join_popup = simple_popup { "Join a server", "Cannot leave a ranked match.", "" };
+				return;
+			}
+
+			const bool hosting_or_editing = has_current_setup() && (
+#if BUILD_NETWORKING
+				std::holds_alternative<server_setup>(*current_setup) ||
+#endif
+				std::holds_alternative<editor_setup>(*current_setup)
+			);
+
+			if (hosting_or_editing) {
+				steam_join_target = address_string;
+				steam_join_popup = simple_popup { "Join a server", "Leave the game?\nYou will instead join:\n" + address_string, "" };
+				return;
+			}
+
+			join_from_steam(address_string);
 		};
 
 		using steam_queue_type = std::vector<
@@ -4923,6 +5015,9 @@ work_result work(
 
 				perform_failed_to_load_arena_popup();
 				perform_abandon_are_you_sure_popup();
+#if !PLATFORM_WEB
+				perform_steam_join_popup();
+#endif
 				perform_sign_in_ui();
 #if BUILD_NETWORKING
 				perform_quick_play();
@@ -5814,7 +5909,7 @@ work_result work(
 			LOG("account.key does not read - only the main menu until it is restored or replaced.");
 			launch_setup(activity_type::MAIN_MENU);
 		}
-		else if (steam_cli.length() > 0) {
+		else if (steam_cli.length() > 0 && connect_target::joinable_from_outside(steam_cli)) {
 			LOG("Detected Steam CLI (length: %x): %x", steam_cli.length(), steam_cli);
 			connect_to(steam_cli);
 		}

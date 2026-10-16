@@ -130,8 +130,13 @@ private:
 	}
 
 public:
-	void init(const augs::path_type& user_dir, const uint16_t port, const augs::ed25519_seed_type& key) {
-		folder = user_dir / "report_queue" / std::to_string(port);
+	/*
+		One folder per instance (r1, t1) - the same instance finds its reports after a restart, whatever port the
+		"instances" config gives it now.
+	*/
+
+	void init(const augs::path_type& user_dir, const std::string& instance_label, const augs::ed25519_seed_type& key) {
+		folder = user_dir / "report_queue" / instance_label;
 		server_key = key;
 
 		if (const auto public_key = augs::ed25519_public_key(key)) {

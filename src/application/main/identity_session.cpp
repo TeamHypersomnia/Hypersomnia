@@ -22,6 +22,7 @@ static constexpr double first_retry_delay_secs = 30.0;
 static constexpr double max_retry_delay_secs = 300.0;
 static constexpr double steam_ticket_timeout_secs = 10.0;
 static constexpr double key_recheck_delay_secs = 30.0;
+static constexpr double link_page_lifetime_secs = 3 * 60.0;
 
 static constexpr std::string_view cert_file_prefix = "hypersomnia-cert-v1:";
 
@@ -68,15 +69,17 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 
 	load_saved_cert();
 
-	key_check_wanted = !cert_saved;
+	key_check_wanted = true;
 	key_check_quiet = true;
 	key_check_next_at = 0.0;
+	key_recheck_until = 0.0;
 }
 
 void identity_session::recheck_link_quietly() {
 	key_check_wanted = true;
 	key_check_quiet = true;
 	key_check_next_at = last_now + key_recheck_delay_secs;
+	key_recheck_until = last_now + link_page_lifetime_secs;
 }
 
 void identity_session::on_key_created() {
@@ -468,7 +471,7 @@ void identity_session::advance(const input& in, const double now) {
 
 	/*
 		Whether the key is linked is asked through the same /cert as every cert - by the key's signature:
-		once a run, quietly, for a key without steam.cert, and when the player links (start_link_check).
+		once a run, quietly, and when the player links (start_link_check).
 		Not in the Steam build (its key is never linked) nor on CrazyGames (its account is the token's).
 	*/
 
@@ -538,7 +541,18 @@ void identity_session::advance(const input& in, const double now) {
 			if (was_check) {
 				link_check = link_check_state::NOT_LINKED;
 				link_check_profile = answer->profile;
-				key_check_quiet = false;
+
+				/*
+					A link page still open in the browser - asked again in a while.
+				*/
+
+				if (key_check_quiet && now < key_recheck_until) {
+					key_check_wanted = true;
+					key_check_next_at = now + key_recheck_delay_secs;
+				}
+				else {
+					key_check_quiet = false;
+				}
 			}
 
 			return;
@@ -554,6 +568,13 @@ void identity_session::advance(const input& in, const double now) {
 			retry_delay = first_retry_delay_secs;
 			next_attempt_at = 0.0;
 
+			/*
+				Linked quietly only when this device did not know it was linked - a quiet check of a key with
+				steam.cert only renews it.
+			*/
+
+			const bool knew_it_was_linked = cert_saved;
+
 			broker_cert = answer->cert;
 			profile = answer->profile;
 			cert_received_at = now;
@@ -565,16 +586,20 @@ void identity_session::advance(const input& in, const double now) {
 
 			/*
 				steam.cert: a valid one is used at once after a restart, and it tells a key that it is linked.
+				A link this device did not know of is saved only once the player says the account is theirs
+				(confirm_link) - unanswered, it is asked again at the next start.
 			*/
 
-			if (in.provider == provider_type::STEAM || was_check) {
+			if ((in.provider == provider_type::STEAM && !was_check) || (was_check && knew_it_was_linked)) {
 				save_cert();
 			}
 
 			if (was_check) {
-				if (key_check_quiet) {
+				if (key_check_quiet && !knew_it_was_linked) {
 					linked_quietly = true;
 				}
+
+				key_recheck_until = 0.0;
 
 				link_check = link_check_state::LINKED;
 				link_check_profile = answer->profile;

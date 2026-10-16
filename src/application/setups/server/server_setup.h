@@ -822,8 +822,8 @@ public:
 
 	std::unordered_map<std::string, wrong_password_record> wrong_passwords;
 
-	bool too_many_wrong_passwords(const std::string& address) const;
-	void note_wrong_password(const std::string& address);
+	bool too_many_wrong_passwords(const std::string& address, const std::string& account) const;
+	void note_wrong_password(const std::string& address, const std::string& account);
 	message_handler_result abort_or_kick_if_debug(const client_id_type&, const std::string& reason);
 	/*
 		minutes == 0 bans for good.
@@ -998,12 +998,6 @@ public:
 	bool is_ranked_live() const;
 	bool is_ranked_live_or_starting() const;
 	bool has_suspended_players() const;
-
-	bool is_connection_request_packet(
-		const netcode_address_t& from,
-		const std::byte* packet_buffer,
-		const std::size_t packet_bytes
-	) const;
 
 	void restart_match();
 

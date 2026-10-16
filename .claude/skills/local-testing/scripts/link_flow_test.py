@@ -136,7 +136,7 @@ check('Link without signing in anew for this page is refused', status == 400 and
 
 check('cert before linking is the key', cert_account() == 'key_' + pub)
 
-# Ranked progress of the key: moves to a Steam account without matches on linking, stays there on an unlink
+# Ranked progress of the key: never moved by a link or an unlink - the Steam account counts the matches from then on
 with db:
     db.execute("INSERT INTO mmr_team (account_id, nickname, mmr, mu, sigma, matches_won, matches_lost) VALUES (?, 'k', 7.5, 30, 5, 3, 2)", ('key_' + pub,))
 
@@ -148,7 +148,7 @@ link_t = str(int(time.time()))
 status, body, headers = confirm(state, cookie, t=link_t)
 check('Link links and says to go back to the game (no redirect)', status == 200 and 'You can go back to Hypersomnia' in body and 'Location' not in headers, body[:200])
 check('the game learns it from its cert: the Steam account', cert_account() == 'steam_' + steam_id)
-check('progress moved to the Steam account', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
+check('progress stays with the key on linking', mmr_owner() == ['key_' + pub], str(mmr_owner()))
 status, body, _ = confirm(state, cookie, t=link_t)
 check('the same page sent again does nothing (not newer than the last change)', status == 409 and 'used already' in body, '%s %s' % (status, body[:100]))
 
@@ -163,7 +163,7 @@ status, result, headers = unlink(t=unlink_t)
 check('unlink from the game, answered at once', status == 200 and result == { 'unlinked': True }, str(result))
 check('the unlink allows the game origin (CORS)', headers.get('Access-Control-Allow-Origin') == '*')
 check('cert after unlinking is the key again', cert_account() == 'key_' + pub)
-check('progress stays with the Steam account after the unlink', mmr_owner() == ['steam_' + steam_id], str(mmr_owner()))
+check('progress stays with the key after the unlink', mmr_owner() == ['key_' + pub], str(mmr_owner()))
 status, result, _ = unlink(t=unlink_t)
 check('the same unlink sent again does nothing', status == 409, str(result))
 
@@ -198,14 +198,18 @@ check('unlink on /profile', status in (302, 303) and cert_account().startswith('
 with db:
     db.execute('DELETE FROM broker_bans WHERE account IN (?, ?)', ('steam_' + steam_id, 'key_' + pub))
 
-# A game whose clock is 5 minutes behind links, is unlinked on /profile, and links again right after (the slack)
+# A game whose clock is 2 minutes behind links, is unlinked on /profile, and links again right after (the slack);
+# a link page is good for 3 minutes, so a clock 5 minutes behind is told it is too old
 behind = Ed25519PrivateKey.generate()
 behind_pub = behind.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
-status, body = link(behind, t=str(int(time.time()) - 300))
-check('a game 5 min behind links', status == 200, body[:200])
+status, body = link(behind, t=str(int(time.time()) - 120))
+check('a game 2 min behind links', status == 200, body[:200])
 post('/profile/unlink_key', { 'key': 'key_' + behind_pub }, cookie)
-status, body = link(behind, t=str(int(time.time()) - 299))
+status, body = link(behind, t=str(int(time.time()) - 119))
 check('and links again right after a /profile unlink', status == 200, '%s %s' % (status, body[-300:]))
+far_behind = Ed25519PrivateKey.generate()
+status, body = link(far_behind, t=str(int(time.time()) - 300))
+check('a game 5 min behind is told the page is too old', status == 400 and 'too old' in body, '%s' % status)
 
 # A banned Steam account posting someone else's key to /profile/unlink_key: that key is not its, nothing happens to it
 foreign = 'key_' + secrets.token_hex(32)

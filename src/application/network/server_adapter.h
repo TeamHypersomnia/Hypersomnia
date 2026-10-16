@@ -130,6 +130,12 @@ public:
 
 	std::size_t num_connected_clients() const;
 
+	/*
+		A new client is told the server takes no one now (NETCODE_CLIENT_STATE_MATCH_IN_PROGRESS) - the ones connected stay.
+	*/
+
+	void set_refusing_new_clients(bool refusing);
+
 	netcode_address_t* get_client_address(const client_id_type& id) const;
 
 	void send_udp_packet(const netcode_address_t& to, std::byte*, std::size_t n) const;

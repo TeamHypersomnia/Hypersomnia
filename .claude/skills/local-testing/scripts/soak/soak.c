@@ -41,6 +41,9 @@ int main(int argc, char** argv) {
 	if (has_expected_key && !hex_to_bytes(argv[4], expected_key, 32)) { fprintf(stderr, "bad key\n"); return 2; }
 
 	if (sodium_init() < 0 || netcode_init() != NETCODE_OK) return 2;
+
+	/* The game's protocol version (major.minor, see work.cpp) - a development build is HS0.0 */
+	netcode_set_version_info(getenv("HS_PROTOCOL") ? getenv("HS_PROTOCOL") : "HS0.0");
 	netcode_log_level(NETCODE_LOG_LEVEL_NONE);
 
 	int failed = 0, first_failed = -1, first_failed_state = 0, connected = 0, abandoned = 0;

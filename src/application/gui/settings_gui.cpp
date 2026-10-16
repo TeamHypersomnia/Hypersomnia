@@ -509,6 +509,17 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 		return;
 	}
 
+	/*
+		Whether the linked Steam account is theirs is never left unanswered - Settings open again with the question.
+	*/
+
+	if (link_flow == link_flow_type::CONFIRM || link_flow == link_flow_type::CONFIRM_UNLINKING) {
+		open();
+		active_pane = settings_pane::ACCOUNT;
+		active_account_pane = account_settings_pane::LINK_WITH_STEAM;
+		return;
+	}
+
 	const bool waiting = link_flow == link_flow_type::CHECKING_BEFORE || link_flow == link_flow_type::NEEDS_STEAM_SIGN_IN;
 
 	if (waiting) {
@@ -530,6 +541,17 @@ void settings_gui_state::cancel_link_flow_if_hidden() {
 			}
 		}
 	}
+}
+
+void settings_gui_state::ask_whether_link_is_theirs() {
+	open();
+	active_pane = settings_pane::ACCOUNT;
+	active_account_pane = account_settings_pane::LINK_WITH_STEAM;
+
+	link_flow = link_flow_type::CONFIRM;
+	link_found_elsewhere = true;
+	link_confirm_profile_wanted = true;
+	link_confirm_error.clear();
 }
 
 bool settings_gui_state::account_modal_open(const bool with_message) const {
@@ -793,9 +815,17 @@ void settings_gui_state::perform_import_modal(
 		spinner_line("Fetching account data from hypersomnia.io...", white);
 	}
 	else if (check == L::LINKED) {
+		/*
+			The player's own key restored - its Steam account is theirs, nothing to ask.
+		*/
+
 		if (!import_profile_applied) {
 			import_profile_applied = true;
 			account_profile_wanted = true;
+
+			if (identity != nullptr) {
+				identity->confirm_link();
+			}
 		}
 
 		checkmark_line("Linked to your Steam account", green);
@@ -992,9 +1022,14 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 	auto import_now = [&](const augs::ed25519_seed_type& imported) {
-		key_file_changed = true;
+		/*
+			The key read anew only once the new one is saved - a failed save keeps the one in use (never a new one
+			made for a file the failure left missing).
+		*/
 
 		if (identity_key::save_replacing(key_path, imported).has_value()) {
+			key_file_changed = true;
+
 			/*
 				Asked right away whether the key is linked - the import modal waits for the answer.
 			*/
@@ -1419,6 +1454,29 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	/*
+		Linked: asked whether that Steam account is the player's - its avatar and name as the broker has them.
+	*/
+
+	auto ask_to_confirm = [&](const bool found_elsewhere) {
+		linked_has_avatar = upload_link_avatar(identity->get_link_check_profile().avatar);
+		linked_name = identity->get_link_check_profile().name;
+		linked_account = identity->get_cert().has_value() ? identity->get_cert()->account : std::string();
+		link_found_elsewhere = found_elsewhere;
+		link_confirm_error.clear();
+		link_flow = F::CONFIRM;
+	};
+
+	/*
+		Asked at the start (ask_whether_link_is_theirs) - the account as this session has it.
+	*/
+
+	if (std::exchange(link_confirm_profile_wanted, false) && identity != nullptr) {
+		linked_has_avatar = upload_link_avatar(identity->get_profile().avatar);
+		linked_name = steam_name;
+		linked_account = steam_account;
+	}
+
+	/*
 		A random state only this game knows - the page in the browser is signed in through Steam anew for it.
 	*/
 
@@ -1511,7 +1569,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 		}
 
-		text_disabled("Once linked, progress counts towards the Steam account.\nIf the Steam account has no progress yet,\nthis key's progress moves there.");
+		text_disabled("Once linked, progress counts towards the Steam account.\nThis key's progress so far stays with the key.");
 	}
 
 	/*
@@ -1560,16 +1618,11 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 
 		if (check == L::LINKED) {
 			/*
-				The name and avatar as the broker has them.
+				Linked before this click - here, or by someone else.
 			*/
 
-			if (upload_link_avatar(identity->get_link_check_profile().avatar)) {
-				linked_has_avatar = true;
-			}
-
-			linked_name = identity->get_link_check_profile().name;
+			ask_to_confirm(true);
 			identity->clear_link_check();
-			finish(true, "Progress now counts towards your Steam account.");
 		}
 		else if (check == L::NOT_LINKED) {
 			identity->clear_link_check();
@@ -1599,7 +1652,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	/*
 		While the browser is out: the cert asked every 3 s - a cert for the Steam account is the link done. A refusal
 		on the page (another account's key, too many keys) is told there only; a banned account is told here too.
-		The page is good for 15 minutes - then the wait ends.
+		The page is good for 3 minutes (see link_key.js) - then the wait ends.
 	*/
 
 	if (identity != nullptr && link_flow == F::NEEDS_STEAM_SIGN_IN && !steam_link_state.empty()) {
@@ -1607,14 +1660,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		const auto page_age = static_cast<int64_t>(augs::date_time::secs_since_epoch()) - steam_link_time;
 
 		if (check == L::LINKED) {
-			if (upload_link_avatar(identity->get_link_check_profile().avatar)) {
-				linked_has_avatar = true;
-			}
-
-			linked_name = identity->get_link_check_profile().name;
+			ask_to_confirm(false);
 			identity->clear_link_check();
 			steam_link_state.clear();
-			finish(true, "Progress now counts towards your Steam account.");
 		}
 		else if (check == L::FAILED && !identity->get_link_check_error().empty()) {
 			const auto refusal = identity->get_link_check_error();
@@ -1622,8 +1670,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			steam_link_state.clear();
 			finish(false, refusal);
 		}
-		else if (page_age > 15 * 60) {
+		else if (page_age > 3 * 60) {
+			/*
+				Its last moments may have been confirmed while this tab or window slept - found quietly then.
+			*/
+
 			identity->clear_link_check();
+			identity->recheck_link_quietly();
 			steam_link_state.clear();
 			finish(false, "The page in the browser is too old now. Try again.");
 		}
@@ -1677,6 +1730,16 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			unlink_succeeded = false;
 			unlink_result = std::string("Unlinking failed:\n") + error;
 		}
+
+		/*
+			Cancelled in the question whether the account is theirs.
+		*/
+
+		if (link_flow == F::CONFIRM_UNLINKING) {
+			link_flow = error.empty() ? F::DECLINED : F::CONFIRM;
+			link_confirm_error = error.empty() ? std::string() : std::string("Unlinking failed - try again.");
+			unlink_result.reset();
+		}
 	}
 
 	/*
@@ -1726,9 +1789,12 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					The tab opens a moment after the click, once hypersomnia.io answered - a browser may block it then.
 				*/
 
+				/*
+					Its address is never shown - whoever sees it could confirm it with their own Steam account.
+				*/
+
 				if (::web_tab_was_blocked() != 0) {
-					text_color("The browser blocked the new tab - click Open it again,\nor open this page yourself:", orange);
-					text_disabled(steam_link_url_cached);
+					text_color("The browser blocked the new tab - click Open it again,\nor copy the page's address and open it yourself:", orange);
 					ImGui::SameLine();
 					copy_icon_button("LinkUrl", steam_link_url_cached);
 				}
@@ -1755,25 +1821,132 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					close();
 				}
 			}
-			else if (link_flow == F::DONE) {
-				if (link_flow_succeeded) {
-					/*
-						The avatar where the question had it - the modal changes as little as it can.
-					*/
+			else if (
+				link_flow == F::CONFIRM
+				|| link_flow == F::CONFIRM_UNLINKING
+				|| link_flow == F::DECLINED
+				|| (link_flow == F::DONE && link_flow_succeeded)
+			) {
+				/*
+					The question whether the Steam account is theirs, the unlink on Cancel, and both results in one
+					layout: a line above the avatar and the name, two lines below, the buttons - only the texts change,
+					never the modal's size, and the modal never closes in between.
+				*/
 
+				const auto question = std::string(
+					link_found_elsewhere ?
+					"This key is linked to a Steam account - is it yours?" :
+					"Link to this Steam account?"
+				);
+
+				const auto check_profile = std::string("Open this Steam profile to make sure!");
+				const auto if_yours = std::string("If it's yours, it says \"Edit Profile\".");
+				const auto counts_there = std::string("Progress now counts towards your Steam account.");
+				const auto counts_here = std::string("Progress counts towards your key account again.");
+
+				{
+					auto widest = 0.0f;
+
+					for (const auto& line : { question, check_profile, if_yours, counts_there, counts_here, link_flow_message }) {
+						widest = std::max(widest, ImGui::CalcTextSize(line.c_str()).x + ImGui::GetTextLineHeight() * 2);
+					}
+
+					ImGui::Dummy(ImVec2(widest, 0));
+				}
+
+				const bool confirming = link_flow == F::CONFIRM || link_flow == F::CONFIRM_UNLINKING;
+
+				if (link_flow == F::CONFIRM) {
+					text(question);
+				}
+				else if (link_flow == F::CONFIRM_UNLINKING) {
+					spinner_line("Unlinking...", white);
+				}
+				else if (link_flow == F::DECLINED) {
+					checkmark_line("Unlinked", green);
+				}
+				else {
 					checkmark_line("Successfully linked", green);
-					link_avatar_and_name(linked_name, linked_has_avatar);
+				}
 
+				/*
+					No name known (hypersomnia.io could not ask Steam): the account's id.
+				*/
+
+				const auto shown_linked_name =
+					linked_name.empty() ?
+					"Steam ID " + linked_account.substr(linked_account.rfind('_') + 1) :
+					linked_name
+				;
+
+				link_avatar_and_name(shown_linked_name, linked_has_avatar);
+
+				if (confirming) {
+					if (external_link("LinkCheckProfile", check_profile, ::steam_profile_url(linked_account), ImGui::GetColorU32(ImGuiCol_Text))) {
+						augs::open_url(::steam_profile_url(linked_account));
+					}
+
+					if (!link_confirm_error.empty()) {
+						text_color(link_confirm_error, orange);
+					}
+					else {
+						text_disabled(if_yours);
+					}
+				}
+				else if (link_flow == F::DECLINED) {
+					text(counts_here);
+					text(" ");
+				}
+				else {
 					if (link_flow_message_is_warning) {
 						text_color(link_flow_message, orange);
 					}
 					else {
 						text(link_flow_message);
 					}
+
+					text(" ");
 				}
-				else {
-					text_color(link_flow_message, orange);
+
+				ImGui::Separator();
+
+				if (confirming) {
+					{
+						auto scope = maybe_disabled_cols(link_flow == F::CONFIRM_UNLINKING);
+
+						if (ImGui::Button("Link##LinkConfirm", ImVec2(120, 0)) && link_flow == F::CONFIRM) {
+							if (identity != nullptr) {
+								identity->confirm_link();
+							}
+
+							finish(true, counts_there);
+						}
+					}
+
+					ImGui::SameLine();
+
+					{
+						auto scope = maybe_disabled_cols(link_flow == F::CONFIRM_UNLINKING);
+
+						if (ImGui::Button("Cancel##LinkConfirm", ImVec2(120, 0)) && link_flow == F::CONFIRM) {
+							link_flow = F::CONFIRM_UNLINKING;
+							link_confirm_error.clear();
+							start_unlink();
+
+							if (!unlinking) {
+								link_flow = F::CONFIRM;
+								link_confirm_error = "Unlinking failed - try again.";
+								unlink_result.reset();
+							}
+						}
+					}
 				}
+				else if (ImGui::Button("OK##LinkFlow", ImVec2(120, 0))) {
+					close();
+				}
+			}
+			else if (link_flow == F::DONE) {
+				text_color(link_flow_message, orange);
 
 				ImGui::Separator();
 

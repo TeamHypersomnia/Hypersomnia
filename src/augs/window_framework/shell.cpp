@@ -22,7 +22,11 @@ namespace augs {
 	std::wstring widen(const std::string& s); 
 
 	int shell(const std::string& s) {
-		LOG("SHELL COMMAND: %x", s);
+		/*
+			Without the query - a link page's address confirms the link (see settings_gui).
+		*/
+
+		LOG("SHELL COMMAND: %x", s.substr(0, s.find('?')));
 
 		const auto wide = widen(s);
 		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));

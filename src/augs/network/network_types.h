@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/port_type.h"
 
@@ -126,6 +127,13 @@ namespace augs {
 		bool init(bool rtc_errors, bool);
 		bool deinit();
 		void enable_detailed_logs(bool);
+
+		/*
+			Only a client and a server of one protocol version connect (see netcode_set_version_info); at most 12
+			characters.
+		*/
+
+		void set_protocol_version(const std::string& version);
 	}
 }
 

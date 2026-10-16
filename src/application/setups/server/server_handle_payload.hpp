@@ -139,14 +139,17 @@ message_handler_result server_setup::handle_payload(
 		const bool joining = c.state == S::PENDING_WELCOME;
 		const auto guessing_address = get_client_ip_for_bans(client_id);
 
-		if (joining && too_many_wrong_passwords(guessing_address) && !find_admin_profile_of(c.cert_account).has_value()) {
+		if (joining
+			&& too_many_wrong_passwords(guessing_address, c.cert_account)
+			&& !find_admin_profile_of(c.cert_account).has_value()
+		) {
 			kick(client_id, "Too many wrong passwords. Try again in a minute.");
 			return continue_v;
 		}
 
 		if (!is_authorized_for_access(client_id)) {
 			if (joining) {
-				note_wrong_password(guessing_address);
+				note_wrong_password(guessing_address, c.cert_account);
 			}
 
 			/*

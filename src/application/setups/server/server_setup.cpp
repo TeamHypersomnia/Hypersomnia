@@ -1073,7 +1073,7 @@ server_setup::server_setup(
 
 	load_bans();
 
-	reports.init(USER_DIR, in.port, this_server_key);
+	reports.init(USER_DIR, get_instance_label(), this_server_key);
 
 	LOG("Server key: %x (%x)", server_key::public_key_hex(this_server_key), KEYS_DIR / server_key::file_name);
 
@@ -1137,12 +1137,6 @@ server_setup::server_setup(
 bool server_setup::handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n) {
 	if (handle_masterserver_response(from, packet, n)) {
 		return true;
-	}
-
-	if (!is_joinable()) {
-		if (is_connection_request_packet(from, packet, n)) {
-			return true;
-		}
 	}
 
 #if BUILD_NATIVE_SOCKETS
@@ -2567,8 +2561,11 @@ bool server_setup::handle_masterserver_response(
 						case R::BAD_SIGNATURE:
 							LOG("WARNING: the masterserver does not list this server: it refused the heartbeat's signature.");
 							break;
-						default:
+						case R::LIST_FULL:
 							LOG("WARNING: the masterserver does not list this server (its list is full).");
+							break;
+						default:
+							LOG("WARNING: the masterserver does not list this server: it took no heartbeat's cookie twice - does this server's public port change between packets (e.g. a carrier-grade NAT)?");
 							break;
 					}
 				}
@@ -2671,10 +2668,10 @@ std::string server_setup::get_steam_join_command_line() const {
 
 void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
 	/*
-		The same group as the clients on this server - its key (see client_setup).
+		The same group as the clients on this server - its instance label and key (see client_setup).
 	*/
 
-	const auto player_group_identifier = server_key::public_key_hex(this_server_key);
+	const auto player_group_identifier = get_instance_label() + "-" + server_key::public_key_hex(this_server_key);
 
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
@@ -4855,6 +4852,12 @@ message_handler_result server_setup::handle_rcon_payload(
 
 void server_setup::handle_client_messages() {
 	auto& message_handler = *this;
+	/*
+		A ranked match that waits for nobody: a new client is told the match is in progress - one of its players who
+		left is suspended (has_suspended_players), so the server takes them back.
+	*/
+
+	server->set_refusing_new_clients(!is_joinable());
 	server->advance(server_time, message_handler);
 }
 
@@ -5619,21 +5622,20 @@ static constexpr uint32_t max_wrong_passwords_per_minute_v = 5;
 static constexpr std::size_t max_wrong_password_addresses_v = 4096;
 
 /*
-	Wrong passwords per address (an IPv6 /64, see address_for_bans) - only slowing down guessing, not sealing it:
-	peers without an address count together, and a full table takes no new addresses until its records go stale.
+	Wrong passwords per address (an IPv6 /64, see address_for_bans) - only slowing down guessing, not sealing it;
+	a full table takes no new addresses until its records go stale.
+
+	Peers with no address (relayed through TURN, or a server in a browser) count by their account - never all of them
+	together, or five typos (or one script) would keep everyone with the right password out. A new account per guess
+	is still held back by the handshake budget.
 */
 
-/*
-	Peers with no address (relayed through TURN, or the browser's WebRTC) share one record - guessing through a relay is
-	slowed down for all of them together, never left unlimited.
-*/
-
-static std::string wrong_passwords_key(const std::string& address) {
-	return address.empty() ? std::string("(no address)") : address;
+static std::string wrong_passwords_key(const std::string& address, const std::string& account) {
+	return address.empty() ? "(no address) " + account : address;
 }
 
-bool server_setup::too_many_wrong_passwords(const std::string& given_address) const {
-	const auto address = ::wrong_passwords_key(given_address);
+bool server_setup::too_many_wrong_passwords(const std::string& given_address, const std::string& account) const {
+	const auto address = ::wrong_passwords_key(given_address, account);
 
 	if (const auto record = mapped_or_nullptr(wrong_passwords, address)) {
 		return server_time - record->since < 60.0 && record->count >= max_wrong_passwords_per_minute_v;
@@ -5642,8 +5644,8 @@ bool server_setup::too_many_wrong_passwords(const std::string& given_address) co
 	return false;
 }
 
-void server_setup::note_wrong_password(const std::string& given_address) {
-	const auto address = ::wrong_passwords_key(given_address);
+void server_setup::note_wrong_password(const std::string& given_address, const std::string& account) {
+	const auto address = ::wrong_passwords_key(given_address, account);
 
 	if (wrong_passwords.size() >= max_wrong_password_addresses_v && !found_in(wrong_passwords, address)) {
 		erase_if(wrong_passwords, [&](const auto& entry) { return server_time - entry.second.since >= 60.0; });
@@ -6439,21 +6441,6 @@ void server_setup::set_client_is_downloading_files(const client_id_type client_i
 	}
 
 	c.downloading_status = type;
-}
-
-#define NETCODE_CONNECTION_REQUEST_PACKET           0
-
-bool server_setup::is_connection_request_packet(
-	const netcode_address_t& from,
-	const std::byte* packet_buffer,
-	const std::size_t packet_bytes
-) const {
-	if (packet_bytes < 1) {
-		return false;
-	}
-
-	(void)from;
-	return static_cast<uint8_t>(packet_buffer[0]) == NETCODE_CONNECTION_REQUEST_PACKET;
 }
 
 std::size_t server_setup::num_suspended_players() const {
