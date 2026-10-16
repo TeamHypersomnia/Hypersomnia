@@ -151,7 +151,7 @@ as well as to test your skills in a laggy environment.
 
 		const bool game_speed_changed = [&]() {
 			auto scope = scoped_text_color(new_feature_color);
-			return slider("Game speed (NEW!)", into_vars.game_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+			return slider("Game speed (NEW!)", into_vars.game_speed, min_logic_speed_v, max_logic_speed_slider_v, "%.2fx");
 		}();
 
 		into_vars.game_speed = ::sanitize_logic_speed(into_vars.game_speed);

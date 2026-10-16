@@ -2614,7 +2614,7 @@ void settings_gui_state::perform(
 				{
 					text_disabled("Shooting range, Tutorial and Editor playtesting:");
 
-					const bool game_speed_changed = revertable_slider("Singleplayer game speed", config.singleplayer_game_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+					const bool game_speed_changed = revertable_slider("Singleplayer game speed", config.singleplayer_game_speed, min_logic_speed_v, max_logic_speed_slider_v, "%.2fx");
 					config.singleplayer_game_speed = ::sanitize_logic_speed(config.singleplayer_game_speed);
 
 					::do_bullet_speed_slider(
@@ -4899,7 +4899,7 @@ bool do_bullet_speed_slider(
 	}
 
 	auto shown_speed = bullet_speed.is_enabled ? bullet_speed.value : game_speed;
-	const bool moved = slider(label, shown_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+	const bool moved = slider(label, shown_speed, min_logic_speed_v, max_logic_speed_slider_v, "%.2fx");
 
 	if (moved) {
 		bullet_speed = augs::maybe<real32>::enabled(::sanitize_logic_speed(shown_speed));
@@ -4947,6 +4947,7 @@ void do_game_speed_tooltip() {
 		"Slows down the entire game:\n"
 		"movement, physics, bullets, reloads, bots.\n"
 		"Fire rates and recoil stay the same.\n\n"
+		"Ctrl+click to type up to 1.5x.\n"
 		"Type \"/speed 0.7\" to adjust in-game."
 	);
 }
@@ -4954,6 +4955,7 @@ void do_game_speed_tooltip() {
 void do_bullet_speed_tooltip() {
 	augs::imgui::tooltip_on_hover(
 		"Separate setting for bullet speeds.\n\n"
+		"Ctrl+click to type up to 1.5x.\n"
 		"Type \"/bspeed 0.8\" to adjust in-game."
 	);
 }
@@ -5101,7 +5103,7 @@ void do_server_vars_section(
 				}
 			}
 
-			const bool game_speed_changed = revertable_slider("Game speed", vars.game_speed, min_logic_speed_v, max_logic_speed_v, "%.2fx");
+			const bool game_speed_changed = revertable_slider("Game speed", vars.game_speed, min_logic_speed_v, max_logic_speed_slider_v, "%.2fx");
 			vars.game_speed = ::sanitize_logic_speed(vars.game_speed);
 			::do_game_speed_tooltip();
 

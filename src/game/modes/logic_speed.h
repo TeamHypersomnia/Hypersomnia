@@ -10,11 +10,17 @@
 */
 
 constexpr real32 min_logic_speed_v = 0.5f;
-constexpr real32 max_logic_speed_v = 1.0f;
+constexpr real32 max_logic_speed_v = 1.5f;
+
+/*
+	The sliders end at 1x - above it only typed in (Ctrl+click on a slider) or with /speed and /bspeed.
+*/
+
+constexpr real32 max_logic_speed_slider_v = 1.0f;
 
 inline real32 sanitize_logic_speed(const real32 speed) {
 	if (!std::isfinite(speed)) {
-		return max_logic_speed_v;
+		return 1.0f;
 	}
 
 	const auto clamped = std::clamp(speed, min_logic_speed_v, max_logic_speed_v);
