@@ -131,19 +131,15 @@ bool social_sign_in_state::perform(social_sign_in_input in) {
 
 	using N = assets::necessary_image_id;
 
-	if (in.is_crazygames) {
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
+	if (in.is_crazygames) {
 		if (login_option(N::SOCIAL_CRAZYGAMES, "Sign in with CrazyGames")) {
 #if PLATFORM_WEB
 			::sign_in_with_crazygames();
 #endif
 		}
 	}
-	else {
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-	}
-
 
 	ImGui::PopFont();
 

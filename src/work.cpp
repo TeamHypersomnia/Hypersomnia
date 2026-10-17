@@ -559,7 +559,8 @@ work_result work(
 	::KEYS_DIR = [&]() {
 #if PLATFORM_WEB
 		/*
-			Its own IndexedDB database in the browser - see pre_run in common.js.
+			Its own IndexedDB database in the browser - see pre_run in common.js (not on CrazyGames: in memory only,
+			the account is the CrazyGames one).
 		*/
 
 		return ::APPDATA_DIR / "hypersomnia_keys";
@@ -2095,7 +2096,6 @@ work_result work(
 
 		streaming.requested_avatar_preview = BLANK_AVATAR;
 
-		augs::remove_file(CACHED_AUTH_PATH);
 		augs::remove_file(CACHED_AVATAR);
 
 		config.client.signed_in.nickname = "";
@@ -2456,7 +2456,7 @@ work_result work(
 		}
 
 		/*
-			An expired steam.cert names the account the first sign-in is about to confirm - shown at once.
+			An expired steam_cert.json names the account the first sign-in is about to confirm - shown at once.
 		*/
 
 		if (identity->signing_in_first_time(in, now)) {
@@ -2498,7 +2498,7 @@ work_result work(
 		}();
 
 		/*
-			Also while the first sign-in confirms the account of an expired steam.cert - its cached profile at once.
+			Also while the first sign-in confirms the account of an expired steam_cert.json - its cached profile at once.
 		*/
 
 		const bool confirming_saved = identity->signing_in_first_time(in, now) && identity->get_cert().has_value();
@@ -4113,7 +4113,7 @@ work_result work(
 
 			account_label,
 			config.website_url + "/user/" + account,
-			signed_in_account ? std::string() : "0x" + augs::bytes_to_hex(identity->public_key()),
+			signed_in_account ? std::string() : identity_key::full_form(identity->public_key()),
 			provider_name(),
 			identity->sign_in_failed(in, now) && !identity->is_requesting()
 #if PLATFORM_WEB
@@ -4938,27 +4938,19 @@ work_result work(
 
 						social_sign_in.open();
 					}
-
-					if (leaderboards_gui.wants_log_out) {
-						leaderboards_gui.wants_log_out = false;
-
-						social_log_out();
-					}
 #endif
 				}
 
-
 #if PLATFORM_WEB
-
-				if (const auto new_auth = get_new_auth_data()) { 
+				if (const auto new_auth = get_new_auth_data()) {
 					LOG("new_auth. is_signed_in() = %x", is_signed_in());
 
 					social_sign_in.cached_auth = *new_auth;
 					social_sign_in.close();
 
-					augs::save_as_json(*new_auth, CACHED_AUTH_PATH);
-
-					bool has_avatar = false;
+					/*
+						The CrazyGames avatar is the account's - shown through client_vars::signed_in, never written to the config.
+					*/
 
 					try {
 						augs::image avatar;
@@ -4974,17 +4966,10 @@ work_result work(
 						avatar.save_as_png(CACHED_AVATAR);
 
 						streaming.requested_avatar_preview = CACHED_AVATAR;
-						has_avatar = true;
 					}
 					catch (...) {
 						LOG("Failed to load the downloaded avatar.");
 					}
-
-					/*
-						The CrazyGames avatar is the account's - shown through client_vars::signed_in, never written to the config.
-					*/
-
-					(void)has_avatar;
 
 					change_with_save(
 						[&](auto& cfg) {

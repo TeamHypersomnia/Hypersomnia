@@ -10,6 +10,7 @@
 #include "augs/string/parse_url.h"
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "application/main/identity_key.h"
 #include "application/main/identity_session.h"
 #include "application/network/client_platform_type.h"
 
@@ -22,16 +23,36 @@ static constexpr double first_retry_delay_secs = 30.0;
 static constexpr double max_retry_delay_secs = 300.0;
 static constexpr double steam_ticket_timeout_secs = 10.0;
 static constexpr double key_recheck_delay_secs = 30.0;
-static constexpr double link_page_lifetime_secs = 3 * 60.0;
-
-static constexpr std::string_view cert_file_prefix = "hypersomnia-cert-v1:";
-
 static double wall_now() {
 	return augs::date_time::secs_since_epoch();
 }
 
+/*
+	A cert for this very key, sane - the broker's answer or the saved one.
+*/
+
+static std::optional<identity_cert::cert> cert_of_key(const std::string& hex, const augs::ed25519_public_key_type& key) {
+	const auto bytes = augs::hex_to_bytes(hex);
+
+	if (!bytes.has_value()) {
+		return std::nullopt;
+	}
+
+	const auto cert = identity_cert::from_bytes(reinterpret_cast<const std::byte*>(bytes->data()), bytes->size());
+
+	if (!cert.has_value() || cert->session_public_key != key || cert->not_after <= cert->not_before) {
+		return std::nullopt;
+	}
+
+	return cert;
+}
+
+static double cert_lifetime(const identity_cert::cert& c) {
+	return static_cast<double>(c.not_after - c.not_before);
+}
+
 void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::path_type& keys_dir) {
-	const auto new_cert_file = keys_dir / "steam.cert";
+	const auto new_cert_file = keys_dir / "steam_cert.json";
 
 	if (seed == key_seed && new_cert_file == cert_file) {
 		return;
@@ -48,7 +69,6 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	std::memcpy(key_secret.data() + key_seed.size(), key_public.data(), key_public.size());
 
 	cert_file = new_cert_file;
-	profile_file = keys_dir / "steam_profile.json";
 	import_marker_file = keys_dir / "imported_key.json";
 	imported_profile.reset();
 	unlinked_noticed.reset();
@@ -75,6 +95,9 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	request.reset();
 	check_in_flight = false;
 	link_check = link_check_state::NONE;
+	link_check_profile = {};
+	link_check_error.clear();
+	drop_unconfirmed_link();
 	clear_steam_ticket();
 
 	attempts_finished = 0;
@@ -95,7 +118,7 @@ void identity_session::recheck_link_quietly() {
 	key_check_wanted = true;
 	key_check_quiet = true;
 	key_check_next_at = last_now + key_recheck_delay_secs;
-	key_recheck_until = last_now + link_page_lifetime_secs;
+	key_recheck_until = last_now + identity_key::link_page_lifetime_secs;
 }
 
 void identity_session::mark_imported() {
@@ -127,12 +150,6 @@ void identity_session::forget_cert() {
 	profile = {};
 }
 
-/*
-	steam.cert: "hypersomnia-cert-v1:<cert in hex> <unix time it arrived>" - the arrival time, so that a computer
-	whose clock is off by hours still sees a fresh cert as fresh. A cert for another key (e.g. a replaced account.key)
-	is not ours and is ignored.
-*/
-
 void identity_session::load_saved_cert() {
 	cert_saved = false;
 
@@ -141,75 +158,40 @@ void identity_session::load_saved_cert() {
 	}
 
 	try {
-		const auto text = augs::file_to_string(cert_file);
+		const auto saved = augs::from_json_file<saved_steam_cert>(cert_file);
+		const auto cert = ::cert_of_key(saved.cert, key_public);
 
-		if (text.rfind(cert_file_prefix, 0) != 0) {
-			LOG("steam.cert is not a cert. Ignored.");
-			return;
-		}
-
-		const auto rest = text.substr(cert_file_prefix.size());
-		const auto space = rest.find(' ');
-
-		if (space == std::string::npos) {
-			return;
-		}
-
-		const auto bytes = augs::hex_to_bytes(rest.substr(0, space));
-		const auto received_wall = std::strtod(rest.substr(space + 1).c_str(), nullptr);
-
-		if (!bytes.has_value()) {
-			return;
-		}
-
-		const auto cert = identity_cert::from_bytes(reinterpret_cast<const std::byte*>(bytes->data()), bytes->size());
-
-		if (!cert.has_value() || cert->session_public_key != key_public || cert->not_after <= cert->not_before) {
-			LOG("steam.cert is for another key. Ignored.");
+		if (!cert.has_value()) {
+			LOG("%x is not a cert for this key. Ignored.", cert_file);
 			return;
 		}
 
 		broker_cert = cert;
-		cert_received_at_wall = received_wall;
+		cert_received_at_wall = saved.received_at;
 		cert_saved = true;
+		profile.name = saved.name;
+		profile.avatar = augs::from_base64(saved.avatar).value_or(std::vector<std::byte>());
 
 		/*
 			The monotonic clock of this run, as if the cert had arrived in it.
 		*/
 
-		cert_received_at = augs::steady_secs() - (wall_now() - received_wall);
+		cert_received_at = augs::steady_secs() - (::wall_now() - saved.received_at);
 
 		/*
 			Arrived "in the future": this computer's clock went back since. Its age is unknown - taken as expired,
 			so it is renewed at once instead of being shown to servers that refuse it.
 		*/
 
-		if (received_wall > wall_now() + 60.0) {
-			LOG("steam.cert arrived later than now by this computer's clock - renewing it.");
-			cert_received_at = augs::steady_secs() - static_cast<double>(cert->not_after - cert->not_before) - 1.0;
+		if (saved.received_at > ::wall_now() + 60.0) {
+			LOG("The saved cert arrived later than now by this computer's clock - renewing it.");
+			cert_received_at = augs::steady_secs() - ::cert_lifetime(*cert) - 1.0;
 		}
 
 		LOG("Loaded the saved cert for %x.", cert->account);
 	}
 	catch (...) {
-		LOG("Could not read steam.cert.");
-	}
-
-	try {
-		const auto document = augs::json_document_from(augs::file_to_string(profile_file));
-
-		if (document.IsObject()) {
-			if (document.HasMember("name") && document["name"].IsString()) {
-				profile.name = document["name"].GetString();
-			}
-
-			if (document.HasMember("avatar") && document["avatar"].IsString()) {
-				profile.avatar = augs::from_base64(document["avatar"].GetString()).value_or(std::vector<std::byte>());
-			}
-		}
-	}
-	catch (...) {
-
+		LOG("Could not read %x.", cert_file);
 	}
 }
 
@@ -221,45 +203,32 @@ void identity_session::save_cert() {
 	try {
 		std::filesystem::create_directories(cert_file.parent_path());
 
-		const auto hex = augs::bytes_to_hex(identity_cert::to_bytes(*broker_cert));
-
-		augs::save_as_text_atomic(
-			cert_file,
-			std::string(cert_file_prefix) + hex + " " + std::to_string(static_cast<int64_t>(cert_received_at_wall)) + "\n"
+		augs::save_as_json_atomic(
+			saved_steam_cert {
+				augs::bytes_to_hex(identity_cert::to_bytes(*broker_cert)),
+				cert_received_at_wall,
+				profile.name,
+				augs::to_base64(profile.avatar)
+			},
+			cert_file
 		);
 
 		cert_saved = true;
-
-		const auto avatar = augs::to_base64(profile.avatar);
-
-		rapidjson::StringBuffer buffer;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-
-		writer.StartObject();
-		writer.Key("name");
-		writer.String(profile.name.c_str(), static_cast<rapidjson::SizeType>(profile.name.size()));
-		writer.Key("avatar");
-		writer.String(avatar.c_str(), static_cast<rapidjson::SizeType>(avatar.size()));
-		writer.EndObject();
-
-		augs::save_as_text_atomic(profile_file, std::string(buffer.GetString()) + "\n");
 	}
 	catch (...) {
-		LOG("Could not save steam.cert.");
+		LOG("Could not save %x.", cert_file);
 	}
 }
 
 void identity_session::delete_saved_cert() {
 	augs::remove_file(cert_file);
-	augs::remove_file(profile_file);
 	cert_saved = false;
 }
 
 void identity_session::on_unlinked() {
 	forget_cert();
 	delete_saved_cert();
-	unconfirmed_cert.reset();
-	unconfirmed_profile = {};
+	drop_unconfirmed_link();
 	last_error.clear();
 	last_attempt_failed = false;
 }
@@ -330,11 +299,15 @@ std::string identity_session::key_location() const {
 		return "";
 	}
 
-	return "&key=" + augs::bytes_to_hex(key_public) + "&sig=" + augs::bytes_to_hex(*signature);
+	return "&sig=" + augs::bytes_to_hex(*signature);
+}
+
+std::string identity_session::cert_location() const {
+	return "/cert?session=" + augs::bytes_to_hex(key_public);
 }
 
 std::optional<std::string> identity_session::build_location(const input& in) const {
-	const auto location = std::string("/cert?session=") + augs::bytes_to_hex(key_public);
+	const auto location = cert_location();
 
 	if (in.provider == provider_type::CRAZYGAMES) {
 		if (in.crazygames_token.empty()) {
@@ -391,13 +364,13 @@ static std::string location_prefix(const parsed_url& url) {
 }
 
 void identity_session::start_request(const input& in, const double now, const std::string& key_query) {
-	const auto location = key_query.empty() ? build_location(in) : std::optional<std::string>("/cert?session=" + augs::bytes_to_hex(key_public) + key_query);
+	const auto location = key_query.empty() ? build_location(in) : std::optional<std::string>(cert_location() + key_query);
 
 	if (!location.has_value()) {
 		return;
 	}
 
-	const auto url = broker_url_of(in.broker_url, last_error);
+	const auto url = ::broker_url_of(in.broker_url, last_error);
 
 	if (!url.has_value()) {
 		/*
@@ -422,7 +395,7 @@ void identity_session::start_request(const input& in, const double now, const st
 		Never after a redirect: the request carries a Steam ticket, a CrazyGames token or the key's signature.
 	*/
 
-	request = augs::async_get(url->get_base_url(), location_prefix(*url) + *location, headers, nullptr, false);
+	request = augs::async_get(url->get_base_url(), ::location_prefix(*url) + *location, headers, nullptr, false);
 	requested_for = in;
 }
 
@@ -443,15 +416,9 @@ std::optional<identity_session::parsed_answer> identity_session::parse_answer(co
 			return std::nullopt;
 		}
 
-		const auto bytes = augs::hex_to_bytes(std::string(document["cert"].GetString()));
+		const auto cert = ::cert_of_key(document["cert"].GetString(), key_public);
 
-		if (!bytes.has_value()) {
-			return std::nullopt;
-		}
-
-		const auto cert = identity_cert::from_bytes(reinterpret_cast<const std::byte*>(bytes->data()), bytes->size());
-
-		if (!cert.has_value() || cert->session_public_key != key_public || cert->not_after <= cert->not_before) {
+		if (!cert.has_value()) {
 			return std::nullopt;
 		}
 
@@ -558,13 +525,13 @@ void identity_session::advance(const input& in, const double now) {
 			++attempts_finished;
 		}
 
-		if (answer.has_value() && is_key_account(answer->cert.account) && key_can_be_linked) {
+		if (answer.has_value() && ::is_key_account(answer->cert.account) && key_can_be_linked) {
 			/*
 				The key's own account: not linked - or no longer (unlinked on the site, or an unlink whose answer got lost).
 				Back to the key account, no error.
 			*/
 
-			if (cert_saved || (broker_cert.has_value() && !is_key_account(broker_cert->account))) {
+			if (cert_saved || (broker_cert.has_value() && !::is_key_account(broker_cert->account))) {
 				LOG("The key is no longer linked to a Steam account.");
 				unlinked_noticed = profile.name;
 				on_unlinked();
@@ -615,9 +582,9 @@ void identity_session::advance(const input& in, const double now) {
 			next_attempt_at = 0.0;
 
 			/*
-				Linked to an account this device did not know of (no steam.cert, or one of another Steam account): the
+				Linked to an account this device did not know of (no steam_cert.json, or one of another Steam account): the
 				player is asked first, and until they say it is theirs the cert waits aside - no connection goes as that
-				account. A quiet check of a key with steam.cert of the same account only renews it.
+				account. A quiet check of a key with steam_cert.json of the same account only renews it.
 			*/
 
 			const bool knew_it_was_linked =
@@ -645,7 +612,7 @@ void identity_session::advance(const input& in, const double now) {
 
 				unconfirmed_cert = answer->cert;
 				unconfirmed_profile = answer->profile;
-				unconfirmed_received_at_wall = wall_now();
+				unconfirmed_received_at_wall = ::wall_now();
 
 				LOG("Received an identity cert for %x - waiting for the player to confirm the account.", answer->cert.account);
 
@@ -667,14 +634,14 @@ void identity_session::advance(const input& in, const double now) {
 			broker_cert = answer->cert;
 			profile = answer->profile;
 			cert_received_at = now;
-			cert_received_at_wall = wall_now();
+			cert_received_at_wall = ::wall_now();
 			attempts_finished = std::max(attempts_finished, 1);
 
-			const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+			const auto lifetime = ::cert_lifetime(*broker_cert);
 			LOG("Received an identity cert for %x, valid for %x minutes.", broker_cert->account, static_cast<int>(lifetime / 60));
 
 			/*
-				steam.cert: a valid one is used at once after a restart, and it tells a key that it is linked.
+				steam_cert.json: a valid one is used at once after a restart, and it tells a key that it is linked.
 			*/
 
 			if (in.provider == provider_type::STEAM || was_check) {
@@ -792,7 +759,7 @@ void identity_session::advance(const input& in, const double now) {
 	}
 
 	if (broker_cert.has_value()) {
-		const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+		const auto lifetime = ::cert_lifetime(*broker_cert);
 
 		if (cert_secs_left(now) > lifetime / 2) {
 			return;
@@ -862,9 +829,9 @@ double identity_session::cert_secs_left(const double now) const {
 		return 0.0;
 	}
 
-	const auto lifetime = static_cast<double>(broker_cert->not_after - broker_cert->not_before);
+	const auto lifetime = ::cert_lifetime(*broker_cert);
 	const auto by_steady = cert_received_at + lifetime - now;
-	const auto by_wall = cert_received_at_wall + lifetime - wall_now();
+	const auto by_wall = cert_received_at_wall + lifetime - ::wall_now();
 
 	return std::min(by_steady, by_wall);
 }

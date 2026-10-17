@@ -250,7 +250,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	std::string steam_link_state;
 	int64_t steam_link_time = 0;
-	std::string steam_link_signature;
 	std::string steam_link_url_cached;
 
 	/*
@@ -279,13 +278,11 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::string link_flow_message;
 	std::string linked_name;
 	std::string linked_account;
-	bool linked_has_avatar = false;
+	bool link_has_avatar = false;
 	bool link_found_elsewhere = false;
 	bool link_confirm_profile_wanted = false;
 	std::string link_confirm_error;
 	bool link_flow_succeeded = false;
-	bool link_flow_conflict = false;
-	bool link_flow_message_is_warning = false;
 
 	/*
 		A key just linked (or a linked key imported) plays with the Steam name and avatar - the toggle is turned on and saved.
@@ -303,13 +300,15 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	bool confirm_forget_key = false;
 	bool reveal_private_key_open = false;
 	bool confirm_unlink = false;
-	bool unlink_has_avatar = false;
 
 	/*
 		The unlink modal stays open for the answer: "Unlinking..." in place of the question, then the result.
 	*/
 
-	bool unlinking = false;
+	bool unlinking() const {
+		return unlink_request != nullptr;
+	}
+
 	std::optional<std::string> unlink_result;
 	bool unlink_succeeded = false;
 	std::string unlinked_name;
@@ -348,8 +347,8 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	void perform_account_message_modal();
 
-	std::optional<augs::ed25519_seed_type> current_account_seed();
-	std::optional<augs::ed25519_public_key_type> current_public_key();
+	std::optional<augs::ed25519_seed_type> current_account_seed() const;
+	std::optional<augs::ed25519_public_key_type> current_public_key() const;
 
 	/*
 		Linked to Steam: a saved Steam cert, or signed in to a Steam account right now.

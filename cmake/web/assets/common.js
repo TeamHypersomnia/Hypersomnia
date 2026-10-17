@@ -5,7 +5,6 @@ function decodeCrazyGamesToken(token) {
   const base64url = token.split('.')[1];
   const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - base64url.length % 4) % 4);
   const payload = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(base64), c => c.charCodeAt(0))));
-  console.log("Decoded token payload", payload);
 
   // How long it still lives: by this computer's clock when that looks right (a cached token is not fresh),
   // else by the token's own lifetime - this computer's clock may be off by hours
@@ -13,7 +12,6 @@ function decodeCrazyGamesToken(token) {
   const lifetime = typeof payload.iat === 'number' ? payload.exp - payload.iat : null;
   const left = payload.exp - currentTime;
   payload.expiresIn = lifetime === null || (left > 0 && left <= lifetime) ? left : lifetime;
-  console.log(currentTime, payload.exp);
 
   return payload;
 }
@@ -381,16 +379,8 @@ function try_fetch_initial_user() {
 function request_fresh_auth_token() {
   if (window.CrazyGames) {
     window.CrazyGames.SDK.user.getUserToken()
-      .then(token => {
-        const payload = decodeCrazyGamesToken(token);
-
-        passAuthDataToCpp('crazygames', payload.userId, payload.username, payload.profilePictureUrl, token, payload.expiresIn);
-        return true;
-      })
-      .catch(e => {
-        console.log("Failed to refresh auth token:", e);
-        return false;
-      });
+      .then(passCrazyGamesToken)
+      .catch(e => console.log("Failed to refresh auth token:", e));
 
     return true;
   }

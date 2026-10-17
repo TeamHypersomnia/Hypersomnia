@@ -7,40 +7,26 @@ namespace augs {
 enum class auth_provider_type {
 	// GEN INTROSPECTOR enum class auth_provider_type
 	CRAZYGAMES,
-	DISCORD,
-
-	STEAM_NATIVE,
-
-	/*
-		An Ed25519 key in the user folder - see identity_key.h.
-	*/
-
-	KEY,
 
 	COUNT
 	// END GEN INTROSPECTOR
 };
 
-inline std::string get_provider_preffix(const auth_provider_type t) {
+/*
+	The web build's sign-in, through the page's SDK - only CrazyGames. Without Steam the account is the account key
+	(identity_key.h), in the Steam build the Steam one.
+*/
+
+inline std::string get_provider_prefix(const auth_provider_type t) {
 	switch (t) {
-		case auth_provider_type::DISCORD:
-			return "discord_";
-		case auth_provider_type::STEAM_NATIVE:
-			return "steam_";
 		case auth_provider_type::CRAZYGAMES:
 			return "crazygames_";
-		case auth_provider_type::KEY:
-			return "key_";
 		default:
 			return "unknown_";
 	}
 }
 
 inline auto get_auth_provider_type(const std::string& p) {
-	if (p == "discord") {
-		return auth_provider_type::DISCORD;
-	}
-
 	if (p == "crazygames") {
 		return auth_provider_type::CRAZYGAMES;
 	}

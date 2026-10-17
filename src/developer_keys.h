@@ -5,7 +5,7 @@
 #include <string>
 
 /*
-	The authenticated account ids of the developers of the game - see get_provider_preffix -
+	The authenticated account ids of the developers of the game - see identity_cert.h -
 	e.g. "steam_76561198000000000" or "discord_100000000000000000", and of any future provider -
 	and their account keys ("key_" and the public key in hex), as which a key linked to Steam counts outside the Steam build.
 	A server shows them with the [DEV] badge in the chat and the scoreboard,

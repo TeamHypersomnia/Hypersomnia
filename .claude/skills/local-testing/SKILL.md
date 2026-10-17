@@ -51,7 +51,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_crazygames.sh` | The CrazyGames build in Chromium with a stubbed SDK (`crazygames_sdk_stub.py`, token signed by `CG_KEY`) joins an official ranked server over WebRTC as `crazygames_...` |
 | `scenario_steam.sh` | The Steam build with the user's running Steam: a real Web API ticket -> broker cert -> ranked (broker started with `STEAM_API_KEY_FILE`) |
 | `scenario_ranked_report.sh` | A whole ranked match to its natural end in about a minute: the test map `de_e2e_short` (de_cyberaqua, max team score 2, 5 s rounds, no warmup) on a ranked server, two key clients clicking Auto-assign, the signed report at the local broker, the site's match and MMR rows |
-| `scenario_ranked_corners.sh` (`CASE=unlink\|broker_down`) | A linked account (a key linked to a fake Steam id straight in the site's DB, its broker behind a stoppable proxy) in a ranked match: mid-match its key is unlinked on the site, or its broker goes down; it is killed and started again - it must rejoin as the same `steam_` account (its saved steam.cert) and the report must name that account. Note: a key put in by hand is linked only after the game's link check - started with `--connect` right away, it joins as `key_`; the script lets alice save her steam.cert first |
+| `scenario_ranked_corners.sh` (`CASE=unlink\|broker_down`) | A linked account (a key linked to a fake Steam id straight in the site's DB, its broker behind a stoppable proxy) in a ranked match: mid-match its key is unlinked on the site, or its broker goes down; it is killed and started again - it must rejoin as the same `steam_` account (its saved steam_cert.json) and the report must name that account. Note: a key put in by hand is linked only after the game's link check - started with `--connect` right away, it joins as `key_`; the script lets alice save her steam_cert.json first |
 | `scenario_disconnects.sh` (`CASES=...`) | Filmstrips of each disconnect as the player sees it, with timings: server SIGTERM/SIGKILL/SIGSTOP, full, the same key joining again, wrong password, AFK, client SIGSTOP/SIGKILL/SIGTERM. Expected: every kick reason shows at once; a dead server or a dropped network shows "Nothing came from the server for 10 seconds" (native only); a 6 s server freeze is survived; a killed client frees its slot in about 5 s, a quitting one at once |
 | `scenario_map_download.sh <out>` (`MAP`, `EXT`, `LATENCY`, `LOSS`, `KILL_AT`) | A client without the server's map downloads it - over UDP or from an HTTP provider (`slow_http.py` serves one at a set rate, with CORS for the browser); a long download never disconnects, a server killed meanwhile shows "Nothing came from the server for 10 seconds". In the browser: `scenario_web_firefox.sh` with `MAP`, `EXT` (and `KILL_SERVER=1`, `TAB_AWAY=<s>`) |
 | `scenario_password_limit.sh` | 7 joins without the password: 5x "Wrong password", then "Too many wrong passwords" |
@@ -85,7 +85,7 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
   in the browser); signed in through Steam anew (every link), the player confirms the Steam account on that page and the key is
   linked at once - the game asks for its cert every 3 s and sees the Steam account there (no redirect back, no local listener,
   no code; the same natively, in a tab or an iframe). The game then asks "Link to this Steam account?" (the profile link,
-  [Link] [Cancel] - Cancel unlinks; steam.cert is saved only after Link); linking moves no progress. A refusal (another
+  [Link] [Cancel] - Cancel unlinks; steam_cert.json is saved only after Link); linking moves no progress. A refusal (another
   account's key, 32 keys) shows on the page only; the page is good for 3 min, then the game stops waiting.
   Unlink from Steam is one signed GET `/link_key/unlink?t&key&sig`, answered at once.
 
@@ -107,7 +107,7 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
   opens the last `/link_key/start` URL signed in to Steam on the scratch site and clicks Link - the game then learns it by itself.
 - account.key is read only at the start and after Restore / Start a new account - a key swapped on disk counts from the
   next start (restart the client to test it). Every start (not of a key made just now) asks the broker quietly whether the key
-  is linked ("Asking quietly whether the key is linked") - unlinked on the site, it drops its steam.cert; linked elsewhere
+  is linked ("Asking quietly whether the key is linked") - unlinked on the site, it drops its steam_cert.json; linked elsewhere
   (`link_key.py`), Settings open with "This key is linked to a Steam account - is it yours?" until answered. Not in the Steam
   build or CrazyGames.
 - `cp imgui_big.ini <client>/user/imgui.ini` first: Settings at 20,20 1240x680, so whole panes fit a screenshot -
@@ -134,15 +134,15 @@ started with `STEAM_API_KEY_FILE` and a `SESSION_SECRET` kept in `$SCRATCH_ROOT/
 - `crazygames_sdk_stub.py <any pem> <game id> - <out.js>` - a CrazyGames guest (no token, no user).
 - The fake `zenity` writes its arguments to `$ZENITY_LOG` (the file filters, the save dialog's title) and "chooses" `$FAKE_ZENITY_FILE`.
 - `ui.sh stop` finds the client by its dir, whatever `BIN` started it.
-- An expired steam.cert: rewrite its last field (the unix time it arrived) to 5 hours ago.
+- An expired steam_cert.json: set its "received_at" (the unix time it arrived) to 5 hours ago.
 
 What each state looks like: an unlinked key asks the broker once per start, quietly, and the leaderboards say
 `Account: Key account (key xxxxxxxx...)`; Link first asks /cert (an already linked key is "Successfully linked" at once, otherwise
-the link page in the browser); a valid steam.cert is used at once after a restart; an expired one shows the cached Steam profile and,
+the link page in the browser); a valid steam_cert.json is used at once after a restart; an expired one shows the cached Steam profile and,
 after loading, a dimmed "Signing in to your Steam account..."; a dead broker gives one "Not signed in" message per run (with
 Join anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
 "Signed in to Steam" at the top; Restore shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
-Continue unlinked); a key unlinked elsewhere silently loses its steam.cert; a damaged account.key shows Backup in a modal.
+Continue unlinked); a key unlinked elsewhere silently loses its steam_cert.json; a damaged account.key shows Backup in a modal.
 
 ## Gameplay checks - measure in the log, not in screenshots
 

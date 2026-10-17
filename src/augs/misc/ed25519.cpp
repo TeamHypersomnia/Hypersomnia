@@ -27,6 +27,21 @@ namespace augs {
 #endif
 	}
 
+	bool secure_random_bytes(uint8_t* const out, const std::size_t count) {
+#if BUILD_NETWORKING
+		if (!sodium_ready()) {
+			return false;
+		}
+
+		randombytes_buf(out, count);
+		return true;
+#else
+		(void)out;
+		(void)count;
+		return false;
+#endif
+	}
+
 	std::optional<ed25519_public_key_type> ed25519_public_key(const ed25519_seed_type& seed) {
 #if BUILD_NETWORKING
 		if (!sodium_ready()) {

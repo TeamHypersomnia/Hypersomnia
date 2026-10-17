@@ -484,7 +484,7 @@ void settings_gui_state::perform_account_message_modal() {
 		return;
 	}
 
-	center_next_modal();
+	::center_next_modal();
 	ImGui::OpenPopup("Account##Message");
 
 	if (ImGui::BeginPopupModal("Account##Message", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -568,7 +568,7 @@ bool settings_gui_state::account_modal_open(const bool with_message) const {
 	return any || (with_message && account_message.has_value());
 }
 
-std::optional<augs::ed25519_public_key_type> settings_gui_state::current_public_key() {
+std::optional<augs::ed25519_public_key_type> settings_gui_state::current_public_key() const {
 	if (const auto seed = current_account_seed()) {
 		return augs::ed25519_public_key(*seed);
 	}
@@ -611,7 +611,7 @@ std::optional<std::string> settings_gui_state::account_change_blocked() const {
 	return std::nullopt;
 }
 
-std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() {
+std::optional<augs::ed25519_seed_type> settings_gui_state::current_account_seed() const {
 	/*
 		The key the game plays with - the game reads the file, the settings never do.
 	*/
@@ -687,7 +687,7 @@ static void local_key_line(const std::optional<augs::ed25519_public_key_type>& p
 	ImGui::SameLine();
 	text(identity_key::short_form(*public_key));
 	ImGui::SameLine();
-	copy_icon_button("LocalKey", "0x" + augs::bytes_to_hex(*public_key));
+	copy_icon_button("LocalKey", identity_key::full_form(*public_key));
 	ImGui::Separator();
 }
 
@@ -711,10 +711,14 @@ bool settings_gui_state::upload_link_avatar(const std::vector<std::byte>& bytes)
 }
 
 /*
-	The avatar (LINK_AVATAR) with the name beside it, as in the link and unlink modals.
+	The avatar (LINK_AVATAR - or another uploaded one) with the name beside it, as in the link, unlink and import modals.
 */
 
-static void link_avatar_and_name(const std::string& name, const bool has_avatar) {
+static void link_avatar_and_name(
+	const std::string& name,
+	const bool has_avatar,
+	const augs::imgui_atlas_type atlas = augs::imgui_atlas_type::LINK_AVATAR
+) {
 	using namespace augs::imgui;
 
 	if (has_avatar) {
@@ -722,7 +726,11 @@ static void link_avatar_and_name(const std::string& name, const bool has_avatar)
 		entry.atlas_space = xywh(0, 0, 1, 1);
 		const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
 
-		game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::LINK_AVATAR);
+		/*
+			game_image only draws - the space it took is taken by the Dummy.
+		*/
+
+		game_image(entry, size, white, vec2::zero, atlas);
 		ImGui::Dummy(ImVec2(size.x, size.y));
 		ImGui::SameLine();
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - ImGui::GetTextLineHeight()) / 2);
@@ -781,7 +789,7 @@ void settings_gui_state::tell_unlinked(const std::string& steam_name) {
 
 	account_message =
 		unlinked + "\n\n"
-		"Your progress now counts towards your key account.\n"
+		"Your progress now counts towards your " + identity_key::account_kind_name_lowercase() + ".\n"
 		"To link it again: Link with Steam."
 	;
 }
@@ -803,7 +811,7 @@ void settings_gui_state::perform_import_modal(
 		return;
 	}
 
-	center_next_modal();
+	::center_next_modal();
 
 	/*
 		At least as wide as its title - a short result ("Key restored") would cut it.
@@ -829,30 +837,7 @@ void settings_gui_state::perform_import_modal(
 
 		ImGui::Separator();
 		text("Welcome back,");
-
-		if (!avatar_shown) {
-			text(name);
-			return;
-		}
-
-		augs::atlas_entry entry;
-		entry.atlas_space = xywh(0, 0, 1, 1);
-		const auto size = vec2::square(ImGui::GetTextLineHeight() * 2);
-
-		game_image(entry, size, white, vec2::zero, augs::imgui_atlas_type::AVATAR_PREVIEW);
-
-		/*
-			game_image only draws - the space it took is taken here.
-		*/
-
-		ImGui::Dummy(ImVec2(size.x, size.y));
-		ImGui::SameLine();
-
-		{
-			const auto line = ImGui::GetTextLineHeight();
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y - line) / 2);
-			text(name);
-		}
+		::link_avatar_and_name(name, avatar_shown, augs::imgui_atlas_type::AVATAR_PREVIEW);
 	};
 
 	bool may_close = false;
@@ -967,7 +952,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		: std::string("hypersomnia-account.key")
 	;
 
-	local_key_line(public_key);
+	::local_key_line(public_key);
 
 #if !PLATFORM_WEB
 	if (valid_and_is_ready(chosen_key_copy_path)) {
@@ -1031,7 +1016,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			Right after Forget the game makes the new key - a moment without one is not an error.
 		*/
 
-		const auto now = augs::high_precision_secs();
+		const auto now = augs::steady_secs();
 
 		if (key_unreadable_since < 0.0) {
 			key_unreadable_since = now;
@@ -1087,7 +1072,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		First: the most common action, and a safe one.
 	*/
 
-	if (public_key.has_value() && colored_button("RevealThePrivateKey", { { "Back up ", white }, { "private key", orange }, { "...", white } })) {
+	if (public_key.has_value() && ::colored_button("RevealThePrivateKey", { { "Back up ", white }, { "private key", orange }, { "...", white } })) {
 		reveal_private_key_open = true;
 	}
 
@@ -1110,7 +1095,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			Not greyed during ranked - clicked, it says why it can not be done now, as the other buttons do.
 		*/
 
-		return colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange }, { " file...", white } });
+		return ::colored_button("ImportPrivateKey", { { "Restore from ", white }, { "private key", orange }, { " file...", white } });
 #endif
 	}();
 
@@ -1202,7 +1187,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	*/
 
 	if (import_to_confirm.has_value() && public_key.has_value()) {
-		center_next_modal();
+		::center_next_modal();
 		ImGui::OpenPopup("Switch account?##Import");
 
 		if (ImGui::BeginPopupModal("Switch account?##Import", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -1221,13 +1206,13 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				ImGui::SameLine(key_column);
 				text(identity_key::short_form(*public_key));
 				ImGui::SameLine();
-				copy_icon_button("SwitchFrom", "0x" + augs::bytes_to_hex(*public_key));
+				copy_icon_button("SwitchFrom", identity_key::full_form(*public_key));
 
 				text("    to");
 				ImGui::SameLine(key_column);
 				text(identity_key::short_form(new_public_key) + "?");
 				ImGui::SameLine();
-				copy_icon_button("SwitchTo", "0x" + augs::bytes_to_hex(new_public_key));
+				copy_icon_button("SwitchTo", identity_key::full_form(new_public_key));
 			}
 
 			text("\nOnly restore a key you backed up yourself -\nwhoever gave you a key can play as you.\n");
@@ -1239,7 +1224,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 #endif
 
 #if PLATFORM_WEB
-			if (seed.has_value() && colored_button("DownloadBeforeSwitch", { { "Download current ", white }, { "private key", orange } })) {
+			if (seed.has_value() && ::colored_button("DownloadBeforeSwitch", { { "Download current ", white }, { "private key", orange } })) {
 				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
 			}
 #endif
@@ -1276,18 +1261,18 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 
 	if (reveal_private_key_open && public_key.has_value()) {
-		center_next_modal();
+		::center_next_modal();
 		ImGui::OpenPopup("Back up your account##Modal");
 
 		if (ImGui::BeginPopupModal("Back up your account##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			colored_text({ { "Whoever has your ", white }, { "private key", orange }, { " plays as you:", white } });
+			::colored_text({ { "Whoever has your ", white }, { "private key", orange }, { " plays as you:", white } });
 			text_color("NEVER share it!", red);
 			text("");
 
 #if !PLATFORM_WEB
 			text("Your private key is the file account.key.\nCopy it somewhere safe (e.g. a USB stick) - with it you restore your account.\n");
 
-			const bool save_copy_clicked = colored_button("SaveKeyCopy", { { "Save a copy...", white } });
+			const bool save_copy_clicked = ::colored_button("SaveKeyCopy", { { "Save a copy...", white } });
 
 			if (save_copy_clicked && !window.has_file_dialog()) {
 				/*
@@ -1330,7 +1315,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				The browser has no folder to show - the key is saved as a file instead.
 			*/
 
-			if (colored_button("DownloadPrivateKey", { { "Download ", white }, { "private key", orange }, { " as a file", white } })) {
+			if (::colored_button("DownloadPrivateKey", { { "Download ", white }, { "private key", orange }, { " as a file", white } })) {
 				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
 			}
 
@@ -1351,7 +1336,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 
 	if (augs::exists(key_path)) {
 		{
-			const auto cols = danger_button_colors(rgba(200, 80, 0, 255));
+			const auto cols = ::danger_button_colors(rgba(200, 80, 0, 255));
 
 			if (ImGui::Button("Start a new account...")) {
 				if (const auto reason = account_change_blocked()) {
@@ -1366,7 +1351,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 	}
 
 	if (confirm_forget_key) {
-		center_next_modal();
+		::center_next_modal();
 		ImGui::OpenPopup("Start a new account?##Modal");
 
 		if (ImGui::BeginPopupModal("Start a new account?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -1375,7 +1360,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			if (public_key.has_value()) {
 				text("    " + identity_key::short_form(*public_key));
 				ImGui::SameLine();
-				copy_icon_button("ForgetKey", "0x" + augs::bytes_to_hex(*public_key));
+				copy_icon_button("ForgetKey", identity_key::full_form(*public_key));
 			}
 
 			text("");
@@ -1385,12 +1370,12 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 				text(typesafe_sprintf("To keep the progress of %x, download its private key first.", identity_key::short_form(*public_key)));
 			}
 #else
-			colored_text({ { "The old ", white }, { "private key", orange }, { " file is kept next to the new one as a backup -", white } });
+			::colored_text({ { "The old ", white }, { "private key", orange }, { " file is kept next to the new one as a backup -", white } });
 			text("delete it yourself to remove it for good.");
 #endif
 
 #if PLATFORM_WEB
-			if (seed.has_value() && colored_button("DownloadBeforeForget", { { "Download current ", white }, { "private key", orange } })) {
+			if (seed.has_value() && ::colored_button("DownloadBeforeForget", { { "Download current ", white }, { "private key", orange } })) {
 				::web_download_text(backup_file_name.c_str(), identity_key::to_export_string(*seed).c_str());
 			}
 #endif
@@ -1398,14 +1383,16 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			ImGui::Separator();
 
 			{
-				const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
+				const auto cols = ::danger_button_colors(rgba(200, 40, 0, 255));
 
-				if (const bool clicked = ImGui::Button("Start new account"); clicked && account_change_blocked().has_value()) {
-					/*
-						A ranked match may have started while this was open.
-					*/
+				const bool clicked = ImGui::Button("Start new account");
 
-					account_message = *account_change_blocked();
+				/*
+					A ranked match may have started while this was open.
+				*/
+
+				if (const auto reason = clicked ? account_change_blocked() : std::nullopt) {
+					account_message = *reason;
 					confirm_forget_key = false;
 					ImGui::CloseCurrentPopup();
 				}
@@ -1476,11 +1463,9 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		return augs::async_get(website_url, location, {}, nullptr, false);
 	};
 
-	auto finish = [&](const bool succeeded, const std::string& message, const bool conflict = false) {
+	auto finish = [&](const bool succeeded, const std::string& message) {
 		link_flow = F::DONE;
 		link_flow_succeeded = succeeded;
-		link_flow_conflict = conflict;
-		link_flow_message_is_warning = false;
 		link_flow_message = message;
 
 		if (succeeded) {
@@ -1493,7 +1478,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	*/
 
 	auto ask_to_confirm = [&](const bool found_elsewhere) {
-		linked_has_avatar = upload_link_avatar(identity->get_link_check_profile().avatar);
+		link_has_avatar = upload_link_avatar(identity->get_link_check_profile().avatar);
 		linked_name = identity->get_link_check_profile().name;
 		linked_account = identity->get_account_to_confirm();
 		link_found_elsewhere = found_elsewhere;
@@ -1506,7 +1491,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	*/
 
 	if (std::exchange(link_confirm_profile_wanted, false) && identity != nullptr) {
-		linked_has_avatar = upload_link_avatar(identity->get_profile_to_confirm().avatar);
+		link_has_avatar = upload_link_avatar(identity->get_profile_to_confirm().avatar);
 		linked_name = identity->get_profile_to_confirm().name;
 		linked_account = identity->get_account_to_confirm();
 	}
@@ -1515,12 +1500,11 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		A random state only this game knows - the page in the browser is signed in through Steam anew for it.
 	*/
 
-	auto make_browser_state = []() {
+	auto make_browser_state = []() -> std::optional<std::string> {
 		auto state_bytes = std::array<uint8_t, 16>();
-		auto rd = std::random_device();
 
-		for (auto& b : state_bytes) {
-			b = static_cast<uint8_t>(rd());
+		if (!augs::secure_random_bytes(state_bytes.data(), state_bytes.size())) {
+			return std::nullopt;
 		}
 
 		return augs::bytes_to_hex(state_bytes);
@@ -1540,7 +1524,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			return;
 		}
 
-		unlinking = true;
 		unlink_request = get_from_website(typesafe_sprintf(
 			"/link_key/unlink?t=%x&key=%x&sig=%x",
 			unix_time,
@@ -1549,7 +1532,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		));
 	};
 
-	local_key_line(public_key);
+	::local_key_line(public_key);
 
 	/*
 		The status.
@@ -1574,7 +1557,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			text_disabled("All progress counts towards this Steam account.");
 		}
 
-		if (!unlinking && has_key && ImGui::Button("Unlink from Steam...")) {
+		if (!unlinking() && has_key && ImGui::Button("Unlink from Steam...")) {
 			/*
 				Not during a ranked match: its rejoin is on the Steam account.
 			*/
@@ -1584,7 +1567,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 			else {
 				confirm_unlink = true;
-				unlink_has_avatar = identity != nullptr && upload_link_avatar(identity->get_profile().avatar);
+				link_has_avatar = identity != nullptr && upload_link_avatar(identity->get_profile().avatar);
 			}
 		}
 	}
@@ -1596,7 +1579,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			else if (has_key && identity != nullptr) {
 				identity->start_link_check(identity_input.broker_url);
 				link_flow = F::CHECKING_BEFORE;
-				linked_has_avatar = false;
+				link_has_avatar = false;
 				link_flow_message.clear();
 			}
 			else {
@@ -1618,26 +1601,29 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	};
 
 	auto start_steam_sign_in = [&]() {
-		steam_link_state = make_browser_state();
+		steam_link_state = make_browser_state().value_or(std::string());
 		link_checked_at = augs::steady_secs();
 
 		steam_link_time = static_cast<int64_t>(augs::date_time::secs_since_epoch());
 
-		const auto signature = has_key ? augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state, steam_link_time)) : std::nullopt;
+		const auto signature =
+			has_key && !steam_link_state.empty() ?
+			augs::ed25519_sign(*seed, identity_key::link_message(steam_link_state, steam_link_time)) :
+			std::nullopt
+		;
 
 		if (!signature.has_value()) {
 			finish(false, "Couldn't sign the link with your key.\n\nSee the logs.");
 			return;
 		}
 
-		steam_link_signature = augs::bytes_to_hex(*signature);
 		steam_link_url_cached = typesafe_sprintf(
 			"%x/link_key/start?state=%x&t=%x&key=%x&sig=%x%x",
 			website_url,
 			steam_link_state,
 			steam_link_time,
 			augs::bytes_to_hex(*public_key),
-			steam_link_signature,
+			augs::bytes_to_hex(*signature),
 			identity != nullptr ? identity->device_query() : std::string()
 		);
 
@@ -1705,7 +1691,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			steam_link_state.clear();
 			finish(false, refusal);
 		}
-		else if (page_age > 3 * 60) {
+		else if (page_age > identity_key::link_page_lifetime_secs) {
 			/*
 				Its last moments may have been confirmed while this tab or window slept - found quietly then.
 			*/
@@ -1730,9 +1716,8 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 		The unlink's answer: {"unlinked": true} or {"error"}.
 	*/
 
-	if (unlinking && augs::is_ready(unlink_request)) {
+	if (augs::is_ready(unlink_request)) {
 		const auto response = augs::get_once(unlink_request);
-		unlinking = false;
 
 		const auto error = [&]() -> std::string {
 			try {
@@ -1782,7 +1767,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	*/
 
 	if (link_flow != F::IDLE) {
-		center_next_modal();
+		::center_next_modal();
 		ImGui::OpenPopup("Link to your Steam account##Modal");
 
 		if (ImGui::BeginPopupModal("Link to your Steam account##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -1877,7 +1862,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 				const auto check_profile = std::string("Open this Steam profile to make sure!");
 				const auto if_yours = std::string("If it's yours, it says \"Edit Profile\".");
 				const auto counts_there = std::string("Progress now counts towards your Steam account.");
-				const auto counts_here = std::string("Progress counts towards your key account again.");
+				const auto counts_here = "Progress counts towards your " + identity_key::account_kind_name_lowercase() + " again.";
 
 				{
 					auto widest = 0.0f;
@@ -1914,7 +1899,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					linked_name
 				;
 
-				link_avatar_and_name(shown_linked_name, linked_has_avatar);
+				::link_avatar_and_name(shown_linked_name, link_has_avatar);
 
 				if (confirming) {
 					if (external_link("LinkCheckProfile", check_profile, ::steam_profile_url(linked_account), ImGui::GetColorU32(ImGuiCol_Text))) {
@@ -1933,12 +1918,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					text(" ");
 				}
 				else {
-					if (link_flow_message_is_warning) {
-						text_color(link_flow_message, orange);
-					}
-					else {
-						text(link_flow_message);
-					}
+					text(link_flow_message);
 
 					text(" ");
 				}
@@ -1972,7 +1952,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 								link_confirm_error.clear();
 								start_unlink();
 
-								if (!unlinking) {
+								if (!unlinking()) {
 									link_flow = F::CONFIRM;
 									link_confirm_error = "Unlinking failed - try again.";
 									unlink_result.reset();
@@ -2011,18 +1991,6 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					close();
 				}
 
-				/*
-					A conflict (409): the account has as many keys linked as it may, or the key is another account's -
-					both sorted out on the site.
-				*/
-
-				if (!link_flow_succeeded && link_flow_conflict) {
-					ImGui::SameLine();
-
-					if (ImGui::Button("Manage linked keys##LinkFlow")) {
-						augs::open_url(website_url + "/profile");
-					}
-				}
 			}
 
 			ImGui::EndPopup();
@@ -2030,7 +1998,7 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 	}
 
 	if (confirm_unlink) {
-		center_next_modal();
+		::center_next_modal();
 		ImGui::OpenPopup("Unlink?##Modal");
 
 		if (ImGui::BeginPopupModal("Unlink?##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -2039,14 +2007,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			*/
 
 			const auto shown_name = unlinked_name.empty() ? (steam_name.empty() ? steam_account : steam_name) : unlinked_name;
-			const auto local_key_line = typesafe_sprintf(
+			const auto key_counts_line = typesafe_sprintf(
 				"\nProgress will count towards your " + identity_key::account_kind_name_lowercase() + " (%x) again.",
 				has_key ? identity_key::short_form(*public_key) : std::string()
 			);
 
 			auto close_unlink = [&]() {
 				confirm_unlink = false;
-				unlinking = false;
 				unlink_request.reset();
 				unlink_result.reset();
 				unlinked_name.clear();
@@ -2061,13 +2028,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 					close_unlink();
 				}
 			}
-			else if (unlinking) {
+			else if (unlinking()) {
 				spinner_line("Unlinking...", white);
-				link_avatar_and_name(shown_name, unlink_has_avatar);
+				::link_avatar_and_name(shown_name, link_has_avatar);
 			}
 			else if (unlink_result.has_value()) {
 				checkmark_line(*unlink_result, green);
-				link_avatar_and_name(shown_name, unlink_has_avatar);
+				::link_avatar_and_name(shown_name, link_has_avatar);
 
 				text(typesafe_sprintf(
 					"\nProgress now counts towards your " + identity_key::account_kind_name_lowercase() + " (%x).",
@@ -2082,13 +2049,13 @@ void settings_gui_state::perform_account_link_pane(const std::string& website_ur
 			}
 			else {
 				text("Unlink this game from your Steam account?");
-				link_avatar_and_name(shown_name, unlink_has_avatar);
-				text(local_key_line);
+				::link_avatar_and_name(shown_name, link_has_avatar);
+				text(key_counts_line);
 
 				ImGui::Separator();
 
 				{
-					const auto cols = danger_button_colors(rgba(200, 40, 0, 255));
+					const auto cols = ::danger_button_colors(rgba(200, 40, 0, 255));
 
 					if (ImGui::Button("Unlink", ImVec2(120, 0))) {
 						/*
@@ -2195,7 +2162,7 @@ void settings_gui_state::perform(
 	if (key_damaged) {
 		was_key_damaged = true;
 
-		center_next_modal();
+		::center_next_modal();
 		ImGui::OpenPopup("Your account key is damaged##Modal");
 
 		if (ImGui::BeginPopupModal("Your account key is damaged##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -2361,7 +2328,7 @@ void settings_gui_state::perform(
 				ImGui::SameLine();
 				text(identity_key::short_form(*server_public_key));
 				ImGui::SameLine();
-				copy_icon_button("ServerKey", "0x" + augs::bytes_to_hex(*server_public_key));
+				copy_icon_button("ServerKey", identity_key::full_form(*server_public_key));
 				tooltip_on_hover("This key is separate from your player account.");
 				ImGui::Separator();
 			}

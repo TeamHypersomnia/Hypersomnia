@@ -10,14 +10,7 @@ self.addEventListener("fetch", function (e) {
     if (r.status === 0) return r;
     const headers = new Headers(r.headers);
     if (e.request.mode === "navigate") {
-      const url = new URL(e.request.url);
-      if (url.pathname.endsWith('/discord_redirect.html')) {
-        // OAuth redirect page must NOT have COOP so window.opener survives
-        // the cross-origin navigation chain (game iframe -> Discord -> redirect)
-        headers.delete("Cross-Origin-Opener-Policy");
-      } else {
-        headers.set("Cross-Origin-Opener-Policy", "same-origin");
-      }
+      headers.set("Cross-Origin-Opener-Policy", "same-origin");
     }
     headers.set("Cross-Origin-Embedder-Policy", "credentialless");
     headers.set("Cross-Origin-Resource-Policy", "cross-origin");

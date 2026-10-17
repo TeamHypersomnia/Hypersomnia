@@ -33,25 +33,27 @@ namespace identity_key {
 	std::string link_message(const std::string& state, int64_t unix_time);
 
 	/*
+		How long that page can be confirmed - LINK_PAGE_LIFETIME_SECS in the site's link_key.js.
+	*/
+
+	inline constexpr double link_page_lifetime_secs = 3 * 60.0;
+
+	/*
 		Signed to unlink the key from its Steam account: only the key's owner (this game) can, and only once with this time.
 	*/
 
 	std::string unlink_message(int64_t unix_time);
 
 	/*
-		The account id without the "key_" provider prefix.
-	*/
-
-	std::string account_id(const augs::ed25519_public_key_type& public_key);
-
-	/*
 		The one public form of a key everywhere - menu, Settings, leaderboards, modals and the site:
 		"0x" and the first 8 hex digits of the public key, e.g. "0x8aed41f2..." - the 0x says it is a key.
 		For a "key_..." account id the same; any other account id is returned as it is.
+		In full (to copy): "0x" and all 64 digits.
 	*/
 
 	std::string short_form(const augs::ed25519_public_key_type& public_key);
 	std::string short_form_of_account(const std::string& account);
+	std::string full_form(const augs::ed25519_public_key_type& public_key);
 
 	/*
 		What a key's account is called to the player: it lives on this computer, or in this browser.

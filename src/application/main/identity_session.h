@@ -16,23 +16,39 @@
 	Every game has its account key (account.key in KEYS_DIR, the browser's key on the web - in the Steam build never linked,
 	its account is the Steam one). It is also the session key: the game signs its connections with it, and a cert names it.
 	With nothing more, the game signs its own cert - the account "key_" and the key in hex.
-	A key without steam.cert (not linked, as far as this game knows) is asked about once at every start, quietly
-	(see load_saved_cert): a link made meanwhile elsewhere (another tab, a copy of the key) is found then; a broker
-	that does not answer shows nothing.
+	A key without steam_cert.json (not linked, as far as this game knows) is asked about once at every start, quietly
+	(set_key wants it, advance asks): a link made meanwhile elsewhere (another tab, a copy of the key) is found then;
+	a broker that does not answer shows nothing.
 
 	An account the identity broker on hypersomnia.io vouches for (Steam, CrazyGames) is expected:
 	- in the Steam build, always - proven with a Steam ticket;
-	- with a key linked to a Steam account, while steam.cert is there - proven with the key's signature;
+	- with a key linked to a Steam account, while steam_cert.json is there - proven with the key's signature;
 	- in the CrazyGames build, once the player signs in to CrazyGames - proven with its token.
 
 	One loop keeps that cert: it lives 4 hours and is renewed at half of its lifetime, also during a match,
 	so a connection never waits for the broker; a failure is retried after 30 s, doubling up to 5 minutes.
 	A cert only matters when connecting - a new one counts from the next connection.
 
-	steam.cert keeps the Steam cert across restarts (a valid one is used at once), and its presence tells a key
+	steam_cert.json keeps the Steam cert across restarts (a valid one is used at once), and its presence tells a key
 	that it is linked. It is no secret: useless without account.key, which lies next to it anyway.
-	It goes only when the broker answers with the key's own account - the key was unlinked on the site.
+	It goes when the key is unlinked (from the game, or the broker answers with the key's own account) or turns out
+	linked to another Steam account.
 */
+
+/*
+	steam_cert.json next to account.key: the Steam cert in hex, the unix time it arrived - so that a computer whose clock
+	is off by hours still sees a fresh cert as fresh - and the account's name and avatar (base64). A cert for another key
+	(e.g. a replaced account.key) is not ours and is ignored.
+*/
+
+struct saved_steam_cert {
+	// GEN INTROSPECTOR struct saved_steam_cert
+	std::string cert;
+	double received_at = 0.0;
+	std::string name;
+	std::string avatar;
+	// END GEN INTROSPECTOR
+};
 
 /*
 	imported_key.json next to account.key: a key restored from a file whose nickname and avatar (the ones it last played
@@ -84,7 +100,7 @@ public:
 
 	/*
 		The account's name and avatar as the broker sent them (Steam), shown instead of the player's own
-		when "Use my Steam name and avatar" is on - see the plan's "two profiles".
+		when "Use my Steam name and avatar" is on.
 	*/
 
 	struct account_profile {
@@ -111,7 +127,6 @@ private:
 	std::array<uint8_t, 64> key_secret = {};
 
 	augs::path_type cert_file;
-	augs::path_type profile_file;
 	bool cert_saved = false;
 
 	std::optional<identity_cert::cert> broker_cert;
@@ -187,6 +202,7 @@ private:
 	void delete_saved_cert();
 
 	std::string key_location() const;
+	std::string cert_location() const;
 	std::optional<std::string> build_location(const input&) const;
 	void start_request(const input&, double now, const std::string& key_query = "");
 	void schedule_retry(double now);
@@ -210,8 +226,8 @@ public:
 	std::string last_error;
 
 	/*
-		The key and where the Steam cert is kept (.keys in the user folder). Another key - an import -
-		forgets the cert, which names the old key.
+		The key and where the Steam cert is kept (KEYS_DIR, see all_paths.h). Another key - an import -
+		forgets the cert, which names the old key, and whatever was asked for the old key.
 	*/
 
 	void set_key(const augs::ed25519_seed_type& seed, const augs::path_type& keys_dir);
@@ -251,6 +267,7 @@ public:
 	void drop_unconfirmed_link() {
 		unconfirmed_cert.reset();
 		unconfirmed_profile = {};
+		linked_quietly = false;
 	}
 
 	/*
@@ -307,7 +324,7 @@ public:
 	}
 
 	/*
-		A key linked to Steam is expected to sign in while steam.cert is there.
+		A key linked to Steam is expected to sign in while steam_cert.json is there.
 	*/
 
 	bool has_saved_cert() const {
@@ -315,7 +332,7 @@ public:
 	}
 
 	/*
-		Unlinked from the game: back to the key account right away, steam.cert deleted.
+		Unlinked from the game: back to the key account right away, steam_cert.json deleted.
 	*/
 
 	void on_unlinked();

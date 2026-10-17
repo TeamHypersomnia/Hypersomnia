@@ -418,10 +418,9 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 	}
 
-/*
-	No Log Out: on CrazyGames it is theirs, elsewhere the account is the key - see Settings - Account.
-*/
-
+	/*
+		No Log Out: on CrazyGames it is theirs, elsewhere the account is the key - see Settings - Account.
+	*/
 
 	ImGui::NextColumn();
 

@@ -5,7 +5,7 @@
 #   Once the match is live:
 #     unlink      - alice's key is unlinked on the site (as /profile would), then alice is killed and started again;
 #     broker_down - the proxy is stopped (hypersomnia.io down), then alice is killed and started again.
-#   Expected: broker_down - alice rejoins as the same Steam account (her saved steam.cert), the match ends and the report names
+#   Expected: broker_down - alice rejoins as the same Steam account (her saved steam_cert.json), the match ends and the report names
 #   that account. unlink - nothing holds the Steam cert for the match any more: alice rejoins with it only if she connects
 #   before the broker says the key is unlinked; otherwise the server refuses her key account (an accepted loss, two rare events).
 # Needs broker.sh running (BROKER_URL, BROKER_PUBLIC_KEY exported, SCRATCH as for broker.sh).
@@ -105,15 +105,15 @@ sleep 1
 # Settings where identity_ui's screenshots have them - the modal's [Link] at 493,472
 cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
 start_client alice 96 alice_first.out
-# The game asks whether the Steam account linked elsewhere is hers - [Link] (centered modal) saves steam.cert
+# The game asks whether the Steam account linked elsewhere is hers - [Link] (centered modal) saves steam_cert.json
 for i in $(seq 1 40); do grep -q "identity cert for steam_" $T/alice_first.out 2>/dev/null && break; sleep 1; done
 sleep 2
 for i in $(seq 1 10); do
-	[ -f $T/alice/user/.keys/steam.cert ] && break
+	[ -f $T/alice/user/.keys/steam_cert.json ] && break
 	DISPLAY=:96 python3 "$HERE/xinput.py" click 493 472
 	sleep 1
 done
-echo "alice's first start: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice_first.out | tail -1), steam.cert: $([ -f $T/alice/user/.keys/steam.cert ] && echo yes || echo no)"
+echo "alice's first start: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice_first.out | tail -1), steam_cert.json: $([ -f $T/alice/user/.keys/steam_cert.json ] && echo yes || echo no)"
 for p in $(pgrep -f -- "Hypersomnia --appdata-dir $T/alice "); do kill $p; done
 sleep 2
 start_client alice 96 alice.out --connect 127.0.0.1:$PORT

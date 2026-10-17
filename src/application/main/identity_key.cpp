@@ -25,6 +25,7 @@
 #include "augs/misc/date_time.h"
 #include "augs/persistent_filesystem.h"
 #include "augs/string/hex.h"
+#include "application/network/identity_cert.h"
 #include "application/main/identity_key.h"
 
 namespace identity_key {
@@ -36,12 +37,12 @@ namespace identity_key {
 		return "hypersomnia-unlink-v1 " + std::to_string(unix_time);
 	}
 
-	std::string account_id(const augs::ed25519_public_key_type& public_key) {
-		return augs::bytes_to_hex(public_key);
+	std::string short_form(const augs::ed25519_public_key_type& public_key) {
+		return short_form_of_account(identity_cert::key_account(public_key));
 	}
 
-	std::string short_form(const augs::ed25519_public_key_type& public_key) {
-		return short_form_of_account("key_" + account_id(public_key));
+	std::string full_form(const augs::ed25519_public_key_type& public_key) {
+		return "0x" + augs::bytes_to_hex(public_key);
 	}
 
 	std::string short_form_of_account(const std::string& account) {

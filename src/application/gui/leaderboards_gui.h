@@ -80,7 +80,6 @@ class leaderboards_gui_state : public standard_window_mixin<leaderboards_gui_sta
 
 public:
 	bool wants_sign_in = false;
-	bool wants_log_out = false;
 	bool wants_sign_in_retry = false;
 
 	using base = standard_window_mixin<leaderboards_gui_state>;

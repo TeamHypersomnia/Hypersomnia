@@ -116,7 +116,7 @@ extern "C" {
 		new_auth_data.emplace(web_auth_data {
 			type,
 			profile_name,
-			typesafe_sprintf("%x%x", get_provider_preffix(type), profile_id),
+			typesafe_sprintf("%x%x", get_provider_prefix(type), profile_id),
 			auth_token,
 			expire_timestamp,
 

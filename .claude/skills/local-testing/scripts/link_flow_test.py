@@ -103,9 +103,9 @@ last_proof = None
 
 def cert_account():
     global last_proof
-    session = Ed25519PrivateKey.generate().public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
-    s = key.sign(b'hs-cert-req-v1' + session).hex()
-    status, body, _ = get('/cert?session=%s&key=%s&sig=%s' % (session.hex(), pub, s))
+    # The account key is the session key too: it signs the request for itself
+    s = key.sign(b'hs-cert-req-v1' + bytes.fromhex(pub)).hex()
+    status, body, _ = get('/cert?session=%s&sig=%s' % (pub, s))
     if status != 200: return 'HTTP %d %s' % (status, body)
     raw = bytes.fromhex(json.loads(body)['cert'])
     n = raw[1]
