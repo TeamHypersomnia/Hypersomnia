@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
+#include "game/detail/inventory/firearm_limit.h"
 #include "augs/templates/continue_or_callback_result.h"
 #include "augs/templates/traits/is_nullopt.h"
 
@@ -148,31 +149,7 @@ void inventory_mixin<E>::recurse_character_attachments(
 	do_callback_for(slot_function::BELT);
 
 	if (should_recurse(character[slot_function::BACK_WEAPON_1])) {
-		/*
-			All weapons on the back hang in the same place,
-			so the one stowed most recently is drawn last - on top.
-			The order changes only with inventory operations.
-		*/
-
-		auto ordered_back_slots = back_weapon_slots_v;
-
-		auto when_stowed = [&](const slot_function type) {
-			if (const auto item = character[type].get_item_if_any()) {
-				return item.when_last_transferred().step;
-			}
-
-			return static_cast<uint32_t>(0);
-		};
-
-		std::stable_sort(
-			ordered_back_slots.begin(),
-			ordered_back_slots.end(),
-			[&](const slot_function a, const slot_function b) {
-				return when_stowed(a) < when_stowed(b);
-			}
-		);
-
-		for (const auto back_slot : ordered_back_slots) {
+		for (const auto back_slot : ::get_back_weapon_slots_bottom_to_top(character)) {
 			recurse_attachments_in(back_slot);
 		}
 	}

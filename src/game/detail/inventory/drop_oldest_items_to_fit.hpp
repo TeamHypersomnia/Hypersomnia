@@ -224,7 +224,8 @@ void drop_items_over_deposit_capacity(const logic_step step, const E& character)
 	Deposit space that the items held in hands would take when hidden.
 	Counted the same for showing what fits in the shop and for making room after a purchase,
 	so that what the shop shows as fitting never makes anything fall out later.
-	Conservative: an item that might go to a wearable slot instead (a knife) still counts.
+	An item that has a free wearable slot (a knife and the shoulder) goes there when hidden, so it needs no room -
+	a slot taken that way counts only once, e.g. for two knives and one shoulder.
 */
 
 template <class E>
@@ -237,6 +238,7 @@ inventory_space_type calc_deposit_space_needed_for_hands(const E& character) {
 	}
 
 	auto needed = inventory_space_type(0);
+	auto claimed_wearable = inventory_slot_id();
 
 	for (const auto& held : character.get_wielded_items()) {
 		const auto held_item = cosm[held];
@@ -246,6 +248,17 @@ inventory_space_type calc_deposit_space_needed_for_hands(const E& character) {
 		*/
 
 		if (held_item.dead() || ::is_firearm_like(held_item) || ::is_like_plantable_bomb(held_item) || ::is_ammo_like(held_item)) {
+			continue;
+		}
+
+		const auto wearable = character.find_slot_for(
+			character.get_cosmos()[held],
+			{ candidate_holster_type::WEARABLES },
+			{ slot_finding_opt::ALL_CHARGES_MUST_FIT, slot_finding_opt::OMIT_MOUNTED_SLOTS }
+		).get_id();
+
+		if (wearable.is_set() && wearable != claimed_wearable) {
+			claimed_wearable = wearable;
 			continue;
 		}
 

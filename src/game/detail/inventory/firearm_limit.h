@@ -1,4 +1,7 @@
 #pragma once
+#include <algorithm>
+#include <cstdint>
+#include "augs/templates/reversion_wrapper.h"
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 #include "game/components/item_component.h"
@@ -66,46 +69,62 @@ int count_carried_firearms(const E& character, const entity_id except = entity_i
 	Picking up a firearm over the limit swaps it for one we carry.
 	With pickup_swaps_wielded_firearm (the default) the one in hands - we "draw" what we want to throw away -
 	or, with no firearm in hands, the one at the very bottom of the back.
-	Otherwise the one on top of the back, so picking up never changes what we hold.
+	Otherwise the one on top of the back, so picking up never throws away what we hold
+	(with no firearm in hands, the picked one is still drawn - see wield_picked_firearm_if_hands_hold_none).
 	Either way, the other kind is taken when there is none of the preferred one, e.g. both firearms in hands.
 */
 
+/*
+	All weapons on the back hang in the same place, stacked in the order they were hidden:
+	the one hidden longest ago at the bottom, the most recent on top - drawn last.
+	Ties keep the order of the slots. Empty slots come first.
+*/
+
+template <class E>
+auto get_back_weapon_slots_bottom_to_top(const E& character) {
+	auto ordered = back_weapon_slots_v;
+
+	auto when_stowed = [&](const slot_function type) {
+		if (const auto item = character[type].get_item_if_any()) {
+			return item.when_last_transferred().step;
+		}
+
+		return static_cast<uint32_t>(0);
+	};
+
+	std::stable_sort(
+		ordered.begin(),
+		ordered.end(),
+		[&](const slot_function a, const slot_function b) {
+			return when_stowed(a) < when_stowed(b);
+		}
+	);
+
+	return ordered;
+}
+
 template <class E>
 entity_id find_top_firearm_on_back(const E& character) {
-	entity_id top_of_back;
-	uint32_t top_step = 0;
+	const auto bottom_to_top = ::get_back_weapon_slots_bottom_to_top(character);
 
-	for (const auto back_slot : back_weapon_slots_v) {
+	for (const auto back_slot : reverse(bottom_to_top)) {
 		if (const auto item = character[back_slot].get_item_if_any()) {
-			const auto stowed_step = item.when_last_transferred().step;
-
-			if (!top_of_back.is_set() || stowed_step >= top_step) {
-				top_of_back = item.get_id();
-				top_step = stowed_step;
-			}
+			return item.get_id();
 		}
 	}
 
-	return top_of_back;
+	return entity_id();
 }
 
 template <class E>
 entity_id find_bottom_firearm_on_back(const E& character) {
-	entity_id bottom_of_back;
-	uint32_t bottom_step = 0;
-
-	for (const auto back_slot : back_weapon_slots_v) {
+	for (const auto back_slot : ::get_back_weapon_slots_bottom_to_top(character)) {
 		if (const auto item = character[back_slot].get_item_if_any()) {
-			const auto stowed_step = item.when_last_transferred().step;
-
-			if (!bottom_of_back.is_set() || stowed_step < bottom_step) {
-				bottom_of_back = item.get_id();
-				bottom_step = stowed_step;
-			}
+			return item.get_id();
 		}
 	}
 
-	return bottom_of_back;
+	return entity_id();
 }
 
 template <class E>

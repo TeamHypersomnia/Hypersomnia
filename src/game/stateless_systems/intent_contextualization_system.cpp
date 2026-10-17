@@ -16,7 +16,7 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
-#include "game/detail/use_interaction_logic.h"
+#include "game/detail/item_pickup_process.hpp"
 #include "game/enums/requested_interaction_type.h"
 
 #include "game/cosmos/entity_handle.h"

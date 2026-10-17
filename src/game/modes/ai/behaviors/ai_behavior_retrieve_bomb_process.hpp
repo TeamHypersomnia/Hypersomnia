@@ -4,7 +4,7 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/detail/use_interaction_logic.h"
+#include "game/detail/item_pickup_process.hpp"
 
 /*
 	Implementation of ai_behavior_retrieve_bomb::process().
