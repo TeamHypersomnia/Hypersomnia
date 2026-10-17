@@ -287,6 +287,16 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject, c
 				return;
 			}
 
+			if (::wears_backpack(subject)) {
+				if (typed_root_item.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
+					/*
+						A second backpack is of no use - not worth picking up.
+					*/
+
+					return;
+				}
+			}
+
 			if (::is_useless_ammo(subject, typed_root_item)) {
 				/*
 					Ammo for none of our firearms is not worth picking up -
