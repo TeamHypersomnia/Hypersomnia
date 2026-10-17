@@ -3187,7 +3187,6 @@ void settings_gui_state::perform(
 							}
 
 							revertable_checkbox(SCOPE_CFG_NVP(forward_moves_towards_crosshair));
-							revertable_checkbox(SCOPE_CFG_NVP(pickup_swaps_wielded_firearm));
 						}
 
 						{
@@ -3502,6 +3501,13 @@ void settings_gui_state::perform(
 						break;
 					}
 					case controls_settings_pane::INVENTORY: {
+						{
+							auto& scope_cfg = config.input.character;
+
+							revertable_checkbox(SCOPE_CFG_NVP(pickup_swaps_wielded_firearm));
+							tooltip_on_hover("When picking up a firearm over the limit:\nON - swap it for the firearm in hands (with none in hands, the one hidden the longest ago),\nOFF - swap it for the firearm on top of the back, keeping what you hold.");
+						}
+
 						{
 							auto& scope_cfg = config.hotbar;
 

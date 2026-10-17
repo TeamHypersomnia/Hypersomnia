@@ -24,8 +24,8 @@
 */
 
 /*
-	A safety margin below the most a body can travel per step in Box2D - b2_maxTranslation -
-	above which Box2D would slow it down, so that it would fall short.
+	A safety margin below the most a thrown explosive can travel per step in Box2D - b2_maxTranslation,
+	its per-body limit (only missiles get more) - above which Box2D would slow it down, so that it would fall short.
 */
 
 inline constexpr real32 AIMED_THROW_MAX_TRANSLATION_MULT = 0.99f;
