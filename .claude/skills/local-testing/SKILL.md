@@ -1,6 +1,6 @@
 ---
 name: local-testing
-description: Test Hypersomnia end to end without the user, mainly networking - local masterserver, dedicated servers and CLI clients (UDP and WebRTC), server keys, certs and the identity broker, the web build in Firefox under Xvfb, game UI via screenshots and XTest clicks, the hypersomnia.io site in a scratch copy, isolated builds (native, Steam, web, Ubuntu containers for the remote hosts) and test servers on arena and arenaus. Use whenever the user asks to test something "lokalnie", "headless", "z CLI", "bez mojej ingerencji", "postaw dedyka i połącz się", to check a UI change on screen, or to verify networking, ranked/auth, WebRTC or web build changes before a release.
+description: Test Hypersomnia end to end without the user, mainly networking - local masterserver, dedicated servers and CLI clients (UDP and WebRTC), server keys, certs and the identity broker, the web build in Firefox under Xvfb, game UI via screenshots and XTest clicks, the hypersomnia.io site in a scratch copy, isolated builds (native, Steam, web, Ubuntu containers for the remote hosts) and test servers on arena and arenaus. Use whenever the user asks to test something "lokalnie", "headless", "z CLI", "bez mojej ingerencji", "postaw dedyka i połącz się", to check a UI change on screen, or to verify networking, ranked/auth, WebRTC or web build changes before a release. Also for gameplay logic (dropping, picking up, inventory, buying, bots, physics) - "przetestuj", "stestuj sobie", "sprawdź czy działa w grze".
 ---
 
 # Local testing
@@ -143,6 +143,24 @@ after loading, a dimmed "Signing in to your Steam account..."; a dead broker giv
 Join anyway / Cancel before a `--connect`), then "Not signed in to Steam. Retry" under the profile; Retry that works shows
 "Signed in to Steam" at the top; Restore shows one modal (Fetching... / Linked to your Steam account / Welcome back, or Retry and
 Continue unlinked); a key unlinked elsewhere silently loses its steam.cert; a damaged account.key shows Backup in a modal.
+
+## Gameplay checks - measure in the log, not in screenshots
+
+Gameplay logic (where items fly, what gets dropped or picked up, what bots buy) is checked faster and more reliably by numbers
+than by driving the game by hand:
+
+1. Add a temporary `LOG("XYZDBG ...")` where the decision is made (e.g. the drop direction vs the aim direction in
+   `perform_transfer.cpp`), build.
+2. Run a dedicated server with bots in the scratchpad (conf.d: `"server_start": { "ip": "127.0.0.1", "port": <free> }`,
+   `"server": { "arena": "de_cyberaqua", "bots": true, "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true }`).
+   **Bots play only while a human is connected** - also start a client under Xvfb with `--connect 127.0.0.1:<port>`
+   (it stays a spectator; that's enough). Within a minute bots buy, fight, die and drop their items.
+3. Parse the `XYZDBG` lines with a short python script (angles, counts, orders), then remove the logs and rebuild.
+
+Actions only a player does (E on an item, H, G) - the editor playtest of a scratch map copy under Xvfb
+(`--edit <copy> --playtest`), items placed as map nodes at the spawns (also add their ids to a layer's `nodes`, or the map
+fails to load), keys held with `scripts/hold_keys.py`. Don't move the mouse - the crosshair moves relatively and the camera
+follows it away from the character.
 
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
