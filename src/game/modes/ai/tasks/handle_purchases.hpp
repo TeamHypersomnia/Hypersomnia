@@ -149,8 +149,13 @@ inline std::optional<item_flavour_id> handle_purchases(
 			}
 		});
 
+		/*
+			With pistols only, just a rifle is worth buying - another pistol would only push one out over the limit.
+		*/
+
 		const auto& weapons_to_choose_from =
-			!affordable_non_pistols.empty() ? affordable_non_pistols : affordable_pistols;
+			!affordable_non_pistols.empty() || !owned_guns.empty() ? affordable_non_pistols : affordable_pistols
+		;
 
 		if (weapons_to_choose_from.empty()) {
 			return std::nullopt;
@@ -228,30 +233,17 @@ inline std::optional<item_flavour_id> handle_purchases(
 	}
 
 	/*
-		If we have >=10000 money and don't need to buy anything else, buy defuse kit and backpack.
+		If we have >=10000 money and don't need to buy anything else, buy a defuse kit, then a backpack.
 		
 		The 10000 threshold ensures bots prioritize essential equipment first.
 		Defuse kits and backpacks are useful but not critical - only buy when we have excess money.
 		A gun never waits for a backpack - buying it over the firearm limit drops the cheapest one.
 	*/
 
-	constexpr money_type SPARE_MONEY_THRESHOLD = 10000;
-
-	if (money >= SPARE_MONEY_THRESHOLD && !has_backpack) {
-		if (const auto backpack = try_buy_backpack(money)) {
-			/*
-				Countdown still delays the actual purchase.
-			*/
-			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
-				return std::nullopt;
-			}
-
-			return backpack;
-		}
-	}
+	constexpr money_type spare_money_threshold_v = 10000;
 
 	if (buyer_faction == faction_type::METROPOLIS) {
-		if (money >= SPARE_MONEY_THRESHOLD && !has_defuse_kit) {
+		if (money >= spare_money_threshold_v && !has_defuse_kit) {
 			if (const auto kit = try_buy_defuse_kit(money)) {
 				/*
 					Countdown still delays the actual purchase.
@@ -262,6 +254,19 @@ inline std::optional<item_flavour_id> handle_purchases(
 
 				return kit;
 			}
+		}
+	}
+
+	if (money >= spare_money_threshold_v && !has_backpack) {
+		if (const auto backpack = try_buy_backpack(money)) {
+			/*
+				Countdown still delays the actual purchase.
+			*/
+			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+				return std::nullopt;
+			}
+
+			return backpack;
 		}
 	}
 

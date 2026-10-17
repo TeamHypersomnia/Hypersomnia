@@ -402,14 +402,7 @@ inline bool is_look_far_camp_waypoint(
 	const cosmos& cosm,
 	const entity_id waypoint_id
 ) {
-	const auto waypoint_handle = cosm[waypoint_id];
-
-	if (!waypoint_handle.alive()) {
-		return false;
-	}
-
-	const auto& marker_comp = waypoint_handle.template get<components::marker>();
-	return marker_comp.camp && marker_comp.camp_look_far;
+	return ::is_camp_waypoint(cosm, waypoint_id) && cosm[waypoint_id].template get<components::marker>().camp_look_far;
 }
 
 /*
