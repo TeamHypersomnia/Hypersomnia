@@ -286,9 +286,10 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& /
 
 		// Check for large velocities
 		b2Vec2 translation = h * v;
-		if (b2Dot(translation, translation) > b2_maxTranslationSquared)
+		const float32 maxTranslation = m_bodies[i]->m_maxTranslation;
+		if (b2Dot(translation, translation) > maxTranslation * maxTranslation)
 		{
-			float32 ratio = b2_maxTranslation / translation.Length();
+			float32 ratio = maxTranslation / translation.Length();
 			v *= ratio;
 		}
 
@@ -484,9 +485,10 @@ void b2Island::SolveTOI(const b2TimeStep& subStep, int32 toiIndexA, int32 toiInd
 
 		// Check for large velocities
 		b2Vec2 translation = h * v;
-		if (b2Dot(translation, translation) > b2_maxTranslationSquared)
+		const float32 maxTranslation = m_bodies[i]->m_maxTranslation;
+		if (b2Dot(translation, translation) > maxTranslation * maxTranslation)
 		{
-			float32 ratio = b2_maxTranslation / translation.Length();
+			float32 ratio = maxTranslation / translation.Length();
 			v *= ratio;
 		}
 

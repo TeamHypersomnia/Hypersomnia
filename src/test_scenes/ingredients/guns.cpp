@@ -4474,7 +4474,7 @@ namespace test_flavours {
 			gun_def.bot_aim_radius_to_shoot = 8.0f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {12000.f, 12000.f};
+			gun_def.muzzle_velocity = {16000.f, 16000.f};
 			gun_def.shot_cooldown_ms = 600.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.gunshot_decal_scale = 4.f;

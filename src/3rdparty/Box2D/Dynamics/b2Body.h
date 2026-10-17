@@ -69,6 +69,7 @@ struct b2BodyDef
 		type = b2_staticBody;
 		active = true;
 		gravityScale = 1.0f;
+		maxTranslation = b2_maxTranslation;
 	}
 
 	/// The body type: static, kinematic, or dynamic.
@@ -118,6 +119,9 @@ struct b2BodyDef
 
 	/// Scale the gravity applied to this body.
 	float32 gravityScale;
+
+	/// Hypersomnia: the most this body may travel per step - see b2_maxTranslation.
+	float32 maxTranslation;
 };
 
 /// A rigid body. These are created via b2World::CreateBody.
@@ -450,6 +454,7 @@ public:
 
 	float32 m_angularDamping;
 	float32 m_gravityScale;
+	float32 m_maxTranslation;
 
 	float32 m_sleepTime;
 

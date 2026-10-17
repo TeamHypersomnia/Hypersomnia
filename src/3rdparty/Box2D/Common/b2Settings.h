@@ -99,8 +99,14 @@ typedef double float64;
 
 /// The maximum linear velocity of a body. This limit is very large and is used
 /// to prevent numerical problems. You shouldn't need to adjust this.
+/// Hypersomnia: every body may have its own limit instead (b2BodyDef::maxTranslation) - see b2_maxMissileTranslation.
 #define b2_maxTranslation			2.0f
 #define b2_maxTranslationSquared	(b2_maxTranslation * b2_maxTranslation)
+
+/// Hypersomnia: the limit for missiles only - 5 m (500 px) per step, so that a bullet of up to 18000 px/s
+/// at the highest bullet speed (1.5x) and 60 Hz - 450 px per step - is never slowed down.
+/// Everything else keeps b2_maxTranslation, so that it moves as before.
+#define b2_maxMissileTranslation	5.0f
 
 /// The maximum angular velocity of a body. This limit is very large and is used
 /// to prevent numerical problems. You shouldn't need to adjust this.
