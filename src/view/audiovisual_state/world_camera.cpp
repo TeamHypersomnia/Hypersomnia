@@ -156,9 +156,7 @@ void world_camera::tick(
 	const vec2 camera_crosshair_offset = calc_camera_offset_due_to_character_crosshair(
 		entity_to_chase,
 		settings,
-		screen_size,
-		mid_step_crosshair_displacement,
-		current_eye.zoom
+		mid_step_crosshair_displacement
 	); 
 
 #if 0
@@ -453,9 +451,7 @@ float world_camera::calc_camera_zoom_out_due_to_character_crosshair(
 vec2 world_camera::calc_camera_offset_due_to_character_crosshair(
 	const const_entity_handle entity_to_chase,
 	const world_camera_settings settings,
-	const vec2 screen_size,
-	const vec2 mid_step_crosshair_displacement,
-	const float zoom
+	const vec2 mid_step_crosshair_displacement
 ) {
 	vec2 camera_crosshair_offset;
 
@@ -472,13 +468,12 @@ vec2 world_camera::calc_camera_offset_due_to_character_crosshair(
 			}
 
 			if (crosshair->orbit_mode == crosshair_orbit_type::LOOK) {
-				const auto bound = screen_size;
-
-				if (bound.neither_zero()) {
-					camera_crosshair_offset /= bound;
-				}
-
-				camera_crosshair_offset *= camera_cone({ vec2::zero, zoom }, screen_size).get_visible_world_area() * std::min(0.5f, settings.look_bound_expand) * zoom;
+				/*
+					A fraction of the crosshair's way to the screen edge
+					moves the camera by the same fraction of the visible area -
+					both are in screen units, so the screen size and zoom cancel out.
+				*/
+				camera_crosshair_offset *= std::min(0.5f, settings.look_bound_expand);
 			}
 		}
 	}

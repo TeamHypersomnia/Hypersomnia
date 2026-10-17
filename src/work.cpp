@@ -5400,6 +5400,27 @@ work_result work(
 
 	WEBSTATIC visible_entities all_visible;
 
+	WEBSTATIC auto get_default_zoom_override = [&]() {
+		return visit_current_setup([&]<typename S>(S& setup) -> std::optional<float> {
+			if constexpr(S::has_game_mode) {
+				return setup.on_mode_with_input(
+					[&]<typename M>(const M& typed_mode, const auto&) -> std::optional<float> {
+						if constexpr(std::is_same_v<M, arena_mode>) {
+							return typed_mode.get_zoom_override();
+						}
+						else {
+							(void)typed_mode;
+							return std::nullopt;
+						}
+					}
+				);
+			}
+			else {
+				return std::nullopt;
+			}
+		});
+	};
+
 	WEBSTATIC auto get_character_camera = [&](const config_json_table& viewing_config) -> character_camera {
 		return { get_viewed_character(), { get_camera_eye(viewing_config), logic_get_screen_size() } };
 	};
@@ -5538,24 +5559,7 @@ work_result work(
 			return std::nullopt;
 		});
 
-		const auto default_zoom_override = visit_current_setup([&]<typename S>(S& setup) -> std::optional<float> {
-			if constexpr(S::has_game_mode) {
-				return setup.on_mode_with_input(
-					[&]<typename M>(const M& typed_mode, const auto&) -> std::optional<float> {
-						if constexpr(std::is_same_v<M, arena_mode>) {
-							return typed_mode.get_zoom_override();
-						}
-						else {
-							(void)typed_mode;
-							return std::nullopt;
-						}
-					}
-				);
-			}
-			else {
-				return std::nullopt;
-			}
-		});
+		const auto default_zoom_override = get_default_zoom_override();
 
 		gameplay_camera.tick(
 			screen_size,
@@ -5695,7 +5699,9 @@ work_result work(
 				viewing_config.performance,
 				viewing_config.damage_indication,
 				viewing_config.drawing,
-				settings
+				settings,
+				get_considered_fow(viewing_config),
+				get_default_zoom_override()
 			});
 		}
 

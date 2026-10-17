@@ -17,7 +17,12 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
 #include "game/detail/gun/gunshot_hearing.h"
+#include "game/balance_params.h"
+#include "game/detail/crosshair_math.hpp"
+#include "game/detail/visible_entities.h"
+#include "game/detail/camera_zoom_area_logic.h"
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
+#include "view/audiovisual_state/world_camera.h"
 
 /*
 	The faction of a conscious character - nothing for anyone else.
@@ -99,10 +104,11 @@ void minimap_sighting_system::record_deaths(const const_logic_step step) {
 void minimap_sighting_system::advance(
 	const const_logic_step step,
 	const entity_id viewed_character,
-	const vec2 sight_range,
-	const float fov_angle
+	const fog_of_war_settings& rules_fow,
+	const std::optional<float> zoom_override,
+	const fog_of_war_settings& viewed_fow,
+	const ltrb viewed_screen_area
 ) {
-	const bool consider_fov_angle = fov_angle > 0.0f && fov_angle < 360.0f;
 	const auto& cosm = step.get_cosmos();
 	const auto viewed = cosm[viewed_character];
 
@@ -181,6 +187,51 @@ void minimap_sighting_system::advance(
 		plus one teammate chosen round-robin.
 	*/
 
+	struct observer_view {
+		fog_of_war_settings fow;
+		ltrb screen_area;
+	};
+
+	/*
+		A teammate's camera isn't known here, so they see what a player standing there would
+		with the default camera settings and the crosshair not at the screen edge:
+		the fog of war scaled by the camera zoom at their position,
+		and a screen following their crosshair, showing the fog of war size (1920x1080 by default) -
+		the camera zoom snaps to it.
+		Cached per step - finding the camera zoom area is a tree query.
+	*/
+
+	thread_local std::vector<std::pair<entity_id, observer_view>> teammate_views;
+	teammate_views.clear();
+
+	auto get_teammate_view = [&](const auto& teammate, const vec2 teammate_pos) {
+		const auto teammate_id = entity_id(teammate.get_id());
+
+		for (const auto& cached : teammate_views) {
+			if (cached.first == teammate_id) {
+				return cached.second;
+			}
+		}
+
+		const auto zoom = ::calc_area_camera_zoom(cosm, teammate_pos, zoom_override);
+		const auto expansion = fog_of_war_settings::calc_camera_requested_expansion(zoom, 0.0f);
+		const auto fow = rules_fow.get_considered(expansion, 0.0f);
+
+		const auto camera_offset = world_camera::calc_camera_offset_due_to_character_crosshair(
+			teammate,
+			world_camera_settings(),
+			vec2::zero
+		);
+
+		const auto view = observer_view {
+			fow,
+			ltrb::center_and_size(teammate_pos + camera_offset, fow.size)
+		};
+
+		teammate_views.emplace_back(teammate_id, view);
+		return view;
+	};
+
 	thread_local std::vector<entity_id> observers;
 	observers.clear();
 	observers.push_back(viewed_character);
@@ -238,21 +289,46 @@ void minimap_sighting_system::advance(
 			const auto observer_pos = observer_transform->pos;
 
 			/*
-				The enemy must be within the observer's field of view cone,
-				just like in is_reasonably_in_view. The angle check goes
-				first as it is the cheapest.
+				The enemy must be within what the observer sees, and only within a narrower cone of it,
+				so that enemies at the very edge of the view don't get pinned.
+				The angle check goes first as it is the cheapest.
 			*/
+			const bool is_viewed = observer_id == viewed_character;
 
-			if (consider_fov_angle) {
-				const auto look_dir = vec2::from_degrees(observer_transform->rotation);
+			const auto view =
+				is_viewed ?
+				observer_view { viewed_fow, viewed_screen_area } :
+				get_teammate_view(observer, observer_pos)
+			;
+
+			const auto& fow = view.fow;
+
+			if (fow.is_enabled()) {
+				const auto considered_angle = fow.angle * BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT;
+
+				/* Like the drawn fog of war cone, which follows the crosshair. */
+				auto look_dir = ::calc_crosshair_displacement(observer);
+
+				if (look_dir.is_zero()) {
+					look_dir = vec2::from_degrees(observer_transform->rotation);
+				}
+
 				const auto enemy_dir = enemy_pos - observer_pos;
 
-				if (look_dir.degrees_between(enemy_dir) > fov_angle / 2) {
+				if (look_dir.degrees_between(enemy_dir) > considered_angle / 2) {
 					continue;
 				}
 			}
 
-			if (!ltrb::center_and_size(observer_pos, sight_range).hover(enemy_pos)) {
+			if (!ltrb::center_and_size(observer_pos, fow.get_real_size()).hover(enemy_pos)) {
+				continue;
+			}
+
+			/*
+				The enemy must actually be on screen -
+				the camera follows the crosshair, so this is narrower than the whole fog of war.
+			*/
+			if (!view.screen_area.hover(enemy_pos)) {
 				continue;
 			}
 

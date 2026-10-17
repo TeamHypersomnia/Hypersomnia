@@ -1,17 +1,20 @@
 #pragma once
 #include <cstddef>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 #include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/step_declaration.h"
 #include "game/enums/faction_type.h"
+#include "game/modes/detail/fog_of_war_settings.h"
 
 /*
 	View-side cache of enemy positions for the minimap.
 
 	Enemies are shown at the last position where the viewed character
-	or any conscious teammate had a line of sight to them, and briefly
+	or any conscious teammate had them in view, and briefly
 	at the muzzle position whenever an audible enemy gunshot happens.
 
 	Line of sight checks run once per logic step with a budget:
@@ -88,8 +91,10 @@ public:
 	void advance(
 		const const_logic_step step,
 		const entity_id viewed_character,
-		const vec2 sight_range,
-		const float fov_angle
+		const fog_of_war_settings& rules_fow,
+		const std::optional<float> zoom_override,
+		const fog_of_war_settings& viewed_fow,
+		const ltrb viewed_screen_area
 	);
 
 	bool is_seen_now(const enemy_record& rec, const double now_secs) const {

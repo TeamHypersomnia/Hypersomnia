@@ -490,8 +490,10 @@ void audiovisual_state::standard_post_solve(
 				minimap_sighting.advance(
 					step,
 					input.camera.viewed_character,
-					input.drawing.fog_of_war.get_real_size(),
-					input.drawing.fog_of_war.angle
+					input.drawing.fog_of_war,
+					input.zoom_override,
+					input.considered_fow,
+					input.camera.cone.get_visible_world_rect_aabb()
 				);
 			}
 		}

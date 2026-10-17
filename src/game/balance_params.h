@@ -22,3 +22,10 @@ constexpr float BALANCE_MAX_ZOOM_OUT_AT_EDGES = 0.7f;
 	The fog of war angle narrows down to this fraction when fully zoomed out at the screen edge.
 */
 constexpr float BALANCE_EDGE_ZOOM_OUT_FOW_ANGLE_MULT = 1.0f / 12;
+
+/*
+	The minimap pins an enemy the viewed character sees only if they are
+	within this fraction of the character's field of view angle - so that
+	enemies at the very edge of the view cone don't get pinned.
+*/
+constexpr float BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT = 0.75f;

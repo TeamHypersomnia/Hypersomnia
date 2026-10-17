@@ -54,6 +54,12 @@ struct audiovisual_post_solve_input {
 	const damage_indication_settings& damage_indication;
 	const game_drawing_settings& drawing;
 	const audiovisual_post_solve_settings settings;
+
+	/* What the viewer's camera effectively shows - see fog_of_war_settings::get_considered. */
+	const fog_of_war_settings considered_fow;
+
+	/* The server's override of the map's default zoom. */
+	const std::optional<float> zoom_override;
 };
 
 struct audiovisual_advance_input {

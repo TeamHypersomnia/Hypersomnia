@@ -83,6 +83,12 @@ struct world_camera {
 		return request_afterimage;
 	}
 
+	static vec2 calc_camera_offset_due_to_character_crosshair(
+		const const_entity_handle,
+		const world_camera_settings,
+		const vec2 crosshair_displacement
+	);
+
 private:
 	camera_eye current_eye;
 
@@ -94,14 +100,6 @@ private:
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;
 	bool request_afterimage = false;
-
-	static vec2 calc_camera_offset_due_to_character_crosshair(
-		const const_entity_handle,
-		const world_camera_settings,
-		const vec2 screen_size,
-		const vec2 crosshair_displacement,
-		const float zoom
-	);
 
 	static float calc_camera_zoom_out_due_to_character_crosshair(
 		const const_entity_handle,
