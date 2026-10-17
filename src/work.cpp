@@ -220,8 +220,6 @@ std::atomic<int> signal_status = 0;
 static_assert(std::atomic<int>::is_always_lock_free);
 #endif
 
-float max_zoom_out_at_edges_v = 0.7f;
-
 #if HEADLESS
 
 #else
@@ -4276,13 +4274,17 @@ work_result work(
 	};
 
 	WEBSTATIC auto get_camera_requested_fow_expansion = [&]() {
-		auto result = 1.0f / get_logic_eye(false).zoom;
+		return fog_of_war_settings::calc_camera_requested_expansion(
+			get_logic_eye(false).zoom,
+			get_camera_edge_zoomout_mult()
+		);
+	};
 
-		if (get_camera_edge_zoomout_mult() > 0.001f) {
-			result /= max_zoom_out_at_edges_v;
-		}
-
-		return result;
+	WEBSTATIC auto get_considered_fow = [&](const config_json_table& viewing_config) {
+		return viewing_config.drawing.fog_of_war.get_considered(
+			get_camera_requested_fow_expansion(),
+			get_camera_edge_zoomout_mult()
+		);
 	};
 
 	WEBSTATIC auto get_camera_eye = [&](const config_json_table& viewing_config, bool with_edge_zoomout = true) {		
@@ -7296,8 +7298,7 @@ work_result work(
 					std::addressof(get_audiovisuals().get<particles_simulation_system>())
 				);
 
-				auto fog_of_war = new_viewing_config.drawing.fog_of_war;
-				fog_of_war.size *= get_camera_requested_fow_expansion();
+				const auto fog_of_war = get_considered_fow(new_viewing_config);
 
 				const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
@@ -7560,14 +7561,7 @@ work_result work(
 							dir.set(1, 0);
 						}
 
-						auto considered_angle = new_viewing_config.drawing.fog_of_war.angle;
-
-						const auto edge_zoomout_mult = get_camera_edge_zoomout_mult();
-
-						if (edge_zoomout_mult > 0.0f) {
-							const auto max_fow_reduction = 1.0f / 12;
-							considered_angle *= augs::interp(1.0f, max_fow_reduction, edge_zoomout_mult);
-						}
+						const auto considered_angle = get_considered_fow(new_viewing_config).angle;
 
 						const auto left_dir = vec2(dir).rotate(-considered_angle / 2).neg_y();
 						const auto right_dir = vec2(dir).rotate(considered_angle / 2).neg_y();

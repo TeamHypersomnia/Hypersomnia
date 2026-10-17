@@ -22,12 +22,11 @@
 #include "game/detail/visible_entities.h"
 #include "game/detail/get_hovered_world_entity.h"
 #include "game/detail/camera_zoom_area_logic.h"
+#include "game/balance_params.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/crosshair_math.hpp"
 #include "view/audiovisual_state/flashbang_math.h"
 #include "application/input/input_settings.h"
-
-extern float max_zoom_out_at_edges_v;
 
 vec2 world_camera::snap_to_pixels(const vec2 pos) {
 	/*
@@ -75,7 +74,7 @@ camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const
 	output_eye.zoom *= current_area_zoom_mult;
 
 	if (with_edge_zoomout) {
-		const auto max_zoom_out = max_zoom_out_at_edges_v;
+		const auto max_zoom_out = BALANCE_MAX_ZOOM_OUT_AT_EDGES;
 
 		output_eye.zoom *= augs::interp(1.0f, max_zoom_out, current_edge_zoomout_mult);
 	}
@@ -163,7 +162,7 @@ void world_camera::tick(
 	); 
 
 #if 0
-	const auto max_zoom_out = max_zoom_out_at_edges_v;
+	const auto max_zoom_out = BALANCE_MAX_ZOOM_OUT_AT_EDGES;
 
 	camera_crosshair_offset /= augs::interp(1.0f, max_zoom_out, current_edge_zoomout_mult);
 #endif
@@ -355,20 +354,7 @@ void world_camera::tick(
 		if (snap_zoom_now || last_area_zoom_query_step != current_step) {
 			last_area_zoom_query_step = current_step;
 
-			/*
-				The map-wide default - unless the server overrides it - applies
-				wherever no camera zoom area covers the player.
-				Sanitize, as these values come from arbitrary map files.
-			*/
-			const auto map_default_zoom = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
-			const auto default_zoom = default_zoom_override.has_value() ? *default_zoom_override : map_default_zoom;
-			target_area_zoom_mult = std::clamp(default_zoom, 0.2f, 4.0f);
-
-			/*
-				The server's override scales the map's camera zoom areas too,
-				so they keep their ratio to the default (default 0.5x, area 1x, override 1x -> area 2x).
-			*/
-			const auto area_zoom_scale = target_area_zoom_mult / map_default_zoom;
+			target_area_zoom_mult = ::calc_default_camera_zoom(cosm, default_zoom_override);
 
 			if (forced_area_zoom.has_value()) {
 				/* E.g. chosen with the zoom pads at the shooting range. */
@@ -376,9 +362,7 @@ void world_camera::tick(
 			}
 			else if (entity_to_chase.alive()) {
 				if (const auto tr = entity_to_chase.find_logic_transform()) {
-					if (const auto area_zoom = ::find_camera_zoom_area(cosm, tr->pos); area_zoom.has_value()) {
-						target_area_zoom_mult = std::clamp(*area_zoom * area_zoom_scale, 0.2f, 4.0f);
-					}
+					target_area_zoom_mult = ::calc_area_camera_zoom(cosm, tr->pos, default_zoom_override);
 
 #if ZOOM_IN_DURING_BUY_TIME
 					/*

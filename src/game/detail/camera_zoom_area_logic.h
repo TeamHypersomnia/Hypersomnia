@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <optional>
 
 /*
@@ -38,4 +39,36 @@ inline std::optional<float> find_camera_zoom_area(const cosmos& cosm, const vec2
 	});
 
 	return result;
+}
+
+/*
+	The map-wide default zoom - unless the server overrides it - which applies
+	wherever no camera zoom area covers the character.
+	Sanitized, as these values come from arbitrary map files.
+*/
+
+inline float calc_default_camera_zoom(const cosmos& cosm, const std::optional<float> default_zoom_override) {
+	const auto map_default_zoom = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
+	const auto default_zoom = default_zoom_override.has_value() ? *default_zoom_override : map_default_zoom;
+
+	return std::clamp(default_zoom, 0.2f, 4.0f);
+}
+
+/*
+	The camera zoom of a character standing at pos.
+	The server's override scales the map's camera zoom areas too,
+	so they keep their ratio to the default (default 0.5x, area 1x, override 1x -> area 2x).
+*/
+
+inline float calc_area_camera_zoom(const cosmos& cosm, const vec2 pos, const std::optional<float> default_zoom_override) {
+	const auto default_zoom = ::calc_default_camera_zoom(cosm, default_zoom_override);
+
+	if (const auto area_zoom = ::find_camera_zoom_area(cosm, pos); area_zoom.has_value()) {
+		const auto map_default_zoom = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
+		const auto area_zoom_scale = default_zoom / map_default_zoom;
+
+		return std::clamp(*area_zoom * area_zoom_scale, 0.2f, 4.0f);
+	}
+
+	return default_zoom;
 }

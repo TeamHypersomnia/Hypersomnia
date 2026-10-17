@@ -3,12 +3,11 @@
 #include "augs/math/camera_cone.h"
 #include "game/enums/game_intent_type.h"
 #include "game/modes/mode_entropy.h"
+#include "game/balance_params.h"
 
 #include "application/input/input_settings.h"
 #include "application/input/adjust_game_motions.h"
 #include "game/per_character_input_settings.h"
-
-extern float max_zoom_out_at_edges_v;
 
 struct entropy_accumulator {
 	struct input {
@@ -36,7 +35,7 @@ struct entropy_accumulator {
 					auto total_bound = in.visible_world_area;
 
 					if (crosshair->zoom_out_mode || in.settings.auto_zoom_out_near_screen_edges) {
-						total_bound /= max_zoom_out_at_edges_v;
+						total_bound /= BALANCE_MAX_ZOOM_OUT_AT_EDGES;
 					}
 
 					return to_game_motion(

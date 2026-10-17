@@ -92,18 +92,7 @@ struct illuminated_rendering_input {
 	}
 
 	auto get_considered_fow() const {
-		auto considered_fow = drawing.fog_of_war;
-
-		considered_fow.size *= camera_requested_fow_expansion;
-
-		if (camera_edge_zoomout_mult > 0.0f) {
-			const auto max_fow_reduction = 1.0f / 12;
-			const auto fow_reduction = augs::interp(1.0f, max_fow_reduction, camera_edge_zoomout_mult);
-
-			considered_fow.angle *= fow_reduction;
-		}
-
-		return considered_fow;
+		return drawing.fog_of_war.get_considered(camera_requested_fow_expansion, camera_edge_zoomout_mult);
 	}
 };
 
