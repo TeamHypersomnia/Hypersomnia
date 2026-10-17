@@ -238,11 +238,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		set_shader_with_matrix(shaders.fog_of_war);
 
-		auto dir = calc_crosshair_displacement(viewed_character) + in.pre_step_crosshair_displacement;
-
-		if (dir.is_zero()) {
-			dir.set(1, 0);
-		}
+		const auto dir = ::calc_look_direction(viewed_character, in.pre_step_crosshair_displacement);
 
 		const auto& angle = considered_fow.angle;
 		const auto left_dir = vec2(dir).rotate(-angle / 2).neg_y();

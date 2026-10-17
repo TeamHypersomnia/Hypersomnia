@@ -1,4 +1,5 @@
 #pragma once
+#include "game/detail/crosshair_math.hpp"
 
 template <class E, class F>
 bool is_reasonably_in_view(
@@ -38,13 +39,7 @@ bool is_reasonably_in_view(
 		return true;
 	}
 
-	auto look_dir = calc_crosshair_displacement(viewed_character) + pre_step_crosshair_displacement;
-
-	if (look_dir.is_zero()) {
-		look_dir.set(1, 0);
-	}
-
-	look_dir.normalize();
+	const auto look_dir = vec2(::calc_look_direction(viewed_character, pre_step_crosshair_displacement)).normalize();
 	const auto target_dir = (to - from).normalize();
 
 	if (look_dir.degrees_between(target_dir) <= fow_angle / 2) {

@@ -25,3 +25,22 @@ vec2 calc_crosshair_displacement(const E& self, bool consider_recoil_position) {
 
 	return vec2::zero;
 }
+
+/*
+	Where a character looks - the same for the drawn fog of war, the minimap pins and the bots' sight:
+	its crosshair with the recoil, or where its body faces while the crosshair is still zero (right after spawning).
+	The viewer's own fog of war adds the crosshair movement not yet applied by a step.
+*/
+
+template <class E>
+vec2 calc_look_direction(const E& self, const vec2 pending_crosshair_displacement = vec2::zero) {
+	const auto dir = ::calc_crosshair_displacement(self) + pending_crosshair_displacement;
+
+	if (dir.is_zero()) {
+		if (const auto transform = self.find_logic_transform()) {
+			return vec2::from_degrees(transform->rotation);
+		}
+	}
+
+	return dir;
+}

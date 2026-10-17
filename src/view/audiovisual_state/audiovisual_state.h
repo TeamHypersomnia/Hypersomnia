@@ -60,6 +60,8 @@ struct audiovisual_post_solve_input {
 
 	/* The server's override of the map's default zoom. */
 	const std::optional<float> zoom_override;
+
+	const std::optional<minimap_sighting_system::viewer_eye> own_eye;
 };
 
 struct audiovisual_advance_input {

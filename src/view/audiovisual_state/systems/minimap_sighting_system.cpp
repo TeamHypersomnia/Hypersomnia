@@ -150,7 +150,8 @@ void minimap_sighting_system::advance(
 	const fog_of_war_settings& rules_fow,
 	const std::optional<float> zoom_override,
 	const fog_of_war_settings& viewed_fow,
-	const ltrb viewed_screen_area
+	const ltrb viewed_screen_area,
+	const std::optional<viewer_eye> own_eye
 ) {
 	const auto& cosm = step.get_cosmos();
 	const auto viewed = cosm[viewed_character];
@@ -317,20 +318,19 @@ void minimap_sighting_system::advance(
 				continue;
 			}
 
-			const auto observer_pos = observer_transform->pos;
+			const bool is_viewer = observer_id == viewed_character;
+			const bool own_eye_known = is_viewer && own_eye.has_value();
+
+			const auto observer_pos = own_eye_known ? own_eye->pos : observer_transform->pos;
 
 			const auto view =
-				observer_id == viewed_character ?
+				is_viewer ?
 				observer_view { viewed_fow, viewed_screen_area } :
 				get_teammate_view(observer, observer_pos)
 			;
 
 			/* Like the drawn fog of war cone, which follows the crosshair. */
-			auto look_dir = ::calc_crosshair_displacement(observer);
-
-			if (look_dir.is_zero()) {
-				look_dir = vec2::from_degrees(observer_transform->rotation);
-			}
+			const auto look_dir = own_eye_known ? own_eye->look_dir : ::calc_look_direction(observer);
 
 			if (!view.shows(observer_pos, look_dir, enemy_pos)) {
 				continue;

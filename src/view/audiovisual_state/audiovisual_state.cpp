@@ -493,7 +493,8 @@ void audiovisual_state::standard_post_solve(
 					input.drawing.fog_of_war,
 					input.zoom_override,
 					input.considered_fow,
-					input.camera.cone.get_visible_world_rect_aabb()
+					input.camera.cone.get_visible_world_rect_aabb(),
+					input.own_eye
 				);
 			}
 		}

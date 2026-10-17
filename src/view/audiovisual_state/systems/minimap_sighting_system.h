@@ -115,6 +115,17 @@ public:
 		const vec2 camera_offset
 	);
 
+	/*
+		The viewer's own position and look direction as they see them - on a client from the predicted cosmos,
+		while the sightings are recorded from the referential one, where the viewer's own crosshair is a ping behind.
+		Their pins would lag by it, which shows in the narrow cone of the edge zoom-out.
+	*/
+
+	struct viewer_eye {
+		vec2 pos;
+		vec2 look_dir;
+	};
+
 	void record_deaths(const const_logic_step step);
 
 	void advance(
@@ -123,7 +134,8 @@ public:
 		const fog_of_war_settings& rules_fow,
 		const std::optional<float> zoom_override,
 		const fog_of_war_settings& viewed_fow,
-		const ltrb viewed_screen_area
+		const ltrb viewed_screen_area,
+		const std::optional<viewer_eye> own_eye
 	);
 
 	bool is_seen_now(const enemy_record& rec, const double now_secs) const {

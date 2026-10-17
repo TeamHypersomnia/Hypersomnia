@@ -5648,6 +5648,27 @@ work_result work(
 		pending_new_state_sample = false;
 	};
 
+	/*
+		Where the viewer is and looks as they see it - see minimap_sighting_system::viewer_eye.
+	*/
+
+	WEBSTATIC auto calc_own_eye = [&](const config_json_table& viewing_config) -> std::optional<minimap_sighting_system::viewer_eye> {
+		const auto viewed = get_viewed_character();
+
+		if (viewed.dead()) {
+			return std::nullopt;
+		}
+
+		if (const auto transform = viewed.find_logic_transform()) {
+			return minimap_sighting_system::viewer_eye {
+				transform->pos,
+				::calc_look_direction(viewed, calc_pre_step_crosshair_displacement(viewing_config))
+			};
+		}
+
+		return std::nullopt;
+	};
+
 	WEBSTATIC auto setup_post_solve = [&](
 		const const_logic_step step, 
 		const augs::audio_renderer* audio_renderer,
@@ -5671,7 +5692,8 @@ work_result work(
 				viewing_config.drawing,
 				settings,
 				get_considered_fow(viewing_config),
-				get_default_zoom_override()
+				get_default_zoom_override(),
+				calc_own_eye(viewing_config)
 			});
 		}
 
@@ -7531,11 +7553,7 @@ work_result work(
 					{
 						using U = augs::common_uniform_name;
 
-						auto dir = ::calc_crosshair_displacement(viewed_character) + calc_pre_step_crosshair_displacement(new_viewing_config);
-
-						if (dir.is_zero()) {
-							dir.set(1, 0);
-						}
+						const auto dir = ::calc_look_direction(viewed_character, calc_pre_step_crosshair_displacement(new_viewing_config));
 
 						const auto considered_angle = get_considered_fow(new_viewing_config).angle;
 
