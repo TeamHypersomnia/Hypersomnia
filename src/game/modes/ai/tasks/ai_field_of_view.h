@@ -17,7 +17,10 @@ struct ai_field_of_view {
 		return angle > 0.f && angle < 360.f;
 	}
 
-	/* The cheap check, done first. */
+	/*
+		The cheap check, done first.
+	*/
+
 	bool within_box(const vec2 from_pos, const vec2 target_pos) const {
 		const auto offset = target_pos - from_pos;
 

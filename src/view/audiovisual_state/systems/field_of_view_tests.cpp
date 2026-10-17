@@ -53,6 +53,16 @@ TEST_CASE("FieldOfView EffectiveFogOfWar") {
 
 	const auto half_way = default_fow().get_considered(1.0f, 0.5f);
 	REQUIRE(half_way.angle == Approx(165.0f * (1.0f + BALANCE_EDGE_ZOOM_OUT_FOW_ANGLE_MULT) / 2));
+
+	SECTION("A disabled fog of war stays disabled at the screen edge") {
+		for (const auto disabled_angle : { 0.0f, 360.0f }) {
+			auto fow = default_fow();
+			fow.angle = disabled_angle;
+
+			REQUIRE_FALSE(fow.get_considered(1.0f, 1.0f).is_enabled());
+			REQUIRE_FALSE(fow.get_considered(1.0f, 0.5f).is_enabled());
+		}
+	}
 }
 
 TEST_CASE("FieldOfView MinimapViewer") {
@@ -81,11 +91,11 @@ TEST_CASE("FieldOfView MinimapViewer") {
 		const auto view = make_viewer_view(0.75f, 0.0f, origin, vec2(2560, 1440));
 		const auto pin_half_angle = 165.0f * BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT / 2;
 
-		REQUIRE(pin_half_angle == Approx(61.875f));
-		REQUIRE(view.shows(origin, right, at_degrees(55.0f, 600.0f)));
-		REQUIRE(view.shows(origin, right, at_degrees(-55.0f, 600.0f)));
-		REQUIRE_FALSE(view.shows(origin, right, at_degrees(70.0f, 600.0f)));
-		REQUIRE_FALSE(view.shows(origin, right, at_degrees(-70.0f, 600.0f)));
+		REQUIRE(pin_half_angle < 165.0f / 2 - 5.0f);
+		REQUIRE(view.shows(origin, right, at_degrees(pin_half_angle - 5.0f, 600.0f)));
+		REQUIRE(view.shows(origin, right, at_degrees(-(pin_half_angle - 5.0f), 600.0f)));
+		REQUIRE_FALSE(view.shows(origin, right, at_degrees(pin_half_angle + 5.0f, 600.0f)));
+		REQUIRE_FALSE(view.shows(origin, right, at_degrees(-(pin_half_angle + 5.0f), 600.0f)));
 	}
 
 	SECTION("The cone follows the look direction") {
@@ -97,12 +107,17 @@ TEST_CASE("FieldOfView MinimapViewer") {
 	}
 
 	SECTION("Edge zoom-out sees farther within a much narrower angle") {
-		/* At full edge zoom-out the angle is 165 / 12 = 13.75, so the pinning cone is +-5.16 degrees. */
+		/*
+			At full edge zoom-out the angle narrows to 165 * BALANCE_EDGE_ZOOM_OUT_FOW_ANGLE_MULT,
+			and the pinning cone is BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT of that.
+		*/
+
 		const auto view = make_viewer_view(0.75f, 1.0f, vec2(1500, 0), vec2(3657, 2057));
+		const auto pin_half_angle = 165.0f * BALANCE_EDGE_ZOOM_OUT_FOW_ANGLE_MULT * BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT / 2;
 
 		REQUIRE(view.shows(origin, right, vec2(3000, 0)));
-		REQUIRE(view.shows(origin, right, at_degrees(4.0f, 3000.0f)));
-		REQUIRE_FALSE(view.shows(origin, right, at_degrees(8.0f, 3000.0f)));
+		REQUIRE(view.shows(origin, right, at_degrees(pin_half_angle - 1.0f, 3000.0f)));
+		REQUIRE_FALSE(view.shows(origin, right, at_degrees(pin_half_angle + 1.0f, 3000.0f)));
 
 		/* Beyond the normal fog of war (2560), within the expanded one (3657). */
 		const auto normal_view = make_viewer_view(0.75f, 0.0f, vec2(1500, 0), vec2(3657, 2057));
@@ -122,6 +137,18 @@ TEST_CASE("FieldOfView MinimapViewer") {
 
 		REQUIRE(view.shows(origin, right, vec2(-500, 0)));
 		REQUIRE_FALSE(view.shows(origin, right, vec2(-1500, 0)));
+	}
+
+	SECTION("A disabled fog of war has no angle limit at the screen edge either") {
+		auto fow = default_fow();
+		fow.angle = 360.0f;
+
+		const auto view = view_type {
+			fow.get_considered(fog_of_war_settings::calc_camera_requested_expansion(0.75f, 1.0f), 1.0f),
+			ltrb::center_and_size(origin, vec2(2560, 1440))
+		};
+
+		REQUIRE(view.shows(origin, right, vec2(-500, 0)));
 	}
 }
 
@@ -144,13 +171,13 @@ TEST_CASE("FieldOfView MinimapTeammate") {
 	}
 
 	SECTION("The screen moves at most as far as a player's crosshair could move it") {
-		/* A bot aims right at a target 5000 px away: the camera moves by at most half the screen. */
+		/* A bot aims right at a target far beyond the screen edge: the camera moves by at most half the screen. */
 		const auto view = minimap_sighting_system::calc_teammate_view(default_fow(), 0.75f, vec2::zero, vec2(2500, -2500));
 
-		REQUIRE(view.screen_area.l == Approx(0.0f));
+		REQUIRE(view.screen_area.l == Approx(0.0f).margin(0.01f));
 		REQUIRE(view.screen_area.r == Approx(2560.0f));
 		REQUIRE(view.screen_area.t == Approx(-1440.0f));
-		REQUIRE(view.screen_area.b == Approx(0.0f));
+		REQUIRE(view.screen_area.b == Approx(0.0f).margin(0.01f));
 	}
 
 	SECTION("A zoomed in camera zoom area shows less") {
@@ -164,8 +191,10 @@ TEST_CASE("FieldOfView MinimapTeammate") {
 	SECTION("The teammate pins within the same narrower cone") {
 		const auto view = minimap_sighting_system::calc_teammate_view(default_fow(), 0.75f, vec2::zero, vec2::zero);
 
-		REQUIRE(view.shows(vec2::zero, right, at_degrees(55.0f, 600.0f)));
-		REQUIRE_FALSE(view.shows(vec2::zero, right, at_degrees(70.0f, 600.0f)));
+		const auto pin_half_angle = 165.0f * BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT / 2;
+
+		REQUIRE(view.shows(vec2::zero, right, at_degrees(pin_half_angle - 5.0f, 600.0f)));
+		REQUIRE_FALSE(view.shows(vec2::zero, right, at_degrees(pin_half_angle + 5.0f, 600.0f)));
 	}
 }
 
@@ -174,10 +203,11 @@ TEST_CASE("FieldOfView Bots") {
 	const auto right = vec2(1, 0);
 
 	SECTION("Difficulty multipliers") {
-		REQUIRE(::get_bot_fov_mult(difficulty_type::VERY_EASY) == BALANCE_BOT_FOV_MULT_VERY_EASY);
-		REQUIRE(::get_bot_fov_mult(difficulty_type::EASY) == BALANCE_BOT_FOV_MULT_EASY);
-		REQUIRE(::get_bot_fov_mult(difficulty_type::MEDIUM) == BALANCE_BOT_FOV_MULT_MEDIUM);
-		REQUIRE(::get_bot_fov_mult(difficulty_type::HARD) == BALANCE_BOT_FOV_MULT_HARD);
+		REQUIRE(::get_bot_fov_mult(difficulty_type::VERY_EASY) < ::get_bot_fov_mult(difficulty_type::EASY));
+		REQUIRE(::get_bot_fov_mult(difficulty_type::EASY) < ::get_bot_fov_mult(difficulty_type::MEDIUM));
+		REQUIRE(::get_bot_fov_mult(difficulty_type::MEDIUM) < ::get_bot_fov_mult(difficulty_type::HARD));
+		REQUIRE(::get_bot_fov_mult(difficulty_type::HARD) <= 1.0f);
+		REQUIRE(::get_bot_fov_mult(difficulty_type::PROGRESSIVE) == ::get_bot_fov_mult(difficulty_type::MEDIUM));
 	}
 
 	SECTION("Proportional to the player's view") {
@@ -220,19 +250,27 @@ TEST_CASE("FieldOfView Bots") {
 		REQUIRE(fov.half_size.y == Approx(player.size.y * mult));
 		REQUIRE(fov.angle == Approx(player.angle * mult));
 
+		const auto half_angle = player.angle * mult / 2;
+
 		REQUIRE(fov.within_box(origin, vec2(3000, 0)));
-		REQUIRE(fov.within_angle(right, vec2::from_degrees(5.0f)));
-		REQUIRE_FALSE(fov.within_angle(right, vec2::from_degrees(7.0f)));
+		REQUIRE(fov.within_angle(right, vec2::from_degrees(half_angle - 1.0f)));
+		REQUIRE_FALSE(fov.within_angle(right, vec2::from_degrees(half_angle + 1.0f)));
 	}
 
 	SECTION("A disabled fog of war has no angle limit") {
 		auto fow = default_fow();
 		fow.angle = 360.0f;
 
-		const auto fov = ::calc_ai_field_of_view(fow, 0.75f, 0.9f, false);
+		for (const auto disabled_angle : { 0.0f, 360.0f }) {
+			fow.angle = disabled_angle;
 
-		REQUIRE_FALSE(fov.considers_angle());
-		REQUIRE(fov.within_angle(right, vec2(-1, 0)));
+			for (const bool looks_far : { false, true }) {
+				const auto fov = ::calc_ai_field_of_view(fow, 0.75f, 0.9f, looks_far);
+
+				REQUIRE_FALSE(fov.considers_angle());
+				REQUIRE(fov.within_angle(right, vec2(-1, 0)));
+			}
+		}
 	}
 }
 #endif

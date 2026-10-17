@@ -7,7 +7,7 @@
 	These are ruleset values, derived from the map JSON - not player-editable.
 	The size doubles as the snap-to-fov target for the camera zoom, so the
 	balance zoom-out is folded into the fow expansion (see
-	get_camera_requested_fow_expansion) rather than baked into this size.
+	calc_camera_requested_expansion) rather than baked into this size.
 */
 
 struct fog_of_war_settings {
@@ -47,6 +47,7 @@ struct fog_of_war_settings {
 	/*
 		What the viewer's camera effectively shows: the size expanded by the camera zoom-out,
 		and the angle narrowed as the crosshair zooms the camera out at the screen edge.
+		A disabled fog of war stays disabled.
 	*/
 
 	fog_of_war_settings get_considered(
@@ -57,7 +58,7 @@ struct fog_of_war_settings {
 
 		result.size *= camera_requested_fow_expansion;
 
-		if (camera_edge_zoomout_mult > 0.0f) {
+		if (is_enabled() && camera_edge_zoomout_mult > 0.0f) {
 			result.angle *= augs::interp(1.0f, BALANCE_EDGE_ZOOM_OUT_FOW_ANGLE_MULT, camera_edge_zoomout_mult);
 		}
 

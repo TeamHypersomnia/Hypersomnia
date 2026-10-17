@@ -159,12 +159,6 @@ void world_camera::tick(
 		mid_step_crosshair_displacement
 	); 
 
-#if 0
-	const auto max_zoom_out = BALANCE_MAX_ZOOM_OUT_AT_EDGES;
-
-	camera_crosshair_offset /= augs::interp(1.0f, max_zoom_out, current_edge_zoomout_mult);
-#endif
-
 	current_eye = target_cone;
 	current_eye.transform.pos += camera_crosshair_offset;
 
