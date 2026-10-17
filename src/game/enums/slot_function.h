@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <optional>
 #include "augs/misc/enum/enum_boolset.h"
 
@@ -26,6 +27,9 @@ enum class slot_function {
 	TORSO_ARMOR,
 	SHOULDER,
 	HAT,
+	BACK_WEAPON_1,
+	BACK_WEAPON_2,
+	BACK_WEAPON_3,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -42,8 +46,26 @@ inline bool is_torso_attachment(const slot_function f) {
 		case slot_function::SHOULDER: return true;
 		case slot_function::TORSO_ARMOR: return true;
 		case slot_function::HAT: return true;
+		case slot_function::BACK_WEAPON_1: return true;
+		case slot_function::BACK_WEAPON_2: return true;
+		case slot_function::BACK_WEAPON_3: return true;
 		default: return false;
 	}
+};
+
+inline bool is_back_weapon_slot(const slot_function f) {
+	switch (f) {
+		case slot_function::BACK_WEAPON_1: return true;
+		case slot_function::BACK_WEAPON_2: return true;
+		case slot_function::BACK_WEAPON_3: return true;
+		default: return false;
+	}
+}
+
+inline constexpr std::array<slot_function, 3> back_weapon_slots_v = {
+	slot_function::BACK_WEAPON_1,
+	slot_function::BACK_WEAPON_2,
+	slot_function::BACK_WEAPON_3
 };
 
 using slot_flags = augs::enum_boolset<slot_function>;

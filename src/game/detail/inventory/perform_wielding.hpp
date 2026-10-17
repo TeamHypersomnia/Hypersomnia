@@ -7,6 +7,7 @@
 #include "game/detail/explosive/like_explosive.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/inventory/manage_shoulder_storage.hpp"
+#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
 
 #define LOG_WIELDING 0
 
@@ -204,12 +205,34 @@ void perform_wielding(
 		if (item_in_hand.alive()) {
 			WLD_LOG("Has to holster existing item.");
 
-			const auto holstering_slot = self.find_holstering_slot_for(item_in_hand);
+			const auto holstering_slot_id = [&]() {
+				const auto found = self.find_holstering_slot_for(item_in_hand).get_id();
+
+				if (!found.is_set()) {
+					/*
+						Hands can always be emptied:
+						items fall out of the personal deposit to make room (see drop_oldest_items_to_fit),
+						and an item too big for the deposit falls to the ground.
+					*/
+
+					if (::drop_oldest_items_to_fit(step, self, item_in_hand)) {
+						return self.find_holstering_slot_for(item_in_hand).get_id();
+					}
+				}
+
+				return found;
+			}();
+
+			const auto holstering_slot = cosm[holstering_slot_id];
 
 			if (holstering_slot.alive()) {
 				WLD_LOG("Holster found.");
 				WLD_LOG_NVPS(holstering_slot);
 				transfer(item_in_hand, holstering_slot);
+				transfer(item_for_hand, hand);
+			}
+			else if (perform_transfer(item_slot_transfer_request::drop(item_in_hand), step).result.is_successful()) {
+				WLD_LOG("Holster failed, dropped the item.");
 				transfer(item_for_hand, hand);
 			}
 			else {

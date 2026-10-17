@@ -3,6 +3,7 @@
 #include "game/detail/inventory/item_mounting.hpp"
 #include "game/detail/weapon_like.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/detail/inventory/firearm_limit.h"
 
 template <class E>
 template <class F>
@@ -40,6 +41,10 @@ void inventory_mixin<E>::for_each_candidate_slot(
 
 	for (const auto& t : types) {
 		if (t == candidate_holster_type::WEARABLES) {
+			for (const auto back_weapon_slot : back_weapon_slots_v) {
+				callback(searched_root_container[back_weapon_slot]);
+			}
+
 			callback(searched_root_container[slot_function::BELT]);
 			callback(searched_root_container[slot_function::BACK]);
 			callback(searched_root_container[slot_function::OVER_BACK]);
@@ -56,18 +61,6 @@ void inventory_mixin<E>::for_each_candidate_slot(
 			if (const auto personal_slot = searched_root_container[slot_function::PERSONAL_DEPOSIT]) {
 				if (const auto personal_wearable = personal_slot.get_item_if_any()) {
 					callback(personal_wearable[slot_function::ITEM_DEPOSIT]);
-				}
-			}
-
-			if (const auto back_slot = searched_root_container[slot_function::BACK]) {
-				if (const auto back_wearable = back_slot.get_item_if_any()) {
-					callback(back_wearable[slot_function::ITEM_DEPOSIT]);
-				}
-			}
-
-			if (const auto back_slot = searched_root_container[slot_function::OVER_BACK]) {
-				if (const auto back_wearable = back_slot.get_item_if_any()) {
-					callback(back_wearable[slot_function::ITEM_DEPOSIT]);
 				}
 			}
 		}
@@ -138,7 +131,26 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 		candidate_holster_type::HANDS 
 	};
 
-	{
+	const auto& searched_root = *static_cast<const E*>(this);
+
+	/*
+		Only firearms can be picked into a busy hand - their limit guarantees a place on the back to hide them.
+		Anything else goes into hands only when both are empty, otherwise straight into the inventory,
+		so that hiding it later never makes anything fall out. Ammo never goes into hands.
+	*/
+
+	const bool keep_out_of_hands = 
+		::is_ammo_like(picked_item)
+		|| (!::is_firearm_like(picked_item) && !searched_root.get_wielded_items().empty())
+	;
+
+	if (keep_out_of_hands) {
+		finding_order = candidate_holster_types {
+			candidate_holster_type::WEARABLES, 
+			candidate_holster_type::CONTAINERS
+		};
+	}
+	else {
 		if (::is_weapon_like(picked_item) && !::is_like_plantable_bomb(picked_item)) {
 			/* If it is a weapon, try to hold them in hands before trying containers. */
 

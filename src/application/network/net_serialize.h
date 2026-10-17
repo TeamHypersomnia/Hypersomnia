@@ -247,6 +247,7 @@ namespace net_messages {
 		serialize_float(s, settings.crosshair_sensitivity.y);
 
 		serialize_bool(s, settings.forward_moves_towards_crosshair);
+		serialize_bool(s, settings.pickup_swaps_wielded_firearm);
 
 		serialize_float(s, p.nonzoomedout_visible_world_area.x);
 		serialize_float(s, p.nonzoomedout_visible_world_area.y);

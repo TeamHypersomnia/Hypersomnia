@@ -404,6 +404,7 @@ namespace test_flavours {
 			;
 
 			item.holding_stance = stance;
+			item.categories_for_slot_compatibility.set(item_category::BACK_WEAPON);
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			::set_weapon_floor_hit_sounds(item);
 			item.gratis_ammo_pieces_with_first = 3;
@@ -5180,6 +5181,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.0");
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
+			item.categories_for_slot_compatibility.set(item_category::BACK_WEAPON);
 			item.gratis_ammo_pieces_with_first = 0;
 			::set_weapon_floor_hit_sounds(item);
 			meta.set(item);
@@ -5220,6 +5222,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("5.0");
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
+			item.categories_for_slot_compatibility.set(item_category::BACK_WEAPON);
 			item.gratis_ammo_pieces_with_first = 0;
 			::set_weapon_floor_hit_sounds(item);
 			meta.set(item);

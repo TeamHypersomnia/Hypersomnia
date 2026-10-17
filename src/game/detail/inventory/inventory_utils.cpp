@@ -8,6 +8,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/item_mounting.hpp"
+#include "game/detail/inventory/firearm_limit.h"
 
 #include "augs/string/string_templates.h"
 
@@ -161,6 +162,10 @@ item_transfer_result query_transfer_result(
 							output.result = item_transfer_result_type::TOO_MANY_ITEMS;
 							break;
 
+						case containment_result_type::TOO_MANY_FIREARMS:
+							output.result = item_transfer_result_type::TOO_MANY_FIREARMS;
+							break;
+
 						default: 
 							output.result = item_transfer_result_type::INVALID_RESULT; 
 							break;
@@ -205,6 +210,7 @@ item_transfer_result query_transfer_result(
 					|| t == slot_function::TORSO_ARMOR
 					|| t == slot_function::SHOULDER
 					|| t == slot_function::HAT
+					|| ::is_back_weapon_slot(t)
 				) {
 					output.wear = true;
 				}
@@ -243,6 +249,9 @@ containment_result query_containment_result(
 	const auto& item_def = item_entity.get<invariants::item>();
 	const auto& slot = *target_slot;
 
+	const auto target_type = target_slot.get_type();
+	const bool is_firearm = ::is_firearm_like(item_entity);
+
 	containment_result output;
 	auto& result = output.result;
 
@@ -251,6 +260,16 @@ containment_result query_containment_result(
 	}
 	else if (!slot.is_category_compatible_with(item_entity)) {
 		result = containment_result_type::INCOMPATIBLE_CATEGORIES;
+	}
+	else if (is_firearm && target_type == slot_function::ITEM_DEPOSIT) {
+		result = containment_result_type::INCOMPATIBLE_CATEGORIES;
+	}
+	else if (
+		is_firearm
+		&& (target_slot.is_hand_slot() || ::is_back_weapon_slot(target_type))
+		&& ::count_carried_firearms(target_slot.get_container(), item_entity.get_id()) >= ::calc_max_firearms(target_slot.get_container())
+	) {
+		result = containment_result_type::TOO_MANY_FIREARMS;
 	}
 	else {
 		const auto& items = target_slot.get_items_inside();

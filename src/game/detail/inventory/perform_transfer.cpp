@@ -1,3 +1,4 @@
+#include <limits>
 #include "augs/log.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/cosmos/cosmic_functions.h"
@@ -30,6 +31,10 @@
 #include "game/cosmos/might_allocate_entities_having.hpp"
 #include "game/components/melee_component.h"
 #include "game/detail/inventory/manage_shoulder_storage.hpp"
+#include "game/detail/inventory/firearm_limit.h"
+#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
+#include "game/detail/entity_handle_mixins/calc_connection.hpp"
+#include "game/detail/crosshair_math.hpp"
 #include "game/detail/physics/infer_damping.hpp"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const real32 slide_distance, const logic_step step) {
@@ -103,6 +108,38 @@ void perform_transfer_result::play_effects(const logic_step step) const {
 	}
 }
 
+/*
+	Taking off the backpack lowers the firearm limit (and shrinks the personal deposit - see drop_items_over_deposit_capacity).
+	The weapon hung on the back the longest ago falls off then - never the one in hands.
+*/
+
+template <class E>
+static void drop_firearms_over_limit(const logic_step step, const E& typed_subject) {
+	while (::count_carried_firearms(typed_subject) > ::calc_max_firearms(typed_subject)) {
+		entity_id oldest_on_back;
+		auto oldest_step = std::numeric_limits<uint32_t>::max();
+
+		for (const auto back_slot : back_weapon_slots_v) {
+			if (const auto item = typed_subject[back_slot].get_item_if_any()) {
+				const auto stowed_step = item.when_last_transferred().step;
+
+				if (!oldest_on_back.is_set() || stowed_step < oldest_step) {
+					oldest_on_back = item.get_id();
+					oldest_step = stowed_step;
+				}
+			}
+		}
+
+		if (!oldest_on_back.is_set()) {
+			break;
+		}
+
+		if (!perform_transfer(item_slot_transfer_request::drop(oldest_on_back), step).result.is_successful()) {
+			break;
+		}
+	}
+}
+
 perform_transfer_result perform_transfer(
 	const item_slot_transfer_request r,
 	const logic_step step
@@ -129,6 +166,34 @@ perform_transfer_result perform_transfer(
 			cosm[chosen_root].dispatch_on_having_all<components::item_slot_transfers>(
 				[&](const auto& typed_subject) {
 					::silently_fill_shoulder_with_largest_melee(step, typed_subject);
+				}
+			);
+		}
+	}
+
+	if (result.result.is_successful()) {
+		if (const auto source_root = cosm[result.result.source_root]) {
+			source_root.dispatch_on_having_all<components::item_slot_transfers>(
+				[&](const auto& typed_subject) {
+					::drop_firearms_over_limit(step, typed_subject);
+					::drop_items_over_deposit_capacity(step, typed_subject);
+				}
+			);
+		}
+
+		/*
+			Whatever enters the character from outside (picked up, dragged from the ground) - into hands or into the deposit -
+			the deposit keeps room for everything held in hands right away,
+			so that hiding it later never makes anything fall out.
+		*/
+
+		const auto target_root = cosm[result.result.target_root];
+		const bool entered_from_outside = target_root.alive() && result.result.target_root != result.result.source_root;
+
+		if (entered_from_outside) {
+			target_root.dispatch_on_having_all<components::item_slot_transfers>(
+				[&](const auto& typed_subject) {
+					::reserve_deposit_space_for_hands(step, typed_subject);
 				}
 			);
 		}
@@ -241,7 +306,34 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 	const bool target_slot_exists = target_slot.alive();
 
-	const auto initial_transform_of_transferred = transferred_item.get_logic_transform();
+	const auto initial_transform_of_transferred = [&]() {
+		/*
+			An item without a body of its own (e.g. in the deposit) has a stale transform -
+			it leaves from the character, in the direction it aims.
+		*/
+
+		const bool had_no_body = 
+			source_root.alive()
+			&& source_root != transferred_item
+			&& !transferred_item.calc_connection_to_topmost_container().owner.is_set()
+		;
+
+		if (had_no_body) {
+			auto from_character = source_root.get_logic_transform();
+
+			if (source_root.find_crosshair() != nullptr) {
+				const auto aim = source_root.get_world_crosshair_transform().pos - from_character.pos;
+
+				if (!aim.is_epsilon(1.f)) {
+					from_character.rotation = aim.degrees();
+				}
+			}
+
+			return from_character;
+		}
+
+		return transferred_item.get_logic_transform();
+	}();
 
 	const bool whole_item_grabbed = 
 		item.charges == static_cast<int>(result.transferred_charges)

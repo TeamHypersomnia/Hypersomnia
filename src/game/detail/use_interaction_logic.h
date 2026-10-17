@@ -5,6 +5,10 @@
 #include "game/enums/requested_interaction_type.h"
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
+#include "game/detail/inventory/firearm_limit.h"
+#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
+#include "game/detail/inventory/perform_wielding.hpp"
+#include "game/detail/inventory/wielding_setup.hpp"
 #include "game/enums/filters.h"
 #include "game/inferred_caches/physics_world_cache.hpp"
 #include "augs/misc/enum/enum_bitset.h"
@@ -59,10 +63,92 @@ struct item_pickup {
 						return;
 					}
 
-					const auto pickup_slot = typed_picker.find_pickup_target_slot_for(typed_item, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
+					const auto picked_id = entity_id(typed_item.get_id());
+
+					/*
+						A firearm picked up while the hands hold no firearm goes into hands,
+						hiding whatever else they hold (a grenade, a knife).
+					*/
+
+					auto wield_picked_firearm_if_hands_hold_none = [&]() {
+						if (!::is_firearm_like(typed_item) || typed_item.get_owning_transfer_capability() != typed_picker) {
+							return;
+						}
+
+						if (typed_item.get_current_slot().is_hand_slot()) {
+							return;
+						}
+
+						if (::find_wielded_firearm_to_swap(typed_picker).is_set()) {
+							return;
+						}
+
+						auto requested_wield = wielding_setup::bare_hands();
+						requested_wield.hand_selections[0] = picked_id;
+
+						::perform_wielding(step, typed_picker, requested_wield);
+					};
+
+					if (const auto swapped_firearm = cosm[::find_firearm_to_swap_for(typed_picker, typed_item)]) {
+						/*
+							Over the firearm limit: drop the swapped firearm and take the picked one in its place -
+							into the same hand, or onto the back.
+						*/
+
+						auto requested_wield = wielding_setup::from_current(typed_picker);
+
+						const bool swapped_from_hands = 
+							requested_wield.hand_selections[0] == swapped_firearm.get_id()
+							|| requested_wield.hand_selections[1] == swapped_firearm.get_id()
+						;
+
+						for (auto& h : requested_wield.hand_selections) {
+							if (h == swapped_firearm.get_id()) {
+								h = picked_id;
+							}
+						}
+
+						if (!perform_transfer(item_slot_transfer_request::drop(swapped_firearm), step).result.is_successful()) {
+							return;
+						}
+
+						const auto pickup_slot = typed_picker.find_pickup_target_slot_for(typed_item, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
+
+						if (pickup_slot.alive()) {
+							perform_transfer(item_slot_transfer_request::standard(picked_id, pickup_slot), step);
+
+							if (swapped_from_hands) {
+								::perform_wielding(step, typed_picker, requested_wield);
+							}
+							else {
+								wield_picked_firearm_if_hands_hold_none();
+							}
+						}
+
+						return;
+					}
+
+					auto find_pickup_slot = [&]() {
+						return typed_picker.find_pickup_target_slot_for(typed_item, { slot_finding_opt::OMIT_MOUNTED_SLOTS }).get_id();
+					};
+
+					const auto pickup_slot_id = [&]() {
+						const auto found = find_pickup_slot();
+
+						if (!found.is_set() && !::is_firearm_like(typed_item)) {
+							if (::drop_oldest_items_to_fit(step, typed_picker, typed_item)) {
+								return find_pickup_slot();
+							}
+						}
+
+						return found;
+					}();
+
+					const auto pickup_slot = cosm[pickup_slot_id];
 
 					if (pickup_slot.alive()) {
-						perform_transfer(item_slot_transfer_request::standard(entity_id(typed_item.get_id()), pickup_slot), step);
+						perform_transfer(item_slot_transfer_request::standard(picked_id, pickup_slot), step);
+						wield_picked_firearm_if_hands_hold_none();
 					}
 				}
 			});
@@ -198,6 +284,15 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject, c
 
 			if (typed_root_item.get_owning_transfer_capability().alive()) {
 				/* Item is somehow used by someone else */
+				return;
+			}
+
+			if (::is_useless_ammo(subject, typed_root_item)) {
+				/*
+					Ammo for none of our firearms is not worth picking up -
+					it would be the first to fall out of the inventory anyway.
+				*/
+
 				return;
 			}
 

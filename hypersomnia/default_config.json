@@ -76,7 +76,8 @@
     "input": {
         "character": {
             "crosshair_sensitivity": [3.0, 3.0],
-            "forward_moves_towards_crosshair": false
+            "forward_moves_towards_crosshair": false,
+            "pickup_swaps_wielded_firearm": true
         },
         "swap_mouse_buttons_in_akimbo": false,
         "game_gui": {

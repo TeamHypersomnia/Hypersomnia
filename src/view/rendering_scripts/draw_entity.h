@@ -596,6 +596,14 @@ FORCE_INLINE void specific_entity_drawer(
 						};
 
 						auto should_recurse = [over_torso, &should_draw_over_torso](const auto& slot) {
+							if (::is_back_weapon_slot(slot.get_type())) {
+								/*
+									A weapon hung on the back stays under the torso but over the legs.
+								*/
+
+								return !over_torso;
+							}
+
 							if (slot.is_hand_slot()) {
 								if (const auto held_item = slot.get_item_if_any()) {
 									return over_torso == should_draw_over_torso(held_item);

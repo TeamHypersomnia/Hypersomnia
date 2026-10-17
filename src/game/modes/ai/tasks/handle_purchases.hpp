@@ -196,50 +196,6 @@ inline std::optional<item_flavour_id> handle_purchases(
 	const bool buy_gun = weapon_count == 0 || has_only_pistols;
 
 	/*
-		When buying a non-pistol, always buy a backpack first.
-	*/
-	if (!has_backpack && buy_gun) {
-		/*
-			Check if we want to buy a non-pistol and if backpack is affordable.
-		*/
-		if (const auto backpack = try_buy_backpack(money)) {
-			const auto backpack_price = *::find_price_of(ctx.cosm, *backpack);
-			const auto remaining_after_backpack = money - backpack_price;
-
-			/*
-				Check if after buying backpack we can still afford a non-pistol.
-			*/
-			bool can_afford_non_pistol_after = false;
-			ctx.cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-				if (!factions_compatible(ctx.character_handle, id)) {
-					return;
-				}
-				if (flavour.template get<invariants::gun>().bots_ban) {
-					return;
-				}
-				const auto buy_type = flavour.template get<invariants::gun>().buy_type;
-				if (buy_type != buy_menu_type::PISTOLS) {
-					const auto price = *::find_price_of(ctx.cosm, item_flavour_id(id));
-					if (price <= remaining_after_backpack) {
-						can_afford_non_pistol_after = true;
-					}
-				}
-			});
-
-			if (can_afford_non_pistol_after) {
-				/*
-					Countdown still delays the actual purchase.
-				*/
-				if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
-					return std::nullopt;
-				}
-
-				return backpack;
-			}
-		}
-	}
-
-	/*
 		Buy gun if needed.
 	*/
 	if (buy_gun) {
@@ -272,15 +228,30 @@ inline std::optional<item_flavour_id> handle_purchases(
 	}
 
 	/*
-		If we have >=10000 money and don't need to buy anything else, buy defuse kit.
+		If we have >=10000 money and don't need to buy anything else, buy defuse kit and backpack.
 		
 		The 10000 threshold ensures bots prioritize essential equipment first.
-		Defuse kits are useful but not critical - only buy when we have excess money.
+		Defuse kits and backpacks are useful but not critical - only buy when we have excess money.
+		A gun never waits for a backpack - buying it over the firearm limit drops the cheapest one.
 	*/
 
+	constexpr money_type SPARE_MONEY_THRESHOLD = 10000;
+
+	if (money >= SPARE_MONEY_THRESHOLD && !has_backpack) {
+		if (const auto backpack = try_buy_backpack(money)) {
+			/*
+				Countdown still delays the actual purchase.
+			*/
+			if (ctx.ai_state.purchase_decision_countdown > 0.0f) {
+				return std::nullopt;
+			}
+
+			return backpack;
+		}
+	}
+
 	if (buyer_faction == faction_type::METROPOLIS) {
-		constexpr money_type DEFUSE_KIT_THRESHOLD = 10000;
-		if (money >= DEFUSE_KIT_THRESHOLD && !has_defuse_kit) {
+		if (money >= SPARE_MONEY_THRESHOLD && !has_defuse_kit) {
 			if (const auto kit = try_buy_defuse_kit(money)) {
 				/*
 					Countdown still delays the actual purchase.

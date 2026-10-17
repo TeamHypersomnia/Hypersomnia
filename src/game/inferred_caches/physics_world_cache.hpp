@@ -55,6 +55,32 @@ auto calc_body_type(const E& handle) {
 	return to_b2Body_type(type);
 }
 
+/*
+	Whether the item hangs on a character's back, also as an attachment of a weapon there, e.g. its magazine.
+*/
+
+template <class E>
+bool is_hung_on_back(const E& handle) {
+	const auto& cosm = handle.get_cosmos();
+	auto slot_id = handle.get_current_slot().get_id();
+
+	while (const auto slot = cosm[slot_id]) {
+		if (::is_back_weapon_slot(slot.get_type())) {
+			return true;
+		}
+
+		const auto container = slot.get_container();
+
+		if (container.template find<components::item>() == nullptr) {
+			return false;
+		}
+
+		slot_id = container.get_current_slot().get_id();
+	}
+
+	return false;
+}
+
 template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
@@ -81,6 +107,21 @@ auto calc_filters(const E& handle) {
 		const auto capability = handle.get_owning_transfer_capability();
 
 		if (capability && capability != handle) {
+			if (const auto sentience = capability.template find<components::sentience>(); sentience && sentience->is_bot) {
+				if (::is_hung_on_back(handle)) {
+					/*
+						Weapons hung on a bot's back still weigh it down (fixtures without
+						category/mask bits keep their mass), but they never snag on walls,
+						which the bot navigation does not account for.
+					*/
+
+					auto unsnagging = filters[predefined_filter_type::CHARACTER_WEAPON];
+					unsnagging.categoryBits = 0;
+					unsnagging.maskBits = 0;
+					return unsnagging;
+				}
+			}
+
 			/*
 				Note that a melee in action will still collide with shoot/throw-through surfaces,
 				because melee_system uses predefined_queries::melee_query()

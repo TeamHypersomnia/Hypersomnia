@@ -136,7 +136,7 @@ entity_name_str get_bbcoded_entity_properties(const const_entity_handle id) {
 		if (children_space != with_parents_space)
 			result << "[color=vsyellow]" << format_space_units(depo.calc_local_space_available()) << "[/color]/";
 			
-		result << "[color=vscyan]" << format_space_units(depo->space_available) << "[/color]\n";
+		result << "[color=vscyan]" << format_space_units(depo.calc_total_space()) << "[/color]\n";
 	}
 
 	entity_name_str out;

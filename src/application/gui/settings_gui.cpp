@@ -3161,6 +3161,7 @@ void settings_gui_state::perform(
 							}
 
 							revertable_checkbox(SCOPE_CFG_NVP(forward_moves_towards_crosshair));
+							revertable_checkbox(SCOPE_CFG_NVP(pickup_swaps_wielded_firearm));
 						}
 
 						{

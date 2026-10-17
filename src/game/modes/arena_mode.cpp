@@ -2908,7 +2908,9 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 								if (money >= *price) {
 									if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
-										return;
+										if (!::can_make_room_for_purchase(player_handle, f_id)) {
+											return;
+										}
 									}
 
 									requested_equipment eq;
@@ -2929,6 +2931,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 										}
 
 										eq.weapon = f_id;
+
+										if (::is_firearm_like(cosm, f_id)) {
+											::drop_cheapest_firearms_to_fit_one_more(step, player_handle);
+										}
 									}
 
 									const auto result_weapon = eq.generate_for(access, player_handle, step);

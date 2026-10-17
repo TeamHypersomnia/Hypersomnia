@@ -50,6 +50,7 @@
 
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/perform_wielding.hpp"
+#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/inventory/calc_reloading_context.hpp"
 
@@ -426,6 +427,15 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 			auto try_hide_other_item = [&]() {
 				const auto redundant_item = it.get_wielded_other_than(concerned_slot.get_container());
+
+				/*
+					The same procedure as for pickups and purchases makes room for it first -
+					ammo for none of the carried firearms falls out first, then the oldest items.
+				*/
+
+				if (redundant_item.alive()) {
+					::drop_oldest_items_to_fit(step, it, redundant_item);
+				}
 
 				if (const auto redundant_item_holster_slot = it.find_holstering_slot_for(redundant_item)) {
 					RLD_LOG("Holster for redundant_item found.");

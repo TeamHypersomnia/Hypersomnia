@@ -311,9 +311,9 @@ void item_button::draw_proc(
 						}
 					}
 
-					if (depo->space_available) {
+					if (const auto total_space = depo.calc_total_space()) {
 						const auto rsa = depo.calc_real_space_available();
-						const auto space_ratio = static_cast<float>(rsa) / depo->space_available;
+						const auto space_ratio = static_cast<float>(rsa) / total_space;
 						const auto empty_bar_amount = space_ratio;
 
 						if (f.draw_space_available_bar) {

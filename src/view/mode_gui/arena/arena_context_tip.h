@@ -317,6 +317,24 @@ inline void draw_context_tip(
 
 					text(".");
 				}
+				else if (const auto swapped_firearm = cosm[::find_firearm_to_swap_for(viewed_character, item_handle)]) {
+					text("Press ");
+					hotkey(game_intent_type::INTERACT);
+					text(" to swap ");
+					total_text += colored(swapped_firearm.get_name(), settings.item_name_color);
+					text(" for ");
+					total_text += colored(item_handle.get_name(), settings.item_name_color);
+					text(".");
+				}
+				else if (!::is_firearm_like(item_handle) && ::can_make_room_for(viewed_character, item_handle)) {
+					text("Press ");
+					hotkey(game_intent_type::INTERACT);
+					text(" to pick up ");
+					total_text += colored(item_handle.get_name(), settings.item_name_color);
+					text(".");
+					break_line();
+					text("The oldest items will fall out to make room.");
+				}
 				else {
 					border_color = bad_color;
 

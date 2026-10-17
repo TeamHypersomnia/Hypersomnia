@@ -35,8 +35,10 @@ struct inventory_slot {
 	bool draw_under_container = false;
 
 	inventory_space_type space_available = 0;
+	inventory_space_type extra_space_with_backpack = 0;
 
 	real32 attachment_density_multiplier = 1.f;
+	real32 attachment_density_multiplier_with_backpack = -1.f;
 
 	sound_effect_input start_mounting_sound;
 	sound_effect_input finish_mounting_sound;

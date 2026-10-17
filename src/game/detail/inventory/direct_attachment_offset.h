@@ -22,6 +22,21 @@ inline transformr get_anchored_offset(
 	return { new_center, rotation - anchor.rotation };
 }
 
+/*
+	Unlike get_anchored_offset, the anchor is a point in the attached item's own image space
+	(e.g. where a weapon hangs on the back), so it is rotated together with the item.
+*/
+
+inline transformr get_hung_offset(
+	const transformi attachment_offset,
+	const transformi anchor
+) {
+	const auto rotation = attachment_offset.rotation - anchor.rotation;
+	const auto new_center = vec2(attachment_offset.pos) - vec2(anchor.pos).rotate(rotation);
+
+	return { new_center, rotation };
+}
+
 struct attachment_offset_settings {
 	bool consider_mag_rotations = false;
 	bool consider_weapon_reloading = false;
@@ -63,6 +78,7 @@ attachment_offset direct_attachment_offset(
 	transformi anchor;
 
 	bool flip_geometry = false;
+	bool anchor_in_image_space = false;
 
 	if (is_torso_attachment(type)) {
 		const bool only_secondary_holds_item = container.only_secondary_holds_item();
@@ -131,6 +147,14 @@ attachment_offset direct_attachment_offset(
 			case slot_function::BELT: 
 				attachment_offset = get_actual_offsets_by_torso().back;
 				anchor = anchors.back_anchor;
+				break;
+
+			case slot_function::BACK_WEAPON_1: 
+			case slot_function::BACK_WEAPON_2: 
+			case slot_function::BACK_WEAPON_3: 
+				attachment_offset = get_actual_offsets_by_torso().back;
+				anchor = anchors.back_anchor;
+				anchor_in_image_space = true;
 				break;
 
 			default:
@@ -241,7 +265,13 @@ attachment_offset direct_attachment_offset(
 		}
 	}
 
-	return { get_anchored_offset(attachment_offset, anchor), flip_geometry };
+	const auto offset = 
+		anchor_in_image_space ?
+		::get_hung_offset(attachment_offset, anchor) :
+		::get_anchored_offset(attachment_offset, anchor)
+	;
+
+	return { offset, flip_geometry };
 }
 
 template <class A, class B>

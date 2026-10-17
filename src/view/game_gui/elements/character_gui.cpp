@@ -82,6 +82,9 @@ xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 		case slot_function::BACK: return xywh(unit * 2, -unit * 1, 33, 33);
 		case slot_function::OVER_BACK: return xywh(unit * 2, 0, 33, 33);
 		case slot_function::TORSO_ARMOR: return xywh(unit * 3, 0, 33, 33);
+		case slot_function::BACK_WEAPON_1: return xywh(unit * 3, -unit * 1, 33, 33);
+		case slot_function::BACK_WEAPON_2: return xywh(unit * 4, -unit * 1, 33, 33);
+		case slot_function::BACK_WEAPON_3: return xywh(unit * 4, 0, 33, 33);
 
 		case slot_function::ITEM_DEPOSIT: return xywh(0, 0, 33, 33);
 

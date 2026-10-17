@@ -593,7 +593,12 @@ void enqueue_illuminated_rendering_jobs(
 
 						pickable_item_to_highlight = typed_interaction.item;
 
-						if (pickup_slot.dead()) {
+						const bool can_pick_anyway = 
+							::find_firearm_to_swap_for(viewed_character, item_handle).is_set()
+							|| (!::is_firearm_like(item_handle) && ::can_make_room_for(viewed_character, item_handle))
+						;
+
+						if (pickup_slot.dead() && !can_pick_anyway) {
 							pickable_color = bad_color;
 						}
 					}
@@ -612,6 +617,7 @@ void enqueue_illuminated_rendering_jobs(
 				draw_bullet_shadows = in.drawing.draw_bullet_shadows,
 				pickable_item_to_highlight,
 				pickable_color,
+				viewed_character,
 				shadows  = make_drawing_input(D::DROPPED_ITEMS_SHADOWS),
 				borders  = make_drawing_input(D::DROPPED_ITEMS_BORDERS),
 				diffuse  = make_drawing_input(D::DROPPED_ITEMS_DIFFUSE),
@@ -675,9 +681,13 @@ void enqueue_illuminated_rendering_jobs(
 							/*
 								Nearly empty magazines are not worth a bounce -
 								they lie on the ground like shells.
+								Nor is ammo for none of the viewed character's firearms - it can't be picked up.
 							*/
 
-							const bool low_ammo_magazine = ::is_low_ammo_magazine(typed_item);
+							const bool low_ammo_magazine = 
+								::is_low_ammo_magazine(typed_item)
+								|| (viewed_character.alive() && ::is_useless_ammo(viewed_character, typed_item))
+							;
 
 							if (!is_laying_on_ground || falling || low_ammo_magazine) {
 								/*

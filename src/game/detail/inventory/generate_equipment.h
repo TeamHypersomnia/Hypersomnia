@@ -7,6 +7,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
 #include "game/modes/detail/owner_meta_logic.h"
 #include "game/cosmos/just_create_entity_functional.h"
 #include "game/cosmos/allocate_new_entity_access.h"
@@ -113,9 +114,30 @@ entity_id requested_equipment::generate_for_impl(
 			return cosm[inventory_slot_id()];
 		}
 		else {
-			const auto slot = character.find_pickup_target_slot_for(new_item);
-			// LOG_NVPS(new_item, slot);
-			return slot;
+			const auto slot_id = [&]() {
+				const auto found = character.find_pickup_target_slot_for(new_item).get_id();
+
+				if (!found.is_set() && !::is_firearm_like(new_item)) {
+					/*
+						Bought or given items never land on the ground - the oldest items fall out to make room.
+					*/
+
+					auto result = found;
+
+					on_step([&](auto&& step) {
+						if (::drop_oldest_items_to_fit(step, character, new_item)) {
+							result = character.find_pickup_target_slot_for(new_item).get_id();
+						}
+					});
+
+					return result;
+				}
+
+				return found;
+			}();
+
+			// LOG_NVPS(new_item, slot_id);
+			return cosm[slot_id];
 		}
 	};
 
@@ -318,6 +340,16 @@ entity_id requested_equipment::generate_for_impl(
 				}
 			}
 		}
+	}
+
+	if constexpr (!to_the_ground) {
+		/*
+			Generated items (purchases, free ammo) keep room in the deposit for everything held in hands.
+		*/
+
+		on_step([&](auto&& step) {
+			::reserve_deposit_space_for_hands(step, character);
+		});
 	}
 
 	return result_weapon;

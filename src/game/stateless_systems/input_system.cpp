@@ -37,6 +37,10 @@ void input_system::make_input_messages(const logic_step step) {
 			movement->forward_moves_towards_crosshair = settings.forward_moves_towards_crosshair;
 		}
 
+		if (const auto transfers = subject.template find<components::item_slot_transfers>()) {
+			transfers->pickup_swaps_wielded_firearm = settings.pickup_swaps_wielded_firearm;
+		}
+
 		for (const auto& intent : commands.intents) {
 			auto msg = messages::intent_message();
 			msg.game_intent::operator=(intent);

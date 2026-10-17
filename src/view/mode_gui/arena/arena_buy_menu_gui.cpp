@@ -18,6 +18,7 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
 #include "augs/gui/formatted_string.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "game/detail/visible_entities.hpp"
@@ -277,6 +278,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		OWNED_OF_THE_SAME_TYPE
 	};
 
+	auto can_make_room_for = [&](const auto& flavour_or_spell) {
+		if constexpr(std::is_same_v<remove_cref<decltype(flavour_or_spell)>, item_flavour_id>) {
+			return subject.alive() && ::can_make_room_for_purchase(subject, flavour_or_spell);
+		}
+		else {
+			return false;
+		}
+	};
+
 	auto general_purchase_button = [&](
 		auto purchasable_graphic_size,
 		auto draw_purchasable_callback,
@@ -302,7 +312,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		const auto num_affordable = in.available_money / price;
 
-		const bool is_disabled = num_affordable == 0 || (num_carryable && *num_carryable == 0);
+		const bool no_space = num_carryable && *num_carryable == 0;
+		const bool can_make_room = no_space && can_make_room_for(flavour_or_spell);
+		const bool is_disabled = num_affordable == 0 || (no_space && !can_make_room);
 
 		bool result = false;
 
@@ -328,6 +340,19 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
 		}
 		else {
+			if (can_make_room) {
+				/*
+					Still buyable - the oldest items fall out to make room.
+				*/
+
+				auto no_space_bg = red;
+				no_space_bg.a = active ? 90 : 50;
+
+				const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
+				rect_filled(selectable_size, no_space_bg, vec2(0, -item_spacing.y + 1));
+				ImGui::SetCursorPos(local_pos);
+			}
+
 			const auto selectable_size = ImVec2(0, 1 + button_h);
 			result = ImGui::Selectable(label_id.c_str(), active, ImGuiSelectableFlags_None, selectable_size);
 		}

@@ -80,6 +80,7 @@ public:
 	float calc_density_multiplier_due_to_being_attached() const;
 
 	inventory_space_type calc_local_space_available() const;
+	inventory_space_type calc_total_space() const;
 	inventory_space_type calc_space_occupied_by_children() const;
 	inventory_space_type calc_real_space_available() const;
 
@@ -273,7 +274,17 @@ bool basic_inventory_slot_handle<E>::is_physically_reachable_from(
 
 template <class E>
 float basic_inventory_slot_handle<E>::calc_density_multiplier_due_to_being_attached() const {
-	const auto density_multiplier = get().attachment_density_multiplier;
+	const auto density_multiplier = [&]() {
+		const auto& slot_def = get();
+
+		if (slot_def.attachment_density_multiplier_with_backpack >= 0.f) {
+			if (const auto back_slot = get_container()[slot_function::BACK]; back_slot.alive() && back_slot.has_items()) {
+				return slot_def.attachment_density_multiplier_with_backpack;
+			}
+		}
+
+		return slot_def.attachment_density_multiplier;
+	}();
 
 	if (const auto maybe_item = get_container().template find<components::item>()) {
 		if (const auto slot = owner[maybe_item->get_current_slot()]) {
@@ -391,13 +402,30 @@ inventory_space_type basic_inventory_slot_handle<E>::calc_space_occupied_by_chil
 	return total;
 }
 
+/*
+	A backpack has no deposit of its own - wearing it enlarges the personal deposit instead.
+*/
+
+template <class E>
+inventory_space_type basic_inventory_slot_handle<E>::calc_total_space() const {
+	const auto& slot_def = get();
+
+	if (slot_def.extra_space_with_backpack > 0) {
+		if (const auto back_slot = get_root_container()[slot_function::BACK]; back_slot.alive() && back_slot.has_items()) {
+			return slot_def.space_available + slot_def.extra_space_with_backpack;
+		}
+	}
+
+	return slot_def.space_available;
+}
+
 template <class E>
 inventory_space_type basic_inventory_slot_handle<E>::calc_local_space_available() const {
 	if (get().has_unlimited_space()) {
 		return max_inventory_space_v;
 	}
 
-	const auto space = get().space_available;
+	const auto space = calc_total_space();
 	const auto children_occupied = calc_space_occupied_by_children();
 	
 	return space > children_occupied ? space - children_occupied : 0;

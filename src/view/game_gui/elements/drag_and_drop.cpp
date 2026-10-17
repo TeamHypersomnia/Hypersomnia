@@ -273,6 +273,9 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 							case slot_function::SECONDARY_HAND: drop.hint_text += "Wield"; break;
 							case slot_function::GUN_MUZZLE: drop.hint_text += "Install"; break;
 							case slot_function::BELT: drop.hint_text += "Wear"; break;
+							case slot_function::BACK_WEAPON_1: drop.hint_text += "Hang"; break;
+							case slot_function::BACK_WEAPON_2: drop.hint_text += "Hang"; break;
+							case slot_function::BACK_WEAPON_3: drop.hint_text += "Hang"; break;
 							default: drop.hint_text += "Unknown slot"; break;
 						}
 
@@ -285,6 +288,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 						case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = "Impossible"; break;
 						case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = "Incompatible item"; break;
 						case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = "Too many items"; break;
+						case item_transfer_result_type::TOO_MANY_FIREARMS: drop.hint_text = "Too many firearms"; break;
 						default: drop.hint_text = format_enum(predicted_result_type); break;
 					}
 				}

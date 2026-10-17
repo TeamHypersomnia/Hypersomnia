@@ -26,6 +26,15 @@ bool is_magazine_like(const E& typed_handle) {
 	return false;
 }
 
+/*
+	Ammo is held in hands only while reloading - it is never picked up or given into hands.
+*/
+
+template <class E>
+bool is_ammo_like(const E& typed_handle) {
+	return ::is_magazine_like(typed_handle) || typed_handle.template has<invariants::cartridge>();
+}
+
 template <class E>
 bool is_armor_like(const E& typed_handle) {
 	return 
