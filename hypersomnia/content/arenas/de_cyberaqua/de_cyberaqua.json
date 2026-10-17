@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-10-05 01:04:58.164300 UTC"
+        "version_timestamp": "2026-10-17 17:53:20.016402 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -17161,18 +17161,21 @@
         {
             "id": "bot_waypoint_patrol (7)",
             "type": "bot_waypoint_patrol",
+            "camp_look_far": true,
             "pos": [2639.0, -511.0],
             "rotation": -75.0
         },
         {
             "id": "bot_waypoint_patrol (8)",
             "type": "bot_waypoint_patrol",
-            "pos": [1919.0, -1905.0],
+            "camp_look_far": true,
+            "pos": [1903.0, -1808.0],
             "rotation": -180.0
         },
         {
             "id": "bot_waypoint_patrol (9)",
             "type": "bot_waypoint_patrol",
+            "camp_look_far": true,
             "pos": [593.0, -1761.0],
             "rotation": -201.9554901123047
         },
@@ -17239,6 +17242,7 @@
             "id": "bot_waypoint_patrol (17)",
             "type": "bot_waypoint_patrol",
             "letter": "C",
+            "camp_look_far": true,
             "pos": [-209.0, 1537.0]
         },
         {
@@ -17348,6 +17352,7 @@
             "id": "bot_waypoint_patrol (32)",
             "type": "bot_waypoint_patrol",
             "letter": "B",
+            "camp_look_far": true,
             "pos": [2876.0, -4816.0],
             "rotation": 179.57061767578125
         },
@@ -17369,6 +17374,7 @@
             "id": "bot_waypoint_patrol (35)",
             "type": "bot_waypoint_patrol",
             "letter": "B",
+            "camp_look_far": true,
             "pos": [3827.0, -4237.0],
             "rotation": 179.57061767578125
         },

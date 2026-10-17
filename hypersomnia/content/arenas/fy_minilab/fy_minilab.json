@@ -2,7 +2,7 @@
     "meta": {
         "game_version": "1.1.7967",
         "name": "fy_minilab",
-        "version_timestamp": "2026-10-05 01:06:34.310065 UTC"
+        "version_timestamp": "2026-10-17 17:53:44.105775 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1862,6 +1862,7 @@
         {
             "id": "bot_waypoint_patrol (2)",
             "type": "bot_waypoint_patrol",
+            "camp_look_far": true,
             "pos": [1791.0, -673.0],
             "rotation": -180.0
         },
@@ -1869,6 +1870,7 @@
             "id": "bot_waypoint_patrol (3)",
             "type": "bot_waypoint_patrol",
             "letter": "B",
+            "camp_look_far": true,
             "pos": [1791.0, 671.0],
             "rotation": -180.0
         },
@@ -1967,6 +1969,7 @@
             "type": "bot_waypoint_patrol",
             "faction": "METROPOLIS",
             "letter": "C",
+            "camp_look_far": true,
             "pos": [2119.0, 173.0],
             "rotation": -180.0
         },
@@ -1975,6 +1978,7 @@
             "type": "bot_waypoint_patrol",
             "faction": "METROPOLIS",
             "letter": "C",
+            "camp_look_far": true,
             "pos": [2203.0, -174.0],
             "rotation": -180.0
         },
