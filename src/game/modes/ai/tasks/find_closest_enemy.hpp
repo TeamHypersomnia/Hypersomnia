@@ -18,12 +18,18 @@ inline entity_id find_closest_enemy(
 	entity_id closest_enemy = entity_id::dead();
 	float closest_distance = std::numeric_limits<float>::max();
 
+	/*
+		Right after spawning the crosshair can still be zero -
+		it would be 90 degrees away from everything, so look where the body faces.
+	*/
 	const auto current_aim_direction = [&]() {
 		if (auto crosshair = ctx.character_handle.find_crosshair()) {
-			return vec2(crosshair->base_offset).normalize();
+			if (!crosshair->base_offset.is_zero()) {
+				return vec2(crosshair->base_offset).normalize();
+			}
 		}
 
-		return vec2::zero;
+		return vec2::from_degrees(ctx.character_handle.get_logic_transform().rotation);
 	}();
 
 	const auto si = ctx.cosm.get_si();
