@@ -168,6 +168,7 @@ perform_transfer_result perform_transfer(
 	auto& cosm = step.get_cosmos();
 
 	const bool was_melee_transfer = cosm[r.item].template has<components::melee>();
+	const bool was_in_hands = cosm[r.item].get_current_slot().is_hand_slot();
 
 	const auto result = perform_transfer_no_step(r, cosm);
 	result.notify(step);
@@ -200,6 +201,26 @@ perform_transfer_result perform_transfer(
 					::drop_items_over_deposit_capacity(step, typed_subject);
 				}
 			);
+		}
+
+		/*
+			A bomb leaving the hands unarmed (dropped, not planted) forgets what to wield back after planting -
+			it would be stale by the time the bomb comes back another way. Planting releases it armed.
+		*/
+
+		if (was_in_hands) {
+			if (const auto moved = cosm[r.item]; moved && ::is_like_plantable_bomb(moved)) {
+				const auto* const fuse = moved.template find<components::hand_fuse>();
+				const bool planted = fuse != nullptr && fuse->armed();
+
+				if (!planted) {
+					if (const auto source_root = cosm[result.result.source_root]) {
+						if (const auto transfers = source_root.template find<components::item_slot_transfers>()) {
+							transfers->wield_after_planting = {};
+						}
+					}
+				}
+			}
 		}
 
 		/*

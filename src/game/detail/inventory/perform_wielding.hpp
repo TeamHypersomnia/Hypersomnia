@@ -111,6 +111,16 @@ void perform_wielding(
 				transfers->wield_after_planting = current_selection;
 			}
 		}
+		else if (!has_bomb(request) && has_bomb(current_selection)) {
+			/*
+				The bomb hidden without planting - what was remembered would be stale
+				by the time it comes back to the hands another way (e.g. picked up).
+			*/
+
+			if (const auto transfers = self.template find<components::item_slot_transfers>()) {
+				transfers->wield_after_planting = {};
+			}
+		}
 	}
 
 	const auto first_held = cosm[current_selection.hand_selections[0]];
