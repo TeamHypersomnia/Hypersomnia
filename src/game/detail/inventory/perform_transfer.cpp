@@ -1,4 +1,5 @@
 #include <limits>
+#include <optional>
 #include "augs/log.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/cosmos/cosmic_functions.h"
@@ -326,6 +327,22 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 	const bool target_slot_exists = target_slot.alive();
 
+	/*
+		Where the character the item leaves aims - for items that don't point there themselves.
+	*/
+
+	const auto source_root_aim_rotation = [&]() -> std::optional<real32> {
+		if (source_root.alive() && source_root != transferred_item && source_root.find_crosshair() != nullptr) {
+			const auto aim = source_root.get_world_crosshair_transform().pos - source_root.get_logic_transform().pos;
+
+			if (!aim.is_epsilon(1.f)) {
+				return aim.degrees();
+			}
+		}
+
+		return std::nullopt;
+	}();
+
 	const auto initial_transform_of_transferred = [&]() {
 		/*
 			An item without a body of its own (e.g. in the deposit) has a stale transform -
@@ -341,12 +358,8 @@ perform_transfer_result perform_transfer_impl::operator()(
 		if (had_no_body) {
 			auto from_character = source_root.get_logic_transform();
 
-			if (source_root.find_crosshair() != nullptr) {
-				const auto aim = source_root.get_world_crosshair_transform().pos - from_character.pos;
-
-				if (!aim.is_epsilon(1.f)) {
-					from_character.rotation = aim.degrees();
-				}
+			if (source_root_aim_rotation.has_value()) {
+				from_character.rotation = *source_root_aim_rotation;
 			}
 
 			return from_character;
@@ -354,6 +367,19 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 		return transferred_item.get_logic_transform();
 	}();
+
+	/*
+		An item worn directly on the character - not held - points anywhere, so it is thrown where the character aims.
+		Except a weapon on the back - it flies the way its barrel points, to the side, always the same way.
+		Held items and attachments (e.g. magazines) fly as they point.
+	*/
+
+	const bool worn_not_held = 
+		source_slot.alive()
+		&& source_slot_container == source_root
+		&& !source_slot.is_hand_slot()
+		&& !::is_back_weapon_slot(source_slot.get_type())
+	;
 
 	const bool whole_item_grabbed = 
 		item.charges == static_cast<int>(result.transferred_charges)
@@ -595,7 +621,11 @@ perform_transfer_result perform_transfer_impl::operator()(
 		rigid_body.set_angular_velocity(0.f);
 		rigid_body.set_transform(initial_transform_of_transferred);
 
-		auto final_direction = initial_transform_of_transferred.get_direction();
+		auto final_direction = 
+			worn_not_held && source_root_aim_rotation.has_value() ?
+			vec2::from_degrees(*source_root_aim_rotation) :
+			initial_transform_of_transferred.get_direction()
+		;
 
 		if (r.params.drop_to_the_side && source_slot_container.alive()) {
 			if (const auto t = source_slot_container.find_logic_transform()) {
