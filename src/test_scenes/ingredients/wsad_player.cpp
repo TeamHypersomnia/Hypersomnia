@@ -231,8 +231,8 @@ namespace test_flavours {
 					slot_def.category_allowed = item_category::BACK_WEAPON;
 					slot_def.make_attachment_with_max_space();
 					slot_def.always_allow_exactly_one_item = true;
-					slot_def.attachment_density_multiplier = 0.5f;
-					slot_def.attachment_density_multiplier_with_backpack = 0.15f;
+					slot_def.attachment_density_multiplier = 0.4f;
+					slot_def.attachment_density_multiplier_with_backpack = 0.2f;
 					slot_def.never_reachable_for_mounting = true;
 					container.slots[back_weapon_slot] = slot_def;
 				}
