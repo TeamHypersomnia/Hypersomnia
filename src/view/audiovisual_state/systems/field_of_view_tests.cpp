@@ -143,6 +143,16 @@ TEST_CASE("FieldOfView MinimapTeammate") {
 		REQUIRE_FALSE(view.shows(teammate_pos, right, vec2(-500, 100)));
 	}
 
+	SECTION("The screen moves at most as far as a player's crosshair could move it") {
+		/* A bot aims right at a target 5000 px away: the camera moves by at most half the screen. */
+		const auto view = minimap_sighting_system::calc_teammate_view(default_fow(), 0.75f, vec2::zero, vec2(2500, -2500));
+
+		REQUIRE(view.screen_area.l == Approx(0.0f));
+		REQUIRE(view.screen_area.r == Approx(2560.0f));
+		REQUIRE(view.screen_area.t == Approx(-1440.0f));
+		REQUIRE(view.screen_area.b == Approx(0.0f));
+	}
+
 	SECTION("A zoomed in camera zoom area shows less") {
 		const auto view = minimap_sighting_system::calc_teammate_view(default_fow(), 1.5f, vec2::zero, vec2::zero);
 

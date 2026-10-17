@@ -105,7 +105,7 @@ public:
 		with the default camera settings and the crosshair not at the screen edge:
 		the fog of war scaled by the camera zoom at their position,
 		and a screen following their crosshair, showing the fog of war size (1920x1080 by default) -
-		the camera zoom snaps to it.
+		the camera zoom snaps to it - moved at most as far as a player's crosshair could move it.
 	*/
 
 	static observer_view calc_teammate_view(

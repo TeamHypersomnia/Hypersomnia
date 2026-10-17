@@ -71,9 +71,16 @@ minimap_sighting_system::observer_view minimap_sighting_system::calc_teammate_vi
 	const auto expansion = fog_of_war_settings::calc_camera_requested_expansion(camera_zoom, 0.0f);
 	const auto fow = rules_fow.get_considered(expansion, 0.0f);
 
+	/*
+		Bots put their crosshair right on the target, however far.
+		A player's crosshair reaches the screen edge when the camera is moved by half the screen.
+	*/
+	auto clamped_offset = camera_offset;
+	clamped_offset.clamp(fow.size / 2);
+
 	return {
 		fow,
-		ltrb::center_and_size(teammate_pos + camera_offset, fow.size)
+		ltrb::center_and_size(teammate_pos + clamped_offset, fow.size)
 	};
 }
 
