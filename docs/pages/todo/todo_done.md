@@ -7567,3 +7567,5 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - paka zeby nie zmieniala dloni
 - /zoom powinien relatywnie skalowac strefy na mapie
 - pokazywac speedy w server monitorze
+- awka jak bedzie ciezka taka na plerach to trzeba jej zwiekszyc predkosc teraz duzo
+

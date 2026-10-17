@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- awka jak bedzie ciezka taka na plerach to trzeba jej zwiekszyc predkosc teraz duzo
-
 - tutorial o backpacku tera jedna awka tylko
 
 - tutorial zaktualizowac o granasy i jak to carrying dodamy na plerach to tez te przejscia
