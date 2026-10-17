@@ -45,7 +45,6 @@ public:
 		server_heartbeat last_heartbeat;
 		std::array<uint8_t, 32> server_public_key = {};
 
-		// TODO_SECURITY: use proper secure channels
 		std::unordered_set<uint64_t> recvd_messages;
 
 		bool is_server() const {
@@ -193,12 +192,9 @@ private:
 							auto hb = augs::from_bytes<server_heartbeat>(bytes);
 
 							/*
-								A server in the browser signs its heartbeats too; its WebSocket session tells it from others,
-								so no cookie is needed - but its key stays the same for the session.
-							*/
-
-							/*
-								Checked like a native one's (a sane heartbeat, no banned name) - and signed for this session.
+								Checked like a native one's (a sane heartbeat, no banned name). A server in the browser signs
+								its heartbeats too: its WebSocket session tells it from others, so no cookie is needed - but
+								its key stays the same for the session.
 							*/
 
 							if (!hb.is_valid() || (heartbeat_rejected && heartbeat_rejected(hb))) {

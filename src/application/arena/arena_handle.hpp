@@ -1,5 +1,8 @@
 #pragma once
 #include <cstdint>
+#include <string>
+#include "augs/misc/ed25519.h"
+#include "augs/misc/secure_hash.h"
 
 template <bool C, class ModeVariant, class RulesVariant>
 class basic_arena_handle;
@@ -32,6 +35,14 @@ bool player_found_in(const basic_arena_handle<C, M, I>& handle, const mode_playe
 			return typed_mode.find(id) != nullptr;
 		}
 	);
+}
+
+/*
+	Steam friends on one server instance are one group: its instance label and its key.
+*/
+
+inline std::string steam_player_group_of(const std::string& instance_label, const augs::ed25519_public_key_type& server_key) {
+	return instance_label + "-" + augs::bytes_to_hex(server_key);
 }
 
 template <bool C, class M, class I>

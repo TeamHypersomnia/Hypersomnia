@@ -1,6 +1,7 @@
 #pragma once
-#include <cctype>
 #include <string>
+#include "application/network/identity_cert.h"
+#include "application/main/identity_key.h"
 
 /*
 	An account id as a person may write it - a key's public key copied from the game is "0x<64 hex>" -
@@ -14,41 +15,11 @@ inline std::string normalize_account_id(const std::string& written) {
 		return std::string();
 	}
 
-	const auto last = written.find_last_not_of(" \t\r\n");
-	const auto id = written.substr(first, last - first + 1);
+	const auto id = written.substr(first, written.find_last_not_of(" \t\r\n") - first + 1);
+	const auto key_text = identity_cert::is_key_account(id) ? id.substr(identity_cert::key_account_prefix.size()) : id;
 
-	auto is_hex_key = [](const std::string& hex) {
-		if (hex.size() != 64) {
-			return false;
-		}
-
-		for (const auto c : hex) {
-			if (!std::isxdigit(static_cast<unsigned char>(c))) {
-				return false;
-			}
-		}
-
-		return true;
-	};
-
-	auto lowercase = [](std::string text) {
-		for (auto& c : text) {
-			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-		}
-
-		return text;
-	};
-
-	if (id.size() == 66 && id[0] == '0' && (id[1] == 'x' || id[1] == 'X') && is_hex_key(id.substr(2))) {
-		return "key_" + lowercase(id.substr(2));
-	}
-
-	if (is_hex_key(id)) {
-		return "key_" + lowercase(id);
-	}
-
-	if (id.size() == 68 && id.rfind("key_", 0) == 0 && is_hex_key(id.substr(4))) {
-		return "key_" + lowercase(id.substr(4));
+	if (const auto key = identity_key::parse_public_key(key_text)) {
+		return identity_cert::key_account(*key);
 	}
 
 	return id;

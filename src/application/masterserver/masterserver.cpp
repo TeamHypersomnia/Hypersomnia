@@ -446,6 +446,16 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	};
 
 	/*
+		Official by its key (official_servers.d) or not: the id, the flag the clients get and the alias, always together.
+	*/
+
+	auto set_official = [&](masterserver_client& entry, const std::string* const official_id) {
+		entry.official_server_id = official_id != nullptr ? *official_id : std::string();
+		entry.meta.is_official = official_id != nullptr;
+		update_webrtc_alias(entry);
+	};
+
+	/*
 		The aliases as the list has them now, each to one server - two official servers with the same name get it
 		in turn no more: the first keeps it and the clash is logged (once a minute at most).
 	*/
@@ -1138,20 +1148,18 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 							server_entry.last_heartbeat.signature.reset();
 							server_entry.last_heartbeat.ack_nonce = {};
 							server_entry.time_last_heartbeat = current_time;
-							server_entry.official_server_id = official_id != nullptr ? *official_id : std::string();
 
 							/*
 								Another key at the same address (e.g. a reinstalled server) simply replaces the entry.
 							*/
 
 							server_entry.meta.server_public_key = public_key;
-							server_entry.meta.is_official = official_id != nullptr;
+							set_official(server_entry, official_id);
+
 							{
 								const auto domain = std::string(typed_request.domain);
 								server_entry.meta.domain = ::is_acceptable_domain(domain, official_id != nullptr) ? typed_request.domain : decltype(typed_request.domain)();
 							}
-
-							update_webrtc_alias(server_entry);
 
 							const bool heartbeats_mismatch = 
 								heartbeat_before != server_entry.last_heartbeat
@@ -1265,9 +1273,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				if (entry.meta.is_official != now_official || entry.official_server_id != now_id) {
 					LOG("The server at %x is %x.", ::ToString(server.first), now_official ? "official as " + now_id : std::string("no longer official"));
 
-					entry.meta.is_official = now_official;
-					entry.official_server_id = now_official ? *official_id : std::string();
-					update_webrtc_alias(entry);
+					set_official(entry, official_id);
 				}
 			}
 

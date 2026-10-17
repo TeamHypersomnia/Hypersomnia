@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <cstring>
 #include <cstddef>
 #include <cstdint>
@@ -132,12 +133,6 @@ const uint8_t* server_adapter::get_client_session_signature(const client_id_type
 	return server.GetClientSessionSignature(id);
 }
 
-augs::ed25519_public_key_type server_adapter::get_public_key() const {
-	auto out = augs::ed25519_public_key_type();
-	std::memcpy(out.data(), privateKey.data() + 32, out.size());
-	return out;
-}
-
 bool server_adapter::is_running() const {
 	return server.IsRunning();
 }
@@ -249,18 +244,17 @@ server_adapter::server_adapter(
 	const augs::ed25519_seed_type& server_key
 ) :
 	privateKey([&server_key]() {
-		/*
-			netcode takes the secret key the way libsodium keeps it: the seed and then the public key.
-		*/
+		static_assert(std::tuple_size_v<augs::ed25519_secret_key_type> == yojimbo::ServerSecretKeyBytes);
 
-		auto out = std::array<uint8_t, yojimbo::ServerSecretKeyBytes>();
-		std::memcpy(out.data(), server_key.data(), server_key.size());
-
-		if (const auto public_key = augs::ed25519_public_key(server_key)) {
-			std::memcpy(out.data() + server_key.size(), public_key->data(), public_key->size());
+		if (const auto secret = augs::ed25519_secret_key(server_key)) {
+			return *secret;
 		}
 
-		return out;
+		/*
+			Never a server on a half-made key.
+		*/
+
+		throw std::runtime_error("Could not derive the server's secret key.");
 	}()),
 	connection_config(in),
 	adapter(this),
@@ -765,11 +759,6 @@ resolve_address_result client_adapter::connect(const client_connect_string& str,
 	const auto target_addr = to_yojimbo_addr(connected_ip_address);
 
 	auto local_addr = yojimbo::Address("127.0.0.1", DEFAULT_GAME_PORT_V);
-
-	if (target_addr.GetType() == yojimbo::AddressType::ADDRESS_IPV6) {
-		local_addr = yojimbo::Address("::1", DEFAULT_GAME_PORT_V);
-	}
-
 	local_addr.SetPort(target_addr.GetPort());
 
 	yojimbo::Address addresses[2] = {

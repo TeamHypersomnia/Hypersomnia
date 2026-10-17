@@ -45,9 +45,27 @@ namespace identity_key {
 		return "0x" + augs::bytes_to_hex(public_key);
 	}
 
+	std::optional<augs::ed25519_public_key_type> parse_public_key(const std::string& text) {
+		const auto first = text.find_first_not_of(" \t\r\n");
+
+		if (first == std::string::npos) {
+			return std::nullopt;
+		}
+
+		auto hex = text.substr(first, text.find_last_not_of(" \t\r\n") - first + 1);
+
+		if (hex.rfind("0x", 0) == 0 || hex.rfind("0X", 0) == 0) {
+			hex = hex.substr(2);
+		}
+
+		return augs::hex_to_array<32>(hex);
+	}
+
 	std::string short_form_of_account(const std::string& account) {
-		if (account.rfind("key_", 0) == 0 && account.size() >= 4 + 8) {
-			return "0x" + account.substr(4, 8) + "...";
+		const auto prefix = identity_cert::key_account_prefix.size();
+
+		if (identity_cert::is_key_account(account) && account.size() >= prefix + 8) {
+			return "0x" + account.substr(prefix, 8) + "...";
 		}
 
 		return account;

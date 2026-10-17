@@ -66,7 +66,6 @@ struct server_client_state {
 
 	uint32_t direct_file_chunks_left = 0;
 
-	bool auth_requested = false;
 	std::string authenticated_id;
 
 	/*
@@ -96,7 +95,6 @@ struct server_client_state {
 	clan_name_type badge;
 
 	rcon_level_type last_sent_rcon_level = rcon_level_type::DENIED;
-	bool verified_has_no_ban = false;
 
 	server_client_session_id session_id = 0;
 

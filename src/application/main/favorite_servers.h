@@ -8,6 +8,7 @@
 #include "augs/misc/ed25519.h"
 #include "augs/string/hex.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "application/main/identity_key.h"
 #include "application/setups/client/connect_target.h"
 
 /*
@@ -67,17 +68,7 @@ class favorite_servers {
 			const auto entries = augs::from_json_file<std::vector<favorite_server_entry>>(path);
 
 			for (const auto& e : entries) {
-				auto hex = e.key;
-
-				if (hex.rfind("0x", 0) == 0) {
-					hex = hex.substr(2);
-				}
-
-				if (hex.size() != 64) {
-					continue;
-				}
-
-				if (const auto key = augs::hex_to_array<32>(hex)) {
+				if (const auto key = identity_key::parse_public_key(e.key)) {
 					const auto address = connect_target::without_default_port(e.address);
 					servers.push_back({ *key, e.manual ? std::string() : e.label, address, e.name, e.manual, !e.manual && e.official });
 				}
@@ -91,7 +82,7 @@ class favorite_servers {
 		auto entries = std::vector<favorite_server_entry>();
 
 		for (const auto& s : servers) {
-			entries.push_back({ "0x" + augs::bytes_to_hex(s.key), s.label, s.address, s.name, s.manual, s.official });
+			entries.push_back({ identity_key::full_form(s.key), s.label, s.address, s.name, s.manual, s.official });
 		}
 
 		try {

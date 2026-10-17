@@ -5,6 +5,7 @@
 #include "augs/string/hex.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/network/network_types.h"
+#include "application/main/identity_key.h"
 
 /*
 	What a join names - one string everywhere (--connect, the config's last join, Steam's invites, the server browser):
@@ -82,17 +83,7 @@ struct connect_target {
 	*/
 
 	static std::optional<augs::ed25519_public_key_type> key_of(const std::string& text) {
-		auto hex = trimmed(text);
-
-		if (hex.rfind("0x", 0) == 0 || hex.rfind("0X", 0) == 0) {
-			hex = hex.substr(2);
-		}
-
-		if (hex.size() != 64) {
-			return std::nullopt;
-		}
-
-		return augs::hex_to_array<32>(hex);
+		return identity_key::parse_public_key(text);
 	}
 
 	static connect_target parse(const std::string& untrimmed) {

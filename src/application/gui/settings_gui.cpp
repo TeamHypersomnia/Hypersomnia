@@ -2316,7 +2316,7 @@ void settings_gui_state::perform(
 				server_public_key_read = true;
 
 				try {
-					server_public_key = augs::ed25519_public_key(server_key::obtain(KEYS_DIR / server_key::file_name));
+					server_public_key = augs::ed25519_public_key(server_key::obtain(server_key::path()));
 				}
 				catch (const std::exception& err) {
 					LOG("Could not show the server key: %x", err.what());
@@ -2329,7 +2329,7 @@ void settings_gui_state::perform(
 				text(identity_key::short_form(*server_public_key));
 				ImGui::SameLine();
 				copy_icon_button("ServerKey", identity_key::full_form(*server_public_key));
-				tooltip_on_hover("This key is separate from your player account.");
+				tooltip_on_hover(typesafe_sprintf("An %x key - separate from your player account.", std::string(augs::key_scheme_name)));
 				ImGui::Separator();
 			}
 
@@ -4153,7 +4153,7 @@ void settings_gui_state::perform(
 							spinner_line("Signing in...", white);
 						}
 						else {
-							const bool is_key = current_account_id.rfind("key_", 0) == 0;
+							const bool is_key = identity_cert::is_key_account(current_account_id);
 							const auto& provider = signed_in.provider_label;
 
 							const auto label = [&]() -> std::string {

@@ -124,7 +124,7 @@ private:
 	augs::ed25519_seed_type key_seed = {};
 	bool key_loaded = false;
 	augs::ed25519_public_key_type key_public = {};
-	std::array<uint8_t, 64> key_secret = {};
+	augs::ed25519_secret_key_type key_secret = {};
 
 	augs::path_type cert_file;
 	bool cert_saved = false;
@@ -363,7 +363,7 @@ public:
 
 	identity_cert::cert cert_for_connect(double now) const;
 
-	const std::array<uint8_t, 64>& session_secret_key() const { return key_secret; }
+	const augs::ed25519_secret_key_type& session_secret_key() const { return key_secret; }
 	const augs::ed25519_public_key_type& public_key() const { return key_public; }
 
 	/*

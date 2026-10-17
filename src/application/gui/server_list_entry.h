@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <optional>
+#include "augs/misc/ed25519.h"
 #include "augs/network/network_types.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "application/masterserver/masterserver_client.h"
@@ -91,15 +93,15 @@ struct server_list_entry {
 		return meta.is_official_server();
 	}
 
-	/*
-		The key from the server list, if the masterserver gave one - what the client expects in the handshake.
-	*/
-
 	std::string get_instance_label() const {
 		return std::string(heartbeat.instance_label);
 	}
 
-	std::optional<std::array<uint8_t, 32>> get_public_key() const {
+	/*
+		The key from the server list, if the masterserver gave one - what the client expects in the handshake.
+	*/
+
+	std::optional<augs::ed25519_public_key_type> get_public_key() const {
 		for (const auto b : meta.server_public_key) {
 			if (b != 0) {
 				return meta.server_public_key;
@@ -112,16 +114,9 @@ struct server_list_entry {
 	std::string get_my_connect_string() const;
 
 	/*
-		The same server: by its key if it has one, else by the address.
-	*/
-
-	/*
-		The same row: a host's instances share the key (told apart by the label), and a favorite added by hand at a
-		listed server's address and key is a row of its own.
-	*/
-
-	/*
-		A favorite starred on the list is the same server on the list or off it; one added by hand is its key at its address.
+		The same row: by the key and the instance label if it has a key (a host's instances share the key), else by the
+		address. A favorite starred on the list is the same server on the list or off it; one added by hand at a listed
+		server's address and key is a row of its own.
 	*/
 
 	bool same_server(const server_list_entry& b) const {

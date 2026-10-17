@@ -49,9 +49,7 @@
 #include "application/setups/client/direct_file_download.h"
 #include "application/setups/client/bandwidth_monitor.h"
 #include "steam_integration_callbacks.h"
-#include "application/main/auth_provider_type.h"
 #include "application/gui/ingame_menu_button_type.h"
-#include "augs/misc/async_response.h"
 #include "application/main/identity_session.h"
 #include "game/messages/hud_message.h"
 
@@ -87,7 +85,6 @@ enum class expected_server_key_source {
 
 struct client_identity_context {
 	std::shared_ptr<identity_session> session;
-	identity_session::input input;
 
 	/*
 		The key the join names (the server list's, a favorite's, an invite's) or the rejoined match's;
@@ -134,12 +131,6 @@ class client_setup :
 	client_identity_context identity;
 	std::string connected_account;
 	bool list_key_mismatch = false;
-
-	/*
-		Whether ranked is required by the server - from server_auth_state.
-	*/
-
-	bool server_requires_authentication = false;
 
 	bool now_resyncing = false;
 	bool schedule_disconnect = false;
@@ -892,6 +883,8 @@ public:
 			Not on the web: a tab coming back would time out before reading what waits for it.
 		*/
 
+		constexpr int silence_limit_secs = 10;
+
 		const bool steps_expected =
 			!downloading
 			&& state == client_state_type::IN_GAME
@@ -903,14 +896,14 @@ public:
 			is_connected()
 			&& (
 				steps_expected ?
-				current_time - when_sent_last_referential_step > 10.0 :
-				secs_since_last_server_packet() > 10.0
+				current_time - when_sent_last_referential_step > silence_limit_secs :
+				secs_since_last_server_packet() > silence_limit_secs
 			)
 		;
 
 		if (server_went_silent) {
-			LOG("Nothing from the server for 10 seconds - disconnecting.");
-			set_disconnect_reason("Nothing came from the server for 10 seconds.\nThe server may be down, or your connection may have dropped.");
+			LOG("Nothing from the server for %x seconds - disconnecting.", silence_limit_secs);
+			set_disconnect_reason(typesafe_sprintf("Nothing came from the server for %x seconds.\nThe server may be down, or your connection may have dropped.", silence_limit_secs));
 			disconnect();
 		}
 #endif

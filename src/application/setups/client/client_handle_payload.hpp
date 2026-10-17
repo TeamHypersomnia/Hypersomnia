@@ -466,7 +466,6 @@ message_handler_result client_setup::handle_payload(
 	}
 	else if constexpr (std::is_same_v<T, server_auth_state>) {
 		client_gui.rcon.level = payload.rcon_level;
-		server_requires_authentication = payload.requires_authentication;
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
 		mode_player_id player_id;

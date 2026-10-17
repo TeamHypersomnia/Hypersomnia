@@ -75,6 +75,7 @@
 #include "application/main/identity_key.h"
 #include "application/main/identity_session.h"
 #include "application/main/ranked_match_record.h"
+#include "application/network/protocol_version.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "application/main/server_passwords.h"
 #include "application/main/favorite_servers.h"
@@ -815,11 +816,10 @@ work_result work(
 	*/
 
 	{
-		const auto version = hypersomnia_version().get_version_string();
-		const auto major_minor = version.substr(0, version.find('.', version.find('.') + 1));
+		const auto protocol_version = ::protocol_version_of(hypersomnia_version().get_version_string());
 
-		augs::network::set_protocol_version("HS" + major_minor);
-		LOG("Protocol version: HS%x", major_minor);
+		augs::network::set_protocol_version(protocol_version);
+		LOG("Protocol version: %x", protocol_version);
 	}
 
 #if PLATFORM_WEB
@@ -838,23 +838,12 @@ work_result work(
 			What an official server's operator sends to the developers: the public part of server.key, made if missing.
 		*/
 
-		const auto path = KEYS_DIR / server_key::file_name;
-
-		if (server_key::damaged(path)) {
-			std::cerr << "ERROR: " << server_key::damaged_message(path) << std::endl;
+		if (const auto error = server_key::dedicated_start_error()) {
+			std::cerr << "ERROR: " << *error << std::endl;
 			return work_result::FAILURE;
 		}
 
-		/*
-			One key for all the instances of this host - never one for this run only (a key that could not be saved).
-		*/
-
-		const auto seed = server_key::load_or_create(path);
-
-		if (!seed.has_value()) {
-			std::cerr << "ERROR: could not read or create " << path.string() << "." << std::endl;
-			return work_result::FAILURE;
-		}
+		const auto seed = server_key::load_or_create(server_key::path());
 
 		/*
 			The key on a line of its own on stdout (grep -E "^[0-9a-f]{64}$" in scripts); how to use it on stderr.
@@ -862,6 +851,7 @@ work_result work(
 
 		const auto key_hex = server_key::public_key_hex(*seed);
 
+		std::cerr << "Server public key (" << augs::key_scheme_name << "):" << std::endl;
 		std::cout << key_hex << std::endl;
 		std::cerr << "\nPublish it with this server's address, e.g. 1.2.3.4:8412,0x" << key_hex << "\n";
 		std::cerr << "Players add it in Browse servers - Favorites - Add an unlisted server." << std::endl;
@@ -1620,17 +1610,11 @@ work_result work(
 		};
 
 		/*
-			All the instances' key is server.key - a damaged one starts nothing (tournament matches neither), and neither
-			does one that can not be saved (a key for this run only would not be this server).
+			All the instances' key is server.key (tournament matches' too).
 		*/
 
-		if (server_key::damaged(KEYS_DIR / server_key::file_name)) {
-			LOG("ERROR: %x Not starting.", server_key::damaged_message(KEYS_DIR / server_key::file_name));
-			return work_result::FAILURE;
-		}
-
-		if (!server_key::load_or_create(KEYS_DIR / server_key::file_name).has_value()) {
-			LOG("ERROR: could not create %x - not starting. Make %x writable.", KEYS_DIR / server_key::file_name, KEYS_DIR);
+		if (const auto error = server_key::dedicated_start_error()) {
+			LOG("ERROR: %x Not starting.", *error);
 			return work_result::FAILURE;
 		}
 
@@ -2636,9 +2620,7 @@ work_result work(
 				*/
 
 				const auto& reason = client.get_last_disconnect_reason();
-				const bool rejoin_refused = reason.find("Joined too late") != std::string::npos || reason.find("wrong match") != std::string::npos;
-
-				if (rejoin_refused && augs::exists(RANKED_MATCH_PATH)) {
+				if (::refuses_rejoin(reason) && augs::exists(RANKED_MATCH_PATH)) {
 					if (const auto record = ranked_match_record::load(RANKED_MATCH_PATH); record.has_value() && record->connect == client.get_connect_string()) {
 						LOG("The rejoin to %x was refused - forgetting it.", record->connect);
 						augs::remove_file(RANKED_MATCH_PATH);
@@ -3355,7 +3337,7 @@ work_result work(
 				return false;
 			}
 			else {
-				const auto short_key = "0x" + augs::bytes_to_hex(*target.key).substr(0, 8) + "...";
+				const auto short_key = identity_key::short_form(*target.key);
 
 				auto popup = simple_popup();
 				popup.title = "Server not found";
@@ -3419,7 +3401,6 @@ work_result work(
 
 		auto identity_context = client_identity_context();
 		identity_context.session = identity;
-		identity_context.input = get_identity_input();
 
 		identity_context.expected_server_public_key = [&]() -> std::optional<augs::ed25519_public_key_type> {
 			using S = expected_server_key_source;
@@ -4086,7 +4067,7 @@ work_result work(
 		const auto now = augs::steady_secs();
 		const auto in = get_identity_input();
 		const auto account = settings_gui.current_account_id;
-		const bool signed_in_account = !account.empty() && account.rfind("key_", 0) != 0;
+		const bool signed_in_account = !account.empty() && !identity_cert::is_key_account(account);
 
 		const auto account_label = [&]() -> std::string {
 			if (account.empty()) {

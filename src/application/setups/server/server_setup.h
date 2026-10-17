@@ -116,12 +116,17 @@ class server_setup :
 	*/
 
 	std::vector<augs::ed25519_public_key_type> trusted_broker_keys;
-	bool broker_keys_read = false;
 	server_bans bans;
 	std::filesystem::file_time_type bans_file_time = {};
 	double when_checked_bans_file = -1000.0;
 	report_queue reports;
 	augs::ed25519_seed_type this_server_key = {};
+
+	/*
+		Of this_server_key - fixed for the setup's whole life.
+	*/
+
+	augs::ed25519_public_key_type this_server_public_key = {};
 
 	/*
 		See server_request_signature.h.
@@ -810,6 +815,12 @@ public:
 	void disconnect_and_unset(const client_id_type&);
 
 	void kick(const client_id_type&, const std::string& reason, chat_target_type target = chat_target_type::KICK);
+
+	/*
+		Kicked and disconnected as soon as the reason is sent - no lingering in the game (refused joins, timeouts).
+	*/
+
+	void kick_now(const client_id_type&, const std::string& reason);
 
 	/*
 		Wrong server passwords per address (see get_client_ip_for_bans): a few a minute, then none for a minute.

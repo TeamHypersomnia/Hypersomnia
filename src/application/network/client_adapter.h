@@ -30,7 +30,7 @@ struct client_connect_identity {
 		The session secret key (seed and public key) that signs the connection, if there is a cert to go with it.
 	*/
 
-	std::optional<std::array<uint8_t, 64>> session_secret_key;
+	std::optional<augs::ed25519_secret_key_type> session_secret_key;
 
 	identity_cert::blob_type blob = {};
 };

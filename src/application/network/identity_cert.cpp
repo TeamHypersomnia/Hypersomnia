@@ -1,3 +1,4 @@
+#include <array>
 #include <cstring>
 #if BUILD_NETWORKING
 #include <sodium.h>
@@ -72,7 +73,18 @@ namespace identity_cert {
 			return std::nullopt;
 		}
 
-		const auto expected_size = 2 + account_length + 32 + 8 + 8 + 1 + 64;
+		/*
+			version, account length, account, session key, not_before, not_after, proof, signature
+		*/
+
+		const auto expected_size =
+			2
+			+ account_length
+			+ std::tuple_size_v<augs::ed25519_public_key_type>
+			+ sizeof(int64_t) * 2
+			+ 1
+			+ std::tuple_size_v<augs::ed25519_signature_type>
+		;
 
 		if (size != expected_size) {
 			return std::nullopt;
@@ -117,7 +129,7 @@ namespace identity_cert {
 	}
 
 	std::string key_account(const augs::ed25519_public_key_type& account_public_key) {
-		return "key_" + augs::bytes_to_hex(account_public_key);
+		return std::string(key_account_prefix) + augs::bytes_to_hex(account_public_key);
 	}
 
 	std::optional<cert> make_self_signed(
@@ -166,13 +178,11 @@ namespace identity_cert {
 	}
 
 	static std::optional<augs::ed25519_public_key_type> key_of_key_account(const std::string& account) {
-		static constexpr std::string_view prefix = "key_";
-
-		if (account.size() != prefix.size() + 64 || account.compare(0, prefix.size(), prefix) != 0) {
+		if (!is_key_account(account)) {
 			return std::nullopt;
 		}
 
-		return augs::hex_to_array<32>(std::string_view(account).substr(prefix.size()), true);
+		return augs::hex_to_array<32>(std::string_view(account).substr(key_account_prefix.size()), true);
 	}
 
 	std::optional<verified_identity> verify(
@@ -233,9 +243,9 @@ namespace identity_cert {
 		std::memcpy(signature.data(), session_signature, signature.size());
 
 		const auto binding = std::string_view(reinterpret_cast<const char*>(connection_binding), NETCODE_BINDING_BYTES);
-		const auto signed_message = std::string(NETCODE_SESSION_SIGNATURE_TAG) + std::string(binding);
+		const auto session_message = std::string(NETCODE_SESSION_SIGNATURE_TAG) + std::string(binding);
 
-		if (!augs::ed25519_verify(c.session_public_key, signed_message, signature)) {
+		if (!augs::ed25519_verify(c.session_public_key, session_message, signature)) {
 			return fail(verify_failure::BAD_SESSION_SIGNATURE);
 		}
 
@@ -352,7 +362,8 @@ namespace {
 }
 
 /*
-	The same vectors as the broker's test on hypersomnia.io (identity_cert.js), so both sides agree on every byte.
+	The same vectors as the site's tools/identity_cert_vectors_test.js (its identity_cert.js), so both sides agree on
+	every byte.
 */
 
 TEST_CASE("Identity cert matches the broker's format") {

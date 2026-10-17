@@ -9,7 +9,6 @@ namespace messages {
 	enum class no_arg_mode_notification {
 		TEAMS_ARE_NOT_VIABLE_FOR_RANKED,
 		FAILED_TO_AUTHENTICATE,
-		FAILED_TO_CHECK_BANS,
 
 		PLAYER_READY_FOR_RANKED,
 		PLAYER_REQUESTED_ABANDON,

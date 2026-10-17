@@ -6,7 +6,6 @@
 #include "augs/misc/profanity_filter.h"
 
 #include "augs/log.h"
-#include "augs/misc/async_get.h"
 #include "application/setups/client/connect_target.h"
 #include "application/setups/client/client_setup.h"
 #include "application/config_json_table.h"
@@ -67,6 +66,20 @@
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
 
+/*
+	A WebRTC connection "disconnected" for this long is lost (it may come back before), and negotiating one through
+	the masterserver has a limit of its own.
+*/
+
+static constexpr double webrtc_disconnected_limit_secs = 5.0;
+static constexpr double webrtc_negotiation_limit_secs = 20.0;
+
+static const auto unreachable_through_masterserver_v = std::string("Couldn't reach the server through masterserver.hypersomnia.io. Try again later.");
+
+static void connecting_line(const std::string& server_name, const double secs) {
+	augs::imgui::text("Connecting to %x\nTime: %2f seconds", server_name, secs);
+}
+
 struct webrtc_client_detail {
 	using this_sptr = std::shared_ptr<webrtc_client_detail>;
 
@@ -101,7 +114,7 @@ struct webrtc_client_detail {
 		std::scoped_lock lock(ready_lk);
 
 		const double since = disconnected_since;
-		const bool disconnected_for_long = since >= 0.0 && augs::high_precision_secs() - since > 5.0;
+		const bool disconnected_for_long = since >= 0.0 && augs::high_precision_secs() - since > webrtc_disconnected_limit_secs;
 
 		return is_error_state || disconnected_for_long;
 	}
@@ -174,7 +187,7 @@ struct webrtc_client_detail {
 			*/
 
 			if (!self->is_ready()) {
-				self->set_message("Couldn't reach the server through masterserver.hypersomnia.io. Try again later.");
+				self->set_message(unreachable_through_masterserver_v);
 				self->set_error();
 			}
 			else {
@@ -1990,12 +2003,12 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				Negotiating through the masterserver has a limit of its own.
 			*/
 
-			if (get_current_time() - when_initiated_connection > 20.0) {
-				webrtc_client->set_message("Couldn't reach the server through masterserver.hypersomnia.io. Try again later.");
+			if (get_current_time() - when_initiated_connection > webrtc_negotiation_limit_secs) {
+				webrtc_client->set_message(unreachable_through_masterserver_v);
 				webrtc_client->set_error();
 			}
 
-			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
+			::connecting_line(get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
 
 			text("\n");
 
@@ -2051,7 +2064,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				The frame before the game connects.
 			*/
 
-			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
+			::connecting_line(get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
 			text("\n");
 			ImGui::Separator();
 
@@ -2060,7 +2073,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (state == C::NETCODE_NEGOTIATING_CONNECTION && adapter->is_connecting()) {
-			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
+			::connecting_line(get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
 
 			text("\n");
 			ImGui::Separator();
@@ -2165,7 +2178,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 					text_color("This server's key was not verified (joined by its address).\nDon't type a password you use elsewhere.", orange);
 				}
 
-				input_text<65>("Server password", password_retry_input, flags);
+				input_text<identity_cert::max_password_length + 1>("Server password", password_retry_input, flags);
 
 				const bool enter_pressed =
 					ImGui::IsItemFocused()
@@ -2552,7 +2565,7 @@ void client_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 	*/
 
 	const auto server_key = get_server_public_key();
-	const auto player_group_identifier = server_key.has_value() ? get_server_instance_label() + "-" + augs::bytes_to_hex(*server_key) : get_connect_string();
+	const auto player_group_identifier = server_key.has_value() ? ::steam_player_group_of(get_server_instance_label(), *server_key) : get_connect_string();
 
 	::get_arena_steam_rich_presence_pairs(
 		pairs,

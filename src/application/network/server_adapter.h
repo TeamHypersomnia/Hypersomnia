@@ -25,7 +25,7 @@ class server_adapter {
 	friend bool aux_send_packet(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes);
 	friend int receive_packet_override(void* context, netcode_address_t* from, uint8_t* packet, int bytes);
 
-	std::array<uint8_t, yojimbo::ServerSecretKeyBytes> privateKey = {};
+	augs::ed25519_secret_key_type privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
 	yojimbo::DefaultAllocator yojimbo_allocator;
@@ -76,8 +76,6 @@ public:
 	const uint8_t* get_client_user_data(const client_id_type& id) const;
 	const uint8_t* get_client_binding(const client_id_type& id) const;
 	const uint8_t* get_client_session_signature(const client_id_type& id) const;
-
-	augs::ed25519_public_key_type get_public_key() const;
 
 	template <class H>
 	void advance(

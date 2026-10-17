@@ -80,13 +80,6 @@ bool chat_gui_state::add_entry_from_mode_notification(
 					);
 					break;
 
-				case N::FAILED_TO_CHECK_BANS:
-					do_entry(
-						"Failed to check bans for some users.\nTry again.",
-						orange
-					);
-					break;
-
 				case N::RANKED_STARTED:
 					do_entry(
 						"============================\nNOW THERE IS NO TURNING BACK.\n============================\nRanked match has started! GL & HF.\n",

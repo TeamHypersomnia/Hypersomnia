@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include "augs/misc/ed25519.h"
 
@@ -40,6 +41,19 @@ namespace augs {
 		(void)count;
 		return false;
 #endif
+	}
+
+	std::optional<ed25519_secret_key_type> ed25519_secret_key(const ed25519_seed_type& seed) {
+		const auto public_key = ed25519_public_key(seed);
+
+		if (!public_key.has_value()) {
+			return std::nullopt;
+		}
+
+		auto out = ed25519_secret_key_type();
+		std::copy(seed.begin(), seed.end(), out.begin());
+		std::copy(public_key->begin(), public_key->end(), out.begin() + seed.size());
+		return out;
 	}
 
 	std::optional<ed25519_public_key_type> ed25519_public_key(const ed25519_seed_type& seed) {

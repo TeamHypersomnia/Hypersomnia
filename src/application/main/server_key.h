@@ -4,13 +4,13 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
-#include <sodium.h>
 #include <string_view>
 #include "augs/log.h"
 #include "augs/filesystem/path.h"
 #include "augs/misc/ed25519.h"
 #include "augs/misc/secure_hash.h"
 #include "application/main/identity_key.h"
+#include "all_paths.h"
 
 /*
 	Every server's Ed25519 key: one secret, server.key in KEYS_DIR (see all_paths.h), created on the first start and never
@@ -103,6 +103,31 @@ namespace server_key {
 		}
 
 		return augs::exists(path) && !identity_key::load(path).has_value();
+	}
+
+	/*
+		This host's server.key - in KEYS_DIR, see all_paths.h.
+	*/
+
+	inline augs::path_type path() {
+		return KEYS_DIR / file_name;
+	}
+
+	/*
+		A dedicated server - and --print-server-key - start only on server.key as it will stay: not on a damaged one, nor on
+		one that can not be saved (a key for this run only would not be this server). Why not, or nothing to complain about.
+	*/
+
+	inline std::optional<std::string> dedicated_start_error() {
+		if (damaged(path())) {
+			return damaged_message(path());
+		}
+
+		if (!load_or_create(path()).has_value()) {
+			return "Could not create " + path().string() + " - make " + KEYS_DIR.string() + " writable.";
+		}
+
+		return std::nullopt;
 	}
 
 	inline std::string public_key_hex(const augs::ed25519_seed_type& seed) {

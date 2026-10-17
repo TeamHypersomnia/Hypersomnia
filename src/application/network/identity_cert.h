@@ -82,7 +82,13 @@ namespace identity_cert {
 
 	std::string signed_message(const cert&);
 
+	inline constexpr std::string_view key_account_prefix = "key_";
+
 	std::string key_account(const augs::ed25519_public_key_type& account_public_key);
+
+	inline bool is_key_account(const std::string& account) {
+		return account.rfind(key_account_prefix, 0) == 0;
+	}
 
 	std::optional<cert> make_self_signed(
 		const augs::ed25519_seed_type& account_seed,

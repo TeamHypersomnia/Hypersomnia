@@ -2,13 +2,13 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <string_view>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/ed25519.h"
 #include "augs/misc/date_time.h"
-#include "augs/string/hex.h"
-#include "augs/misc/secure_hash.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "application/main/identity_key.h"
 
 /*
 	user/ranked_match.json - a ranked match the player is in, kept so that the game brings the player back to it on its own
@@ -18,6 +18,33 @@
 	so after a crash at any moment it is right within the rewrite period. Past it a rejoin is refused anyway -
 	a stale file does nothing.
 */
+
+/*
+	The kick reasons that refuse a rejoin for good (the match ended, or the record was another account's) - the server
+	kicks with them, and the game forgets its record on seeing one.
+*/
+
+inline constexpr std::string_view rejoin_too_late_reason_v = "Joined too late! Match is ongoing.";
+inline constexpr std::string_view rejoin_wrong_match_reason_v = "Connected to a wrong match.";
+
+inline bool refuses_rejoin(const std::string& kick_reason) {
+	return
+		kick_reason.find(rejoin_too_late_reason_v) != std::string::npos
+		|| kick_reason.find(rejoin_wrong_match_reason_v) != std::string::npos
+	;
+}
+
+/*
+	The file's form - the server key as identity_key::full_form.
+*/
+
+struct ranked_match_record_file {
+	// GEN INTROSPECTOR struct ranked_match_record_file
+	std::string connect;
+	std::string server_key;
+	double rejoin_until = 0.0;
+	// END GEN INTROSPECTOR
+};
 
 struct ranked_match_record {
 	std::string connect;
@@ -34,35 +61,14 @@ struct ranked_match_record {
 		}
 
 		try {
-			const auto document = augs::json_document_from(augs::file_to_string(path));
+			const auto file = augs::from_json_file<ranked_match_record_file>(path);
+			const auto key = identity_key::parse_public_key(file.server_key);
 
-			if (!document.IsObject()) {
+			if (file.connect.empty() || !key.has_value()) {
 				return std::nullopt;
 			}
 
-			auto string_of = [&](const char* const key) -> std::string {
-				if (document.HasMember(key) && document[key].IsString()) {
-					return document[key].GetString();
-				}
-
-				return "";
-			};
-
-			auto out = ranked_match_record();
-			out.connect = string_of("connect");
-
-			if (document.HasMember("rejoin_until") && document["rejoin_until"].IsInt64()) {
-				out.rejoin_until = document["rejoin_until"].GetInt64();
-			}
-
-			const auto key = augs::hex_to_array<32>(string_of("server_key"));
-
-			if (out.connect.empty() || !key.has_value()) {
-				return std::nullopt;
-			}
-
-			out.server_key = *key;
-			return out;
+			return ranked_match_record { file.connect, *key, static_cast<int64_t>(file.rejoin_until) };
 		}
 		catch (...) {
 			LOG("Could not read %x.", path);
@@ -71,22 +77,11 @@ struct ranked_match_record {
 	}
 
 	void save(const augs::path_type& path) const {
-		const auto key = augs::bytes_to_hex(server_key);
-
-		rapidjson::StringBuffer buffer;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-
-		writer.StartObject();
-		writer.Key("connect");
-		writer.String(connect.c_str(), static_cast<rapidjson::SizeType>(connect.size()));
-		writer.Key("server_key");
-		writer.String(key.c_str(), static_cast<rapidjson::SizeType>(key.size()));
-		writer.Key("rejoin_until");
-		writer.Int64(rejoin_until);
-		writer.EndObject();
-
 		try {
-			augs::save_as_text_atomic(path, std::string(buffer.GetString()) + "\n");
+			augs::save_as_json_atomic(
+				ranked_match_record_file { connect, identity_key::full_form(server_key), static_cast<double>(rejoin_until) },
+				path
+			);
 		}
 		catch (...) {
 			LOG("Could not save %x.", path);

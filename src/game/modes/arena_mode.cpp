@@ -3502,10 +3502,6 @@ void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step st
 			interrupt(messages::no_arg_mode_notification::FAILED_TO_AUTHENTICATE);
 			return;
 		}
-		else if (!in.dynamic_vars.all_not_banned) {
-			interrupt(messages::no_arg_mode_notification::FAILED_TO_CHECK_BANS);
-			return;
-		}
 		else {
 			ranked_state = ranked_state_type::LIVE;
 			total_effective_ranked_time_secs = 0.f;

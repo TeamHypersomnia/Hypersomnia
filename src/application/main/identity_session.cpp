@@ -61,12 +61,10 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	key_seed = seed;
 	key_loaded = true;
 
-	if (const auto public_key = augs::ed25519_public_key(key_seed)) {
-		key_public = *public_key;
+	if (const auto secret = augs::ed25519_secret_key(key_seed)) {
+		key_secret = *secret;
+		std::copy(key_secret.begin() + key_seed.size(), key_secret.end(), key_public.begin());
 	}
-
-	std::memcpy(key_secret.data(), key_seed.data(), key_seed.size());
-	std::memcpy(key_secret.data() + key_seed.size(), key_public.data(), key_public.size());
 
 	cert_file = new_cert_file;
 	import_marker_file = keys_dir / "imported_key.json";
@@ -440,10 +438,6 @@ std::optional<identity_session::parsed_answer> identity_session::parse_answer(co
 	}
 }
 
-static bool is_key_account(const std::string& account) {
-	return account.rfind("key_", 0) == 0;
-}
-
 void identity_session::advance(const input& in, const double now) {
 	last_now = now;
 
@@ -525,13 +519,13 @@ void identity_session::advance(const input& in, const double now) {
 			++attempts_finished;
 		}
 
-		if (answer.has_value() && ::is_key_account(answer->cert.account) && key_can_be_linked) {
+		if (answer.has_value() && identity_cert::is_key_account(answer->cert.account) && key_can_be_linked) {
 			/*
 				The key's own account: not linked - or no longer (unlinked on the site, or an unlink whose answer got lost).
 				Back to the key account, no error.
 			*/
 
-			if (cert_saved || (broker_cert.has_value() && !::is_key_account(broker_cert->account))) {
+			if (cert_saved || (broker_cert.has_value() && !identity_cert::is_key_account(broker_cert->account))) {
 				LOG("The key is no longer linked to a Steam account.");
 				unlinked_noticed = profile.name;
 				on_unlinked();

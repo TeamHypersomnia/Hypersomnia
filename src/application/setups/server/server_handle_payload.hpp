@@ -51,8 +51,7 @@ message_handler_result server_setup::handle_payload(
 				Lingering shortly, so the reason reaches the player instead of a bare disconnect.
 			*/
 
-			kick(client_id, reason);
-			c.kick_no_linger = true;
+			kick_now(client_id, reason);
 			return continue_v;
 		}
 
@@ -67,11 +66,10 @@ message_handler_result server_setup::handle_payload(
 
 		if (requires_authentication()) {
 			const auto platform = payload.get_platform_type();
-			const bool guest_account = c.cert_account.rfind("key_", 0) == 0;
+			const bool guest_account = identity_cert::is_key_account(c.cert_account);
 
 			if (platform == client_platform_type::ITCH) {
-				kick(client_id, "Ranked is not available on itch.io.\nPlay on play.hypersomnia.io or on Steam.");
-				c.kick_no_linger = true;
+				kick_now(client_id, "Ranked is not available on itch.io.\nPlay on play.hypersomnia.io or on Steam.");
 				return continue_v;
 			}
 
@@ -80,8 +78,7 @@ message_handler_result server_setup::handle_payload(
 			*/
 
 			if (platform == client_platform_type::CRAZYGAMES && guest_account) {
-				kick(client_id, "Sign in to CrazyGames to play ranked.\nSigned in already? Your account could not be confirmed right now - try again in a moment.");
-				c.kick_no_linger = true;
+				kick_now(client_id, "Sign in to CrazyGames to play ranked.\nSigned in already? Your account could not be confirmed right now - try again in a moment.");
 				return continue_v;
 			}
 		}
@@ -200,14 +197,6 @@ message_handler_result server_setup::handle_payload(
 
 		c.rebroadcast_synced_meta = true;
 		c.last_keyboard_activity_time = server_time;
-
-#if 0
-#if !IS_PRODUCTION_BUILD
-		/* Test rankeds without real accounts */
-		c.verified_has_no_ban = true;
-		c.authenticated_id = new_nick;
-#endif
-#endif
 	}
 	else if constexpr (is_one_of_v<T, rcon_command_variant, server_vars>) {
 		const auto level = get_rcon_level(client_id);

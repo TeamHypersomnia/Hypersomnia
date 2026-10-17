@@ -9,5 +9,4 @@
 
 struct server_auth_state {
 	rcon_level_type rcon_level = rcon_level_type::DENIED;
-	bool requires_authentication = false;
 };

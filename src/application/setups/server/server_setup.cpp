@@ -49,6 +49,8 @@
 #include "application/network/identity_cert.h"
 #include "application/main/server_key.h"
 #include "application/main/identity_key.h"
+#include "application/main/ranked_match_record.h"
+#include "application/network/protocol_version.h"
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
@@ -938,7 +940,8 @@ server_setup::server_setup(
 ) :
 	integrated_client_vars(integrated_client_vars),
 	canon_with_confd_vars(canon_with_confd_vars),
-	this_server_key(server_key::obtain(KEYS_DIR / server_key::file_name)),
+	this_server_key(server_key::obtain(server_key::path())),
+	this_server_public_key(augs::ed25519_public_key(this_server_key).value_or(augs::ed25519_public_key_type())),
 	official(official),
 	last_loaded_project(std::make_unique<editor_project>()),
 	last_start(in),
@@ -1075,7 +1078,7 @@ server_setup::server_setup(
 
 	reports.init(USER_DIR, get_instance_label(), this_server_key);
 
-	LOG("Server key: %x (%x)", server_key::public_key_hex(this_server_key), server_key::source_name(KEYS_DIR / server_key::file_name));
+	LOG("Server key: %x (%x)", augs::bytes_to_hex(this_server_public_key), server_key::source_name(server_key::path()));
 
 	if (private_initial_vars.admin_profiles.empty()) {
 		LOG("No admin_profiles: nobody connected can use RCON (a host from the game always can).");
@@ -1332,14 +1335,7 @@ static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const ser
 	auto keys = std::vector<augs::ed25519_public_key_type>();
 
 	for (const auto& written : configured) {
-		/*
-			Also as the game shows keys: "0x<64 hex>".
-		*/
-
-		auto hex = ::normalize_account_id(written);
-		hex = cut_preffix(hex, "key_");
-
-		if (const auto key = augs::hex_to_array<32>(hex)) {
+		if (const auto key = identity_key::parse_public_key(written)) {
 			keys.push_back(*key);
 		}
 		else {
@@ -1361,7 +1357,7 @@ static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const ser
 static std::string admin_account_of(const identity_cert::cert& c) {
 	const bool proven_only_by_a_key =
 		c.proof == identity_cert::proof_type::ACCOUNT_KEY
-		&& !begins_with(c.account, "key_")
+		&& !identity_cert::is_key_account(c.account)
 	;
 
 	return proven_only_by_a_key ? identity_cert::key_account(c.session_public_key) : c.account;
@@ -1379,16 +1375,14 @@ void server_setup::verify_client_identity(const client_id_type id) {
 
 	if (!blob.has_value()) {
 		LOG("Client %x sent unreadable handshake data.", id);
-		kick(id, "Invalid connection data. Update the game.");
-		c.kick_no_linger = true;
+		kick_now(id, "Invalid connection data. Update the game.");
 		return;
 	}
 
 	c.connect_password = blob->password;
 
 	if (const auto b = find_ban("", get_client_ip_for_bans(id))) {
-		kick(id, ban_message(*b));
-		c.kick_no_linger = true;
+		kick_now(id, ban_message(*b));
 		return;
 	}
 
@@ -1440,7 +1434,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 	}();
 
 	if (!verified.has_value()) {
-		const bool broker_account = blob->identity.has_value() && blob->identity->account.rfind("key_", 0) != 0;
+		const bool broker_account = blob->identity.has_value() && !identity_cert::is_key_account(blob->identity->account);
 
 		const auto reason = [&]() -> std::string {
 			using F = identity_cert::verify_failure;
@@ -1459,8 +1453,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			}
 		}();
 
-		kick(id, reason);
-		c.kick_no_linger = true;
+		kick_now(id, reason);
 		return;
 	}
 
@@ -1480,8 +1473,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 		);
 
 		if (!c.when_kicked.has_value() && !c.is_authenticated()) {
-			kick(id, "Authentication failure. Try again.");
-			c.kick_no_linger = true;
+			kick_now(id, "Authentication failure. Try again.");
 		}
 	}
 	else if (is_banned(verified->account)) {
@@ -1489,8 +1481,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			Banned by account also where the nicknames are the accounts.
 		*/
 
-		kick(id, ban_message_for(verified->account));
-		c.kick_no_linger = true;
+		kick_now(id, ban_message_for(verified->account));
 	}
 
 	if (c.when_kicked.has_value()) {
@@ -1515,7 +1506,6 @@ uint32_t server_setup::get_game_capacity() const {
 */
 
 void server_setup::admit_or_refuse(const client_id_type id) {
-	auto& c = clients[id];
 	const auto ip = get_client_ip_for_bans(id);
 
 	auto is_counted = [&](const auto other_id, const auto& other) {
@@ -1536,8 +1526,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		});
 
 		if (static_cast<uint32_t>(from_this_ip) >= vars.max_ranked_players_per_ip) {
-			kick(id, typesafe_sprintf("At most %x players from one network can join a ranked server.", vars.max_ranked_players_per_ip));
-			c.kick_no_linger = true;
+			kick_now(id, typesafe_sprintf("At most %x players from one network can join a ranked server.", vars.max_ranked_players_per_ip));
 			return;
 		}
 	}
@@ -1548,8 +1537,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		return;
 	}
 
-	kick(id, "The server is full.");
-	c.kick_no_linger = true;
+	kick_now(id, "The server is full.");
 }
 
 void server_setup::apply_authentication(
@@ -1604,8 +1592,7 @@ void server_setup::apply_authentication(
 	}
 
 	if (is_banned(new_id)) {
-		kick(client_id, ban_message_for(new_id));
-		client->kick_no_linger = true;
+		kick_now(client_id, ban_message_for(new_id));
 		return;
 	}
 
@@ -1639,7 +1626,6 @@ void server_setup::apply_authentication(
 
 	client->authenticated_id = new_id;
 	client->authenticated_by_broker = signed_by_broker;
-	client->verified_has_no_ban = true;
 
 	LOG(
 		"Authenticated \"%x\". ID: %x (%x). Took %x secs.", 
@@ -2680,7 +2666,7 @@ std::string server_setup::get_steam_join_command_line() const {
 		return "";
 	}
 
-	return address + "," + server_key::public_key_hex(this_server_key);
+	return address + "," + augs::bytes_to_hex(this_server_public_key);
 }
 
 void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pairs) const {
@@ -2688,7 +2674,7 @@ void server_setup::get_steam_rich_presence_pairs(steam_rich_presence_pairs& pair
 		The same group as the clients on this server - its instance label and key (see client_setup).
 	*/
 
-	const auto player_group_identifier = get_instance_label() + "-" + server_key::public_key_hex(this_server_key);
+	const auto player_group_identifier = ::steam_player_group_of(get_instance_label(), this_server_public_key);
 
 	::get_arena_steam_rich_presence_pairs(
 		pairs,
@@ -3328,10 +3314,11 @@ void server_setup::apply(const server_private_vars& private_new_vars) {
 	const auto old_vars = private_vars;
 	private_vars = private_new_vars;
 
-	if (!broker_keys_read || old_vars.identity_broker_public_keys != private_vars.identity_broker_public_keys) {
-		trusted_broker_keys = ::identity_broker_keys(private_vars);
-		broker_keys_read = true;
-	}
+	/*
+		Parsed at every apply - a few keys, and the first apply has nothing different from the defaults to compare with.
+	*/
+
+	trusted_broker_keys = ::identity_broker_keys(private_vars);
 
 	if (old_vars.admin_profiles != private_vars.admin_profiles) {
 		for (const auto& entry : private_vars.admin_profiles) {
@@ -3426,7 +3413,7 @@ void server_setup::send_auth_state(const client_id_type id, const bool only_if_r
 		id,
 		game_channel_type::RELIABLE_MESSAGES,
 
-		server_auth_state { level, requires_authentication() }
+		server_auth_state { level }
 	);
 
 	/*
@@ -3483,9 +3470,8 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	bool has_browser_clients_playing = false;
 
 	bool all_authenticated = true;
-	bool all_not_banned = true;
 
-	for_each_id_and_client([this, &all_authenticated, &all_not_banned, &has_browser_clients_playing](const auto id, const auto& c) {
+	for_each_id_and_client([this, &all_authenticated, &has_browser_clients_playing](const auto id, const auto& c) {
 		if (c.is_browser_client()) {
 			const auto faction = get_assigned_faction(to_mode_player_id(id));
 
@@ -3496,10 +3482,6 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 		if (!c.is_authenticated()) {
 			all_authenticated = false;
-		}
-
-		if (!c.verified_has_no_ban) {
-			all_not_banned = false;
 		}
 	}, only_connected_v);
 
@@ -3540,13 +3522,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 		out.all_assigned_present = playing_in_game == expected_playing;
 	}
 
-	out.all_authenticated = all_authenticated;
-	out.all_not_banned = all_not_banned;
-
-	if (!requires_authentication()) {
-		out.all_authenticated = true;
-		out.all_not_banned = true;
-	}
+	out.all_authenticated = all_authenticated || !requires_authentication();
 
 	out.friendly_fire = vars.friendly_fire;
 	out.freeze_time = vars.freeze_time;
@@ -4178,8 +4154,7 @@ void server_setup::advance_clients_state() {
 
 				if (!is_joinable()) {
 					/* Joined too late. */
-					kick(client_id, "Joined too late! Match is ongoing.");
-					c.kick_no_linger = true;
+					kick_now(client_id, std::string(rejoin_too_late_reason_v));
 				}
 
 				if (c.is_authenticated()) {
@@ -4200,8 +4175,7 @@ void server_setup::advance_clients_state() {
 							c.authenticated_id
 						);
 
-						kick(client_id, "Connected to a wrong match.");
-						c.kick_no_linger = true;
+						kick_now(client_id, std::string(rejoin_wrong_match_reason_v));
 					}
 				}
 			}
@@ -4233,8 +4207,7 @@ void server_setup::advance_clients_state() {
 				const auto paused_limit_secs = c.state == server_client_state::type::IN_GAME ? 600.0 : 60.0;
 
 				if (server_time - c.last_valid_payload_time > paused_limit_secs) {
-					kick(client_id, "Connection timed out!");
-					c.kick_no_linger = true;
+					kick_now(client_id, "Connection timed out!");
 				}
 			}
 
@@ -4251,8 +4224,7 @@ void server_setup::advance_clients_state() {
 							c.reset_solvable_stream();
 						}
 						else {
-							kick(client_id, "Connection timed out!");
-							c.kick_no_linger = true;
+							kick_now(client_id, "Connection timed out!");
 						}
 					}
 				}
@@ -5307,7 +5279,7 @@ std::string server_setup::get_native_server_connect_string() const {
 #endif
 
 std::optional<augs::ed25519_public_key_type> server_setup::get_server_public_key() const {
-	return augs::ed25519_public_key(this_server_key);
+	return this_server_public_key;
 }
 
 std::string server_setup::get_connect_string() const {
@@ -5654,7 +5626,7 @@ static std::string wrong_passwords_key(const std::string& address, const std::st
 		return address;
 	}
 
-	return begins_with(account, "key_") ? keys_without_address_record_v : "(no address) " + account;
+	return identity_cert::is_key_account(account) ? keys_without_address_record_v : "(no address) " + account;
 }
 
 static uint32_t max_wrong_passwords_of(const std::string& record_key) {
@@ -5844,6 +5816,14 @@ message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type
 	kick(id, reason);
 	return message_handler_result::CONTINUE;
 #endif
+}
+
+void server_setup::kick_now(const client_id_type& kicked_id, const std::string& reason) {
+	kick(kicked_id, reason);
+
+	if (auto& c = clients[kicked_id]; c.is_set()) {
+		c.kick_no_linger = true;
+	}
 }
 
 void server_setup::kick(const client_id_type& kicked_id, const std::string& reason, chat_target_type target) {
@@ -6156,8 +6136,7 @@ void server_setup::ban(const client_id_type& id, const std::string& reason, cons
 
 	LOG("Banned %x (account: %x, ip: %x) %x. Reason: %x", entry.nickname, entry.account, entry.ip, minutes == 0 ? std::string("for good") : typesafe_sprintf("for %x minutes", minutes), reason);
 
-	kick(id, ban_message(entry));
-	c.kick_no_linger = true;
+	kick_now(id, ban_message(entry));
 }
 
 std::optional<arena_player_metas> server_setup::get_new_player_metas() {
@@ -7071,28 +7050,11 @@ faction_type server_setup::get_assigned_faction() const {
 }
 
 /*
-	The same rule as the handshake's (the protocol version is major.minor - see work.cpp): a development build (0.0.0)
-	is compatible only with development builds.
+	The same rule as the handshake's - see protocol_version.h.
 */
 
 bool server_heartbeat::versions_compatible() const {
-	const auto client_version = hypersomnia_version().get_version_string();
-
-	int client_major = 0;
-	int client_minor = 0;
-	int client_patch = 0;
-	int server_major = 0;
-	int server_minor = 0;
-	int server_patch = 0;
-
-	if (
-		typesafe_sscanf(client_version, "%x.%x.%x", client_major, client_minor, client_patch) &&
-		typesafe_sscanf(server_version, "%x.%x.%x", server_major, server_minor, server_patch)
-	) {
-		return client_major == server_major && client_minor == server_minor;
-	}
-
-	return false;
+	return ::protocol_version_of(hypersomnia_version().get_version_string()) == ::protocol_version_of(server_version);
 }
 
 std::string get_steam_join_link(const std::string& suffix) {

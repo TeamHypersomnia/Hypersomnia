@@ -46,7 +46,6 @@ struct synced_dynamic_vars {
 	bool preassigned_factions = false;
 	bool all_assigned_present = false;
 	bool all_authenticated = false;
-	bool all_not_banned = false;
 	bool friendly_fire = false;
 	bool freeze_time = true;
 	augs::maybe<real32> zoom_override;

@@ -1,6 +1,10 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <string>
+#include <unordered_map>
+#include "augs/network/network_types.h"
+#include "application/masterserver/server_heartbeat.h"
 
 enum class server_type : uint8_t {
 	NATIVE,

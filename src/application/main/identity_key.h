@@ -56,6 +56,13 @@ namespace identity_key {
 	std::string full_form(const augs::ed25519_public_key_type& public_key);
 
 	/*
+		A public key as written anywhere - with "0x" or bare, any case, whitespace around it. Files are written with
+		full_form.
+	*/
+
+	std::optional<augs::ed25519_public_key_type> parse_public_key(const std::string& text);
+
+	/*
 		What a key's account is called to the player: it lives on this computer, or in this browser.
 	*/
 

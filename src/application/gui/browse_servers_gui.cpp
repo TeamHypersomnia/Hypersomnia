@@ -1940,7 +1940,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::Separator();
 
 		if (current_tab == browser_tab::FAVORITES) {
-			text_disabled("Favorite servers are remembered by their public key, for security.");
+			text_disabled(typesafe_sprintf("Favorite servers are remembered by their public key (%x), for security.", std::string(augs::key_scheme_name)));
 			ImGui::Separator();
 		}
 
