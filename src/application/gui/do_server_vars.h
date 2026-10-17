@@ -35,7 +35,7 @@ void do_game_speed_tooltip();
 void do_bullet_speed_tooltip();
 
 /*
-	Right after the game speed slider: a green "Original Hypersomnia experience"
+	Right after the game speed slider: a gold star and a green "Original Hypersomnia"
 	while both the game and the bullet speed are at 1x.
 */
 

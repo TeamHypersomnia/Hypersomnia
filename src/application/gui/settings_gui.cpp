@@ -4960,7 +4960,7 @@ void do_original_speed_badge(const real32 game_speed, const augs::maybe<real32>&
 
 	if (game_speed == 1.f && effective_bullet_speed == 1.f) {
 		ImGui::SameLine();
-		text_color("* Original Hypersomnia experience", green);
+		star_line("Original Hypersomnia", green);
 	}
 }
 
