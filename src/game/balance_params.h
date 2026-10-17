@@ -29,3 +29,12 @@ constexpr float BALANCE_EDGE_ZOOM_OUT_FOW_ANGLE_MULT = 1.0f / 12;
 	enemies at the very edge of the view cone don't get pinned.
 */
 constexpr float BALANCE_MINIMAP_SIGHTING_FOV_ANGLE_MULT = 0.75f;
+
+/*
+	Bots see this fraction of what a player in the same spot would see -
+	both the range (the fog of war scaled by the camera zoom) and the view angle.
+*/
+constexpr float BALANCE_BOT_FOV_MULT_VERY_EASY = 0.8f;
+constexpr float BALANCE_BOT_FOV_MULT_EASY = 0.85f;
+constexpr float BALANCE_BOT_FOV_MULT_MEDIUM = 0.9f;
+constexpr float BALANCE_BOT_FOV_MULT_HARD = 0.95f;

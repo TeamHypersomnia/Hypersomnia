@@ -41,6 +41,14 @@ inline bool is_camping_on_waypoint(const ai_behavior_variant& behavior) {
 	return false;
 }
 
+inline bool is_camping_and_looking_far(const ai_behavior_variant& behavior) {
+	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(behavior)) {
+		return patrol->is_camping_and_looking_far();
+	}
+
+	return false;
+}
+
 inline bool should_walk_silently(
 	const ai_behavior_variant& behavior,
 	const faction_type bot_faction,

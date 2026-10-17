@@ -395,6 +395,24 @@ inline bool is_camp_waypoint(
 }
 
 /*
+	Check if a camp waypoint makes the bot look far ahead.
+*/
+
+inline bool is_look_far_camp_waypoint(
+	const cosmos& cosm,
+	const entity_id waypoint_id
+) {
+	const auto waypoint_handle = cosm[waypoint_id];
+
+	if (!waypoint_handle.alive()) {
+		return false;
+	}
+
+	const auto& marker_comp = waypoint_handle.template get<components::marker>();
+	return marker_comp.camp && marker_comp.camp_look_far;
+}
+
+/*
 	Get camp duration range from a waypoint marker.
 	Returns (min, max) pair. Defaults to (5.0, 15.0) if not a valid waypoint.
 */

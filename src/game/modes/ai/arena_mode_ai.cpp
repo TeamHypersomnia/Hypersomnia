@@ -58,6 +58,9 @@
 #include "game/cosmos/make_physics_path_hints.h"
 #include "game/modes/ai/tasks/bot_avoidance.hpp"
 #include "game/modes/ai/tasks/bullet_avoidance.hpp"
+#include "game/detail/visible_entities.h"
+#include "game/detail/camera_zoom_area_logic.h"
+#include "game/balance_params.h"
 #include "game/modes/ai/tasks/danger_avoidance.hpp"
 #include "game/modes/ai/tasks/take_cover.hpp"
 
@@ -254,6 +257,47 @@ void update_arena_mode_ai_team(
 	}
 }
 
+static float get_bot_fov_mult(const difficulty_type difficulty) {
+	switch (difficulty) {
+		case difficulty_type::VERY_EASY: return BALANCE_BOT_FOV_MULT_VERY_EASY;
+		case difficulty_type::EASY: return BALANCE_BOT_FOV_MULT_EASY;
+		case difficulty_type::HARD: return BALANCE_BOT_FOV_MULT_HARD;
+		default: return BALANCE_BOT_FOV_MULT_MEDIUM;
+	}
+}
+
+/*
+	A bot sees proportionally to what a player standing in the same spot would:
+	the map's fog of war scaled by the camera zoom there (the map's default, the server's /zoom, camera zoom areas),
+	times the difficulty's balance multiplier.
+	Camping on a "look far" waypoint is like a player with the crosshair at the screen edge:
+	the bot sees farther, but within a much narrower angle.
+*/
+
+static ai_field_of_view calc_ai_field_of_view(
+	const cosmos& cosm,
+	const vec2 character_pos,
+	const fog_of_war_settings& fog_of_war,
+	const std::optional<real32> zoom_override,
+	const difficulty_type difficulty,
+	const bool looks_far
+) {
+	const auto zoom = ::calc_area_camera_zoom(cosm, character_pos, zoom_override);
+	const auto edge_zoomout_mult = looks_far ? 1.0f : 0.0f;
+	const auto expansion = fog_of_war_settings::calc_camera_requested_expansion(zoom, edge_zoomout_mult);
+	const auto considered = fog_of_war.get_considered(expansion, edge_zoomout_mult);
+	const auto mult = ::get_bot_fov_mult(difficulty);
+
+	auto result = ai_field_of_view();
+	result.half_size = considered.size * mult;
+
+	if (considered.is_enabled()) {
+		result.angle = considered.angle * mult;
+	}
+
+	return result;
+}
+
 arena_ai_result update_arena_mode_ai(
 	cosmos& cosm,
 	const logic_step step,
@@ -275,7 +319,9 @@ arena_ai_result update_arena_mode_ai(
 	bool in_buy_area,
 	const bool is_freeze_time,
 	const std::size_t bot_index,
-	const std::size_t num_bots
+	const std::size_t num_bots,
+	const fog_of_war_settings& fog_of_war,
+	const std::optional<real32> zoom_override
 ) {
 	auto stable_rng = randomization(stable_round_rng);
 
@@ -613,13 +659,21 @@ arena_ai_result update_arena_mode_ai(
 		===========================================================================
 	*/
 
-	const bool is_camping = ::is_camping_on_waypoint(ai_state.last_behavior);
 	const auto is_in_combat = [&]() {
 		return ::is_behavior<ai_behavior_combat>(ai_state.last_behavior);
 	};
 
 	if (!is_blinded) {
-		const auto detected_enemy = ::find_closest_enemy(ctx, is_ffa, is_camping, is_in_combat());
+		const auto fov = ::calc_ai_field_of_view(
+			cosm,
+			character_pos,
+			fog_of_war,
+			zoom_override,
+			difficulty,
+			::is_camping_and_looking_far(ai_state.last_behavior)
+		);
+
+		const auto detected_enemy = ::find_closest_enemy(ctx, is_ffa, fov);
 
 		if (detected_enemy != ai_state.perceived_enemy) {
 			/* World state differs from bot's perception — queue/update LOS change. */

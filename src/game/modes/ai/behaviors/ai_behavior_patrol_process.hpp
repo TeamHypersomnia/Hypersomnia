@@ -224,6 +224,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 				camp_center = wp_transform.pos;
 				camp_twitch_target = wp_transform.pos;
 				camp_look_direction = wp_transform.get_direction();
+				camp_look_far = ::is_look_far_camp_waypoint(cosm, current_waypoint_id);
 			}
 			else {
 				AI_LOG("Non-camp waypoint - clearing for next pick");

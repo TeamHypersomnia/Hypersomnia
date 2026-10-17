@@ -2795,7 +2795,9 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			in_buy_area,
 			is_freeze_time,
 			bot_index,
-			num_bots
+			num_bots,
+			in.rules.view.fog_of_war,
+			get_zoom_override()
 		);
 		
 		if (ai_result.item_purchase.has_value()) {

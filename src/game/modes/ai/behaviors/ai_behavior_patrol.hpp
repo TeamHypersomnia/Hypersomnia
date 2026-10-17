@@ -45,6 +45,7 @@ struct ai_behavior_patrol {
 	vec2 camp_center = vec2::zero;
 	vec2 camp_twitch_target = vec2::zero;
 	vec2 camp_look_direction = vec2(1.0f, 0.0f);
+	bool camp_look_far = false;
 
 	/*
 		Twitch timers for camp movement.
@@ -65,6 +66,10 @@ struct ai_behavior_patrol {
 
 	bool is_camping() const {
 		return camp_timer > 0.0f;
+	}
+
+	bool is_camping_and_looking_far() const {
+		return is_camping() && camp_look_far;
 	}
 
 	bool in_motion() const {

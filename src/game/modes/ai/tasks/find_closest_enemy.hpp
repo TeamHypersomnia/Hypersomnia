@@ -7,17 +7,12 @@
 
 /*
 	Find the closest visible enemy within the bot's field of view.
-	
-	is_camping: When true, uses extended FOV (40% larger). Set this when the bot
-	is camping on a waypoint to give them better vision while stationary.
-	in_combat: When true, also uses extended FOV (same extension as camping).
 */
 
 inline entity_id find_closest_enemy(
 	const ai_character_context& ctx,
 	const bool is_ffa,
-	const bool is_camping = false,
-	const bool in_combat = false
+	const ai_field_of_view& fov
 ) {
 	entity_id closest_enemy = entity_id::dead();
 	float closest_distance = std::numeric_limits<float>::max();
@@ -53,7 +48,7 @@ inline entity_id find_closest_enemy(
 			/*
 				Check if target is within field of view first (early exit for efficiency).
 			*/
-			if (!::is_within_fov(ctx.character_pos, target_pos, is_camping || in_combat)) {
+			if (!::is_within_fov(ctx.character_pos, target_pos, fov)) {
 				return;
 			}
 
@@ -64,7 +59,7 @@ inline entity_id find_closest_enemy(
 				const auto direction_to_enemy = vec2(offset).normalize();
 				const auto angle_to_enemy = current_aim_direction.degrees_between(direction_to_enemy);
 
-				if (angle_to_enemy <= 70.0f) {
+				if (!fov.considers_angle() || angle_to_enemy <= fov.angle / 2) {
 					/*
 						Check line of sight using the helper function.
 					*/

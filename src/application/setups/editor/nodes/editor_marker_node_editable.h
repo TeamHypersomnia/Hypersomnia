@@ -102,6 +102,7 @@ struct editor_point_marker_node_editable {
 	faction_type faction = faction_type::ANY;
 	marker_letter_type letter = marker_letter_type::A;
 	bool camp = false;
+	bool camp_look_far = false;
 	float camp_secs_min = 2.0f;
 	float camp_secs_max = 10.0f;
 

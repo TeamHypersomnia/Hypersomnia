@@ -26,7 +26,9 @@ arena_ai_result update_arena_mode_ai(
 	const bool in_buy_area,
 	const bool is_freeze_time,
 	const std::size_t bot_index,
-	const std::size_t num_bots
+	const std::size_t num_bots,
+	const fog_of_war_settings& fog_of_war,
+	const std::optional<real32> zoom_override
 );
 
 void update_arena_mode_ai_team(

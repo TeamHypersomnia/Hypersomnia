@@ -914,6 +914,9 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 			auto ind = scoped_indent();
 			MULTIPROPERTY("Camp min (secs)", camp_secs_min);
 			MULTIPROPERTY("Camp max (secs)", camp_secs_max);
+			MULTIPROPERTY("Look far", camp_look_far);
+
+			tooltip_on_hover("While camping here, the bot looks far ahead\nlike a player with the crosshair at the screen edge:\nit sees farther, but within a much narrower angle.");
 		}
 	}
 

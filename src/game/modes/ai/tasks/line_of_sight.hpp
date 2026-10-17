@@ -7,14 +7,18 @@
 #include "augs/math/repro_math.h"
 
 /*
-	Field of view constants.
-	Normal FOV: 1920x1080 (standard resolution)
-	Extended FOV (camping): 2688x1560 (40% larger in each dimension)
+	The bot's field of view: a box around the bot and a cone around its aim.
+	See calc_ai_field_of_view.
 */
-constexpr float AI_FOV_NORMAL_X = 1920.0f;
-constexpr float AI_FOV_NORMAL_Y = 1080.0f;
-constexpr float AI_FOV_EXTENDED_X = 2688.0f;
-constexpr float AI_FOV_EXTENDED_Y = 1560.0f;
+
+struct ai_field_of_view {
+	vec2 half_size;
+	real32 angle = 360.f;
+
+	bool considers_angle() const {
+		return angle > 0.f && angle < 360.f;
+	}
+};
 
 /*
 	Check if a position is within line of sight from another position.
@@ -153,11 +157,9 @@ float sense_free_space_from_vertices_of(
 inline bool is_within_fov(
 	const vec2 from_pos,
 	const vec2 target_pos,
-	const bool camping
+	const ai_field_of_view& fov
 ) {
 	const auto offset = target_pos - from_pos;
-	const float fov_x = camping ? AI_FOV_EXTENDED_X : AI_FOV_NORMAL_X;
-	const float fov_y = camping ? AI_FOV_EXTENDED_Y : AI_FOV_NORMAL_Y;
 
-	return repro::fabs(offset.x) < fov_x && repro::fabs(offset.y) < fov_y;
+	return repro::fabs(offset.x) < fov.half_size.x && repro::fabs(offset.y) < fov.half_size.y;
 }

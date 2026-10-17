@@ -250,6 +250,7 @@ bool setup_entity_from_node(
 		}
 		else {
 			marker.camp = editable.camp;
+			marker.camp_look_far = editable.camp_look_far;
 			marker.camp_secs_min = editable.camp_secs_min;
 			marker.camp_secs_max = editable.camp_secs_max;
 		}
