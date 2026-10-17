@@ -47,18 +47,38 @@ void drop_from_all_slots(const invariants::container& container, const entity_ha
 
 	constexpr auto fan_step_degrees = 30.f;
 
-	auto num_slid = 0;
+	/*
+		All items fan out around the direction the character faced -
+		the first firearm (the held one if any) straight ahead, the rest turned by ever more to alternating sides,
+		in the deterministic order of the slots.
+	*/
+
+	const auto facing = handle.get_logic_transform().get_direction();
+
+	const auto straight_item = [&]() {
+		entity_id first_firearm;
+
+		::for_each_carried_firearm(handle, [&](const auto& firearm) {
+			if (!first_firearm.is_set()) {
+				first_firearm = firearm.get_id();
+			}
+		});
+
+		return first_firearm;
+	}();
+
+	auto num_fanned = straight_item.is_set() ? 1 : 0;
 
 	auto slide = [&](const auto& typed_item) {
-		const auto fan_side = num_slid % 2 == 0 ? -1.f : 1.f;
-		const auto fan_degrees = fan_side * fan_step_degrees * static_cast<real32>((num_slid + 1) / 2);
+		const auto fan_index = entity_id(typed_item.get_id()) == straight_item ? 0 : num_fanned++;
+
+		const auto fan_side = fan_index % 2 == 0 ? -1.f : 1.f;
+		const auto fan_degrees = fan_side * fan_step_degrees * static_cast<real32>((fan_index + 1) / 2);
 
 		const auto damping = ::calc_damping_mults(typed_item, typed_item.template get<invariants::rigid_body>());
-		const auto direction = typed_item.get_logic_transform().get_direction().rotate(fan_degrees);
+		const auto direction = vec2(facing).rotate(fan_degrees);
 
 		typed_item.template get<components::rigid_body>().set_velocity(direction * slide_distance * damping.linear);
-
-		++num_slid;
 	};
 
 	drop_from_all_slots(container, handle, [&](const auto& result) {
