@@ -377,10 +377,10 @@ public:
 	);
 
 	/*
-		Settings open with a message: the key was unlinked elsewhere.
+		Settings open with a message: the key was unlinked.
 	*/
 
-	void tell_unlinked_elsewhere(const std::string& steam_name);
+	void tell_unlinked(const std::string& steam_name);
 
 	/*
 		Any modal of the Account settings - another modal waits while one is open (two would close each other every frame).
@@ -422,6 +422,9 @@ public:
 	*/
 
 	bool avatar_changed = false;
+
+	bool server_public_key_read = false;
+	std::optional<augs::ed25519_public_key_type> server_public_key;
 
 	/*
 		CrazyGames' "Sign in" in Info - opened by work.cpp, like the leaderboards' one.

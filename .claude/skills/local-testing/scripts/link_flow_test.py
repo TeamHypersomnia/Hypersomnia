@@ -98,13 +98,18 @@ cookie = 'connect.sid=' + urllib.parse.quote('s:' + sid + '.' + sig, safe='') + 
 key = Ed25519PrivateKey.generate()
 pub = key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw).hex()
 
+# The proof byte of the last cert (identity_cert.h): 0 - the account key, 1 - a Steam ticket, 2 - a CrazyGames token
+last_proof = None
+
 def cert_account():
+    global last_proof
     session = Ed25519PrivateKey.generate().public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
     s = key.sign(b'hs-cert-req-v1' + session).hex()
     status, body, _ = get('/cert?session=%s&key=%s&sig=%s' % (session.hex(), pub, s))
     if status != 200: return 'HTTP %d %s' % (status, body)
     raw = bytes.fromhex(json.loads(body)['cert'])
     n = raw[1]
+    last_proof = raw[2 + n + 32 + 8 + 8]
     return raw[2:2 + n].decode()
 
 state = secrets.token_hex(16)
@@ -150,6 +155,7 @@ link_t = str(int(time.time()))
 status, body, headers = confirm(state, cookie, t=link_t)
 check('Link links and says to go back to the game (no redirect)', status == 200 and 'You can go back to Hypersomnia' in body and 'Location' not in headers, body[:200])
 check('the game learns it from its cert: the Steam account', cert_account() == 'steam_' + steam_id)
+check('proven by the key, not by Steam (no admin as the Steam account)', last_proof == 0, str(last_proof))
 check('progress stays with the key on linking', mmr_owner() == ['key_' + pub], str(mmr_owner()))
 status, body, _ = confirm(state, cookie, t=link_t)
 check('the same page sent again does nothing (not newer than the last change)', status == 409 and 'used already' in body, '%s %s' % (status, body[:100]))

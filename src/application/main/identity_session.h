@@ -127,7 +127,7 @@ private:
 	bool crazygames_token_refused = false;
 	bool linked_quietly = false;
 
-	std::optional<std::string> unlinked_elsewhere;
+	std::optional<std::string> unlinked_noticed;
 
 	augs::path_type import_marker_file;
 	bool import_profile_pending = false;
@@ -276,12 +276,12 @@ public:
 	}
 
 	/*
-		The key was unlinked elsewhere (on another computer, or on hypersomnia.io) - the game tells the player, once.
-		The name of the Steam account it was linked to, if known.
+		The key turned out unlinked (on hypersomnia.io, another computer, or an unlink here whose answer got lost) -
+		the game tells the player, once. The name of the Steam account it was linked to, if known.
 	*/
 
-	std::optional<std::string> take_unlinked_elsewhere() {
-		return std::exchange(unlinked_elsewhere, std::nullopt);
+	std::optional<std::string> take_unlinked() {
+		return std::exchange(unlinked_noticed, std::nullopt);
 	}
 
 	/*

@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <cmath>
 #include <optional>
 
 /*
@@ -42,16 +43,24 @@ inline std::optional<float> find_camera_zoom_area(const cosmos& cosm, const vec2
 }
 
 /*
+	Every zoom from arbitrary map files or the server: NaN would pass std::clamp.
+*/
+
+inline float sanitize_camera_zoom(const float zoom) {
+	return std::isfinite(zoom) ? std::clamp(zoom, 0.2f, 4.0f) : 1.0f;
+}
+
+/*
 	The map-wide default zoom - unless the server overrides it - which applies
 	wherever no camera zoom area covers the character.
 	Sanitized, as these values come from arbitrary map files.
 */
 
 inline float calc_default_camera_zoom(const cosmos& cosm, const std::optional<float> default_zoom_override) {
-	const auto map_default_zoom = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
+	const auto map_default_zoom = ::sanitize_camera_zoom(cosm.get_common_significant().default_zoom);
 	const auto default_zoom = default_zoom_override.has_value() ? *default_zoom_override : map_default_zoom;
 
-	return std::clamp(default_zoom, 0.2f, 4.0f);
+	return ::sanitize_camera_zoom(default_zoom);
 }
 
 /*
@@ -64,10 +73,10 @@ inline float calc_area_camera_zoom(const cosmos& cosm, const vec2 pos, const std
 	const auto default_zoom = ::calc_default_camera_zoom(cosm, default_zoom_override);
 
 	if (const auto area_zoom = ::find_camera_zoom_area(cosm, pos); area_zoom.has_value()) {
-		const auto map_default_zoom = std::clamp(cosm.get_common_significant().default_zoom, 0.2f, 4.0f);
+		const auto map_default_zoom = ::sanitize_camera_zoom(cosm.get_common_significant().default_zoom);
 		const auto area_zoom_scale = default_zoom / map_default_zoom;
 
-		return std::clamp(*area_zoom * area_zoom_scale, 0.2f, 4.0f);
+		return ::sanitize_camera_zoom(*area_zoom * area_zoom_scale);
 	}
 
 	return default_zoom;

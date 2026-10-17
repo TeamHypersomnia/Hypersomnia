@@ -3076,7 +3076,11 @@ work_result work(
 				return typesafe_sprintf("steam_%x", steam_id);
 			}
 
-			return std::string("");
+			/*
+				Outside the Steam build the account key - as which a key linked to Steam counts for badges too.
+			*/
+
+			return identity->key_account();
 #endif
 		}();
 
@@ -6381,8 +6385,8 @@ work_result work(
 				}
 
 				if (!in_a_game) {
-					if (const auto steam_name = identity->take_unlinked_elsewhere()) {
-						settings_gui.tell_unlinked_elsewhere(*steam_name);
+					if (const auto steam_name = identity->take_unlinked()) {
+						settings_gui.tell_unlinked(*steam_name);
 					}
 				}
 

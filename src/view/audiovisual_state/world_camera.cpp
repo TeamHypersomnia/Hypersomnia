@@ -356,7 +356,7 @@ void world_camera::tick(
 
 			if (forced_area_zoom.has_value()) {
 				/* E.g. chosen with the zoom pads at the shooting range. */
-				target_area_zoom_mult = std::clamp(*forced_area_zoom, 0.2f, 4.0f);
+				target_area_zoom_mult = ::sanitize_camera_zoom(*forced_area_zoom);
 			}
 			else if (entity_to_chase.alive()) {
 				if (const auto tr = entity_to_chase.find_logic_transform()) {

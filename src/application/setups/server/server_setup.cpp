@@ -1352,18 +1352,19 @@ static std::vector<augs::ed25519_public_key_type> identity_broker_keys(const ser
 }
 
 /*
-	A Steam account is an admin only when Steam itself proved it (the Steam build's ticket) - a key linked to it proves
-	only that key (someone may have tricked the account's owner into confirming a link). Such a cert counts as the key's
-	own account, key_<the key that signed this connection>: an admin with both in admin_profiles gets in either way.
+	An account of a provider (Steam) is an admin only when the provider itself proved it (the Steam build's ticket) - a key
+	linked to it proves only that key (someone may have tricked the account's owner into confirming a link). Such a cert
+	counts as the key's own account, key_<the key that signed this connection>: an admin with both in admin_profiles gets
+	in either way.
 */
 
 static std::string admin_account_of(const identity_cert::cert& c) {
-	const bool steam_proven_by_a_key =
-		begins_with(c.account, "steam_")
-		&& c.proof != identity_cert::proof_type::STEAM_TICKET
+	const bool proven_only_by_a_key =
+		c.proof == identity_cert::proof_type::ACCOUNT_KEY
+		&& !begins_with(c.account, "key_")
 	;
 
-	return steam_proven_by_a_key ? identity_cert::key_account(c.session_public_key) : c.account;
+	return proven_only_by_a_key ? identity_cert::key_account(c.session_public_key) : c.account;
 }
 
 /*
@@ -5636,6 +5637,7 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 
 static constexpr uint32_t max_wrong_passwords_per_minute_v = 5;
 static constexpr uint32_t max_wrong_passwords_of_keys_without_address_per_minute_v = 30;
+static const auto keys_without_address_record_v = std::string("(no address, keys)");
 static constexpr std::size_t max_wrong_password_addresses_v = 4096;
 
 /*
@@ -5652,12 +5654,12 @@ static std::string wrong_passwords_key(const std::string& address, const std::st
 		return address;
 	}
 
-	return begins_with(account, "key_") ? std::string("(no address, keys)") : "(no address) " + account;
+	return begins_with(account, "key_") ? keys_without_address_record_v : "(no address) " + account;
 }
 
 static uint32_t max_wrong_passwords_of(const std::string& record_key) {
 	return
-		record_key == "(no address, keys)" ?
+		record_key == keys_without_address_record_v ?
 		max_wrong_passwords_of_keys_without_address_per_minute_v :
 		max_wrong_passwords_per_minute_v
 	;

@@ -43,6 +43,7 @@
 #include "application/config_json_table.h"
 #include "application/main/auth_provider_type.h"
 #include "application/main/identity_key.h"
+#include "application/main/server_key.h"
 #include "application/main/ranked_match_record.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "augs/templates/thread_templates.h"
@@ -772,15 +773,14 @@ bool settings_gui_state::apply_imported_profile(
 	return changed;
 }
 
-void settings_gui_state::tell_unlinked_elsewhere(const std::string& steam_name) {
+void settings_gui_state::tell_unlinked(const std::string& steam_name) {
 	open();
 	active_pane = settings_pane::ACCOUNT;
 
-	const auto linked_to = steam_name.empty() ? std::string("a Steam account") : "the Steam account " + steam_name;
+	const auto unlinked = steam_name.empty() ? std::string("Your key was unlinked from its Steam account.") : "Your key was unlinked from the Steam account:\n    " + steam_name;
 
 	account_message =
-		"This key is no longer linked to " + linked_to + " -\n"
-		"it was unlinked elsewhere (on another computer or on hypersomnia.io).\n\n"
+		unlinked + "\n\n"
 		"Your progress now counts towards your key account.\n"
 		"To link it again: Link with Steam."
 	;
@@ -2340,6 +2340,32 @@ void settings_gui_state::perform(
 		};
 
 		auto do_server_settings = [&]() {
+			/*
+				The key players' games know this host's servers by (server.key) - read once, made if there is none yet
+				or it can not be read (see server_key::obtain).
+			*/
+
+			if (!server_public_key_read) {
+				server_public_key_read = true;
+
+				try {
+					server_public_key = augs::ed25519_public_key(server_key::obtain(KEYS_DIR / server_key::file_name));
+				}
+				catch (const std::exception& err) {
+					LOG("Could not show the server key: %x", err.what());
+				}
+			}
+
+			if (server_public_key.has_value()) {
+				text("Server public key:");
+				ImGui::SameLine();
+				text(identity_key::short_form(*server_public_key));
+				ImGui::SameLine();
+				copy_icon_button("ServerKey", "0x" + augs::bytes_to_hex(*server_public_key));
+				tooltip_on_hover("This key is separate from your player account.");
+				ImGui::Separator();
+			}
+
 			do_pretty_tabs(active_server_pane);
 
 			auto do_section = [&](const server_vars_section section) {
@@ -4607,20 +4633,6 @@ void settings_gui_state::perform(
 						input_text("WebRTC signalling server", config.webrtc_signalling_server_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.webrtc_signalling_server_url);
 						input_text("Identity broker", config.identity_broker_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.identity_broker_url);
 						input_text("Website", config.website_url, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.website_url);
-
-						ImGui::Separator();
-
-						if (current_account_id.empty()) {
-							text_disabled("Account: signing in...");
-						}
-						else {
-							text("Account: " + identity_key::short_form_of_account(current_account_id));
-							ImGui::SameLine();
-
-							copy_icon_button("MyAccountId", current_account_id);
-
-							tooltip_on_hover("For a server admin - e.g. to make you an admin of their server, or to unban you.");
-						}
 
 						if (!identity_error.empty()) {
 							text_color("Signing in: " + identity_error, orange);

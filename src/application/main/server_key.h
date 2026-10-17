@@ -63,8 +63,9 @@ namespace server_key {
 	}
 
 	/*
-		Hosting from the game with a key file it can not read still starts - with a key for this run only, so it is not known
-		as the server it was; the file is left as it is. A dedicated server does not start then (see damaged).
+		The game with a key file it can not read makes a new key quietly (the old file kept next to it, see
+		identity_key::save_replacing) - its servers are new ones from then on. A dedicated server does not start then
+		(see damaged). A damaged key in the environment variable is never replaced - hosting uses a key for this run only.
 	*/
 
 	inline augs::ed25519_seed_type obtain(const augs::path_type& path) {
@@ -72,17 +73,23 @@ namespace server_key {
 			return *seed;
 		}
 
-		LOG("ERROR: could not read or create the server key at %x. Using a key for this run only.", server_key::source_name(path));
-
-		if (const auto seed = augs::ed25519_generate_seed()) {
-			return *seed;
-		}
+		const auto seed = augs::ed25519_generate_seed();
 
 		/*
 			Never a made-up key (e.g. all zeros - the same for every such server, its private key known to all).
 		*/
 
-		throw std::runtime_error("Could not generate a server key.");
+		if (!seed.has_value()) {
+			throw std::runtime_error("Could not generate a server key.");
+		}
+
+		if (!from_environment().has_value() && identity_key::save_replacing(path, *seed).has_value()) {
+			LOG("The server key at %x could not be read - made a new one.", path);
+			return *seed;
+		}
+
+		LOG("ERROR: could not read or create the server key at %x. Using a key for this run only.", server_key::source_name(path));
+		return *seed;
 	}
 
 	/*

@@ -51,7 +51,7 @@ void identity_session::set_key(const augs::ed25519_seed_type& seed, const augs::
 	profile_file = keys_dir / "steam_profile.json";
 	import_marker_file = keys_dir / "imported_key.json";
 	imported_profile.reset();
-	unlinked_elsewhere.reset();
+	unlinked_noticed.reset();
 
 	import_profile_pending = [&]() {
 		if (!augs::exists(import_marker_file)) {
@@ -566,7 +566,7 @@ void identity_session::advance(const input& in, const double now) {
 
 			if (cert_saved || (broker_cert.has_value() && !is_key_account(broker_cert->account))) {
 				LOG("The key is no longer linked to a Steam account.");
-				unlinked_elsewhere = profile.name;
+				unlinked_noticed = profile.name;
 				on_unlinked();
 			}
 
