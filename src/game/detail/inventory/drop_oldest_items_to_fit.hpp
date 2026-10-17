@@ -79,7 +79,7 @@ inventory_space_type calc_deposit_space_of_useless_ammo(const E& character) {
 		return 0;
 	}
 
-	inventory_space_type total = 0;
+	auto total = inventory_space_type(0);
 
 	for (const auto& candidate_id : deposit.get_items_inside()) {
 		const auto candidate = cosm[candidate_id];
@@ -110,10 +110,15 @@ entity_id find_next_to_fall_out(const E& character) {
 		const auto stowed_step = candidate.when_last_transferred().step;
 		const bool useless = ::is_useless_ammo(character, candidate);
 
+		/*
+			Ties broken by id - the order of items inside is inferred, so it may differ after reinference.
+		*/
+
 		const bool falls_out_sooner =
 			!next.is_set()
 			|| (useless && !next_useless)
 			|| (useless == next_useless && stowed_step < next_step)
+			|| (useless == next_useless && stowed_step == next_step && candidate_id < next)
 		;
 
 		if (falls_out_sooner) {
@@ -148,17 +153,6 @@ bool drop_from_deposit_until(const logic_step step, const E& character, F&& cond
 	return true;
 }
 
-template <class E>
-inventory_space_type calc_space_of_one_piece(const E& item) {
-	const auto& item_def = item.template get<invariants::item>();
-
-	return
-		item_def.stackable ?
-		item_def.space_occupied_per_charge :
-		::calc_space_occupied_with_children(item)
-	;
-}
-
 template <class E, class I>
 bool can_make_room_for(const E& character, const I& item) {
 	if (::is_firearm_like(item)) {
@@ -175,7 +169,7 @@ bool can_make_room_for(const E& character, const I& item) {
 	return
 		deposit.alive()
 		&& deposit->is_category_compatible_with(item)
-		&& deposit.calc_total_space() >= ::calc_space_of_one_piece(item)
+		&& deposit.calc_total_space() >= ::calc_space_occupied_with_children(item)
 	;
 }
 
@@ -190,8 +184,12 @@ bool drop_oldest_items_to_fit(const logic_step step, const E& character, const I
 		candidate_holster_type::CONTAINERS
 	};
 
+	/*
+		A whole stack has to fit - otherwise a part of it would be left behind.
+	*/
+
 	auto fits = [&]() {
-		return character.find_slot_for(item, stowing_types, { slot_finding_opt::OMIT_MOUNTED_SLOTS }).alive();
+		return character.find_slot_for(item, stowing_types, { slot_finding_opt::ALL_CHARGES_MUST_FIT, slot_finding_opt::OMIT_MOUNTED_SLOTS }).alive();
 	};
 
 	if (fits()) {
@@ -238,12 +236,16 @@ inventory_space_type calc_deposit_space_needed_for_hands(const E& character) {
 		return 0;
 	}
 
-	inventory_space_type needed = 0;
+	auto needed = inventory_space_type(0);
 
 	for (const auto& held : character.get_wielded_items()) {
 		const auto held_item = cosm[held];
 
-		if (held_item.dead() || ::is_firearm_like(held_item) || ::is_like_plantable_bomb(held_item)) {
+		/*
+			Ammo is held only while reloading - it goes into the firearm, not the deposit.
+		*/
+
+		if (held_item.dead() || ::is_firearm_like(held_item) || ::is_like_plantable_bomb(held_item) || ::is_ammo_like(held_item)) {
 			continue;
 		}
 
@@ -292,12 +294,19 @@ bool can_make_room_for_purchase(const E& character, const item_flavour_id& flavo
 		return false;
 	}
 
+	const auto needed_for_hands = ::calc_deposit_space_needed_for_hands(character);
+
 	return cosm.on_flavour(flavour_id, [&](const auto& typed_flavour) {
 		const auto& categories = typed_flavour.template get<invariants::item>().categories_for_slot_compatibility;
 
+		/*
+			Room for what the hands hold too - see reserve_deposit_space_for_hands,
+			otherwise the purchase itself would fall out right after.
+		*/
+
 		return
 			deposit->is_category_compatible_with(flavour_id, categories)
-			&& deposit.calc_total_space() >= ::calc_space_occupied_of_purchased(cosm, flavour_id)
+			&& deposit.calc_total_space() >= ::calc_space_occupied_of_purchased(cosm, flavour_id) + needed_for_hands
 		;
 	});
 }

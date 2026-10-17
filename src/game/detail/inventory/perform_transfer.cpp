@@ -1,4 +1,3 @@
-#include <limits>
 #include <optional>
 #include "augs/log.h"
 #include "game/detail/inventory/perform_transfer.h"
@@ -137,19 +136,7 @@ void perform_transfer_result::play_effects(const logic_step step) const {
 template <class E>
 static void drop_firearms_over_limit(const logic_step step, const E& typed_subject) {
 	while (::count_carried_firearms(typed_subject) > ::calc_max_firearms(typed_subject)) {
-		entity_id oldest_on_back;
-		auto oldest_step = std::numeric_limits<uint32_t>::max();
-
-		for (const auto back_slot : back_weapon_slots_v) {
-			if (const auto item = typed_subject[back_slot].get_item_if_any()) {
-				const auto stowed_step = item.when_last_transferred().step;
-
-				if (!oldest_on_back.is_set() || stowed_step < oldest_step) {
-					oldest_on_back = item.get_id();
-					oldest_step = stowed_step;
-				}
-			}
-		}
+		const auto oldest_on_back = ::find_bottom_firearm_on_back(typed_subject);
 
 		if (!oldest_on_back.is_set()) {
 			break;

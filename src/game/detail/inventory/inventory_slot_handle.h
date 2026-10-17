@@ -14,6 +14,7 @@
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_types.h"
+#include "game/detail/inventory/wears_backpack.h"
 #include "game/components/transform_component.h"
 #include "augs/templates/traits/is_nullopt.h"
 #include "game/cosmos/get_corresponding.h"
@@ -278,7 +279,7 @@ float basic_inventory_slot_handle<E>::calc_density_multiplier_due_to_being_attac
 		const auto& slot_def = get();
 
 		if (slot_def.attachment_density_multiplier_with_backpack >= 0.f) {
-			if (const auto back_slot = get_container()[slot_function::BACK]; back_slot.alive() && back_slot.has_items()) {
+			if (::wears_backpack(get_container())) {
 				return slot_def.attachment_density_multiplier_with_backpack;
 			}
 		}
@@ -411,7 +412,7 @@ inventory_space_type basic_inventory_slot_handle<E>::calc_total_space() const {
 	const auto& slot_def = get();
 
 	if (slot_def.extra_space_with_backpack > 0) {
-		if (const auto back_slot = get_root_container()[slot_function::BACK]; back_slot.alive() && back_slot.has_items()) {
+		if (::wears_backpack(get_root_container())) {
 			return slot_def.space_available + slot_def.extra_space_with_backpack;
 		}
 	}

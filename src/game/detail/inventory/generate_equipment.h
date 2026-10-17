@@ -115,18 +115,19 @@ entity_id requested_equipment::generate_for_impl(
 		}
 		else {
 			const auto slot_id = [&]() {
-				const auto found = character.find_pickup_target_slot_for(new_item).get_id();
+				const auto found = character.find_pickup_target_slot_for(new_item, { slot_finding_opt::ALL_CHARGES_MUST_FIT }).get_id();
 
 				if (!found.is_set() && !::is_firearm_like(new_item)) {
 					/*
-						Bought or given items never land on the ground - the oldest items fall out to make room.
+						Bought or given items never land on the ground, not even a part of a stack -
+						the oldest items fall out to make room.
 					*/
 
 					auto result = found;
 
 					on_step([&](auto&& step) {
 						if (::drop_oldest_items_to_fit(step, character, new_item)) {
-							result = character.find_pickup_target_slot_for(new_item).get_id();
+							result = character.find_pickup_target_slot_for(new_item, { slot_finding_opt::ALL_CHARGES_MUST_FIT }).get_id();
 						}
 					});
 
@@ -208,7 +209,14 @@ entity_id requested_equipment::generate_for_impl(
 
 	entity_id result_weapon;
 
+	/*
+		Returns the flavour of the spares to generate once the weapon is carried -
+		before that they would count as useless ammo and fall out of the deposit first.
+	*/
+
 	auto fill_with_ammo = [&](const auto& weapon) {
+		auto spares_flavour = item_flavour_id();
+
 		const auto chamber_slot = weapon[slot_function::GUN_CHAMBER];
 		const auto chamber_mag_slot = weapon[slot_function::GUN_CHAMBER_MAGAZINE];
 
@@ -258,7 +266,7 @@ entity_id requested_equipment::generate_for_impl(
 						create_charge_in_chamber(loaded_charge.get_flavour_id());
 					}
 
-					generate_spares(final_mag_flavour);
+					spares_flavour = final_mag_flavour;
 				}
 			}
 		}
@@ -279,9 +287,11 @@ entity_id requested_equipment::generate_for_impl(
 				create_charge_in_chamber(final_charge_flavour);
 				--ammo_pieces_to_generate_left;
 
-				generate_spares(final_charge_flavour);
+				spares_flavour = final_charge_flavour;
 			}
 		}
+
+		return spares_flavour;
 	};
 
 	if (eq.weapon.is_set()) {
@@ -291,10 +301,14 @@ entity_id requested_equipment::generate_for_impl(
 			/* So that the effect transform is valid */
 			weapon.set_logic_transform(character_transform);
 
-			fill_with_ammo(weapon);
+			const auto spares_flavour = fill_with_ammo(weapon);
 
 			if constexpr(!to_the_ground) {
 				pickup(weapon);
+			}
+
+			if (spares_flavour.is_set()) {
+				generate_spares(spares_flavour);
 			}
 		}
 
@@ -302,10 +316,14 @@ entity_id requested_equipment::generate_for_impl(
 			if (const auto weapon = make_owned_item(eq.weapon_secondary)) {
 				weapon.set_logic_transform(character_transform);
 
-				fill_with_ammo(weapon);
+				const auto spares_flavour = fill_with_ammo(weapon);
 
 				if constexpr(!to_the_ground) {
 					transfer(weapon, character[slot_function::SECONDARY_HAND]);
+				}
+
+				if (spares_flavour.is_set()) {
+					generate_spares(spares_flavour);
 				}
 			}
 		}

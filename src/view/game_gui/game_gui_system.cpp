@@ -528,7 +528,7 @@ void game_gui_system::advance(
 							return recursive_callback_result::CONTINUE_DONT_RECURSE;
 						}
 
-						if (!::is_ammo_piece_like(typed_item)) {
+						if (!::is_ammo_like(typed_item)) {
 							return recursive_callback_result::CONTINUE_AND_RECURSE;
 						}
 

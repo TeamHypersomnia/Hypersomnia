@@ -100,7 +100,6 @@ std::optional<money_type> find_price_of(const cosmos& cosm, const E& object) {
 inline auto get_buy_slot_opts() {
 	return candidate_holster_types {
 		candidate_holster_type::WEARABLES,
-		candidate_holster_type::HANDS,
 		candidate_holster_type::CONTAINERS
 	};
 }
@@ -151,13 +150,6 @@ inline bool is_armor_like(const cosmos& cosm, const item_flavour_id& id) {
 	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
 		return typed_flavour.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::TORSO_ARMOR);
 	});
-}
-
-template <class H>
-inline bool is_ammo_piece_like(const H& handle) {
-	const bool is_charge_like = handle.template has<invariants::cartridge>();
-
-	return is_charge_like || ::is_magazine_like(handle.get_cosmos(), handle.get_flavour_id());
 }
 
 inline bool is_shotgun_like(const cosmos& cosm, const item_flavour_id& id) {
@@ -235,6 +227,25 @@ inline once_owning_category calc_once_owning_category(const cosmos& cosm, const 
 
 		return once_owning_category::NONE;
 	});
+}
+
+/*
+	Armor, a backpack or a defuse kit is owned at most once - checked by the server too,
+	so that a crafted purchase never pays for nothing or squeezes a second backpack into the deposit.
+*/
+
+template <class E>
+bool owns_once_owning_category_of(const E& character, const item_flavour_id& id) {
+	const auto& cosm = character.get_cosmos();
+	const auto category = ::calc_once_owning_category(cosm, id);
+
+	if (category == once_owning_category::NONE) {
+		return false;
+	}
+
+	return character.count_contained([&](const auto& typed_item) {
+		return category == ::calc_once_owning_category(cosm, typed_item.get_flavour_id());
+	}) >= 1;
 }
 
 template <class E>

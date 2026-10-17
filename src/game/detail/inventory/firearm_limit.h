@@ -3,6 +3,7 @@
 #include "game/enums/item_category.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
+#include "game/detail/inventory/wears_backpack.h"
 
 /*
 	Firearms are carried only in hands or hung on the back - never inside containers.
@@ -23,12 +24,6 @@ bool is_firearm_like(const E& handle) {
 	}
 
 	return false;
-}
-
-template <class E>
-bool wears_backpack(const E& character) {
-	const auto back_slot = character[slot_function::BACK];
-	return back_slot.alive() && back_slot.has_items();
 }
 
 template <class E>

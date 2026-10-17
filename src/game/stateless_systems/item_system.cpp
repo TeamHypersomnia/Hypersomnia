@@ -431,9 +431,11 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				/*
 					The same procedure as for pickups and purchases makes room for it first -
 					ammo for none of the carried firearms falls out first, then the oldest items.
+					Except the old magazine: with no room it falls to the ground instead,
+					never pushing out the new one or anything else.
 				*/
 
-				if (redundant_item.alive()) {
+				if (redundant_item.alive() && !::is_ammo_like(redundant_item)) {
 					::drop_oldest_items_to_fit(step, it, redundant_item);
 				}
 

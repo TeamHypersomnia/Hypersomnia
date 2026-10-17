@@ -38,8 +38,8 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 }
 
 /*
-	The dropped items slide about slide_distance away, fanning out around the direction they faced
-	- the first one straight, the next ones turned by ever more to alternating sides - so they don't pile up.
+	The dropped items slide about slide_distance away, fanning out around the direction the character faced
+	- the first firearm straight, the next items turned by ever more to alternating sides - so they don't pile up.
 */
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, real32 slide_distance, const logic_step step);

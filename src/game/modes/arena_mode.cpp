@@ -1064,7 +1064,15 @@ void arena_mode::create_character_for_player(
 					access,
 					cosm, 
 					entity_flavour_id(flavour), 
-					[](entity_handle) {},
+					[&](const entity_handle new_character) {
+						/*
+							Before init_spawned gives back the saved items - the physics of a bot's back weapons depend on it.
+						*/
+
+						if (const auto sentience = new_character.template find<components::sentience>()) {
+							sentience->is_bot = p.is_bot;
+						}
+					},
 					[&](const entity_handle new_character) {
 						const auto spawn_used = teleport_to_next_spawn(in, new_character);
 						init_spawned(in, id, new_character, step, changed_identities, transferred);
@@ -1088,8 +1096,6 @@ void arena_mode::create_character_for_player(
 				else {
 					sentience->last_assigned_color = in.rules.default_player_color;
 				}
-
-				sentience->is_bot = p.is_bot;
 			}
 
 			const auto old_id = p.controlled_character_id;
@@ -2898,6 +2904,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 								}
 
 								if (!factions_compatible(player_handle, f_id)) {
+									return;
+								}
+
+								if (::owns_once_owning_category_of(player_handle, f_id)) {
 									return;
 								}
 

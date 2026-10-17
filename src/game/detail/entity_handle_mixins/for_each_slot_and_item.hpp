@@ -147,7 +147,7 @@ void inventory_mixin<E>::recurse_character_attachments(
 
 	do_callback_for(slot_function::BELT);
 
-	{
+	if (should_recurse(character[slot_function::BACK_WEAPON_1])) {
 		/*
 			All weapons on the back hang in the same place,
 			so the one stowed most recently is drawn last - on top.
@@ -161,7 +161,7 @@ void inventory_mixin<E>::recurse_character_attachments(
 				return item.when_last_transferred().step;
 			}
 
-			return uint32_t(0);
+			return static_cast<uint32_t>(0);
 		};
 
 		std::stable_sort(

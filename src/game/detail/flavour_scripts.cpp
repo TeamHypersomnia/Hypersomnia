@@ -1,3 +1,4 @@
+#include "augs/templates/remove_cref.h"
 #include "game/detail/flavour_scripts.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/cosmos/entity_handle.h"
@@ -16,6 +17,16 @@ inventory_space_type calc_space_occupied_of_purchased(
 						if (const auto& f = mag->only_allow_flavour; f.is_set()) {
 							return item->space_occupied_per_charge + calc_space_occupied_of_purchased(cosm, f);
 						}
+					}
+				}
+
+				if constexpr(remove_cref<decltype(typed_flavour)>::template has<components::item>()) {
+					if (item->stackable) {
+						/*
+							A stack is bought whole.
+						*/
+
+						return item->space_occupied_per_charge * typed_flavour.template get<components::item>().charges;
 					}
 				}
 

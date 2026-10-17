@@ -107,12 +107,13 @@ auto calc_filters(const E& handle) {
 		const auto capability = handle.get_owning_transfer_capability();
 
 		if (capability && capability != handle) {
-			if (const auto sentience = capability.template find<components::sentience>(); sentience && sentience->is_bot) {
+			if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
 				if (::is_hung_on_back(handle)) {
 					/*
 						Weapons hung on a bot's back still weigh it down (fixtures without
 						category/mask bits keep their mass), but they never snag on walls,
 						which the bot navigation does not account for.
+						is_bot is set before the bot gets any items, so nothing needs reinferring when it changes.
 					*/
 
 					auto unsnagging = filters[predefined_filter_type::CHARACTER_WEAPON];

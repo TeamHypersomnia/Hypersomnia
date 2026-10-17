@@ -18,7 +18,6 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
-#include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
 #include "augs/gui/formatted_string.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "game/detail/visible_entities.hpp"
@@ -278,7 +277,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		OWNED_OF_THE_SAME_TYPE
 	};
 
-	auto can_make_room_for = [&](const auto& flavour_or_spell) {
+	auto purchase_can_make_room = [&](const auto& flavour_or_spell) {
 		if constexpr(std::is_same_v<remove_cref<decltype(flavour_or_spell)>, item_flavour_id>) {
 			return subject.alive() && ::can_make_room_for_purchase(subject, flavour_or_spell);
 		}
@@ -313,7 +312,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const auto num_affordable = in.available_money / price;
 
 		const bool no_space = num_carryable && *num_carryable == 0;
-		const bool can_make_room = no_space && can_make_room_for(flavour_or_spell);
+		const bool can_make_room = no_space && purchase_can_make_room(flavour_or_spell);
 		const bool is_disabled = num_affordable == 0 || (no_space && !can_make_room);
 
 		bool result = false;
@@ -484,16 +483,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 		const auto& selected = b == button_type::REPLENISHABLE ? selected_replenishables : selected_weapons;
 
-		auto buy_opts = ::get_buy_slot_opts();
-
-		if (b == button_type::REPLENISHABLE) {
-			/* Don't count hands as a space for replenishables, e.g. mags */
-			erase_element(buy_opts, candidate_holster_type::HANDS);
-		}
-
 		const auto num_carryable = num_carryable_pieces(
 			subject,
-			buy_opts, 
+			::get_buy_slot_opts(), 
 			f_id
 		);
 
@@ -505,13 +497,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const auto this_owning_category = ::calc_once_owning_category(cosm, f_id);
 
 		const auto num_owned = subject.count_contained(f_id);
-		const auto num_owned_of_same_once_category = subject.count_contained([&](const auto& typed_item) {
-			if (this_owning_category == ::calc_once_owning_category(cosm, typed_item.get_flavour_id())) {
-				return true;
-			}
-
-			return false;
-		});
 
 		const auto owned_status = [&]() {
 			if (this_owning_category == once_owning_category::NONE) {
@@ -522,7 +507,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				return owning_type::OWNED;
 			}
 
-			return num_owned_of_same_once_category >= 1 ? owning_type::OWNED_OF_THE_SAME_TYPE : owning_type::UNOWNED;
+			return ::owns_once_owning_category_of(subject, f_id) ? owning_type::OWNED_OF_THE_SAME_TYPE : owning_type::UNOWNED;
 		}();
 
 		const auto aabb = ::aabb_of_game_image_with_attachments(
