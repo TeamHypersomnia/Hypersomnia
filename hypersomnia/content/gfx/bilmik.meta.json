@@ -85,7 +85,7 @@
                 "rotation": -1.0
             },
             "back_anchor": {
-                "pos": [-2, 3],
+                "pos": [-4, 3],
                 "rotation": 90.0
             },
             "shoulder_anchor": {
