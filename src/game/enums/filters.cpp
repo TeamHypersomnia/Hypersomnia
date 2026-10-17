@@ -46,9 +46,13 @@ filter_type make_thrown_melee_bouncing_filter(filter_type f) {
 	return f;
 }
 
-filter_type make_thrown_melee_hitting_filter(filter_type f) {
+filter_type make_obstacle_free_filter(filter_type f) {
 	f.maskBits &= static_cast<uint16>(~thrown_melee_bouncing_categories());
 	return f;
+}
+
+filter_type make_thrown_melee_hitting_filter(filter_type f) {
+	return ::make_obstacle_free_filter(f);
 }
 
 namespace predefined_queries {

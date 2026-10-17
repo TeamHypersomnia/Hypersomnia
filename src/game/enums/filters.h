@@ -45,6 +45,12 @@ namespace predefined_queries {
 filter_type make_thrown_melee_bouncing_filter(filter_type);
 filter_type make_thrown_melee_hitting_filter(filter_type);
 
+/*
+	Leaves out the obstacles (walls, glass, car floors) - e.g. for weapons on a bot's back, which must never snag.
+*/
+
+filter_type make_obstacle_free_filter(filter_type);
+
 enum class predefined_filter_type {
 	// GEN INTROSPECTOR enum class predefined_filter_type
 	WALL,

@@ -110,16 +110,13 @@ auto calc_filters(const E& handle) {
 			if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
 				if (::is_hung_on_back(handle)) {
 					/*
-						Weapons hung on a bot's back still weigh it down (fixtures without
-						category/mask bits keep their mass), but they never snag on walls,
-						which the bot navigation does not account for.
+						Weapons hung on a bot's back never snag on obstacles, which the bot navigation
+						does not account for. Everything else stays as for a human's: bullets and knives
+						fly through them with their effects, they keep their mass.
 						is_bot is set before the bot gets any items, so nothing needs reinferring when it changes.
 					*/
 
-					auto unsnagging = filters[predefined_filter_type::CHARACTER_WEAPON];
-					unsnagging.categoryBits = 0;
-					unsnagging.maskBits = 0;
-					return unsnagging;
+					return ::make_obstacle_free_filter(filters[predefined_filter_type::CHARACTER_WEAPON]);
 				}
 			}
 
