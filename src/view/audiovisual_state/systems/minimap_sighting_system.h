@@ -86,6 +86,35 @@ public:
 	/* Fired when the bomb lands on the ground or gets planted. */
 	event_pulse bomb_pulse;
 
+	/*
+		What an observer sees. An enemy counts as seen only within a narrower cone
+		of the view angle, so that enemies at the very edge of the view don't get pinned,
+		and only on the screen - the camera follows the crosshair,
+		so it is narrower than the whole fog of war.
+	*/
+
+	struct observer_view {
+		fog_of_war_settings fow;
+		ltrb screen_area;
+
+		bool shows(const vec2 observer_pos, const vec2 look_dir, const vec2 enemy_pos) const;
+	};
+
+	/*
+		A teammate's camera isn't known here, so they see what a player standing there would
+		with the default camera settings and the crosshair not at the screen edge:
+		the fog of war scaled by the camera zoom at their position,
+		and a screen following their crosshair, showing the fog of war size (1920x1080 by default) -
+		the camera zoom snaps to it.
+	*/
+
+	static observer_view calc_teammate_view(
+		const fog_of_war_settings& rules_fow,
+		const float camera_zoom,
+		const vec2 teammate_pos,
+		const vec2 camera_offset
+	);
+
 	void record_deaths(const const_logic_step step);
 
 	void advance(

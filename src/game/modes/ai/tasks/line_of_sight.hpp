@@ -4,21 +4,6 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/inferred_caches/find_physics_cache.h"
 #include "game/enums/filters.h"
-#include "augs/math/repro_math.h"
-
-/*
-	The bot's field of view: a box around the bot and a cone around its aim.
-	See calc_ai_field_of_view.
-*/
-
-struct ai_field_of_view {
-	vec2 half_size;
-	real32 angle = 360.f;
-
-	bool considers_angle() const {
-		return angle > 0.f && angle < 360.f;
-	}
-};
 
 /*
 	Check if a position is within line of sight from another position.
@@ -150,16 +135,3 @@ float sense_free_space_from_vertices_of(
 	return total_free;
 }
 
-/*
-	Check if a position is within the bot's field of view.
-*/
-
-inline bool is_within_fov(
-	const vec2 from_pos,
-	const vec2 target_pos,
-	const ai_field_of_view& fov
-) {
-	const auto offset = target_pos - from_pos;
-
-	return repro::fabs(offset.x) < fov.half_size.x && repro::fabs(offset.y) < fov.half_size.y;
-}

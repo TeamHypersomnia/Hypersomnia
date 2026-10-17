@@ -4,6 +4,7 @@
 #include "game/enums/filters.h"
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/line_of_sight.hpp"
+#include "game/modes/ai/tasks/ai_field_of_view.h"
 
 /*
 	Find the closest visible enemy within the bot's field of view.
@@ -48,7 +49,7 @@ inline entity_id find_closest_enemy(
 			/*
 				Check if target is within field of view first (early exit for efficiency).
 			*/
-			if (!::is_within_fov(ctx.character_pos, target_pos, fov)) {
+			if (!fov.within_box(ctx.character_pos, target_pos)) {
 				return;
 			}
 
@@ -57,9 +58,8 @@ inline entity_id find_closest_enemy(
 
 			if (distance < closest_distance) {
 				const auto direction_to_enemy = vec2(offset).normalize();
-				const auto angle_to_enemy = current_aim_direction.degrees_between(direction_to_enemy);
 
-				if (!fov.considers_angle() || angle_to_enemy <= fov.angle / 2) {
+				if (fov.within_angle(current_aim_direction, direction_to_enemy)) {
 					/*
 						Check line of sight using the helper function.
 					*/
