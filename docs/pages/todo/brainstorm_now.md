@@ -6,12 +6,26 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- osobne flagi na podglad przy rzucaniu granatem a podglad przy rzucaniu nozem
-	- wylaczyc domyslnie w ogole dla melee
-	- albo flage domyslnie on zeby rysowac to jako zwykly laser a nie te sylwetki durne
+- awka jak bedzie ciezka taka na plerach to trzeba jej zwiekszyc predkosc teraz duzo
 
-- swiecacy dev label
-- te public keye cale dla linuxiarzy
+- tutorial o backpacku tera jedna awka tylko
+
+- tutorial zaktualizowac o granasy i jak to carrying dodamy na plerach to tez te przejscia
+- jakis lepszy feedback kamery przy strzelaniu
+- glosne alerty kiedys zapiac na failure rankedow lub polaczen, na telegrama
+
+- te polygonalne kiedys mozna zrobic polygony i fixnac de facing worlds tym + to powinno byc teksturowane jak w soldacie ze jeszcze mozna nalozyc na to trawe na rog np.
+
+- moze sprobowac jednak recznie sklepac ten heartbeat do wielu masterserverow i potem audyt krotki na tym puscic z ciekawosci
+
+- mozna jeszcze te bulety zeby nieliniowa predkosc mialy tylko przyspieszaly i zwalnialy nawet ta karabinowe z wyjatkiem snajperek
+
+- przepatrzec diff caly od poczatku tych zmian do auth zeby sprawdzic czy nie dolozylismy gdzies oczywistej zlozonosci
+
+- na turnieje: discovery serwerow po lanie
+	- moze wtedy bez sensu to wysylanie internal addressow do masterservera? to znowu jakiejs luki nie otwiera?
+
+- moze jakies powiadomienie na telegrama te ciche odmowy?
 
 - proper triggery ktore bedziemy reuzywac w shooting rangu jako te pady i inne pierdoły bo mamy kod boilerplate w test setupie i nie da sie tego reuzywac
 	- portale to co innego, player triggery co innego. inna prostsza semantyka + bedzie dzialac jak sa obok siebie dotykajace sie + mozna decydowac czy na dotyk czy na srodek itp

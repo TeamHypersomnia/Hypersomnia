@@ -5,6 +5,8 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- heartbeats size may exceed max
+
 - RCON: dont send to other servers
 
 - OAuth

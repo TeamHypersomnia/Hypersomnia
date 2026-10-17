@@ -7553,3 +7553,17 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 	- loaded from autosave jako toast bardzo widoczny z gory ktory znika zaraz a nie kurwa cos co trzeba kliknac okejke modal jebany bo to wkurwia
 - ranked: sensowna konfiguracja
 - ranked: sensowna konfiguracja
+- name servera niech zostaje po wpisaniu do favorites
+- swiecacy dev label
+- te public keye cale dla linuxiarzy
+
+- osobne flagi na podglad przy rzucaniu granatem a podglad przy rzucaniu nozem
+	- wylaczyc domyslnie w ogole dla melee
+	- albo flage domyslnie on zeby rysowac to jako zwykly laser a nie te sylwetki durne
+- jeszcze marginalnie zoom outnac 
+- rzucanie granatu prawym - bez interpolacji tylko snap
+- rewo ciut wolniejszy
+- upewnic sie ze w heartbeacie leca efektywne te zoomy/speedy ale mysle ze tak
+- paka zeby nie zmieniala dloni
+- /zoom powinien relatywnie skalowac strefy na mapie
+- pokazywac speedy w server monitorze
