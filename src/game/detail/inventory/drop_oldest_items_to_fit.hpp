@@ -161,6 +161,15 @@ inventory_space_type calc_space_of_one_piece(const E& item) {
 
 template <class E, class I>
 bool can_make_room_for(const E& character, const I& item) {
+	if (::is_firearm_like(item)) {
+		/*
+			A firearm never goes into the deposit (see query_containment_result) -
+			emptying it would drop everything for nothing.
+		*/
+
+		return false;
+	}
+
 	const auto deposit = ::find_personal_deposit(character);
 
 	return
