@@ -31,7 +31,6 @@ struct admin_profile_entry {
 using admin_profiles_type = std::vector<admin_profile_entry>;
 
 struct admin_profile {
-	std::string account_id;
 	rcon_level_type rcon_level = rcon_level_type::DENIED;
 	std::string badge;
 };
@@ -59,7 +58,6 @@ inline std::optional<admin_profile> find_admin_profile(const admin_profiles_type
 		}
 
 		auto result = admin_profile();
-		result.account_id = entry.account;
 
 		if (entry.rcon == "MASTER_RCON") {
 			result.rcon_level = rcon_level_type::MASTER;

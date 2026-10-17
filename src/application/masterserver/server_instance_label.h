@@ -5,14 +5,13 @@
 
 /*
 	One server.key per host: all its instances (casual, ranked, tournament matches) have the same key and tell themselves
-	apart by a label the launcher gives them - c1, c2, r1, t1, a1 - in their signed heartbeat.
+	apart by a label the launcher gives them - c1, c2, r1, t1 - in their signed heartbeat.
 	A join names an instance by its address; the label is the list's and the favorites' (see favorite_servers.h).
 */
 
 enum class server_instance_type : uint8_t {
 	CASUAL,
 	RANKED,
-	AURA,
 	TOURNAMENT
 };
 
@@ -22,7 +21,6 @@ inline instance_label_type make_instance_label(const server_instance_type type, 
 	const auto letter = [type]() {
 		switch (type) {
 			case server_instance_type::RANKED: return "r";
-			case server_instance_type::AURA: return "a";
 			case server_instance_type::TOURNAMENT: return "t";
 			default: return "c";
 		}

@@ -14,7 +14,7 @@
 
 /*
 	Every server's Ed25519 key: one secret, server.key in KEYS_DIR (see all_paths.h), created on the first start and never
-	overwritten - one per host, shared by all its instances (they differ by their labels - see server_instance_label.h).
+	overwritten while it reads (an unreadable one is replaced by the game, kept next to it, see obtain) - one per host, shared by all its instances (they differ by their labels - see server_instance_label.h).
 	The clients seal their handshakes to that key, and the masterserver and hypersomnia.io know an official server by it.
 	The same format as the account keys - see identity_key.h.
 

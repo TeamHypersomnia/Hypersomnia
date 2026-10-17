@@ -69,13 +69,6 @@ struct server_client_state {
 	std::string authenticated_id;
 
 	/*
-		Whether the identity broker vouches for authenticated_id - see identity_cert.h.
-		Only such accounts play ranked and report matches.
-	*/
-
-	bool authenticated_by_broker = false;
-
-	/*
 		The account its cert proves, whatever authenticated_id is - e.g. a nick_ on a tournament server.
 	*/
 

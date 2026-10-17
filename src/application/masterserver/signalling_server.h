@@ -236,12 +236,11 @@ private:
 											The list is written anew only when what it shows changed - not for every heartbeat.
 										*/
 
-										auto without_signature = [](server_heartbeat h) {
-											h.signature.reset();
-											return h;
-										};
+										/*
+											Neither carries its signature - taken off above.
+										*/
 
-										const bool changed = !(without_signature(peer->last_heartbeat) == without_signature(hb));
+										const bool changed = !(peer->last_heartbeat == hb);
 
 										peer->last_heartbeat = hb;
 										peer->time_last_heartbeat = unix_time;

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <optional>
 #include <filesystem>
 #include <string>
 #include <system_error>
@@ -7,10 +8,11 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/secure_hash.h"
+#include "application/main/identity_key.h"
 
 /*
 	The official servers, read from a directory where every file is named after a server id (e.g. "de", "us-central")
-	and holds nothing but that server's public key in hex - what its --print-server-key prints.
+	and holds nothing but that server's public key - what its --print-server-key prints, or as the game shows it (0x...).
 	The keys are public: nothing here needs to be kept secret, and the same directory serves hypersomnia.io.
 
 	Adding a server is adding a file, revoking it is removing the file.
@@ -20,38 +22,6 @@
 class official_servers_registry {
 	augs::path_type directory;
 	std::unordered_map<std::string, std::string> id_by_key;
-
-	static std::string trimmed(std::string s) {
-		auto is_space = [](const char c) {
-			return c == ' ' || c == '\t' || c == '\r' || c == '\n';
-		};
-
-		while (!s.empty() && is_space(s.back())) {
-			s.pop_back();
-		}
-
-		std::size_t first = 0;
-
-		while (first < s.size() && is_space(s[first])) {
-			++first;
-		}
-
-		return s.substr(first);
-	}
-
-	static bool is_key_hex(const std::string& s) {
-		if (s.size() != 64) {
-			return false;
-		}
-
-		for (const auto c : s) {
-			if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))) {
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 public:
 	explicit official_servers_registry(augs::path_type directory) : directory(std::move(directory)) {
@@ -88,20 +58,22 @@ public:
 				An unreadable file (wrong owner, removed mid-reload) must not take the masterserver down.
 			*/
 
-			const auto key = [&]() -> std::string {
+			const auto parsed = [&]() -> std::optional<augs::ed25519_public_key_type> {
 				try {
-					return trimmed(augs::file_to_string(file.path()));
+					return identity_key::parse_public_key(augs::file_to_string(file.path()));
 				}
 				catch (const std::exception& err) {
 					LOG("Official server %x: could not read the key: %x", server_id, err.what());
-					return std::string();
+					return std::nullopt;
 				}
 			}();
 
-			if (!is_key_hex(key)) {
-				LOG("Official server %x: not a public key (64 lowercase hex characters), skipping.", server_id);
+			if (!parsed.has_value()) {
+				LOG("Official server %x: not a public key (64 hex characters), skipping.", server_id);
 				continue;
 			}
+
+			const auto key = augs::bytes_to_hex(*parsed);
 
 			/*
 				One key in two files: which id wins would depend on the directory order - neither is used.

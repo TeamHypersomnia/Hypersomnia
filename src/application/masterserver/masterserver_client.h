@@ -49,5 +49,4 @@ struct masterserver_client {
 	server_heartbeat last_heartbeat;
 };
 
-using server_list_type = std::unordered_map<webrtc_id_type, masterserver_client>;
 

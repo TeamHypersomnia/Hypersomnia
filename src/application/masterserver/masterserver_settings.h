@@ -28,9 +28,6 @@ struct masterserver_settings {
 	port_type server_list_port = 8420;
 	port_type fallback_http_server_list_port = 8410;
 
-	augs::path_type cert_pem_path;
-	augs::path_type key_pem_path;
-
 	float sleep_ms = 8;
 
 	bool report_rtc_errors_to_webhook = false;

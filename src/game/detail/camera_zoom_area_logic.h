@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <optional>
+#include "game/detail/get_hovered_world_entity.h"
 
 /*
 	Returns the zoom of the topmost camera zoom area at the given position.

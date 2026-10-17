@@ -5,6 +5,15 @@ description: Test Hypersomnia end to end without the user, mainly networking - l
 
 # Local testing
 
+**After a change to the network architecture (netcode, connecting, identity and accounts, the server's auth, the
+masterserver, the site's match reports and broker): run `scripts/regression.sh`** (about 15 minutes; not for gameplay,
+UI or rendering changes) - every
+check below in a fresh scratch directory and a PASS/FAIL table at the end; `SOAK=1` adds the netcode soak (~35 min),
+`REMOTE=1` the remote part (`remote_e2e/regression_remote.sh`: the MMR rules on the remote test site, one real ranked match
+through real NAT, a web client over TURN only), `ONLY="mmr keys"` runs some checks only. Such a fix is tested with it before it is
+committed; a new kind of such change gets its check added there. The site's MMR rules are tested by signed simulated reports
+(`run_mmr_tests.py` in the site), real ranked matches only for one or two end-to-end cases.
+
 Everything runs from scripts in `scripts/`, each isolated: own appdata dirs, own scratch dir, and they check their ports
 are free (the scenarios share 18000/18410/18420/18430/10002 - run one at a time)
 (`SCRATCH`, default `/tmp/hypersomnia-nettest` - point it at the session scratchpad).
@@ -54,6 +63,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `scenario_ranked_corners.sh` (`CASE=unlink\|broker_down`) | A linked account (a key linked to a fake Steam id straight in the site's DB, its broker behind a stoppable proxy) in a ranked match: mid-match its key is unlinked on the site, or its broker goes down; it is killed and started again - it must rejoin as the same `steam_` account (its saved steam_cert.json) and the report must name that account. Note: a key put in by hand is linked only after the game's link check - started with `--connect` right away, it joins as `key_`; the script lets alice save her steam_cert.json first |
 | `scenario_disconnects.sh` (`CASES=...`) | Filmstrips of each disconnect as the player sees it, with timings: server SIGTERM/SIGKILL/SIGSTOP, full, the same key joining again, wrong password, AFK, client SIGSTOP/SIGKILL/SIGTERM. Expected: every kick reason shows at once; a dead server or a dropped network shows "Nothing came from the server for 10 seconds" (native only); a 6 s server freeze is survived; a killed client frees its slot in about 5 s, a quitting one at once |
 | `scenario_map_download.sh <out>` (`MAP`, `EXT`, `LATENCY`, `LOSS`, `KILL_AT`) | A client without the server's map downloads it - over UDP or from an HTTP provider (`slow_http.py` serves one at a set rate, with CORS for the browser); a long download never disconnects, a server killed meanwhile shows "Nothing came from the server for 10 seconds". In the browser: `scenario_web_firefox.sh` with `MAP`, `EXT` (and `KILL_SERVER=1`, `TAB_AWAY=<s>`) |
+| `scenario_admin.sh` | A key linked to a Steam account on a server with a password: with only the `steam_` account in `admin_profiles` it is asked for the password (outside the Steam build a linked key is no admin), with its `key_` too it gets in without one |
 | `scenario_password_limit.sh` | 7 joins without the password: 5x "Wrong password", then "Too many wrong passwords" |
 | `link_flow_test.py`, `crazygames_cert_test.py` | The site's link/unlink/start endpoints and the broker's CrazyGames token checks, at the HTTP level |
 | netcode's own tests (handshake, replays, forged challenges) | Not in any build target: `printf 'void netcode_test(void);int netcode_init(void);void netcode_term(void);int main(void){netcode_init();netcode_test();netcode_term();return 0;}' > main.c` in a scratch dir, then `clang -O1 -DNETCODE_ENABLE_TESTS=1 -DNETCODE_DEBUG=1 -I$Y/netcode -I$Y/include main.c $Y/netcode/netcode.c -lsodium -lm -o nctest` (`Y=src/3rdparty/yojimbo`) and `stdbuf -oL ./nctest` - a failed check aborts (exit 132) after naming it |

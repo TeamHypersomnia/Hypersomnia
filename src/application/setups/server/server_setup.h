@@ -483,7 +483,6 @@ private:
 		const std::size_t packet_bytes
 	);
 
-	void start_ranked_match_if_conditions_met();
 
 	template <class T>
 	void choose_next_map_from(const T&);
@@ -690,7 +689,7 @@ public:
 				if (is_dedicated()) {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
 						handle_abandon_requests(step);
-						ban_players_who_left_for_good(step);
+						announce_ranked_abandons(step);
 						lock_ranked_roster_if_started(step);
 #if CRASH_RECOVERY
 						crash_recovery_dump_on_round_start(step);
@@ -966,7 +965,13 @@ public:
 	game_mode_name_type get_current_game_mode_name() const;
 
 	void default_server_post_solve(const const_logic_step step);
-	void ban_players_who_left_for_good(const const_logic_step step);
+	void announce_ranked_abandons(const const_logic_step step);
+
+	/*
+		Friday to Sunday from 19:00 to 21:00 by the server's time zone - a ranked match started then counts twice.
+	*/
+
+	bool happy_hours_now() const;
 	void handle_abandon_requests(const const_logic_step step);
 	void lock_ranked_roster_if_started(const const_logic_step step);
 #if CRASH_RECOVERY

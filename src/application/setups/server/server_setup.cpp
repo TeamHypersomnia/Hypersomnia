@@ -1620,12 +1620,10 @@ void server_setup::apply_authentication(
 		if (auto old = find_client_state(existing)) {
 			old->kick_no_linger = true;
 			old->authenticated_id.clear();
-			old->authenticated_by_broker = false;
 		}
 	}
 
 	client->authenticated_id = new_id;
-	client->authenticated_by_broker = signed_by_broker;
 
 	LOG(
 		"Authenticated \"%x\". ID: %x (%x). Took %x secs.", 
@@ -1709,7 +1707,7 @@ void server_setup::lock_ranked_roster_if_started(const const_logic_step step) {
 		using J = messages::no_arg_mode_notification;
 
 		if (n.payload == decltype(n.payload)(J::RANKED_STARTED)) {
-			ranked_match_happy_hours = augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0;
+			ranked_match_happy_hours = happy_hours_now();
 
 			/*
 				Lock in the game id to account id mappings.
@@ -1769,7 +1767,11 @@ void server_setup::handle_abandon_requests(const const_logic_step step) {
 	}
 }
 
-void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
+bool server_setup::happy_hours_now() const {
+	return augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0;
+}
+
+void server_setup::announce_ranked_abandons(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::mode_notification>();
 
 	for (const auto& n : notifications) {
@@ -1779,16 +1781,6 @@ void server_setup::ban_players_who_left_for_good(const const_logic_step step) {
 			const auto message = typesafe_sprintf("%x ABANDONED the ranked match with a penalty.", n.subject_name);
 
 			broadcast_info(message, chat_target_type::INFO_CRITICAL);
-
-			const auto id_to_ban = n.subject_account_id;
-
-#if !IS_PRODUCTION_BUILD
-			ensure(!id_to_ban.empty());
-#endif
-
-			if (!id_to_ban.empty()) {
-				// TODO_RANKED - call ban endpoint
-			}
 		}
 	}
 }
@@ -2217,7 +2209,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 		get_current_arena_name(),
 		get_current_game_mode_name(),
 		summary,
-		ranked_match_happy_hours.value_or(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0),
+		ranked_match_happy_hours.value_or(happy_hours_now()),
 		get_clan_of,
 		get_avatar_of
 	);
@@ -2229,7 +2221,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 			get_current_arena_name(),
 			get_current_game_mode_name(),
 			summary,
-			ranked_match_happy_hours.value_or(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()) == 0.0),
+			ranked_match_happy_hours.value_or(happy_hours_now()),
 			get_clan_of,
 			[](const mode_player_id) { return std::vector<std::byte>(); }
 		)
@@ -2881,11 +2873,6 @@ game_mode_name_type server_setup::get_current_game_mode_name() const {
 bool server_setup::is_ranked_server() const {
 	return instance_type == server_instance_type::RANKED || instance_type == server_instance_type::TOURNAMENT;
 }
-
-/*
-	Nickname-auth ranked servers (e.g. tournaments) authenticate clients by their declared nickname, not by a cert -
-	so non-Steam clients do not filter them out of the server browser as ranked-with-auth.
-*/
 
 /*
 	Where this server is, for its happy hours (and the browser's guess of the distance): the config's time_zone, else the
@@ -6110,7 +6097,7 @@ void server_setup::ban(const client_id_type& id, const std::string& reason, cons
 	auto& c = clients[id];
 
 	auto entry = server_ban();
-	entry.account = c.cert_account.empty() ? c.authenticated_id : c.cert_account;
+	entry.account = c.cert_account;
 	entry.nickname = c.get_nickname();
 	entry.reason = reason;
 	entry.until_unix = minutes == 0 ? 0 : ::unix_now_secs() + static_cast<uint64_t>(minutes) * 60;

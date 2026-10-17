@@ -35,3 +35,6 @@ run bash -c 'git config --global --add safe.directory "*"; B=/src/build/Release-
 mkdir -p $S/libcxx22
 for l in libc++.so.1 libc++abi.so.1 libunwind.so.1; do cp -L $R/usr/lib/llvm-18/lib/$l $S/libcxx22/ 2>/dev/null || cp -L $R/lib/x86_64-linux-gnu/$l $S/libcxx22/; done
 echo "libc++ to ship: $S/libcxx22"
+
+# A failed build (a link error) leaves no binary - say so in the exit code
+[ -x "$REPO/build/Release-x64-ubuntu22-headless/Hypersomnia" ] && [ "$REPO/build/Release-x64-ubuntu22-headless/Hypersomnia" -nt "$REPO/build/Release-x64-ubuntu22-headless/build.ninja" ] || { echo "no fresh binary - the build failed"; exit 1; }

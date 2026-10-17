@@ -61,19 +61,6 @@ struct server_public_vars {
 	bool operator==(const server_public_vars&) const = default;
 };
 
-/*
-	When a ranked instance starts its match - see server_instance_label.h for what makes an instance ranked.
-*/
-
-enum class ranked_start_type {
-	// GEN INTROSPECTOR enum class ranked_start_type
-	TEAMS_EQUAL,
-	SERVER_FULL,
-	ALWAYS,
-	COUNT
-	// END GEN INTROSPECTOR
-};
-
 enum class arena_cycle_type {
 	// GEN INTROSPECTOR enum class arena_cycle_type
 	REPEAT_CURRENT,
@@ -88,7 +75,6 @@ struct server_ranked_vars {
 	static constexpr bool force_read_field_by_field = true;
 
 	// GEN INTROSPECTOR struct server_ranked_vars
-	ranked_start_type start_when = ranked_start_type::ALWAYS;
 	uint16_t countdown_time = 40;
 	uint16_t rejoin_time_limit = 150;
 	uint8_t max_rejoins = 1;

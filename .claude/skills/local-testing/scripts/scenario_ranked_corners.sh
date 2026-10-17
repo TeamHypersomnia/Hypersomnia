@@ -69,7 +69,7 @@ cat > $T/server/user/conf.d/test.json <<J
 { "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": $PORT, "slots": 16 },
   "server": { "server_name": "[PL] Corners test", "arena": "de_e2e_short", "game_mode": "bomb_defusal", "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "sync_all_external_arenas_on_startup": false,
-              "ranked": { "start_when": "TEAMS_EQUAL", "countdown_time": 2 },
+              "ranked": { "countdown_time": 2 },
               "move_to_spectators_if_afk_for_secs": 999999, "kick_if_afk_for_secs": 999999,
               "webrtc_port_range_begin": 19710, "webrtc_port_range_end": 19715 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" } }
@@ -119,12 +119,14 @@ sleep 2
 start_client alice 96 alice.out --connect 127.0.0.1:$PORT
 start_client bob 97 bob.out --connect 127.0.0.1:$PORT
 
+# Auto-assign in the faction window until the match starts (at most 6 tries, 5 s apart)
 for t in 1 2 3 4 5 6; do
 	sleep 5
 	for d in 96 97; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
+	grep -q "Starting ranked\.$" $T/server.out && break
 done
 
-for i in $(seq 1 30); do grep -q "Starting ranked\|ranked match started\|Match started" $T/server.out && break; sleep 1; done
+for i in $(seq 1 30); do grep -q "Starting ranked\.$" $T/server.out && break; sleep 1; done
 # the rejoin record is written every 10 s of a match - killed before it, there is nothing to rejoin
 for i in $(seq 1 25); do [ -s $T/alice/user/ranked_match.json ] && break; sleep 1; done
 echo "alice's cert: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice.out | tail -1)"

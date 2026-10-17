@@ -52,7 +52,7 @@ EOF
     "arena": "de_cyberaqua",
     "notified_server_list": "${ARENAUS_IP:-154.12.226.211}:18430",
     "suppress_new_community_server_webhook": true,
-    "ranked": { "start_when": "ALWAYS", "countdown_time": 5, "max_rejoins": 0 },
+    "ranked": { "countdown_time": 5, "max_rejoins": 0 },
     "move_to_spectators_if_afk_for_secs": 999999,
     "kick_if_afk_for_secs": 999999,
     "freeze_time": false,

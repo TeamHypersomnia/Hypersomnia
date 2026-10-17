@@ -20,8 +20,8 @@
 
 /*
 	Match reports wait on the disk until hypersomnia.io takes them - a report made while the site is down
-	is sent when it is back, not lost. Each server instance has its own folder (by port), since instances share
-	the user folder. A report is signed with the server key ("hs-report-v1" and the body): the site knows an official
+	is sent when it is back, not lost. Each server instance has its own folder (by its instance label - not by its
+	port, which may change), since instances share the user folder. A report is signed with the server key ("hs-report-v1" and the body): the site knows an official
 	server by its public key.
 
 	2xx and 409 (already have it) remove a report, so do the other 4xx (with an error in the log - retrying can not help),

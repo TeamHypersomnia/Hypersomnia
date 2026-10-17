@@ -63,7 +63,7 @@ cat > $T/server/user/conf.d/test.json <<J
 { "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": 10060, "slots": 16 },
   "server": { "server_name": "[PL] Report test", "arena": "de_e2e_short", "game_mode": "bomb_defusal", "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "sync_all_external_arenas_on_startup": false,
-              "ranked": { "start_when": "TEAMS_EQUAL", "countdown_time": 2 },
+              "ranked": { "countdown_time": 2 },
               "move_to_spectators_if_afk_for_secs": 999999, "kick_if_afk_for_secs": 999999,
               "webrtc_port_range_begin": 19600, "webrtc_port_range_end": 19605 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "$BROKER_URL/report_match" } }

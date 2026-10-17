@@ -293,7 +293,7 @@ However, you can easily manage multiple server instances - casual and ranked - b
 }
 ```
 
-Only a ranked instance plays ranked matches - ``server.ranked.start_when`` (``ALWAYS``, ``TEAMS_EQUAL``, ``SERVER_FULL``) is when its match starts.
+Only a ranked instance plays ranked matches - its match starts when the warmup ends, or earlier once all the players type ``/go``, with at least one player in each team.
 
 The ranked instances run with the ``server`` vars with ``instance_vars.ranked`` over them - any of its fields, e.g.:
 

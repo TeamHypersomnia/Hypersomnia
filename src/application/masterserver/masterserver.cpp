@@ -15,7 +15,6 @@
 #include "augs/readwrite/memory_stream.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "augs/templates/thread_templates.h"
-#include "augs/misc/date_time.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/network/netcode_socket_raii.h"
 #include "application/network/address_utils.h"
@@ -198,18 +197,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		LOG("Created masterserver socket at: %x", ::ToString(udp_command_sockets.back().socket.address));
 	}
 
-	auto find_socket_by_port = [&](const port_type port) -> netcode_socket_raii* {
-		const auto first = settings.first_udp_command_port;
-		const auto index = static_cast<std::size_t>(port - first);
-
-		if (index < udp_command_sockets.size()) {
-			return std::addressof(udp_command_sockets[index]);
-		}
-
-		return nullptr;
-	};
-	(void)find_socket_by_port;
-
 	auto banlist_to_set = [](const auto& path) {
 		std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> out;
 
@@ -353,7 +340,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
 
 		if (passed < mute_for_secs) {
-			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", passed, mute_for_secs);
+			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", ip_str, passed, mute_for_secs);
 			return;
 		}
 
@@ -723,13 +710,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				entry.time_last_heartbeat = current_time;
 
 				/*
-					The dump does not say which official server an entry was -
-					its next signed heartbeat makes it official again. Until then neither an official alias nor domain.
+					Official again by its key at once (the registry is read already) - its alias stays. Its domain comes
+					back with its next heartbeat, checked anew.
 				*/
 
-				entry.meta.is_official = false;
+				set_official(entry, official_servers.find(entry.meta.server_public_key));
 				entry.meta.domain = {};
-				entry.meta.webrtc_id = {};
 
 				server_list.try_emplace(address, std::move(entry));
 			}
@@ -1193,9 +1179,6 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 								reserialize_list();
 							}
 						}
-						else {
-							// MSR_LOG("Invalid request (%x bytes) from %x.", packet_bytes, ::ToString(from));
-						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {
 						masterserver_out::tell_me_my_address response;
@@ -1233,18 +1216,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		const auto timeout_secs = settings.server_entry_timeout_secs;
 
-		auto process_entry_logic = [&](auto& server_entry) {
-			(void)server_entry;
-		};
-
 		auto erase_if_dead = [&](auto& server_entry) {
 			const bool timed_out = current_time - server_entry.second.time_last_heartbeat >= timeout_secs;
 
 			if (timed_out) {
 				LOG("The server at %x (%x) has timed out.", ::ToString(server_entry.first), server_entry.second.last_heartbeat.server_name);
-			}
-			else {
-				process_entry_logic(server_entry);
 			}
 
 			return timed_out;
