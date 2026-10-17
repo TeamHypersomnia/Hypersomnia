@@ -978,7 +978,9 @@
             "already_owns_bg": [0, 76, 0, 91],
             "already_owns_active_bg": [0, 130, 0, 150],
             "already_owns_other_type_bg": [94, 12, 255, 91],
-            "already_owns_other_type_active_bg": [94, 101, 255, 120]
+            "already_owns_other_type_active_bg": [94, 101, 255, 120],
+            "make_room_bg": [255, 0, 0, 50],
+            "make_room_active_bg": [255, 0, 0, 90]
         },
         "money_indicator_color": [255, 236, 179, 255],
         "money_bar_color": [255, 190, 0, 255],

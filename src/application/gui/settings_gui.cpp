@@ -3903,6 +3903,10 @@ void settings_gui_state::perform(
 
 							revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_bg));
 							revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_active_bg));
+
+							revertable_color_edit(SCOPE_CFG_NVP(make_room_bg));
+							revertable_color_edit(SCOPE_CFG_NVP(make_room_active_bg));
+							tooltip_on_hover("A purchase that is made anyway - the oldest items fall out to make room.");
 						}
 
 						auto& scope_cfg = config.arena_mode_gui;

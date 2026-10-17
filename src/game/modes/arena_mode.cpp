@@ -29,6 +29,7 @@ extern void yojimbo_random_bytes(uint8_t* data, int bytes);
 #include "augs/string/format_enum.h"
 #include "game/messages/battle_event_message.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/modes/detail/item_purchase_room.hpp"
 #include "game/detail/buy_area_in_range.h"
 #include "game/cosmos/delete_entity.h"
 #include "augs/templates/logically_empty.h"

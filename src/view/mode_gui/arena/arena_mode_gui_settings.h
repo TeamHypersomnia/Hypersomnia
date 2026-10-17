@@ -11,6 +11,9 @@ struct buy_menu_gui_settings {
 
 	rgba already_owns_other_type_bg = rgba(0, 170, 0, 90);
 	rgba already_owns_other_type_active_bg = rgba(0, 180, 0, 150);
+
+	rgba make_room_bg = rgba(255, 0, 0, 50);
+	rgba make_room_active_bg = rgba(255, 0, 0, 90);
 	// END GEN INTROSPECTOR
 	
 	bool operator==(const buy_menu_gui_settings& b) const = default;

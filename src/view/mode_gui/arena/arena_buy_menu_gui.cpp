@@ -18,6 +18,7 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/modes/detail/item_purchase_room.hpp"
 #include "augs/gui/formatted_string.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "game/detail/visible_entities.hpp"
@@ -323,20 +324,19 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		const bool active = found_in(selected, index);
 
-		if (owning == owning_type::OWNED) {
-			const auto col = active ? in.settings.already_owns_active_bg : in.settings.already_owns_bg;
+		auto fill_bg = [&](const rgba& normal_col, const rgba& active_col) {
 			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
-			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
+			rect_filled(selectable_size, active ? active_col : normal_col, vec2(0, -item_spacing.y + 1));
+		};
+
+		if (owning == owning_type::OWNED) {
+			fill_bg(in.settings.already_owns_bg, in.settings.already_owns_active_bg);
 		}
 		else if (owning == owning_type::OWNED_OF_THE_SAME_TYPE) {
-			const auto col = active ? in.settings.already_owns_other_type_active_bg : in.settings.already_owns_other_type_bg;
-			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
-			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
+			fill_bg(in.settings.already_owns_other_type_bg, in.settings.already_owns_other_type_active_bg);
 		}
 		else if (is_disabled) {
-			const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
-			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
-			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
+			fill_bg(in.settings.disabled_bg, in.settings.disabled_active_bg);
 		}
 		else {
 			if (can_make_room) {
@@ -344,11 +344,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					Still buyable - the oldest items fall out to make room.
 				*/
 
-				auto no_space_bg = red;
-				no_space_bg.a = active ? 90 : 50;
-
-				const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
-				rect_filled(selectable_size, no_space_bg, vec2(0, -item_spacing.y + 1));
+				fill_bg(in.settings.make_room_bg, in.settings.make_room_active_bg);
 				ImGui::SetCursorPos(local_pos);
 			}
 
@@ -601,6 +597,19 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 						text_disabled("more)");
 						ImGui::SameLine();
 						ImGui::SetCursorPosY(prev_y);
+					}
+
+					if (subject.alive() && ::is_firearm_like(cosm, f_id)) {
+						/*
+							A firearm is always buyable - at the limit the cheapest one carried is dropped,
+							so the limit is just shown, never as a missing space.
+						*/
+
+						text_disabled("Firearms:");
+						ImGui::SameLine();
+						ImGui::SetCursorPosY(prev_y);
+						text_disabled(typesafe_sprintf("%x/%x", ::count_carried_firearms(subject), ::calc_max_firearms(subject)));
+						return;
 					}
 
 					const auto space_rhs = num_owned + num_carryable;
