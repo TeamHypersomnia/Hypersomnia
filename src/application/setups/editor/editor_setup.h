@@ -831,6 +831,13 @@ public:
 	void do_game_main_thread_synced_op(renderer_backend_result&);
 
 	void request_arena_screenshot(const augs::path_type& output_path, int max_size, bool reveal);
+
+	/*
+		See editor_random_waypoints.hpp.
+	*/
+
+	std::size_t count_author_waypoints() const;
+	void generate_random_waypoints_preview(uint32_t seed);
 	bool is_generating_miniature() const;
 
 	void rebuild_project_internal_resources_gui();

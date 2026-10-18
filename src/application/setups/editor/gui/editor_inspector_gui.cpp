@@ -2546,6 +2546,28 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		text_tooltip("Color used to display navigation debug path in the editor.");
 	}
 
+	ImGui::Separator();
+	text_color("Bot waypoints", yellow);
+	ImGui::Separator();
+
+	PROPERTY("Bot waypoints", bot_waypoints.mode);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Where the bots' push and patrol waypoints come from.\n\nAutomatic: your waypoints if the map has any, otherwise generated every round.\nYours and generated: your waypoints, plus more generated around them every round.\nRandom every round: generated every round, your waypoints are ignored.");
+	}
+
+	PROPERTY_RANGED("Density", bot_waypoints.density, 0.1f, 2.0f);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("How many waypoints get generated - more, closer to each other, with a higher density.\nUsed every round and by the preview below.");
+	}
+
+	PROPERTY("Preview seed", bot_waypoints_preview_seed);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("The seed of the preview below - the same seed gives the same waypoints again.\nEvery round in game draws its own.");
+	}
+
 	return result;
 }
 
@@ -3423,6 +3445,54 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				cmd.after = edited_copy;
 				cmd.built_description = typesafe_sprintf(changed, "Arena");
 				post_new_or_rewrite(std::move(cmd));
+			}
+
+			{
+				/*
+					What the chosen Bot waypoints mode does with this map, and the preview of generated waypoints.
+				*/
+
+				const auto num_yours = in.setup.count_author_waypoints();
+				const auto mode = project.settings.bot_waypoints.mode;
+				const auto preview_hint = std::string("\nYou can preview them by generating below.");
+
+				const auto note = [&]() -> std::string {
+					switch (mode) {
+						case bot_waypoints_mode::YOURS_AND_GENERATED:
+							return typesafe_sprintf("Your %x waypoints will be used,\nand more will be generated around them every round.", num_yours) + preview_hint;
+						case bot_waypoints_mode::RANDOM_EVERY_ROUND:
+							return typesafe_sprintf("Waypoints will be generated randomly every round -\nyour %x waypoints will be ignored.", num_yours) + preview_hint;
+						default:
+							if (num_yours > 0) {
+								return typesafe_sprintf("Your %x waypoints will be used.", num_yours);
+							}
+
+							return std::string("Waypoints will be generated automatically every round.") + preview_hint;
+					}
+				}();
+
+				text_disabled(note);
+
+				const auto current_seed = project.settings.bot_waypoints_preview_seed;
+
+				if (ImGui::Button("Generate into layer random_waypoints")) {
+					const auto new_seed = (static_cast<uint32_t>(augs::date_time().secs_since_epoch()) ^ (current_seed * 2654435761u)) & 0x7fffffffu;
+					in.setup.generate_random_waypoints_preview(new_seed);
+				}
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip(std::string("Draws a new Preview seed and generates waypoints like a round would, with the Density above,\ninto the layer \"") + random_waypoints_layer_name_v + "\" - overwriting it.\nIt is only a preview: never used in game. Rename the layer to keep them as your own waypoints.");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Same seed")) {
+					in.setup.generate_random_waypoints_preview(current_seed);
+				}
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Generates again with the Preview seed above - e.g. after changing the Density, or with a seed typed in.");
+				}
 			}
 		}
 		else if (project_current_tab == inspected_project_tab_type::ABOUT) {

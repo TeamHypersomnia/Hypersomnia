@@ -63,6 +63,7 @@
 #include "augs/window_framework/window.h"
 
 #include "application/setups/editor/commands/replace_whole_project_command.hpp"
+#include "application/setups/editor/editor_random_waypoints.hpp"
 
 #include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
