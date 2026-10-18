@@ -1304,21 +1304,42 @@ arena_ai_result update_arena_mode_ai(
 				has been seen for bot_aim_settle_secs - time for the player to react, while the crosshair keeps aiming.
 				Once settled it stays so while the target is seen, and drains back over bot_aim_settle_drain_secs
 				after losing it, so a quick re-peek waits shorter than a peek after a while.
+				While the gun can't fire (after a shot: the cooldown and the bolt; a reload) the settle doesn't grow
+				and stays below what bot_aim_settle_secs_min leaves - so every shot waits at least that long
+				after the gun is ready again.
 			*/
 
 			auto settle_secs = 0.0f;
 			auto drain_secs = 0.0f;
+			auto min_secs = 0.0f;
+			bool gun_busy = false;
+
+			const auto clk = cosm.get_clock().get_real_clock();
 
 			for (const auto& wielded : character_handle.get_wielded_guns()) {
-				if (const auto gun_def = cosm[wielded].find<invariants::gun>()) {
+				const auto gun_handle = cosm[wielded];
+
+				if (const auto gun_def = gun_handle.find<invariants::gun>()) {
 					if (gun_def->bot_aim_settle_secs > settle_secs) {
 						settle_secs = gun_def->bot_aim_settle_secs;
 						drain_secs = gun_def->bot_aim_settle_drain_secs;
+						min_secs = gun_def->bot_aim_settle_secs_min;
+
+						if (const auto gun = gun_handle.find<components::gun>()) {
+							gun_busy =
+								gun->chambering_progress_ms > 0.0f ||
+								!clk.is_ready(gun_def->shot_cooldown_ms, gun->fire_cooldown_object)
+							;
+						}
 					}
 				}
 			}
 
 			auto& settle = ai_state.aim_settle;
+
+			if (gun_busy && settle_secs > 0.0f) {
+				settle = std::min(settle, std::max(0.0f, 1.0f - min_secs / settle_secs));
+			}
 
 			if (settle_secs <= 0.0f) {
 				settle = 0.0f;
@@ -1329,7 +1350,7 @@ arena_ai_result update_arena_mode_ai(
 				if (!target_acquired) {
 					settle = drain_secs > 0.0f ? std::max(0.0f, settle - dt_secs * mult / drain_secs) : 0.0f;
 				}
-				else {
+				else if (!gun_busy) {
 					settle = std::min(1.0f, settle + dt_secs / (settle_secs * mult));
 				}
 

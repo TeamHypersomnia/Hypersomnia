@@ -144,6 +144,7 @@ namespace invariants {
 		real32 bot_aim_radius_to_shoot = 100.0f;
 		real32 bot_aim_settle_secs = 0.0f;
 		real32 bot_aim_settle_drain_secs = 1.5f;
+		real32 bot_aim_settle_secs_min = 0.2f;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
 		recoil_player_instance_def recoil;
