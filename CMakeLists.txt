@@ -668,6 +668,8 @@ if(HAS_HEAD)
 	"src/application/gui/client/chat_gui.cpp"
 	"src/application/gui/client/client_gui_state.cpp"
 	"src/application/gui/leaderboards_gui.cpp"
+	"src/application/gui/changelog_gui.cpp"
+	"src/application/gui/changelog_entry.cpp"
 	"src/application/gui/social_sign_in_gui.cpp"
 	"src/view/hud_messages/hud_messages_gui.cpp"
 	"src/application/gui/map_catalogue_gui.cpp"
@@ -793,6 +795,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/date_time.cpp"
 	"src/augs/string/typesafe_sprintf.cpp"
 	"src/augs/string/typesafe_sscanf.cpp"
+	"src/augs/string/simple_markdown.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/physical_material.cpp"
 	"src/game/components/flags_component.cpp"
@@ -1556,6 +1559,7 @@ if(BUILD_FOR_WEB)
 	# HRTF presets are for OpenAL Soft - the browser does its own HRTF.
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --exclude-file *.mhr")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.json@/default_config.json")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/CHANGELOG.md@/CHANGELOG.md")
 
 	if (BUILD_OPENGL)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2")

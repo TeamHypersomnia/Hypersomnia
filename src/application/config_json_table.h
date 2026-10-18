@@ -97,6 +97,7 @@ struct config_json_table {
 	bool remove_live_log_file_on_start = true;
 
 	bool prompted_for_sign_in_once = false;
+	std::string last_seen_changelog_version;
 
 	std::string log_timestamp_format = std::string("[%m-%d-%y %H:%M:%S] ");
 

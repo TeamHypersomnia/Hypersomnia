@@ -476,6 +476,7 @@ public:
 	using base::base;
 
 	vec2i display_size_for_clipping;
+	bool wants_changelog = false;
 
 	bool should_hijack_key() const;
 	void set_hijacked_key(augs::event::keys::key);

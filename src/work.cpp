@@ -119,6 +119,7 @@
 #endif
 #include "application/gui/map_catalogue_gui.h"
 #include "application/gui/leaderboards_gui.h"
+#include "application/gui/changelog_gui.h"
 #include "application/gui/social_sign_in_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 #include "application/setups/editor/editor_paths.h"
@@ -2024,6 +2025,96 @@ work_result work(
 	WEBSTATIC map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
 
 	WEBSTATIC leaderboards_gui_state leaderboards_gui = std::string("Leaderboards");
+
+	WEBSTATIC auto changelog = ::load_changelog(CHANGELOG_PATH);
+	WEBSTATIC changelog_view_state changelog_view;
+	WEBSTATIC changelog_window_state changelog_window = std::string("What's new in Hypersomnia?");
+
+	WEBSTATIC auto get_changelog_input = [&]() {
+		return changelog_input {
+			changelog,
+			changelog_view,
+			config.last_seen_changelog_version
+		};
+	};
+
+	WEBSTATIC auto acknowledge_changelog = [&]() {
+		change_with_save(
+			[&](auto& cfg) {
+				cfg.last_seen_changelog_version = ::get_newest_changelog_version(changelog);
+			}
+		);
+	};
+
+#if !IS_PRODUCTION_BUILD
+	WEBSTATIC double changelog_checked_at = 0.0;
+	WEBSTATIC std::optional<std::filesystem::file_time_type> changelog_write_time;
+#endif
+
+	/*
+		Development builds pick up edits to CHANGELOG.md within a second, whichever view shows it.
+	*/
+
+	WEBSTATIC auto reload_changelog_if_changed = [&]() {
+#if !IS_PRODUCTION_BUILD
+		const auto now = augs::steady_secs();
+
+		if (now - changelog_checked_at < 1.0) {
+			return;
+		}
+
+		changelog_checked_at = now;
+
+		try {
+			const auto write_time = augs::last_write_time(CHANGELOG_PATH);
+
+			if (changelog_write_time.has_value() && *changelog_write_time != write_time) {
+				LOG("CHANGELOG.md changed - reloading.");
+				changelog = ::load_changelog(CHANGELOG_PATH);
+			}
+
+			changelog_write_time = write_time;
+		}
+		catch (...) {
+
+		}
+#endif
+	};
+
+	/*
+		The changelog is a window of its own. The leaderboards and Settings are hidden while it is open
+		and Settings come back once it closes.
+	*/
+
+	WEBSTATIC bool reopen_settings_after_changelog = false;
+	WEBSTATIC bool changelog_auto_opened = false;
+
+	WEBSTATIC auto open_changelog_window = [&]() {
+		if (settings_gui.is_open()) {
+			reopen_settings_after_changelog = true;
+			settings_gui.close();
+		}
+
+		changelog_window.open();
+	};
+
+	WEBSTATIC auto perform_changelog_window = [&]() {
+		reload_changelog_if_changed();
+
+		if (settings_gui.wants_changelog) {
+			settings_gui.wants_changelog = false;
+			open_changelog_window();
+		}
+
+		if (changelog_window.perform(get_changelog_input())) {
+			acknowledge_changelog();
+		}
+
+		if (!changelog_window.is_open() && reopen_settings_after_changelog) {
+			reopen_settings_after_changelog = false;
+			settings_gui.open();
+		}
+	};
 
 	WEBSTATIC std::string displayed_connecting_server_name;
 
@@ -4062,7 +4153,16 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_leaderboards = [&]() {
-		leaderboards_gui.show = !browse_servers_gui.show;
+		/*
+			A release not acknowledged yet opens the changelog once per run (production builds only - see should_show_changelog).
+		*/
+
+		if (!changelog_auto_opened && ::should_show_changelog(changelog, config.last_seen_changelog_version)) {
+			changelog_auto_opened = true;
+			open_changelog_window();
+		}
+
+		leaderboards_gui.show = !browse_servers_gui.show && !changelog_window.is_open();
 
 		const auto now = augs::steady_secs();
 		const auto in = get_identity_input();
@@ -4096,7 +4196,14 @@ work_result work(
 			config.website_url + "/user/" + account,
 			signed_in_account ? std::string() : identity_key::full_form(identity->public_key()),
 			provider_name(),
-			identity->sign_in_failed(in, now) && !identity->is_requesting()
+			identity->sign_in_failed(in, now) && !identity->is_requesting(),
+
+			/*
+				The changelog drawn in place of the leaderboards - kept for comparison, not triggered for now.
+			*/
+
+			false,
+			get_changelog_input()
 #if PLATFORM_WEB
 			/*
 				Outside CrazyGames the account is the key in the browser - always there.
@@ -4111,6 +4218,16 @@ work_result work(
 		if (leaderboards_gui.wants_sign_in_retry) {
 			leaderboards_gui.wants_sign_in_retry = false;
 			retry_sign_in();
+		}
+
+		if (leaderboards_gui.acknowledged_changelog) {
+			leaderboards_gui.acknowledged_changelog = false;
+			acknowledge_changelog();
+		}
+
+		if (leaderboards_gui.wants_changelog_window) {
+			leaderboards_gui.wants_changelog_window = false;
+			open_changelog_window();
 		}
 	};
 
@@ -4889,18 +5006,24 @@ work_result work(
 				browse_servers_gui.advance_ping_logic();
 #endif
 
-				if (const bool show_server_browser = !has_current_setup() || ingame_menu.show) {
+				/*
+					While the changelog is open, no other window is drawn - only the menu buttons and the logo stay.
+				*/
+
+				const bool changelog_shown = changelog_window.is_open();
+
+				if (const bool show_server_browser = (!has_current_setup() || ingame_menu.show) && !changelog_shown) {
 					perform_browse_servers();
 				}
 
-				if (ingame_menu.show) {
+				if (ingame_menu.show && !changelog_shown) {
 					if (const auto invite = get_invite_input()) {
 						invite_to_join_gui.perform(*invite);
 					}
 				}
 #endif
 
-				if (const bool show_map_catalogue = !has_current_setup()) {
+				if (const bool show_map_catalogue = !has_current_setup() && !changelog_window.is_open()) {
 					perform_map_catalogue();
 				}
 
@@ -5004,7 +5127,7 @@ work_result work(
 #endif
 			
 
-				if (!has_current_setup()) {
+				if (!has_current_setup() && !changelog_window.is_open()) {
 					perform_last_exit_incorrect();
 #if BUILD_NETWORKING
 					perform_start_client_gui();
@@ -5012,6 +5135,7 @@ work_result work(
 #endif
 				}
 
+				perform_changelog_window();
 				perform_failed_to_load_arena_popup();
 				perform_abandon_are_you_sure_popup();
 #if !PLATFORM_WEB
@@ -5026,7 +5150,9 @@ work_result work(
 			},
 
 			[&]() {
-				perform_setup_custom_imgui();
+				if (!changelog_window.is_open()) {
+					perform_setup_custom_imgui();
+				}
 			},
 
 			/* Flags controlling IMGUI behaviour */

@@ -1,0 +1,66 @@
+---
+name: changelog
+description: Write or update CHANGELOG.md entries for a new Hypersomnia version so they render correctly in the in-game changelog (ImGui view parsed at runtime by augs/string/simple_markdown). Use whenever the user says "napisz changelog", "dodaj do changeloga", "changelog do X", "zrób changelog", "write the changelog", "add a changelog entry", or prepares a release/tag.
+---
+
+# Writing the changelog
+
+The real file is `hypersomnia/CHANGELOG.md`. The repository root `CHANGELOG.md` is a symlink to it.
+It ships with the game and is parsed at runtime (`application/gui/changelog_entry.cpp` + `augs/string/simple_markdown.cpp`).
+It is shown in place of the leaderboards until the player clicks OK, and from `Settings -> General -> Show changelog`.
+Versions older than `CHANGELOG_SINCE_VERSION` (`changelog_entry.h`) are not shown in-game.
+
+The parser understands only a small markdown subset. Anything else shows up as literal text.
+
+## Gathering content
+
+1. Find the previous version: the newest `## [X.Y.Z]` in `CHANGELOG.md`, and its tag (`git tag --sort=-creatordate | head`).
+2. Read `git log --oneline <prev_tag>..HEAD`. Commit messages are long and list every detail - condense them.
+3. Ask the user for the new version number and date only if not given. Date is the release date, `YYYY-MM-DD`.
+
+## Format
+
+```markdown
+## [3.1.0] - 2026-10-04
+
+### Added
+
+- **Changelog.** Shows what's new after every update.
+- Grenade trajectories.
+	- Red where blocked.
+
+### Changed
+
+- **Balance:** Galilea: 34 -> 24 bullets.
+
+### Fixed
+
+- Crash when leaving the editor.
+```
+
+Rules:
+
+1. New version goes at the top, right under the intro (newest first). The in-game list is in file order.
+2. Version line exactly `## [X.Y.Z] - YYYY-MM-DD`. The version must be parsable `X.Y.Z` - it decides `(NEW!)` markers and whether the changelog pops up.
+   `## [Unreleased]` is skipped in-game.
+3. Section headings with `###`. Use `Added`, `Changed`, `Fixed`, `Removed` - they get their own colors (green, amber, blue, red). Other names render white.
+4. Bullets with `- `. Nest with one tab per level. A non-empty line right under a bullet continues it - leave an empty line before a new paragraph.
+   A top-level bullet with nested ones is drawn collapsed with an arrow and expands on click.
+   So: a bold headline, and its explanation as nested points (`- **Game speeds.**` + `\t- Servers run at 0.75x by default.`).
+   Short items stay on one line without nesting (`- **Changelog.** You're reading it.`).
+5. Inline: `**bold**`, `*italic*` / `_italic_`, `` `code` ``. Bold is the main emphasis - use it for headline features and `**Balance:**`-style prefixes.
+   Links `[text](url)` show only the text. Images `![..](..)` on their own line are dropped.
+6. No tables, no HTML, no numbered lists (they render as plain paragraphs).
+7. Plain paragraphs are fine for a short intro under a heading, e.g. `Most bugs were introduced by bots in 1.3.0:`.
+
+## Style
+
+- Write for players, not developers. "Bots now plant the bomb", not "`arena_mode_ai_state` gained a plant goal".
+- Headline features first, bold, one short sentence each. Details go to nested bullets.
+- Keep internal refactors, audits and code renames out unless they change behavior players notice.
+- Keep lines short. The in-game view is narrow (about 40% of the screen minus the version column).
+
+## Verify
+
+1. Run a development build and open the changelog (the leaderboards' Changelog button or `Settings -> General -> Show changelog`). It reloads `hypersomnia/CHANGELOG.md` within a second of every save - production builds read it once.
+2. Stray `*`, `_` or `` ` `` in the rendered text mean unbalanced markers.

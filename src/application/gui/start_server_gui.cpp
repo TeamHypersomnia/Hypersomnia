@@ -12,6 +12,7 @@
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "augs/misc/date_time.h"
 #include "application/gui/bot_quota_widget.h"
+#include "application/gui/changelog_gui.h"
 #include "game/modes/logic_speed.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
@@ -147,7 +148,7 @@ as well as to test your skills in a laggy environment.
 
 		slider("Slots", into.slots, 2, 64);
 
-		const auto new_feature_color = rgba::get_bright_wave(augs::steady_secs() / 4.0, 0.55);
+		const auto new_feature_color = ::get_new_feature_color();
 
 		const bool game_speed_changed = [&]() {
 			auto scope = scoped_text_color(new_feature_color);

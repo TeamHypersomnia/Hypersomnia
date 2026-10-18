@@ -2,8 +2,16 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/graphics/texture.h"
 #include "view/necessary_resources.h"
+#include "application/gui/changelog_gui.h"
 
 struct leaderboards_gui_internal;
+
+/*
+	Amber tint multiplied into the white shades used across the leaderboards and the changelog shown in their place.
+	Matches the strong amber of menu_buttons_colors (255, 206, 130).
+*/
+
+inline const rgba leaderboards_tint = rgba(255, 206, 130, 255);
 
 struct leaderboards_input {
 	const std::string nickname;
@@ -26,6 +34,13 @@ struct leaderboards_input {
 	const std::string copyable_public_key;
 	const std::string provider_label;
 	const bool sign_in_failed;
+
+	/*
+		Replaces the leaderboards themselves until acknowledged with OK.
+	*/
+
+	const bool show_changelog;
+	const changelog_input changelog;
 #if PLATFORM_WEB
 	const bool is_logged_in;
 	const bool is_crazygames;
@@ -77,10 +92,13 @@ class leaderboards_gui_state : public standard_window_mixin<leaderboards_gui_sta
 	leaderboards_type type = leaderboards_type::TEAM;
 	all_leaderboards all;
 	bool refreshed_once = false;
+	bool reopened_changelog = false;
 
 public:
 	bool wants_sign_in = false;
 	bool wants_sign_in_retry = false;
+	bool acknowledged_changelog = false;
+	bool wants_changelog_window = false;
 
 	using base = standard_window_mixin<leaderboards_gui_state>;
 
