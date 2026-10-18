@@ -206,15 +206,14 @@ auto setup_ruleset_from_editor_mode(
 			rules.buy_secs_after_freeze = vars.buy_time;
 
 			/*
-				An entry just added in the inspector is not set yet - left out.
-				Visited, as a tool resource may be a container item (a backpack).
+				An entry just added in the inspector is not set yet, nor a resource whose nodes all have their own flavours -
+				both left out. Visited, as a tool resource may be a container item (a backpack).
 			*/
 
-			auto to_shop_whitelist = [&]<typename R>(const editor_shop_whitelist<R>& whitelist) {
-				auto result = arena_shop_whitelist();
-				result.enabled = whitelist.enabled;
+			auto to_item_flavour_ids = [&]<typename R>(const std::vector<editor_typed_resource_id<R>>& entries) {
+				auto result = item_purchases_vector();
 
-				for (const auto& entry : whitelist.items) {
+				for (const auto& entry : entries) {
 					if (!entry.is_set()) {
 						continue;
 					}
@@ -222,12 +221,22 @@ auto setup_ruleset_from_editor_mode(
 					if (const auto res = find_resource(entry)) {
 						std::visit(
 							[&](const auto& flavour_id) {
-								result.items.push_back(item_flavour_id(flavour_id));
+								if (flavour_id.is_set()) {
+									result.push_back(item_flavour_id(flavour_id));
+								}
 							},
 							res->scene_flavour_id
 						);
 					}
 				}
+
+				return result;
+			};
+
+			auto to_shop_whitelist = [&]<typename R>(const editor_shop_whitelist<R>& whitelist) {
+				auto result = arena_shop_whitelist();
+				result.enabled = whitelist.enabled;
+				result.items = to_item_flavour_ids(whitelist.items);
 
 				return result;
 			};
@@ -248,10 +257,7 @@ auto setup_ruleset_from_editor_mode(
 			});
 
 			auto blacklist_all = [&]<typename R>(const std::vector<editor_typed_resource_id<R>>& entries) {
-				auto as_list = editor_shop_whitelist<R>();
-				as_list.items = entries;
-
-				concatenate(whitelists.blacklist, to_shop_whitelist(as_list).items);
+				concatenate(whitelists.blacklist, to_item_flavour_ids(entries));
 			};
 
 			blacklist_all(vars.shop_blacklist.firearms);

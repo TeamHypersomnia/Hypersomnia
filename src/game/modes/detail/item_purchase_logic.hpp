@@ -55,15 +55,16 @@ inline const arena_shop_whitelist& get_shop_whitelist_of(
 	const arena_shop_whitelists& whitelists,
 	const item_flavour_id& id
 ) {
-	if (::is_firearm_like(cosm, id)) {
-		return whitelists.firearms;
-	}
-
 	/*
 		A pointer - on_flavour returns the callback's result by value.
+		Firearms by the gun invariant - what the editor's firearm resources and bots go by.
 	*/
 
 	const auto found = cosm.on_flavour(id, [&](const auto& typed_flavour) -> const arena_shop_whitelist* {
+		if (typed_flavour.template find<invariants::gun>() != nullptr) {
+			return &whitelists.firearms;
+		}
+
 		if (typed_flavour.template find<invariants::hand_fuse>() != nullptr) {
 			return &whitelists.explosives;
 		}

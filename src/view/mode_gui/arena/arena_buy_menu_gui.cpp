@@ -908,7 +908,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			either RIFLE_LIKE or PISTOL_LIKE stances.
 		*/
 
-		auto buyable_items_of = [&](const buy_menu_type category) {
+		auto collect_buyable_items_of = [&](const buy_menu_type category) {
 			switch (category) {
 				case buy_menu_type::MELEE: return collect_buyable(item_holding_stance::KNIFE_LIKE, for_each_melee);
 				case buy_menu_type::PISTOLS: return collect_buyable(item_holding_stance::PISTOL_LIKE, for_each_pistol);
@@ -923,10 +923,56 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			}
 		};
 
+		/*
+			Each category's list is collected at most once per frame -
+			whether a category is shown asks every one of them.
+		*/
+
+		augs::enum_array<std::optional<std::vector<item_flavour_id>>, buy_menu_type> buyable_items_cache;
+
+		auto buyable_items_of = [&](const buy_menu_type category) -> const std::vector<item_flavour_id>& {
+			auto& cached = buyable_items_cache[category];
+
+			if (!cached.has_value()) {
+				cached = collect_buyable_items_of(category);
+			}
+
+			return *cached;
+		};
+
+		auto collect_buyable_spells = [&]() {
+			std::vector<spell_id> buyable_spells;
+
+			for_each_through_std_get(
+				spells,
+				[&]<typename S>(const S&) {
+					const auto id = spell_id::of<S>();
+
+					if (!factions_compatible(subject, id)) {
+						return;
+					}
+
+					if (!::is_sold_in_shop(in.shop_whitelists, id)) {
+						return;
+					}
+
+					if (price_of(id) <= 0) {
+						return;
+					}
+
+					buyable_spells.push_back(id);
+				}
+			);
+
+			sort_range(buyable_spells, price_comparator);
+			reverse_range(buyable_spells);
+
+			return buyable_spells;
+		};
+
 		auto is_category_shown = [&](const buy_menu_type category) {
 			if (category == buy_menu_type::SPELLS) {
-				const auto& spells_whitelist = in.shop_whitelists.spells;
-				return !spells_whitelist.enabled || !spells_whitelist.spells.empty();
+				return !collect_buyable_spells().empty();
 			}
 
 			return !buyable_items_of(category).empty();
@@ -1007,37 +1053,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			};
 
 			auto do_spells_menu = [&]() {
-				std::vector<spell_id> buyable_spells;
-
-				for_each_through_std_get(
-					spells,
-					[&]<typename S>(const S&) {
-						if (!factions_compatible(subject, spell_id::of<S>())) {
-							return;
-						}
-
-						if (!::is_sold_in_shop(in.shop_whitelists, spell_id::of<S>())) {
-							return;
-						}
-
-						spell_id id;
-						id.set<S>();
-						buyable_spells.push_back(id);
-					}
-				);
-
-				sort_range(buyable_spells, price_comparator);
-				reverse_range(buyable_spells);
+				const auto buyable_spells = collect_buyable_spells();
 
 				for (const auto& b : buyable_spells) {
 					const auto index = 1 + index_in(buyable_spells, b);
 
-					if (price_of(b) > 0) {
-						ImGui::Separator();
+					ImGui::Separator();
 
-						if (purchase_spell_button(b, index)) {
-							set_result(b);
-						}
+					if (purchase_spell_button(b, index)) {
+						set_result(b);
 					}
 				}
 

@@ -80,84 +80,77 @@ inline std::optional<item_flavour_id> handle_purchases(
 		return std::tuple{ weapon_count, has_only_pistols, owned_guns, has_backpack, has_defuse_kit, has_armor };
 	};
 
-	auto try_buy_backpack = [&](money_type available_money) -> std::optional<item_flavour_id> {
-		std::optional<item_flavour_id> cheapest_backpack;
-		money_type cheapest_price = std::numeric_limits<money_type>::max();
+	/*
+		Every item this bot could buy with available_money: its faction's, sold in this map's shop, with a price.
+	*/
 
+	auto for_each_affordable = [&](const money_type available_money, auto&& callback) {
 		ctx.cosm.for_each_flavour_having<invariants::item>([&](const auto& id, const auto& flavour) {
+			const auto item_id = item_flavour_id(id);
+
 			if (!factions_compatible(ctx.character_handle, id)) {
 				return;
 			}
 
-			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
+			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_id)) {
 				return;
 			}
 
-			if (::is_backpack_like(flavour)) {
-				const auto price_opt = ::find_price_of(ctx.cosm, item_flavour_id(id));
-				if (price_opt.has_value() && *price_opt <= available_money && *price_opt < cheapest_price) {
-					cheapest_price = *price_opt;
-					cheapest_backpack = item_flavour_id(id);
-				}
-			}
-		});
+			const auto price = ::find_price_of(ctx.cosm, item_id);
 
-		return cheapest_backpack;
+			if (!price.has_value() || *price <= 0 || *price > available_money) {
+				return;
+			}
+
+			callback(item_id, flavour, *price);
+		});
 	};
 
-	auto try_buy_defuse_kit = [&](money_type available_money) -> std::optional<item_flavour_id> {
-		std::optional<item_flavour_id> cheapest_kit;
+	auto try_buy_cheapest = [&](const money_type available_money, auto&& predicate) -> std::optional<item_flavour_id> {
+		std::optional<item_flavour_id> cheapest;
 		money_type cheapest_price = std::numeric_limits<money_type>::max();
 
-		ctx.cosm.for_each_flavour_having<invariants::tool>([&](const auto& id, const auto& flavour) {
-			if (!factions_compatible(ctx.character_handle, id)) {
-				return;
-			}
-
-			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
-				return;
-			}
-
-			const auto& tool = flavour.template get<invariants::tool>();
-			if (tool.defusing_speed_mult > 1.f) {
-				const auto price_opt = ::find_price_of(ctx.cosm, item_flavour_id(id));
-				if (price_opt.has_value() && *price_opt <= available_money && *price_opt < cheapest_price) {
-					cheapest_price = *price_opt;
-					cheapest_kit = item_flavour_id(id);
-				}
+		for_each_affordable(available_money, [&](const item_flavour_id& id, const auto& flavour, const money_type price) {
+			if (predicate(flavour) && price < cheapest_price) {
+				cheapest_price = price;
+				cheapest = id;
 			}
 		});
 
-		return cheapest_kit;
+		return cheapest;
 	};
 
-	auto try_buy_gun = [&](const std::vector<item_flavour_id>& owned_guns, money_type available_money) -> std::optional<item_flavour_id> {
+	auto try_buy_backpack = [&](const money_type available_money) {
+		return try_buy_cheapest(available_money, [](const auto& flavour) {
+			return ::is_backpack_like(flavour);
+		});
+	};
+
+	auto try_buy_defuse_kit = [&](const money_type available_money) {
+		return try_buy_cheapest(available_money, [](const auto& flavour) {
+			if (const auto tool = flavour.template find<invariants::tool>()) {
+				return tool->defusing_speed_mult > 1.f;
+			}
+
+			return false;
+		});
+	};
+
+	auto try_buy_gun = [&](const std::vector<item_flavour_id>& owned_guns, const money_type available_money) -> std::optional<item_flavour_id> {
 		std::vector<item_flavour_id> affordable_pistols;
 		std::vector<item_flavour_id> affordable_non_pistols;
 
-		ctx.cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-			if (!factions_compatible(ctx.character_handle, id)) {
-				return;
-			}
+		for_each_affordable(available_money, [&](const item_flavour_id& id, const auto& flavour, money_type) {
+			if (const auto gun = flavour.template find<invariants::gun>()) {
+				if (gun->bots_ban) {
+					return;
+				}
 
-			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
-				return;
-			}
-
-			if (flavour.template get<invariants::gun>().bots_ban) {
-				return;
-			}
-
-			const auto price = *::find_price_of(ctx.cosm, item_flavour_id(id));
-
-			if (price <= available_money) {
-				const auto buy_type = flavour.template get<invariants::gun>().buy_type;
-
-				if (buy_type == buy_menu_type::PISTOLS) {
-					affordable_pistols.push_back(item_flavour_id(id));
+				if (gun->buy_type == buy_menu_type::PISTOLS) {
+					affordable_pistols.push_back(id);
 				}
 				else {
-					affordable_non_pistols.push_back(item_flavour_id(id));
+					affordable_non_pistols.push_back(id);
 				}
 			}
 		});
@@ -184,24 +177,12 @@ inline std::optional<item_flavour_id> handle_purchases(
 		return bought;
 	};
 
-	auto try_buy_armor = [&](money_type available_money) -> std::optional<item_flavour_id> {
+	auto try_buy_armor = [&](const money_type available_money) -> std::optional<item_flavour_id> {
 		std::vector<item_flavour_id> affordable_armor;
 
-		ctx.cosm.for_each_flavour_having<invariants::tool>([&](const auto& id, const auto& flavour) {
-			if (!factions_compatible(ctx.character_handle, id)) {
-				return;
-			}
-
-			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
-				return;
-			}
-
-			if (::is_armor_like(flavour)) {
-				const auto price = *::find_price_of(ctx.cosm, item_flavour_id(id));
-
-				if (price <= available_money) {
-					affordable_armor.push_back(item_flavour_id(id));
-				}
+		for_each_affordable(available_money, [&](const item_flavour_id& id, const auto& flavour, money_type) {
+			if (flavour.template find<invariants::tool>() != nullptr && ::is_armor_like(flavour)) {
+				affordable_armor.push_back(id);
 			}
 		});
 

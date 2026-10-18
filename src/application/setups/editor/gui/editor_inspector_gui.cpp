@@ -2901,9 +2901,9 @@ EDIT_FUNCTION(
 			shop_whitelist_property(
 				"Shop firearm whitelist",
 				"Firearm",
-				"Off - the shop sells every firearm.",
-				"None listed - the shop sells no firearms.",
-				"Only these firearms are sold.",
+				"Off - the shop sells every firearm (also those under Tools, e.g. Blunaz).",
+				"None listed - the shop sells no firearms (also those under Tools, e.g. Blunaz).",
+				"Only these firearms are sold (also those under Tools, e.g. Blunaz).",
 				[](auto& m) -> auto& { return m.shop_firearms; }
 			);
 

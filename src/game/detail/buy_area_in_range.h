@@ -57,8 +57,7 @@ bool buy_area_in_range(const E& subject) {
 					}
 
 					/*
-						The zone's own faction - get_official_faction() reads ANY as RESISTANCE,
-						so a zone for anyone was only for the Resistance.
+						ANY sells to every team - checked on the marker itself, as get_official_faction() reads ANY as RESISTANCE.
 					*/
 
 					const bool faction_matches =
