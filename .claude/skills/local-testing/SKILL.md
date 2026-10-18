@@ -161,16 +161,13 @@ than by driving the game by hand:
 
 1. Add a temporary `LOG("XYZDBG ...")` where the decision is made (e.g. the drop direction vs the aim direction in
    `perform_transfer.cpp`), build.
-2. Run a dedicated server with bots in the scratchpad (conf.d: `"server_start": { "ip": "127.0.0.1", "port": <free> }`,
-   `"server": { "arena": "de_cyberaqua", "bots": true, "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true }`).
-   **Bots play only while a human is connected** - also start a client under Xvfb with `--connect 127.0.0.1:<port>`
-   (it stays a spectator; that's enough). Within a minute bots buy, fight, die and drop their items.
+2. Run the map with bots: `MAP=<map> SECS=200 LOG_GREP=XYZDBG scripts/bots_match.sh` - a thin wrapper of the
+   **run-map** skill's `run_map.sh` (any map, edited copies via `map_copy.py`, and the pitfalls of loading maps).
+   Bots play only while a human is connected; the script adds a spectator client. Within a minute bots buy, fight, die and drop their items.
 3. Parse the `XYZDBG` lines with a short python script (angles, counts, orders), then remove the logs and rebuild.
 
-Actions only a player does (E on an item, H, G) - the editor playtest of a scratch map copy under Xvfb
-(`--edit <copy> --playtest`), items placed as map nodes at the spawns (also add their ids to a layer's `nodes`, or the map
-fails to load), keys held with `scripts/hold_keys.py`. Don't move the mouse - the crosshair moves relatively and the camera
-follows it away from the character.
+Actions only a player does (E on an item, H, G) - the editor playtest of a scratch map copy under Xvfb, see the
+run-map skill.
 
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
