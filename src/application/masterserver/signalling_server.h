@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <exception>
 #include <functional>
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
@@ -144,38 +145,61 @@ private:
 				active_connections.emplace(client);
 			}
 
+			/*
+				Nothing a remote peer does may end the masterserver -
+				and send or close on a socket going away can throw.
+			*/
+
 			client->onOpen([this, wclient = std::weak_ptr(client)]() {
-				if(auto client = wclient.lock()) {
-					on_peers([&](auto& peers) {
-						register_web_peer(
-							peers,
-							client,
-							client->path(),
-							client->remoteAddress()
-						);
-					});
+				try {
+					if(auto client = wclient.lock()) {
+						on_peers([&](auto& peers) {
+							register_web_peer(
+								peers,
+								client,
+								client->path(),
+								client->remoteAddress()
+							);
+						});
+					}
+				}
+				catch (const std::exception& err) {
+					LOG("Could not register a Web peer: %x", err.what());
+				}
+				catch (...) {
+					LOG("Could not register a Web peer.");
 				}
 			});
 
 			client->onClosed([this, wclient = std::weak_ptr(client)]() {
-				if (auto client = wclient.lock()) {
-					LOG("(onClosed) Address: %x", client->remoteAddress());
+				try {
+					if (auto client = wclient.lock()) {
+						LOG("(onClosed) Address: %x", client->remoteAddress());
 
-					on_peers([&](auto& peers) {
-						remove_web_peer(peers, client);
-					});
+						on_peers([&](auto& peers) {
+							remove_web_peer(peers, client);
+						});
+					}
+				}
+				catch (...) {
+					LOG("Error while removing a closed Web peer.");
 				}
 			});
 
 			client->onError([this, wclient = std::weak_ptr(client)](const std::string& err) {
 				LOG("Client WebSocket error: %x", err);
 
-				if (auto client = wclient.lock()) {
-					LOG("(onError) Address: %x", client->remoteAddress());
+				try {
+					if (auto client = wclient.lock()) {
+						LOG("(onError) Address: %x", client->remoteAddress());
 
-					on_peers([&](auto& peers) {
-						remove_web_peer(peers, client);
-					});
+						on_peers([&](auto& peers) {
+							remove_web_peer(peers, client);
+						});
+					}
+				}
+				catch (...) {
+					LOG("Error while removing an erred Web peer.");
 				}
 			});
 
