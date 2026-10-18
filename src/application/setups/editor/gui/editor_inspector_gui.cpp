@@ -3898,8 +3898,37 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		}
 	};
 
+	/*
+		Nothing of a scratchpad's layer or node is edited here - only restored.
+	*/
+
+	auto scratchpad_notice = [&](const editor_layer_id layer_id, const std::string& what) {
+		const auto layer = in.setup.find_layer(layer_id);
+		const auto layer_name = layer != nullptr ? layer->get_display_name() : std::string("?");
+
+		text_color(what, yellow);
+		text_disabled("It is never drawn in the editor or added to the game,\nwhether visible or not - as if it were not in the project.");
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Restore to Layers")) {
+			reorder_layers_command command;
+			command.layers_to_move = { layer_id };
+			command.to_scratchpad = false;
+			command.target_index = 0;
+			command.built_description = "Restored to Layers: " + layer_name;
+
+			in.setup.post_new_command(command);
+		}
+	};
+
 	auto edit_properties = [&]<typename T>(const T& inspected_id) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
+			if (const auto parent = in.setup.find_parent_layer(inspected_id); parent.has_value() && parent->in_scratchpad) {
+				scratchpad_notice(parent->layer_id, typesafe_sprintf("This node is in the scratchpad layer \"%x\".", parent->layer_ptr->get_display_name()));
+				return;
+			}
+
 			const auto insp_count = all_inspected.size();
 			const auto node_label = insp_count == 1 ? std::string("Node") : typesafe_sprintf("Nodes (%x)", insp_count);
 
@@ -3940,6 +3969,11 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			in.setup.on_resource(inspected_id, resource_handler);
 		}
 		else if constexpr(std::is_same_v<T, editor_layer_id>) {
+			if (in.setup.get_project().is_scratchpad_layer(inspected_id)) {
+				scratchpad_notice(inspected_id, "This is a scratchpad layer.");
+				return;
+			}
+
 			if (auto layer = in.setup.find_layer(inspected_id)) {
 				layer_handler(*layer, inspected_id);
 			}

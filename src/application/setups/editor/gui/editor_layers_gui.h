@@ -15,6 +15,12 @@ struct editor_layers_input {
 
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
+
+	/*
+		The same window for editor_layers::scratchpad - layers never in the scene, whatever their visibility.
+	*/
+
+	bool scratchpad = false;
 };
 
 struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {

@@ -21,6 +21,13 @@ namespace editor_project_readwrite {
 	struct reading_settings {
 		bool strict = true;
 		bool read_inactive_nodes = true;
+
+		/*
+			The scratchpad's layers (editor_layers::scratchpad) and their nodes - only the editor reads them,
+			everything else (the game, servers, the tutorial) never sees them, as if they were not in the project.
+		*/
+
+		bool read_scratchpad = false;
 	};
 
 	editor_project read_project_json(

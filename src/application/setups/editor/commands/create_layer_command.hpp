@@ -18,7 +18,7 @@ void create_layer_command::redo(editor_command_input in) {
 	new_layer = created_layer;
 
 	const auto new_id = base::get_allocated_id();
-	layers.order.insert(layers.order.begin() + at_index, new_id);
+	layers.order.insert(layers.order.begin() + std::min(at_index, layers.order.size()), new_id);
 
 	if (!omit_inspector) {
 		in.setup.inspect_only(new_id);
@@ -37,6 +37,7 @@ void delete_layers_command::redo(editor_command_input in) {
 	auto& pool = project_layers.pool;
 
 	order_backup = project_layers.order;
+	scratchpad_backup = project_layers.scratchpad;
 
 	for (auto& entry : entries) {
 		const auto found_layer = pool.find(entry.layer_id);
@@ -48,6 +49,7 @@ void delete_layers_command::redo(editor_command_input in) {
 		entry.undo_delete_input = *delete_input;
 
 		erase_element(project_layers.order, entry.layer_id);
+		erase_element(project_layers.scratchpad, entry.layer_id);
 	}
 }
 
@@ -65,5 +67,6 @@ void delete_layers_command::undo(editor_command_input in) {
 	}
 
 	project_layers.order = order_backup;
+	project_layers.scratchpad = scratchpad_backup;
 	in.setup.after_quietly_adding_inspected();
 }

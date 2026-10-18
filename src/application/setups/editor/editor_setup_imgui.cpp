@@ -45,14 +45,6 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	auto frame_border_size = scoped_style_var(ImGuiStyleVar_FrameBorderSize, 0.0f);
 
-	auto item_if_tabs_and = [&](const bool condition, const char* label, const char* shortcut = nullptr) {
-		return ImGui::MenuItem(label, shortcut, nullptr, condition);
-	};
-
-	auto item_if_tabs = [&](const char* label, const char* shortcut = nullptr) {
-		return item_if_tabs_and(true, label, shortcut);
-	};
-
 	if (auto main_menu = scoped_menu_bar()) {
 		const auto file_button_label = get_arena_name_with_star();
 
@@ -216,14 +208,23 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 		}
 
 		if (auto menu = scoped_menu("Window")) {
-			auto do_window_entry = [&](auto& win, const auto shortcut) {
-				const auto s = std::string(shortcut);
-				if (item_if_tabs(win.get_title().c_str(), s.c_str())) {
-					win.open();
+			/*
+				Checked while the window is open - clicking toggles it.
+			*/
+
+			auto do_window_entry = [&](auto& win, const char* const shortcut) {
+				if (ImGui::MenuItem(win.get_title().c_str(), shortcut, win.show, true)) {
+					win.toggle();
 				}
 			};
 
 			do_window_entry(gui.layers, "CTRL+L");
+			do_window_entry(gui.scratchpad, nullptr);
+
+			if (ImGui::IsItemHovered()) {
+				text_tooltip("Layers kept for the future - never drawn in the editor or added to the game.");
+			}
+
 			do_window_entry(gui.filesystem, "CTRL+F");
 			do_window_entry(gui.inspector, "CTRL+I");
 			do_window_entry(gui.history, "CTRL+H");
@@ -404,6 +405,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 			ImGui::DockBuilderDockWindow(gui.filesystem.get_title().c_str(), dock_id_bottom_left);
 			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
+			ImGui::DockBuilderDockWindow(gui.scratchpad.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
 			ImGui::DockBuilderDockWindow(gui.history.get_title().c_str(), dock_id_bottom_right);
 
@@ -451,6 +453,15 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		gui.filesystem.dragged_resource,
 		in.ad_hoc_atlas,
 		in.necessary_images
+	});
+
+	gui.scratchpad.perform({ 
+		*this, 
+		project.layers,
+		gui.filesystem.dragged_resource,
+		in.ad_hoc_atlas,
+		in.necessary_images,
+		true
 	});
 
 	gui.filesystem.perform({ 

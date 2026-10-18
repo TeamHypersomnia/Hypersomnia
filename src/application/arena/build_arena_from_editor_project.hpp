@@ -267,11 +267,21 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	/* Create nodes */
 
 	{
+		/*
+			The scratchpad's nodes are never in the scene - not even their flavours.
+		*/
+
+		const auto scratchpad_nodes = project.make_scratchpad_node_set();
+
 		auto setup_per_node_flavours = [&]<typename P>(const P& pool) {
 			using N = typename P::value_type;
 
 			if constexpr(has_custom_scene_flavour_id_v<N>) {
-				for (const auto& node : pool) {
+				pool.for_each_id_and_object([&](const auto& raw_id, const auto& node) {
+					if (found_in(scratchpad_nodes, editor_typed_node_id<N>::from_raw(raw_id).operator editor_node_id())) {
+						return;
+					}
+
 					if (auto resource = find_resource(node.resource_id)) {
 						::setup_per_node_flavour(
 							get_asset_id_of,
@@ -281,7 +291,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							common
 						);
 					}
-				}
+				});
 			}
 		};
 

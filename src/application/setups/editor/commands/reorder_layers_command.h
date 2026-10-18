@@ -12,6 +12,13 @@ struct reorder_layers_command {
 	std::size_t target_index = 0;
 	std::vector<editor_layer_id> layers_to_move;
 
+	/*
+		Where the layers go - to editor_layers::scratchpad or (back) to editor_layers::order,
+		from whichever of the two they are in.
+	*/
+
+	bool to_scratchpad = false;
+
 	std::string built_description;
 
 	void undo(editor_command_input in);
@@ -23,4 +30,5 @@ struct reorder_layers_command {
 
 private:
 	std::vector<editor_layer_id> original_order;
+	std::vector<editor_layer_id> original_scratchpad;
 };

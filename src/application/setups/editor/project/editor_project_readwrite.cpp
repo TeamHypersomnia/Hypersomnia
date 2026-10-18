@@ -617,14 +617,12 @@ namespace editor_project_readwrite {
 			writer.EndObject();
 		};
 
-		auto write_layers = [&]() {
-			const auto& layers = project.layers.order;
-
+		auto write_layer_array = [&](const auto& key, const std::vector<editor_layer_id>& layers) {
 			if (layers.empty()) {
 				return;
 			}
 
-			writer.Key("layers");
+			writer.Key(key);
 			writer.StartArray();
 
 			auto defaults = editor_layer();
@@ -635,11 +633,6 @@ namespace editor_project_readwrite {
 
 					writer.Key("id");
 					writer.String(layer->unique_name);
-
-					if (layer->is_open != defaults.is_open) {
-						writer.Key("is_open_in_editor");
-						writer.Bool(layer->is_open);
-					}
 
 					augs::write_json_diff(writer, layer->editable, defaults.editable);
 
@@ -662,6 +655,11 @@ namespace editor_project_readwrite {
 			}
 
 			writer.EndArray();
+		};
+
+		auto write_layers = [&]() {
+			write_layer_array("layers", project.layers.order);
+			write_layer_array("scratchpad_layers", project.layers.scratchpad);
 		};
 
 		auto write_external_resources = [&]() {
@@ -1158,7 +1156,30 @@ namespace editor_project_readwrite {
 		std::unordered_map<std::string, node_meta> node_name_map;
 		std::unordered_set<std::string> skipped_nodes;
 
+		/*
+			Nodes of the scratchpad's layers - not read at all unless the editor asks for the scratchpad.
+		*/
+
+		std::unordered_set<std::string> scratchpad_node_names;
+		const auto maybe_scratchpad_layers = FindArray(document, "scratchpad_layers");
+
+		if (maybe_scratchpad_layers && !settings.read_scratchpad) {
+			for (auto& json_layer : *maybe_scratchpad_layers) {
+				if (const auto maybe_nodes = FindArray(json_layer, "nodes")) {
+					for (auto& layer_node : *maybe_nodes) {
+						if (layer_node.IsString()) {
+							scratchpad_node_names.emplace(layer_node.GetString());
+						}
+					}
+				}
+			}
+		}
+
 		const bool create_fallback_node_order = [&]() {
+			if (maybe_scratchpad_layers && maybe_scratchpad_layers->Size() > 0) {
+				return false;
+			}
+
 			auto layers = FindArray(document, "layers");
 
 			if (!layers) {
@@ -1202,6 +1223,11 @@ namespace editor_project_readwrite {
 					}
 
 					const auto& id = *maybe_id;
+
+					if (found_in(scratchpad_node_names, id)) {
+						skipped_nodes.emplace(id);
+						continue;
+					}
 
 					const auto maybe_type = GetIf<std::string>(json_node, "type");
 
@@ -1301,7 +1327,7 @@ namespace editor_project_readwrite {
 
 			const auto maybe_layers = FindArray(document, "layers");
 
-			if (!maybe_layers) {
+			if (!maybe_layers && create_fallback_node_order) {
 				if (fallback_node_order.empty()) {
 					return;
 				}
@@ -1318,101 +1344,113 @@ namespace editor_project_readwrite {
 				return;
 			}
 
-			for (auto& json_layer : *maybe_layers) {
-				const auto id = GetIf<std::string>(json_layer, "id");
+			auto read_layer_array = [&](const auto& json_layers, std::vector<editor_layer_id>& target_order, const bool in_main_layers) {
+				for (auto& json_layer : json_layers) {
+					const auto id = GetIf<std::string>(json_layer, "id");
 
-				if (id == std::nullopt) {
-					if (strict) {
-						throw augs::json_deserialization_error("Missing \"id\" property for layer!");
+					if (id == std::nullopt) {
+						if (strict) {
+							throw augs::json_deserialization_error("Missing \"id\" property for layer!");
+						}
+
+						continue;
 					}
 
-					continue;
-				}
-
-				if (!settings.read_inactive_nodes) {
-					if (const auto maybe_active = GetIf<bool>(json_layer, "active")) {
-						if (!*maybe_active) {
+					if (!settings.read_inactive_nodes) {
+						if (const auto maybe_active = GetIf<bool>(json_layer, "active")) {
+							if (!*maybe_active) {
+								continue;
+							}
+						}
+						else if (const bool inactive_by_default = !editor_layer_editable().active) {
 							continue;
 						}
 					}
-					else if (const bool inactive_by_default = !editor_layer_editable().active) {
-						continue;
-					}
-				}
 
-				editor_layer layer;
-				layer.unique_name = *id;
+					editor_layer layer;
+					layer.unique_name = *id;
 
-				if (const auto is_open = GetIf<bool>(json_layer, "is_open_in_editor")) {
-					layer.is_open = *is_open;
-				}
+					augs::read_json(json_layer, layer.editable);
 
-				augs::read_json(json_layer, layer.editable);
-
-				auto read_layer_nodes = [&]() {
-					if (const auto maybe_nodes = FindArray(json_layer, "nodes")) {
-						for (auto& layer_node : *maybe_nodes) {
-							if (layer_node.IsString()) {
-								const auto node_id = layer_node.GetString();
+					auto read_layer_nodes = [&]() {
+						if (const auto maybe_nodes = FindArray(json_layer, "nodes")) {
+							for (auto& layer_node : *maybe_nodes) {
+								if (layer_node.IsString()) {
+									const auto node_id = layer_node.GetString();
 								
-								if (const auto found_node = mapped_or_nullptr(node_name_map, node_id)) {
-									if (found_node->assigned_to_layer) {
-										if (strict) {
-											throw augs::json_deserialization_error(
-												"Error reading layer \"%x\":\nnode \"%x\" is already assigned to another layer!", 
-												layer.unique_name,
-												node_id
-											);
-										}
+									if (const auto found_node = mapped_or_nullptr(node_name_map, node_id)) {
+										if (found_node->assigned_to_layer) {
+											if (strict) {
+												throw augs::json_deserialization_error(
+													"Error reading layer \"%x\":\nnode \"%x\" is already assigned to another layer!", 
+													layer.unique_name,
+													node_id
+												);
+											}
 
-										continue;
+											continue;
+										}
+										else {
+											found_node->assigned_to_layer = true;
+											layer.hierarchy.nodes.push_back(found_node->id);
+
+											++nodes_registered;
+										}
 									}
 									else {
-										found_node->assigned_to_layer = true;
-										layer.hierarchy.nodes.push_back(found_node->id);
-
-										++nodes_registered;
+										if (!found_in(skipped_nodes, node_id) ) {
+											if (strict) {
+												throw augs::json_deserialization_error(
+													"Error reading layer \"%x\": node \"%x\" not found!", 
+													layer.unique_name,
+													node_id
+												);
+											}
+										}
 									}
 								}
 								else {
-									if (!found_in(skipped_nodes, node_id) ) {
-										if (strict) {
-											throw augs::json_deserialization_error(
-												"Error reading layer \"%x\": node \"%x\" not found!", 
-												layer.unique_name,
-												node_id
-											);
-										}
+									if (strict) {
+										throw augs::json_deserialization_error(
+											"Error reading layer \"%x\": Node identifier must be a string!", 
+											layer.unique_name
+										);
 									}
 								}
 							}
-							else {
-								if (strict) {
-									throw augs::json_deserialization_error(
-										"Error reading layer \"%x\": Node identifier must be a string!", 
-										layer.unique_name
-									);
-								}
-							}
 						}
+					};
+
+					auto allocate_layer = [&]() {
+						const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
+						target_order.push_back(layer_id);
+					};
+
+					if (create_fallback_node_order && in_main_layers) {
+						layer.hierarchy.nodes = std::move(fallback_node_order);
+						nodes_registered = layer.hierarchy.nodes.size();
+
+						allocate_layer();
+						break;
 					}
-				};
-
-				auto allocate_layer = [&]() {
-					const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
-					loaded.layers.order.push_back(layer_id);
-				};
-
-				if (create_fallback_node_order) {
-					layer.hierarchy.nodes = std::move(fallback_node_order);
-					nodes_registered = layer.hierarchy.nodes.size();
-
-					allocate_layer();
-					break;
+					else {
+						read_layer_nodes();
+						allocate_layer();
+					}
 				}
-				else {
-					read_layer_nodes();
-					allocate_layer();
+			};
+
+			if (maybe_layers) {
+				read_layer_array(*maybe_layers, loaded.layers.order, true);
+			}
+
+			/*
+				The scratchpad's layers - only for the editor (see reading_settings::read_scratchpad).
+			*/
+
+			if (settings.read_scratchpad) {
+				if (const auto maybe_scratchpad = FindArray(document, "scratchpad_layers")) {
+					read_layer_array(*maybe_scratchpad, loaded.layers.scratchpad, false);
 				}
 			}
 

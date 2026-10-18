@@ -115,12 +115,23 @@ editor_setup::editor_setup(
 		}
 	}
 
+	/*
+		Only the editor reads the scratchpad - everything else loads the map without it.
+	*/
+
+	auto editor_reading_settings = []() {
+		auto settings = editor_project_readwrite::reading_settings();
+		settings.read_scratchpad = true;
+		return settings;
+	};
+
 	auto try_read_saved_revision_from = [&](const auto& path) {
 		try {
 			project = editor_project_readwrite::read_project_json(
 				path,
 				official.resources,
-				official.resource_map
+				official.resource_map,
+				editor_reading_settings()
 			);
 
 			/* Will be overwritten to the new name upon the first save. */
@@ -147,7 +158,8 @@ editor_setup::editor_setup(
 			auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
 				path,
 				official.resources,
-				official.resource_map
+				official.resource_map,
+				editor_reading_settings()
 			));
 
 			autosaved_project->meta.name = paths.arena_name;
@@ -1510,7 +1522,32 @@ void editor_setup::inspected_to_entity_selector_state() {
 	);
 }
 
+bool editor_setup::is_in_scratchpad(const inspected_variant& inspected) const {
+	if (const auto layer_id = std::get_if<editor_layer_id>(std::addressof(inspected))) {
+		return project.is_scratchpad_layer(*layer_id);
+	}
+
+	if (const auto node_id = std::get_if<editor_node_id>(std::addressof(inspected))) {
+		return project.is_in_scratchpad(*node_id);
+	}
+
+	return false;
+}
+
+/*
+	The scratchpad's layers and nodes are never selected together with the others.
+*/
+
+void editor_setup::separate_scratchpad_selection(const inspected_variant& new_inspected) {
+	const bool new_in_scratchpad = is_in_scratchpad(new_inspected);
+
+	erase_if(gui.inspector.all_inspected, [&](const inspected_variant& existing) {
+		return is_in_scratchpad(existing) != new_in_scratchpad;
+	});
+}
+
 void editor_setup::inspect_add_quiet(inspected_variant new_inspected) {
+	separate_scratchpad_selection(new_inspected);
 	gui.inspector.inspect(new_inspected, true);
 }
 
@@ -1522,6 +1559,7 @@ void editor_setup::after_quietly_adding_inspected() {
 }
 
 void editor_setup::inspect(inspected_variant new_inspected) {
+	separate_scratchpad_selection(new_inspected);
 	gui.inspector.inspect(new_inspected, wants_multiple_selection());
 
 	inspected_to_entity_selector_state();
@@ -1733,9 +1771,32 @@ void editor_setup::load_gui_state() {
 	catch (...) { 
 		view = {};
 	}
+
+	/*
+		Layers are collapsed unless this user left them expanded.
+	*/
+
+	for (const auto& name : view.open_layers) {
+		if (auto layer = find_layer(name)) {
+			layer->is_open = true;
+		}
+	}
 }
 
 void editor_setup::save_gui_state() {
+	view.open_layers.clear();
+
+	auto collect_open = [&](const std::vector<editor_layer_id>& list) {
+		for (const auto layer_id : list) {
+			if (const auto layer = find_layer(layer_id); layer != nullptr && layer->is_open) {
+				view.open_layers.push_back(layer->unique_name);
+			}
+		}
+	};
+
+	collect_open(project.layers.order);
+	collect_open(project.layers.scratchpad);
+
 	editor_project_readwrite::write_editor_view(paths.editor_view, view);
 	save_last_project_location();
 }
@@ -1884,6 +1945,14 @@ void editor_setup::create_new_layer(const std::string& name_pattern) {
 	}
 
 	post_new_command(cmd);
+}
+
+void editor_setup::open_scratchpad() {
+	gui.scratchpad.open();
+}
+
+const std::string& editor_setup::get_layers_window_title() const {
+	return gui.layers.get_title();
 }
 
 bool editor_setup::wants_multiple_selection() const {
@@ -3217,7 +3286,11 @@ double editor_setup::get_interpolation_ratio() const {
 }
 
 std::optional<parent_layer_info> editor_setup::find_best_layer_for_new_node() const {
-	return std::visit(
+	/*
+		Never a scratchpad's layer - a node made on the scene belongs to the scene.
+	*/
+
+	const auto best = std::visit(
 		[&]<typename T>(const T& inspected_id) -> std::optional<parent_layer_info> {
 			if constexpr(std::is_same_v<T, editor_layer_id>) {
 				return convert_to_parent_layer_info(inspected_id);
@@ -3231,6 +3304,12 @@ std::optional<parent_layer_info> editor_setup::find_best_layer_for_new_node() co
 		},
 		gui.inspector.get_last_inspected_layer_or_node()
 	);
+
+	if (best.has_value() && best->in_scratchpad) {
+		return std::nullopt;
+	}
+
+	return best;
 }
 
 std::optional<parent_layer_info> editor_setup::convert_to_parent_layer_info(const editor_layer_id layer_id) const {

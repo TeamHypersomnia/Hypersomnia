@@ -85,6 +85,7 @@ struct editor_gui {
 	// GEN INTROSPECTOR struct editor_gui
 	editor_inspector_gui inspector = std::string("Inspector");
 	editor_layers_gui layers = std::string("Layers");
+	editor_layers_gui scratchpad = std::string("Scratchpad");
 	editor_filesystem_gui filesystem = std::string("Resources");
 	editor_history_gui history = std::string("History");
 	editor_toolbar_gui toolbar = std::string("Toolbar");
@@ -309,6 +310,8 @@ public:
 	editor_layer* find_layer(const std::string& name);
 	const editor_layer* find_layer(const std::string& name) const;
 	void create_new_layer(const std::string& name_pattern = "Layer");
+	void open_scratchpad();
+	const std::string& get_layers_window_title() const;
 
 	std::string get_free_layer_name() const;
 	std::string get_free_layer_name_for(const std::string& name_pattern) const;
@@ -444,6 +447,9 @@ public:
 
 	void inspect(inspected_variant);
 	void inspect_add_quiet(inspected_variant);
+
+	bool is_in_scratchpad(const inspected_variant&) const;
+	void separate_scratchpad_selection(const inspected_variant&);
 	void quiet_set_last_inspected_layer_or_node(inspected_variant);
 	void quiet_set_last_inspected_any(inspected_variant);
 

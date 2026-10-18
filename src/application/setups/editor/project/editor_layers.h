@@ -24,12 +24,16 @@ struct editor_layer_editable {
 	bool operator==(const editor_layer_editable&) const = default;
 };
 
+/*
+	is_open - expanded in the Layers window, saved per user in editor_view.json (editor_view::open_layers), not in the map.
+*/
+
 struct editor_layer {
 	// GEN INTROSPECTOR struct editor_layer
 	std::string unique_name;
 	editor_layer_editable editable;
 
-	bool is_open = true;
+	bool is_open = false;
 
 	editor_layer_hierarchy hierarchy;
 	// END GEN INTROSPECTOR
@@ -56,6 +60,15 @@ struct editor_layers {
 	static constexpr bool json_ignore = true;
 
 	std::vector<editor_layer_id> order;
+
+	/*
+		Layers kept for the future: never drawn in the editor nor added to the game, whatever their visibility -
+		as if they were not in the project. In the same pool, but only `order` is what everything iterates by default.
+		Saved under "scratchpad_layers", read only by the editor (reading_settings::read_scratchpad).
+	*/
+
+	std::vector<editor_layer_id> scratchpad;
+
 	editor_layer_pool pool;
 
 	auto make_name_to_layer_map() {

@@ -87,9 +87,19 @@ void editor_setup::for_each_resource(F&& callback, bool for_official) const {
 
 template <class N, class F>
 void editor_setup::for_each_node(F&& callback) const {
+	/*
+		Not the scratchpad's nodes - as if they were not in the project.
+	*/
+
+	const auto scratchpad_nodes = project.make_scratchpad_node_set();
+
 	project.nodes.template get_pool_for<N>().for_each_id_and_object(
 		[&](const auto& raw_id, const auto& object) {
 			const auto typed_id = editor_typed_node_id<N>::from_raw(raw_id);
+
+			if (found_in(scratchpad_nodes, typed_id.operator editor_node_id())) {
+				return;
+			}
 
 			callback(typed_id, object);
 		}

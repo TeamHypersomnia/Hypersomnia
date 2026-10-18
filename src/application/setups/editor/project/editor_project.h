@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <unordered_set>
 #include "augs/misc/constant_size_string.h"
 #include "application/setups/editor/project/editor_project_meta.h"
 #include "application/setups/editor/project/editor_project_about.h"
@@ -35,6 +36,12 @@ struct parent_layer_info {
 	const editor_layer* layer_ptr = nullptr;
 	std::size_t layer_index;
 	std::size_t index_in_layer;
+
+	/*
+		In editor_layers::scratchpad - then layer_index counts on after all of editor_layers::order.
+	*/
+
+	bool in_scratchpad = false;
 };
 
 struct editor_project {
@@ -140,6 +147,15 @@ struct editor_project {
 
 	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
 	std::optional<parent_layer_info> convert_to_parent_layer_info(editor_layer_id id) const;
+
+	bool is_scratchpad_layer(editor_layer_id id) const;
+	bool is_in_scratchpad(editor_node_id id) const;
+
+	/*
+		For code that walks the node pools directly - the nodes of the scratchpad's layers, to leave out.
+	*/
+
+	std::unordered_set<editor_node_id> make_scratchpad_node_set() const;
 
 	void clear_cached_scene_node_data();
 

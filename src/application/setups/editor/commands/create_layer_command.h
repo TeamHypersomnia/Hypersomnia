@@ -39,6 +39,7 @@ struct delete_layers_command {
 
 	std::vector<entry> entries;
 	std::vector<editor_layer_id> order_backup;
+	std::vector<editor_layer_id> scratchpad_backup;
 
 	void undo(editor_command_input in);
 	void redo(editor_command_input in);

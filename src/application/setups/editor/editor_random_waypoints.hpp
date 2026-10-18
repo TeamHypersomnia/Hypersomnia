@@ -28,7 +28,21 @@ inline void gather_spawns_and_sites_from_project(
 
 	std::vector<vec2> ffa_spawns;
 
-	for (const auto& node : project.nodes.template get_pool_for<editor_point_marker_node>()) {
+	/*
+		Not the scratchpad's nodes - as if they were not in the project.
+	*/
+
+	const auto scratchpad_nodes = project.make_scratchpad_node_set();
+
+	auto in_scratchpad = [&]<typename N>(const N&, const auto raw_id) {
+		return found_in(scratchpad_nodes, editor_typed_node_id<N>::from_raw(raw_id).operator editor_node_id());
+	};
+
+	project.nodes.template get_pool_for<editor_point_marker_node>().for_each_id_and_object([&](const auto& raw_id, const auto& node) {
+		if (in_scratchpad(node, raw_id)) {
+			return;
+		}
+
 		if (const auto resource = project.find_resource(officials, node.resource_id)) {
 			const auto type = resource->editable.type;
 
@@ -39,7 +53,7 @@ inline void gather_spawns_and_sites_from_project(
 				ffa_spawns.push_back(node.editable.pos);
 			}
 		}
-	}
+	});
 
 	if (input.gun_game) {
 		auto& all = input.resistance_spawns;
@@ -49,13 +63,17 @@ inline void gather_spawns_and_sites_from_project(
 		return;
 	}
 
-	for (const auto& node : project.nodes.template get_pool_for<editor_area_marker_node>()) {
+	project.nodes.template get_pool_for<editor_area_marker_node>().for_each_id_and_object([&](const auto& raw_id, const auto& node) {
+		if (in_scratchpad(node, raw_id)) {
+			return;
+		}
+
 		if (const auto resource = project.find_resource(officials, node.resource_id)) {
 			if (::is_bombsite(resource->editable.type)) {
 				input.bombsites.emplace_back(ltrb::center_and_size(node.editable.pos, vec2(node.editable.size)), node.editable.letter);
 			}
 		}
-	}
+	});
 }
 
 template <class F>
@@ -146,6 +164,18 @@ void editor_setup::generate_random_waypoints_preview(const uint32_t seed) {
 
 	auto after = std::make_unique<editor_project>(project);
 	after->settings.bot_waypoints_preview_seed = seed;
+
+	/*
+		A preview layer kept in the scratchpad stays there under a free name - it was moved there to be kept.
+	*/
+
+	for (const auto layer_id : after->layers.scratchpad) {
+		if (auto* const layer = after->find_layer(layer_id)) {
+			if (layer->unique_name == random_waypoints_layer_name_v) {
+				layer->unique_name = get_free_layer_name_for(std::string(random_waypoints_layer_name_v) + " (kept)");
+			}
+		}
+	}
 
 	/*
 		Overwrite: the previous preview layer goes away with all its nodes.

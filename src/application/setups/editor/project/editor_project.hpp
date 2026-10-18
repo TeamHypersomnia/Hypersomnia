@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <unordered_set>
 #include "application/setups/editor/project/editor_project.h"
 
 template <class S, class Officials, class F>
@@ -157,14 +158,22 @@ inline name_to_node_map_type editor_project::make_name_to_node_map() const {
 }
 
 inline std::optional<parent_layer_info> editor_project::convert_to_parent_layer_info(const editor_layer_id layer_id) const {
-	parent_layer_info info;
-
 	const auto& order = layers.order;
 
 	for (std::size_t l = 0; l < order.size(); ++l) {
 		if (layer_id == order[l]) {
 			if (const auto layer = find_layer(layer_id)) {
-				return parent_layer_info { layer_id, layer, l, 0 };
+				return parent_layer_info { layer_id, layer, l, 0, false };
+			}
+		}
+	}
+
+	const auto& scratchpad = layers.scratchpad;
+
+	for (std::size_t l = 0; l < scratchpad.size(); ++l) {
+		if (layer_id == scratchpad[l]) {
+			if (const auto layer = find_layer(layer_id)) {
+				return parent_layer_info { layer_id, layer, order.size() + l, 0, true };
 			}
 		}
 	}
@@ -172,30 +181,59 @@ inline std::optional<parent_layer_info> editor_project::convert_to_parent_layer_
 	return std::nullopt;
 }
 
+inline bool editor_project::is_scratchpad_layer(const editor_layer_id id) const {
+	return found_in(layers.scratchpad, id);
+}
+
+inline bool editor_project::is_in_scratchpad(const editor_node_id id) const {
+	const auto parent = find_parent_layer(id);
+	return parent.has_value() && parent->in_scratchpad;
+}
+
+inline std::unordered_set<editor_node_id> editor_project::make_scratchpad_node_set() const {
+	std::unordered_set<editor_node_id> result;
+
+	for (const auto layer_id : layers.scratchpad) {
+		if (const auto layer = find_layer(layer_id)) {
+			result.insert(layer->hierarchy.nodes.begin(), layer->hierarchy.nodes.end());
+		}
+	}
+
+	return result;
+}
+
 inline std::optional<parent_layer_info> editor_project::find_parent_layer(const editor_node_id node_id) const {
 	if (!node_id.is_set()) {
 		return std::nullopt;
 	}
 
-	parent_layer_info info;
+	/*
+		The scratchpad's layers too - the editor's commands work on their nodes like on any other.
+	*/
 
-	const auto& order = layers.order;
+	auto search = [&](const std::vector<editor_layer_id>& list, const std::size_t first_index, const bool in_scratchpad) -> std::optional<parent_layer_info> {
+		for (std::size_t l = 0; l < list.size(); ++l) {
+			const auto layer_id = list[l];
 
-	for (std::size_t l = 0; l < order.size(); ++l) {
-		const auto layer_id = order[l];
+			if (const auto layer = find_layer(layer_id)) {
+				const auto& nodes = layer->hierarchy.nodes;
 
-		if (const auto layer = find_layer(layer_id)) {
-			const auto& nodes = layer->hierarchy.nodes;
-
-			for (std::size_t i = 0; i < nodes.size(); ++i) {
-				if (nodes[i] == node_id) {
-					return parent_layer_info { layer_id, layer, l, i };
+				for (std::size_t i = 0; i < nodes.size(); ++i) {
+					if (nodes[i] == node_id) {
+						return parent_layer_info { layer_id, layer, first_index + l, i, in_scratchpad };
+					}
 				}
 			}
 		}
+
+		return std::nullopt;
+	};
+
+	if (const auto found = search(layers.order, 0, false)) {
+		return found;
 	}
 
-	return std::nullopt;
+	return search(layers.scratchpad, layers.order.size(), true);
 }
 
 inline void editor_project::clear_cached_scene_node_data() {
