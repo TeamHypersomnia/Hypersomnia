@@ -4,22 +4,105 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [4.0.0] - 2026-10-18
+
+### Added
+
+- **Game speeds.**
+	- **Official servers** now have 25% slower gameplay.
+	- This is to acommodate newbies.
+	- **You can customize speeds** in your own matches!
+	- You can easily host a match with the **original 1.0x speed.**
+	- Tweak this easily from `Host a server` or use `/speed` and `/bspeed` in-game.
+- **Custom zoom.**
+	- Feel claustrophobic? You can now zoom out the game in your match. 
+	- Default zoom changed from 0.8x to 0.75x. **You will see more everywhere now.**
+	- Tweak this easily from `Host a server` or use `/zoom` in-game.
+- **Soft shadows.**
+	- "Sun" has its own shadow.
+	- Point lights are fully physical.
+	- Shadows of walls, characters, corpses, everything.
+- **Favorite servers.**
+- **Pixel-art explosions.**
+- **Realistic gun shells.**
+	- Casings bounce, roll and get kicked around.
+- **Simplified inventory.**
+	- Carry up to 2 guns by default.
+	- A backpack lets you carry 3, and halves the weight of holstered weapons.
+	- Buying at the limit drops your cheapest gun.
+	- "Pickup swaps wielded firearm" setting in Controls → Inventory.
+- **Public-key cryptography.**
+	- We're now using `Ed25519` to identify servers and players.
+	- Connections are secure - every server has its own public key.
+	- **Favorite servers** are remembered by their key - like `.ssh/known_hosts`!
+- Play ranked **without Steam.**
+	- Thanks to **Public-key cryptography.**
+	- Your account is just a private/public key pair stored in your user folder.
+	- Any community server can now authenticate you **without relying on an external vendor.**
+	- Opens the path to **tracking custom progress** for any player, on any server.
+	- See `Settings` for details.
+- **Non-Steam** build can link to your **Steam account.**
+	- Your local key pair is linked to it.
+	- No need to sign in to Steam every time!
+- **Grenades land at crosshair.**
+	- They also bounce off the floor.
+- **Bigger items** on the ground.
+	- Magazines, shells and grenades are easier to spot.
+- **Changelog.** You're reading it.
+- **HRTF presets** for spatial audio.
+- Guns are stored **on the character's back.**
+	- They are fully physical and can hit walls!
+	- They contribute to player's weight too, slowing you down.
+- Bot waypoints **regenerated every round.**
+	- Every round against bots will now be unique.
+- **Simulated trajectories** for grenades and knives.
+	- Just toggle laser to see it while you wield a grenade.
+- **Items bounce off the floor** when thrown or dropped.
+- **Shop item whitelists** - customize what can be bought on your map.
+	- Only-snipers or only-melee maps? No problem!
+
+### Changed
+
+- Slightly improved **muzzle flashes**.
+- More detailed settings for bullet traces.
+- Quick play joins the best server right away.
+- Thrown knives bounce off walls **like billiard balls.**
+	- Exactly like was the case with grenades.
+- After planting, the gun goes back to your hand.
+	- The bomb key works like a hotbar number.
+- Bots see only as far as a player standing in their spot would.
+- Bots using sniper rifles wait a moment before the first shot. 
+
+### Fixed
+
+- **Minimap fixes.**
+	- Enemies are pinned **only when actually seen on screen.**
+	- Unconscious players are no longer shown as killed.
+- **Stability.** Several crashes fixed.
+- **Ricochets and penetration** bugs.
+	- Inner corners and wall seams let you penetrate too much.
+- Bots **no longer spin** when trying to defuse a bomb.
+- **Decals** properly progress **through neighboring walls**.
+	- Even of different materials.
+- Smooth camera when zoomed out, no pixel jumps.
+- Lighting performance: **360 -> 460 FPS** on `de_facing_worlds`.
+- **Servers no longer stop accepting players** after many connections.
+
 ## [3.0.0] - 2026-09-20
 
 ### Added
 
 - **Gore.**
-- **Intelligent bots with progression.**
 - **Decals.**
-- **Bullet traces.**
 - **Minimap.**
+- **Bullet traces.**
+- **Intelligent bots with progression.**
 - Game is zoomed out by 0.8x by default.
 - Many more!
 
 ### Fixed
 
-- The scoreboard no longer widens underneath the minimap on screens narrower than 1200px. Only the player column gives up the width.
-- Nicknames too long for the player column are now cut off at its edge instead of running over the columns to the right.
+- **Stability.** Several crashes fixed.
 
 ## [1.6.3] - 2025-10-26
 
