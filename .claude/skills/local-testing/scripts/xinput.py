@@ -60,20 +60,24 @@ def press(keysym_name, shift=False):
 
 mode = sys.argv[1]
 
-if mode == "click":
+if mode in ("click", "rclick"):
+	# rclick - the right button (context menus)
 	x, y = int(sys.argv[2]), int(sys.argv[3])
+	button = 3 if mode == "rclick" else 1
 	xtst.XTestFakeMotionEvent(display, -1, x, y, 0)
 	x11.XFlush(display)
 	time.sleep(0.3)
-	xtst.XTestFakeButtonEvent(display, 1, 1, 0)
+	xtst.XTestFakeButtonEvent(display, button, 1, 0)
 	x11.XFlush(display)
 	time.sleep(0.1)
-	xtst.XTestFakeButtonEvent(display, 1, 0, 0)
+	xtst.XTestFakeButtonEvent(display, button, 0, 0)
 	x11.XFlush(display)
 	time.sleep(0.2)
 elif mode == "drag":
-	# drag x1 y1 x2 y2 - e.g. a window's edge, in steps so ImGui sees the motion
-	x1, y1, x2, y2 = (int(v) for v in sys.argv[2:6])
+	# drag x1 y1 x2 y2 [x3 y3 ...] - e.g. a window's edge, in steps so ImGui sees the motion;
+	# with more points it rests 1.5 s at each one in between (e.g. over a tab, until it switches)
+	points = [(int(sys.argv[i]), int(sys.argv[i + 1])) for i in range(2, len(sys.argv) - 1, 2)]
+	x1, y1 = points[0]
 	xtst.XTestFakeMotionEvent(display, -1, x1, y1, 0)
 	x11.XFlush(display)
 	time.sleep(0.3)
@@ -81,10 +85,16 @@ elif mode == "drag":
 	x11.XFlush(display)
 	time.sleep(0.2)
 
-	for i in range(1, 21):
-		xtst.XTestFakeMotionEvent(display, -1, x1 + (x2 - x1) * i // 20, y1 + (y2 - y1) * i // 20, 0)
-		x11.XFlush(display)
-		time.sleep(0.03)
+	for n, (x2, y2) in enumerate(points[1:]):
+		for i in range(1, 21):
+			xtst.XTestFakeMotionEvent(display, -1, x1 + (x2 - x1) * i // 20, y1 + (y2 - y1) * i // 20, 0)
+			x11.XFlush(display)
+			time.sleep(0.03)
+
+		x1, y1 = x2, y2
+
+		if n < len(points) - 2:
+			time.sleep(1.5)
 
 	time.sleep(0.2)
 	xtst.XTestFakeButtonEvent(display, 1, 0, 0)
