@@ -50,14 +50,21 @@ bool buy_area_in_range(const E& subject) {
 				const auto& marker = typed_handle.template get<invariants::area_marker>();
 
 				if (area_marker_type::BUY_ZONE == marker.type) {
-					if (is_bot && !typed_handle.template get<components::marker>().bots_can_use) {
+					const auto& zone_marker = typed_handle.template get<components::marker>();
+
+					if (is_bot && !zone_marker.bots_can_use) {
 						return callback_result::CONTINUE;
 					}
 
-					const auto zone_faction = typed_handle.get_official_faction();
-					const bool faction_matches = 
-						matched_faction == zone_faction || 
-						zone_faction == faction_type::ANY;
+					/*
+						The zone's own faction - get_official_faction() reads ANY as RESISTANCE,
+						so a zone for anyone was only for the Resistance.
+					*/
+
+					const bool faction_matches =
+						zone_marker.faction == faction_type::ANY ||
+						matched_faction == typed_handle.get_official_faction()
+					;
 
 					if (faction_matches) {
 						if (entity_overlaps_entity(typed_handle, subject)) {
