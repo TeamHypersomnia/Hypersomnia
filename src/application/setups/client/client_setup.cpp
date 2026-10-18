@@ -1220,7 +1220,8 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 				clean_round_state,
 				new_vars.playtesting_context,
 				keep_loaded_project,
-				nullptr
+				nullptr,
+				new_vars.arena_rng_offset
 			},
 
 			new_vars.required_arena_hash

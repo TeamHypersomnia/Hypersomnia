@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <optional>
 #include <cstdint>
 #include <unordered_map>
 
@@ -501,6 +502,9 @@ private:
 
 	bool short_match = false;
 	xorshift_state stable_round_rng;
+	uint32_t rng_offset = 0;
+	uint32_t generated_waypoints_seed = 0;
+	bool generated_waypoints_this_round = false;
 
 	per_actual_faction<uint16_t> last_announced_team_casual_levels = {};
 	difficulty_type last_announced_casual_bot_difficulty = difficulty_type::VERY_EASY;
@@ -533,6 +537,22 @@ private:
 	void trigger_match_summary(input in, const_logic_step);
 
 public:
+
+	void set_rng_offset(const uint32_t offset) {
+		rng_offset = offset;
+	}
+
+	/*
+		The seed of this round's generated bot waypoints, if it has any.
+	*/
+
+	std::optional<uint32_t> find_generated_waypoints_seed() const {
+		if (generated_waypoints_this_round) {
+			return generated_waypoints_seed;
+		}
+
+		return std::nullopt;
+	}
 
 	faction_type get_player_faction(const mode_player_id&) const;
 	faction_type get_opposing_faction(const_input, faction_type) const;

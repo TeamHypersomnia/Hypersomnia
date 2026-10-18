@@ -167,6 +167,7 @@ class server_setup :
 
 	augs::path_type current_arena_folder;
 	augs::secure_hash_type current_arena_hash;
+	uint32_t current_arena_rng_offset = 0;
 
 	const packaged_official_content& official;
 

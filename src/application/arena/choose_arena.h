@@ -23,6 +23,7 @@ struct choose_arena_input {
 	std::optional<arena_playtesting_context> playtesting_context;
 	editor_project* keep_loaded_project;
 	scene_entity_to_node_map* const entity_to_node;
+	uint32_t rng_offset = 0;
 
 	bool is_for_playtesting() const {
 		return playtesting_context.has_value();
@@ -136,6 +137,9 @@ inline server_choose_arena_result choose_arena_server(
 			if constexpr(std::is_same_v<test_mode, T>) {
 				typed_mode.playtesting_context = in.playtesting_context;
 			}
+			else if constexpr(std::is_same_v<arena_mode, T>) {
+				typed_mode.set_rng_offset(in.rng_offset);
+			}
 		}
 	);
 
@@ -173,6 +177,9 @@ inline client_find_arena_result choose_arena_client(
 			[&]<typename T>(T& typed_mode) {
 				if constexpr(std::is_same_v<test_mode, T>) {
 					typed_mode.playtesting_context = in.playtesting_context;
+				}
+				else if constexpr(std::is_same_v<arena_mode, T>) {
+					typed_mode.set_rng_offset(in.rng_offset);
 				}
 			}
 		);

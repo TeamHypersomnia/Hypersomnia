@@ -90,7 +90,11 @@ inline random_waypoints_input gather_random_waypoints_input(const cosmos& cosm, 
 	return input;
 }
 
-inline void create_random_waypoints(
+/*
+	Returns whether this round got generated waypoints (the editor shows their seed for a preview).
+*/
+
+inline bool create_random_waypoints(
 	allocate_new_entity_access access,
 	cosmos& cosm,
 	const bool gun_game,
@@ -103,7 +107,7 @@ inline void create_random_waypoints(
 	input.seed = seed;
 
 	if (mode == bot_waypoints_mode::AUTOMATIC && !input.existing.empty()) {
-		return;
+		return false;
 	}
 
 	if (mode == bot_waypoints_mode::RANDOM_EVERY_ROUND) {
@@ -113,7 +117,7 @@ inline void create_random_waypoints(
 	const auto generated = ::generate_random_waypoints(input);
 
 	if (generated.empty()) {
-		return;
+		return false;
 	}
 
 	auto patrol_flavour = entity_flavour_id();
@@ -156,4 +160,6 @@ inline void create_random_waypoints(
 			[](entity_handle) {}
 		);
 	}
+
+	return true;
 }

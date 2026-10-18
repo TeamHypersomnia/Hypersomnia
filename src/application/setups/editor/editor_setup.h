@@ -686,6 +686,14 @@ public:
 							callbacks,
 							solve_settings()
 						);
+
+						using M = remove_cref<decltype(mode)>;
+
+						if constexpr(std::is_same_v<M, arena_mode>) {
+							if (const auto seed = mode.find_generated_waypoints_seed()) {
+								show_playtest_waypoints_seed(*seed);
+							}
+						}
 					}
 				);
 			}
@@ -703,6 +711,13 @@ public:
 	}
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
+
+	/*
+		The seed of the waypoints a playtest round generated goes to the Preview seed -
+		"Same seed" then shows them in the editor.
+	*/
+
+	void show_playtest_waypoints_seed(uint32_t seed);
 
 	std::optional<camera_eye> find_current_camera_eye() const;
 

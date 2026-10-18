@@ -52,6 +52,7 @@ struct server_public_vars {
 
 	augs::secure_hash_type required_arena_hash = augs::secure_hash_type();
 	std::optional<arena_playtesting_context> playtesting_context;
+	uint32_t arena_rng_offset = 0;
 
 	address_string_type external_arena_files_provider;
 	server_name_type server_name;

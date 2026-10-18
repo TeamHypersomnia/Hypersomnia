@@ -3573,6 +3573,7 @@ server_public_vars server_setup::make_public_vars() const {
 	pub.instance_label = instance_label;
 
 	pub.required_arena_hash = current_arena_hash;
+	pub.arena_rng_offset = current_arena_rng_offset;
 	pub.playtesting_context = vars.playtesting_context;
 
 	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
@@ -3823,6 +3824,13 @@ void server_setup::rechoose_arena() {
 
 	const auto& arena = get_arena_handle();
 
+	/*
+		A new offset for all the mode's seeds at every arena load - clients get it in the public vars.
+		30 bits, so that the seeds stay positive where the editor shows them for a long time.
+	*/
+
+	current_arena_rng_offset = static_cast<uint32_t>(std::random_device()()) & 0x3fffffffu;
+
 	{
 		const auto result = ::choose_arena_server({
 			editor_project_readwrite::reading_settings(),
@@ -3833,7 +3841,8 @@ void server_setup::rechoose_arena() {
 			clean_round_state,
 			vars.playtesting_context,
 			std::addressof(*last_loaded_project),
-			nullptr
+			nullptr,
+			current_arena_rng_offset
 		});
 
 		current_arena_folder = result.arena_folder_path;

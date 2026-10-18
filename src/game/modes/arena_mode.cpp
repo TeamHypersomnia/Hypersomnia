@@ -100,7 +100,13 @@ bool arena_mode_player::operator<(const arena_mode_player& b) const {
 
 std::size_t arena_mode::get_round_rng_seed(const cosmos& cosm) const {
 	(void)cosm;
-	return clock_before_setup.now.step + get_current_round_number(); 
+
+	/*
+		rng_offset is drawn at every arena load (by the server, or the editor's playtest) -
+		otherwise every match on a map would repeat the same rounds, e.g. when they all end with the time.
+	*/
+
+	return clock_before_setup.now.step + get_current_round_number() + rng_offset;
 }
 
 std::size_t arena_mode::get_step_rng_seed(const cosmos& cosm) const {
@@ -1181,7 +1187,7 @@ void arena_mode::setup_round(
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
 
-	stable_round_rng = randomization(total_mode_steps_passed).generator;
+	stable_round_rng = randomization(total_mode_steps_passed + rng_offset).generator;
 
 	/*
 		The clean round state carries its own clock timing.
@@ -1255,7 +1261,8 @@ void arena_mode::setup_round(
 		fill_spawns(cosm, faction, factions[faction]);
 	});
 
-	::create_random_waypoints(access, cosm, in.rules.is_gun_game(), static_cast<uint32_t>(get_round_rng_seed(cosm)));
+	generated_waypoints_seed = static_cast<uint32_t>(get_round_rng_seed(cosm));
+	generated_waypoints_this_round = ::create_random_waypoints(access, cosm, in.rules.is_gun_game(), generated_waypoints_seed);
 
 	/*
 		Gather waypoints for AI teams at round start.
@@ -2336,7 +2343,7 @@ void arena_mode::swap_assigned_factions(const arena_mode::participating_factions
 }
 
 void arena_mode::scramble_assigned_factions(const arena_mode::participating_factions& p) {
-	auto rng = randomization(total_mode_steps_passed);
+	auto rng = randomization(total_mode_steps_passed + rng_offset);
 
 	std::vector<arena_mode_player*> ptrs;
 	ptrs.reserve(players.size());

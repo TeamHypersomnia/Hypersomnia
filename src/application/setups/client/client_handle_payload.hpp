@@ -57,10 +57,15 @@ message_handler_result client_setup::handle_payload(
 		LOG_NVPS(new_arena, new_mode, new_hash);
 		LOG_NVPS(old_arena, old_mode, old_hash);
 
+		/*
+			The server draws a new arena_rng_offset at every arena load, even of the same arena.
+		*/
+
 		const bool reload_arena = 
 			new_arena != old_arena
 			|| new_mode != old_mode
 			|| new_hash != old_hash
+			|| new_vars.arena_rng_offset != sv_public_vars.arena_rng_offset
 		;
 
 		sv_public_vars = new_vars;

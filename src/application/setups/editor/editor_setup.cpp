@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstddef>
+#include <random>
 #include "game/cosmos/logic_step.h"
 #include "game/organization/all_messages_includes.h"
 #include "augs/misc/pool/pool_allocate.h"
@@ -3350,6 +3351,27 @@ void editor_setup::start_playtesting() {
 		needs_rebuild = true;
 	}
 
+	{
+		/*
+			The editor shows the preview of generated waypoints (and the author's ones) -
+			a playtest leaves out what the game would, see build_arena_from_editor_project.
+		*/
+
+		const bool has_preview_layer = [&]() {
+			for (const auto& layer : project.layers.pool) {
+				if (layer.unique_name == random_waypoints_layer_name_v) {
+					return true;
+				}
+			}
+
+			return false;
+		}();
+
+		if (has_preview_layer || project.settings.bot_waypoints.mode == bot_waypoints_mode::RANDOM_EVERY_ROUND) {
+			needs_rebuild = true;
+		}
+	}
+
 	if (auto mode = project.get_game_modes().find(project.playtesting.mode.raw)) {
 		if (mode->editable.common.activate_layers.size() > 0) {
 			needs_rebuild = true;
@@ -3382,6 +3404,12 @@ void editor_setup::start_playtesting() {
 			local_player_id = mode.add_player(input, simulated_client.nickname, project.playtesting.starting_faction);
 		}
 		else {
+			/*
+				Like a server at every arena load - otherwise every playtest would start with the same rounds.
+			*/
+
+			mode.set_rng_offset(static_cast<uint32_t>(std::random_device()()) & 0x3fffffffu);
+
 			local_player_id = mode.add_player(input, simulated_client.nickname);
 			mode.choose_faction(input, local_player_id, project.playtesting.starting_faction);
 
@@ -3410,6 +3438,15 @@ void editor_setup::stop_playtesting() {
 
 	/* Would interrupt the sounds which would be unpleasant to the ear */
 	//scene.world.request_resample();
+}
+
+void editor_setup::show_playtest_waypoints_seed(const uint32_t seed) {
+	auto& shown = project.settings.bot_waypoints_preview_seed;
+
+	if (shown != seed) {
+		shown = seed;
+		recent_message.set(typesafe_sprintf("This round's waypoints: seed %x (Same seed in Project settings shows them).", seed));
+	}
 }
 
 bool editor_setup::is_playtesting() const {
