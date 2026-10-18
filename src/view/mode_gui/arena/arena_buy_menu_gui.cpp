@@ -763,11 +763,184 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			return result;
 		};
 
+		auto for_each_gun = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::gun>(callback);
+		};
+
+		auto for_each_rifle = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+				const auto buy_type = flavour.template get<invariants::gun>().buy_type;
+
+				if (buy_type == buy_menu_type::RIFLES) {
+					callback(id, flavour);
+					return;
+				}
+
+				if (buy_type != buy_menu_type::COUNT) {
+					return;
+				}
+
+				if (!is_shotgun_like(cosm, id)) {
+					callback(id, flavour);
+				}
+			});
+		};
+
+		auto for_each_melee = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::melee>([&](const auto& id, const auto& flavour) {
+				callback(id, flavour);
+			});
+		};
+
+		auto for_each_pistol = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+				if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::PISTOLS) {
+					callback(id, flavour);
+				}
+			});
+		};
+
+		auto for_each_smg = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+				if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::SUBMACHINE_GUNS) {
+					callback(id, flavour);
+				}
+			});
+		};
+
+		auto for_each_shotgun = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+				const auto buy_type = flavour.template get<invariants::gun>().buy_type;
+
+				if (buy_type == buy_menu_type::SHOTGUNS) {
+					callback(id, flavour);
+					return;
+				}
+
+				if (buy_type != buy_menu_type::COUNT) {
+					return;
+				}
+
+				if (is_shotgun_like(cosm, id)) {
+					callback(id, flavour);
+				}
+			});
+		};
+
+		auto for_each_tool = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::tool>(
+				[&](const auto& id, const auto& flavour) {
+					if (::is_backpack_like(flavour) || !::is_armor_like(flavour)) {
+						callback(id, flavour);
+					}
+				}
+			);
+
+			cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+				if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::TOOLS) {
+					callback(id, flavour);
+				}
+			});
+		};
+
+		auto for_each_armor = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::tool>(
+				[&](const auto& id, const auto& flavour) {
+					if (::is_armor_like(flavour)) {
+						callback(id, flavour);
+					}
+				}
+			);
+		};
+
+		auto for_each_grenade = [&](auto&& callback) {
+			cosm.for_each_flavour_having<invariants::hand_fuse>(callback);
+		};
+
+		/*
+			What a category sells to this player - a category with nothing (e.g. all its firearms left out
+			by the map's shop_allowed_firearms) is not shown at all.
+		*/
+
+		auto collect_buyable = [&](
+			const std::optional<item_holding_stance> considered_stance,
+			auto&& for_each_purchasable
+		) {
+			std::vector<item_flavour_id> buyable_items;
+
+			for_each_purchasable([&](const auto& id, const auto& flavour) {
+				const auto item = flavour.template get<invariants::item>();
+
+				if (!factions_compatible(subject, id)) {
+					return;
+				}
+
+				if (!::is_sold_in_shop(cosm, in.shop_allowed_firearms, item_flavour_id(id))) {
+					return;
+				}
+
+				if (price_of(item_flavour_id(id)) <= 0) {
+					return;
+				}
+
+				if (considered_stance.has_value()) {
+					if (item.holding_stance != *considered_stance) {
+						const bool but_its_sniper_and_we_want_rifles = item.holding_stance == item_holding_stance::SNIPER_LIKE && considered_stance == item_holding_stance::RIFLE_LIKE;
+
+						if (!but_its_sniper_and_we_want_rifles) {
+							return;
+						}
+					}
+				}
+
+				buyable_items.push_back(id);
+			});
+
+			sort_range(buyable_items, price_comparator);
+			reverse_range(buyable_items);
+
+			return buyable_items;
+		};
+
+		/*
+			No stance filter for SMGs: for_each_smg already picks guns
+			with buy_type == SUBMACHINE_GUNS, and SMGs may use
+			either RIFLE_LIKE or PISTOL_LIKE stances.
+		*/
+
+		auto buyable_items_of = [&](const buy_menu_type category) {
+			switch (category) {
+				case buy_menu_type::MELEE: return collect_buyable(item_holding_stance::KNIFE_LIKE, for_each_melee);
+				case buy_menu_type::PISTOLS: return collect_buyable(item_holding_stance::PISTOL_LIKE, for_each_pistol);
+				case buy_menu_type::SUBMACHINE_GUNS: return collect_buyable(std::nullopt, for_each_smg);
+				case buy_menu_type::RIFLES: return collect_buyable(item_holding_stance::RIFLE_LIKE, for_each_rifle);
+				case buy_menu_type::HEAVY_GUNS: return collect_buyable(item_holding_stance::HEAVY_LIKE, for_each_gun);
+				case buy_menu_type::SHOTGUNS: return collect_buyable(item_holding_stance::RIFLE_LIKE, for_each_shotgun);
+				case buy_menu_type::GRENADES: return collect_buyable(std::nullopt, for_each_grenade);
+				case buy_menu_type::ARMORS: return collect_buyable(std::nullopt, for_each_armor);
+				case buy_menu_type::TOOLS: return collect_buyable(std::nullopt, for_each_tool);
+				default: return std::vector<item_flavour_id>();
+			}
+		};
+
+		auto is_category_shown = [&](const buy_menu_type category) {
+			return category == buy_menu_type::SPELLS || !buyable_items_of(category).empty();
+		};
+
+		if (current_menu != buy_menu_type::MAIN && !is_category_shown(current_menu)) {
+			/*
+				E.g. reached with its hotkey.
+			*/
+
+			current_menu = buy_menu_type::MAIN;
+			next_requested_menu = buy_menu_type::MAIN;
+		}
+
 		if (current_menu == buy_menu_type::MAIN) {
 			centered_text("CHOOSE CATEGORY");
 
 			auto do_buttons_for_buy_categories = [&](const buy_menu_type e) {
-				if (e == buy_menu_type::MAIN) {
+				if (e == buy_menu_type::MAIN || !is_category_shown(e)) {
 					return;
 				}
 
@@ -806,48 +979,14 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 #endif
 			centered_text(to_uppercase(format_enum(current_menu)));
 
-			auto do_item_menu = [&](
-				const std::optional<item_holding_stance> considered_stance,
-				auto&& for_each_purchasable
-			) {
-				std::vector<item_flavour_id> buyable_items;
-
-				for_each_purchasable([&](const auto& id, const auto& flavour) {
-					const auto item = flavour.template get<invariants::item>();
-
-					if (!factions_compatible(subject, id)) {
-						return;
-					}
-
-					if (!::is_sold_in_shop(cosm, in.shop_allowed_firearms, item_flavour_id(id))) {
-						return;
-					}
-
-					if (considered_stance.has_value()) {
-						if (item.holding_stance != *considered_stance) {
-							const bool but_its_sniper_and_we_want_rifles = item.holding_stance == item_holding_stance::SNIPER_LIKE && considered_stance == item_holding_stance::RIFLE_LIKE;
-
-							if (!but_its_sniper_and_we_want_rifles) {
-								return;
-							}
-						}
-					}
-
-					buyable_items.push_back(id);
-				});
-
-				sort_range(buyable_items, price_comparator);
-				reverse_range(buyable_items);
-
+			auto do_item_menu = [&](const std::vector<item_flavour_id>& buyable_items) {
 				for (const auto& b : buyable_items) {
 					const auto index = 1 + index_in(buyable_items, b);
 
-					if (price_of(b) > 0) {
-						ImGui::Separator();
+					ImGui::Separator();
 
-						if (purchase_item_button(b, button_type::BUYABLE_WEAPON, index)) {
-							set_result(b);
-						}
+					if (purchase_item_button(b, button_type::BUYABLE_WEAPON, index)) {
+						set_result(b);
 					}
 				}
 
@@ -904,187 +1043,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				}
 			};
 
-			auto for_each_gun = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::gun>(callback);
-			};
 
-			auto for_each_rifle = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					const auto buy_type = flavour.template get<invariants::gun>().buy_type;
-
-					if (buy_type == buy_menu_type::RIFLES) {
-						callback(id, flavour);
-						return;
-					}
-
-					if (buy_type != buy_menu_type::COUNT) {
-						return;
-					}
-
-					if (!is_shotgun_like(cosm, id)) {
-						callback(id, flavour);
-					}
-				});
-			};
-
-			auto for_each_melee = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::melee>([&](const auto& id, const auto& flavour) {
-					callback(id, flavour);
-				});
-			};
-
-			auto for_each_pistol = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::PISTOLS) {
-						callback(id, flavour);
-					}
-				});
-			};
-
-			auto for_each_smg = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::SUBMACHINE_GUNS) {
-						callback(id, flavour);
-					}
-				});
-			};
-
-			auto for_each_shotgun = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					const auto buy_type = flavour.template get<invariants::gun>().buy_type;
-
-					if (buy_type == buy_menu_type::SHOTGUNS) {
-						callback(id, flavour);
-						return;
-					}
-
-					if (buy_type != buy_menu_type::COUNT) {
-						return;
-					}
-
-					if (is_shotgun_like(cosm, id)) {
-						callback(id, flavour);
-					}
-				});
-			};
-
-			auto for_each_tool = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::tool>(
-					[&](const auto& id, const auto& flavour) {
-						if (::is_backpack_like(flavour) || !::is_armor_like(flavour)) {
-							callback(id, flavour);
-						}
-					}
-				);
-
-				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (flavour.template get<invariants::gun>().buy_type == buy_menu_type::TOOLS) {
-						callback(id, flavour);
-					}
-				});
-			};
-
-			auto for_each_armor = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::tool>(
-					[&](const auto& id, const auto& flavour) {
-						if (::is_armor_like(flavour)) {
-							callback(id, flavour);
-						}
-					}
-				);
-			};
-
-			auto for_each_grenade = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::hand_fuse>(callback);
-			};
-
-			switch (current_menu) {
-				case buy_menu_type::MELEE: {
-					do_item_menu(
-						item_holding_stance::KNIFE_LIKE,
-						for_each_melee
-					);
-					break;
-				}
-
-				case buy_menu_type::PISTOLS: {
-					do_item_menu(
-						item_holding_stance::PISTOL_LIKE,
-						for_each_pistol
-					);
-					break;
-				}
-
-				case buy_menu_type::SUBMACHINE_GUNS: {
-					/*
-						No stance filter: for_each_smg already picks guns
-						with buy_type == SUBMACHINE_GUNS, and SMGs may use
-						either RIFLE_LIKE or PISTOL_LIKE stances.
-					*/
-					do_item_menu(
-						std::nullopt,
-						for_each_smg
-					);
-					break;
-				}
-
-				case buy_menu_type::RIFLES: {
-					do_item_menu(
-						item_holding_stance::RIFLE_LIKE,
-						for_each_rifle
-					);
-					break;
-				}
-
-				case buy_menu_type::HEAVY_GUNS: {
-					do_item_menu(
-						item_holding_stance::HEAVY_LIKE,
-						for_each_gun
-					);
-					break;
-				}
-
-				case buy_menu_type::SHOTGUNS: {
-					do_item_menu(
-						item_holding_stance::RIFLE_LIKE,
-						for_each_shotgun
-					);
-					break;
-				}
-
-				case buy_menu_type::SPELLS: {
-					do_spells_menu();
-					break;
-				}
-
-				case buy_menu_type::GRENADES: {
-					do_item_menu(
-						std::nullopt,
-						for_each_grenade
-					);
-
-					break;
-				}
-
-				case buy_menu_type::ARMORS: {
-					do_item_menu(
-						std::nullopt,
-						for_each_armor
-					);
-
-					break;
-				}
-
-				case buy_menu_type::TOOLS: {
-					do_item_menu(
-						std::nullopt,
-						for_each_tool
-					);
-
-					break;
-				}
-
-				default: break;
+			if (current_menu == buy_menu_type::SPELLS) {
+				do_spells_menu();
+			}
+			else {
+				do_item_menu(buyable_items_of(current_menu));
 			}
 
 #if BUY_CATEGORIES_SEPARATE
