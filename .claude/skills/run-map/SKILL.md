@@ -38,6 +38,11 @@ Build into `build/Debug-x64-clang-claude` first (`BIN` defaults to it), never `b
 - Never run the user's `build/current` build and edit headers at the same time; builds are memory-capped by CMake
   (job pools), don't pass a higher `-j`.
 
+- **Desyncs:** the client compares its state with the server's hash and logs `Client desynchronized at step` -
+  `run_map.sh` prints their count; anything above 0 is a determinism bug (a client that joined mid-round
+  has the server's snapshot, so a desync right after joining means the snapshot misses something - see
+  `never_changes_in_game` in net_solvable_stream.h).
+
 ## The editor and playtest
 
 `../build/Debug-x64-clang-claude/Hypersomnia --edit <project dir> --playtest` from `hypersomnia/` - always on a scratch

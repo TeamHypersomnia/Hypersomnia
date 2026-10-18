@@ -8,6 +8,7 @@
 #                screenshots and xinput.py clicks) | none
 #   SECS         how long (default 180); KEEP=1 returns at once and leaves everything running (pids in <dir>/*.pid)
 #   SERVER_EXTRA more JSON fields of "server", e.g. ', "bot_difficulty": "HARD"'
+#   CONF_EXTRA   more top-level JSON fields for both the server and the client, e.g. ', "debug": { "log_solvable_hashes": true }'
 #   BIN, PORT, SCRATCH, LOG_GREP (printed from the server log at the end), LOG_TAIL
 #
 # Prints the run dir (server log <dir>/srv.out, client log <dir>/c.out). Heartbeats go to 127.0.0.1:1, never production.
@@ -40,10 +41,10 @@ fi
 cat > $T/srv/user/conf.d/test.json <<J
 { "server_start": { "ip": "127.0.0.1", "port": $PORT, "slots": 16 },
   "server": { "server_name": "map test", "arena": "$MAP", "bots": $BOTS_JSON, "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
-              "webrtc_port_range_begin": 19930, "webrtc_port_range_end": 19935 $SERVER_EXTRA } }
+              "webrtc_port_range_begin": 19930, "webrtc_port_range_end": 19935 $SERVER_EXTRA } $CONF_EXTRA }
 J
 cat > $T/c/user/conf.d/test.json <<J
-{ "identity_broker_url": "http://127.0.0.1:1", "window": { "fullscreen": false, "size": [1280, 720] }, "client": { "nickname": "maptest" } }
+{ "identity_broker_url": "http://127.0.0.1:1", "window": { "fullscreen": false, "size": [1280, 720] }, "client": { "nickname": "maptest" } $CONF_EXTRA }
 J
 
 cd $REPO/hypersomnia
@@ -78,5 +79,6 @@ sleep 22
 grep -m1 "Sending heartbeat through UDP to" $T/srv.out
 grep -m1 -E "Failed to load arena|Choosing arena" $T/srv.out
 grep -ciE "assert|segfault|terminate called" $T/srv.out $T/c.out 2>/dev/null
+echo "client desyncs: $(grep -c 'Client desynchronized' $T/c.out 2>/dev/null)"
 [ -n "$LOG_GREP" ] && grep -E "$LOG_GREP" $T/srv.out | tail -${LOG_TAIL:-60}
 exit 0
