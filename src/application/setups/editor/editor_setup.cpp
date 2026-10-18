@@ -2154,6 +2154,12 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		const auto portal_color = project.settings.debug_navmesh_portal_color;
 		const auto blank_tex = triangles.default_texture;
 
+		/*
+			Only the cells in view - a big map has tens of thousands of them.
+		*/
+
+		const auto visible = cone.get_visible_world_rect_aabb();
+
 		for (const auto& island : navmesh.islands) {
 			const auto cell_size = island.cell_size;
 
@@ -2162,9 +2168,27 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			}
 
 			const auto size_in_cells = island.get_size_in_cells();
+			const auto island_lt = vec2(island.bound.lt());
 
-			for (uint32_t cy = 0; cy < size_in_cells.y; ++cy) {
-				for (uint32_t cx = 0; cx < size_in_cells.x; ++cx) {
+			auto to_cell_range = [&](const float world, const float lt, const uint32_t cells, const bool ceil) {
+				const auto cell = (world - lt) / cell_size;
+				const auto rounded = ceil ? std::ceil(cell) : std::floor(cell);
+
+				return static_cast<uint32_t>(std::clamp(rounded, 0.0f, static_cast<float>(cells)));
+			};
+
+			const auto first = vec2u(
+				to_cell_range(visible.l, island_lt.x, size_in_cells.x, false),
+				to_cell_range(visible.t, island_lt.y, size_in_cells.y, false)
+			);
+
+			const auto last = vec2u(
+				to_cell_range(visible.r, island_lt.x, size_in_cells.x, true),
+				to_cell_range(visible.b, island_lt.y, size_in_cells.y, true)
+			);
+
+			for (uint32_t cy = first.y; cy < last.y; ++cy) {
+				for (uint32_t cx = first.x; cx < last.x; ++cx) {
 					const auto cell_xy = vec2u(cx, cy);
 					const auto world_xy = vec2(island.bound.lt()) + cell_xy * cell_size;
 					const auto cell_value = island.get_cell(cell_xy);
