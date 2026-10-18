@@ -1,5 +1,7 @@
 #if !IS_PRODUCTION_BUILD
 #if BUILD_UNIT_TESTS
+#include <algorithm>
+#include <cmath>
 #include <Catch/single_include/catch2/catch.hpp>
 
 #include "augs/math/vec2.h"
@@ -30,14 +32,24 @@ static random_waypoints_input make_input(const cosmos_navmesh& navmesh, const ui
 	in.navmesh = &navmesh;
 	in.seed = seed;
 	in.free_distance = [](const vec2 from, const vec2 to) { return (to - from).length(); };
+
+	/*
+		The spacing of 1100 px between patrols of a team, as the official maps have.
+	*/
+
+	in.density = 0.5f;
 	return in;
 }
 
-static std::vector<vec2> positions_of(const std::vector<random_waypoint>& waypoints, const point_marker_type type) {
+static std::vector<vec2> positions_of(
+	const std::vector<random_waypoint>& waypoints,
+	const point_marker_type type,
+	const faction_type faction = faction_type::COUNT
+) {
 	std::vector<vec2> out;
 
 	for (const auto& w : waypoints) {
-		if (w.type == type) {
+		if (w.type == type && (faction == faction_type::COUNT || w.faction == faction)) {
 			out.push_back(w.pos);
 		}
 	}
@@ -89,14 +101,36 @@ TEST_CASE("RandomWaypoints OpenField") {
 		REQUIRE(pushes_of(faction_type::METROPOLIS) >= 1);
 	}
 
-	SECTION("Patrols keep the spacing - on an open field the straight distance is about the path one") {
-		const auto patrols = positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL);
+	SECTION("Patrols of a team keep the spacing - on an open field the straight distance is about the path one") {
+		for (const auto faction : { faction_type::METROPOLIS, faction_type::RESISTANCE }) {
+			const auto patrols = positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL, faction);
 
-		for (std::size_t a = 0; a < patrols.size(); ++a) {
-			for (std::size_t b = a + 1; b < patrols.size(); ++b) {
-				REQUIRE((patrols[a] - patrols[b]).length() >= 1100.0f * 0.7f);
+			for (std::size_t a = 0; a < patrols.size(); ++a) {
+				for (std::size_t b = a + 1; b < patrols.size(); ++b) {
+					REQUIRE((patrols[a] - patrols[b]).length() >= 1100.0f * 0.7f);
+				}
 			}
 		}
+	}
+
+	SECTION("Each team has its own patrols - none for both") {
+		REQUIRE(positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL, faction_type::METROPOLIS).size() >= 2);
+		REQUIRE(positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL, faction_type::RESISTANCE).size() >= 2);
+		REQUIRE(positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL, faction_type::ANY).empty());
+	}
+
+	SECTION("The attackers' patrols stay around the bombsite") {
+		const auto site_center = ::cell_center(island, vec2u(40, 8));
+
+		for (const auto& w : positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL, faction_type::RESISTANCE)) {
+			REQUIRE((w - site_center).length() <= 1100.0f * 1.5f + 512.0f);
+		}
+	}
+
+	SECTION("Density 1 has about twice the patrols of density 0.5") {
+		in.density = 1.0f;
+		const auto denser = positions_of(::generate_random_waypoints(in), point_marker_type::BOT_WAYPOINT_PATROL);
+		REQUIRE(denser.size() > positions_of(first, point_marker_type::BOT_WAYPOINT_PATROL).size() * 3 / 2);
 	}
 
 	SECTION("The author's patrols are complemented, never covered again") {
@@ -109,6 +143,44 @@ TEST_CASE("RandomWaypoints OpenField") {
 
 		for (const auto& w : positions_of(::generate_random_waypoints(in), point_marker_type::BOT_WAYPOINT_PATROL)) {
 			REQUIRE((w - authors).length() >= 1100.0f * 0.7f);
+		}
+	}
+}
+
+TEST_CASE("RandomWaypoints DefendersNeverFaceAwayFromTheAttackers") {
+	/*
+		Every spot sees farthest towards the defenders' spawn (a long corridor to it) - the longest view alone
+		would turn the defenders' patrols with their backs to where the attackers come from (de_silo's "Random patrol 28").
+	*/
+
+	cosmos_navmesh navmesh;
+	navmesh.islands.push_back(::make_open_island(vec2i::zero, vec2u(60, 30)));
+	const auto& island = navmesh.islands[0];
+
+	auto in = ::make_input(navmesh, 11);
+	in.resistance_spawns = { ::cell_center(island, vec2u(2, 15)) };
+	in.metropolis_spawns = { ::cell_center(island, vec2u(57, 15)) };
+	in.bombsites = { { ltrb::center_and_size(::cell_center(island, vec2u(30, 15)), vec2::square(512)), marker_letter_type::A } };
+
+	in.free_distance = [](const vec2 from, const vec2 to) {
+		const auto dir = to - from;
+		const bool towards_defenders = dir.x > 0.0f && std::abs(dir.y) < dir.x * 0.3f;
+		return towards_defenders ? dir.length() : std::min(dir.length(), 2500.0f);
+	};
+
+	for (uint32_t seed = 1; seed <= 20; ++seed) {
+		in.seed = seed;
+
+		for (const auto& w : ::generate_random_waypoints(in)) {
+			if (w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.faction == faction_type::METROPOLIS) {
+				/*
+					On an open field the attackers come straight from their spawn.
+				*/
+
+				const auto attackers_from = in.resistance_spawns[0] - w.pos;
+				const auto off = vec2::from_degrees(w.rotation).degrees_between(attackers_from);
+				REQUIRE(off <= 90.0f);
+			}
 		}
 	}
 }
@@ -136,14 +208,16 @@ TEST_CASE("RandomWaypoints EveryBombsiteGetsPatrols") {
 
 		const auto generated = ::generate_random_waypoints(in);
 
-		auto patrols_of = [&](const marker_letter_type letter) {
+		auto patrols_of = [&](const marker_letter_type letter, const faction_type faction) {
 			return std::count_if(generated.begin(), generated.end(), [&](const auto& w) {
-				return w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.letter == letter;
+				return w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.letter == letter && w.faction == faction;
 			});
 		};
 
-		REQUIRE(patrols_of(marker_letter_type::A) >= 2);
-		REQUIRE(patrols_of(marker_letter_type::B) >= 2);
+		for (const auto faction : { faction_type::METROPOLIS, faction_type::RESISTANCE }) {
+			REQUIRE(patrols_of(marker_letter_type::A, faction) >= 2);
+			REQUIRE(patrols_of(marker_letter_type::B, faction) >= 2);
+		}
 	}
 }
 

@@ -7,7 +7,7 @@
 #include "game/modes/ai/random_waypoints_generator.h"
 
 /*
-	The spacing between waypoints of one kind at density 1 - by path, about what the official maps have between their patrols.
+	The spacing between waypoints of one kind (and team) at density 0.5 - by path, about what the official maps have between their patrols.
 	Pushes gather around the front line, so they may stand closer.
 */
 
@@ -23,6 +23,12 @@ static constexpr int min_rays_per_patrol = 6;
 static constexpr int max_rays_per_patrol = 16;
 static constexpr real32 ray_length = 3000.0f;
 static constexpr real32 covering_ray_length = 450.0f;
+
+/*
+	A defenders' patrol faces at most this far from where the attackers come - so never with its back to them.
+*/
+
+static constexpr real32 attackers_cone_degrees = 60.0f;
 
 /*
 	Where a cell lies between the two sides, in permille: 0 at the own side, 1000 at the other.
@@ -225,43 +231,125 @@ struct navmesh_cells {
 
 		return best_dir.degrees();
 	}
+
+	/*
+		The cells back along the shortest path to the sources of `towards`, at most max_steps of them.
+		Stops at a portal - beyond it the cells are elsewhere on the map.
+	*/
+
+	std::vector<std::size_t> path_towards(const std::size_t global, const std::vector<uint32_t>& towards, const int max_steps) const {
+		std::vector<std::size_t> path;
+		auto current = global;
+
+		for (int step = 0; step < max_steps; ++step) {
+			const auto i = island_of(current);
+			const auto size = layout.sizes[i];
+			const auto offset = layout.offsets[i];
+			const auto local = current - offset;
+			const auto x = static_cast<int>(local % size.x);
+			const auto y = static_cast<int>(local / size.x);
+
+			auto next = current;
+
+			for (int dy = -1; dy <= 1; ++dy) {
+				for (int dx = -1; dx <= 1; ++dx) {
+					const auto nx = x + dx;
+					const auto ny = y + dy;
+
+					if ((dx == 0 && dy == 0) || nx < 0 || ny < 0 || nx >= static_cast<int>(size.x) || ny >= static_cast<int>(size.y)) {
+						continue;
+					}
+
+					const auto neighbour = offset + static_cast<std::size_t>(ny * static_cast<int>(size.x) + nx);
+
+					if (towards[neighbour] < towards[next]) {
+						next = neighbour;
+					}
+				}
+			}
+
+			if (next == current) {
+				break;
+			}
+
+			path.push_back(next);
+			current = next;
+		}
+
+		return path;
+	}
 };
 
-patrol_spot_rating rate_patrol_spot(
+static real32 ray_degrees(const int r, const int num_rays) {
+	return 360.0f * static_cast<real32>(r) / static_cast<real32>(num_rays);
+}
+
+/*
+	How far the view reaches in num_rays directions evenly around pos.
+*/
+
+static std::vector<real32> cast_patrol_rays(
 	const vec2 pos,
 	const int num_rays,
 	const std::function<real32(vec2 from, vec2 to)>& free_distance
 ) {
-	patrol_spot_rating rating;
-
-	if (num_rays <= 0 || !free_distance) {
-		return rating;
-	}
-
-	std::vector<real32> lengths(static_cast<std::size_t>(num_rays));
-
-	auto ray_degrees = [&](const int r) {
-		return 360.0f * static_cast<real32>(r) / static_cast<real32>(num_rays);
-	};
-
-	auto best_ray = 0;
+	std::vector<real32> lengths;
 
 	for (int r = 0; r < num_rays; ++r) {
-		lengths[r] = free_distance(pos, pos + vec2::from_degrees(ray_degrees(r)) * ray_length);
+		lengths.push_back(free_distance(pos, pos + vec2::from_degrees(::ray_degrees(r, num_rays)) * ray_length));
+	}
 
-		if (lengths[r] > lengths[best_ray]) {
-			best_ray = r;
+	return lengths;
+}
+
+/*
+	The longest ray at most cone_degrees off `towards` - with no ray within the cone, the one nearest to `towards`.
+*/
+
+static int find_longest_ray_within(const std::vector<real32>& lengths, const real32 towards, const real32 cone_degrees) {
+	const auto num_rays = static_cast<int>(lengths.size());
+
+	auto best = -1;
+	auto nearest = 0;
+	auto nearest_off = 360.0f;
+
+	for (int r = 0; r < num_rays; ++r) {
+		const auto off = vec2::from_degrees(::ray_degrees(r, num_rays)).degrees_between(vec2::from_degrees(towards));
+
+		if (off < nearest_off) {
+			nearest_off = off;
+			nearest = r;
+		}
+
+		if (off <= cone_degrees && (best == -1 || lengths[r] > lengths[best])) {
+			best = r;
 		}
 	}
 
-	rating.facing = ray_degrees(best_ray);
-	rating.view_ahead = lengths[best_ray];
+	return best == -1 ? nearest : best;
+}
+
+/*
+	A spot facing the given ray: good with its back and sides covered and an open view ahead.
+*/
+
+static patrol_spot_rating rate_patrol_facing(const std::vector<real32>& lengths, const int facing_ray) {
+	patrol_spot_rating rating;
+
+	const auto num_rays = static_cast<int>(lengths.size());
+
+	if (num_rays <= 0) {
+		return rating;
+	}
+
+	rating.facing = ::ray_degrees(facing_ray, num_rays);
+	rating.view_ahead = lengths[facing_ray];
 
 	auto behind = 0;
 	auto covered_behind = 0;
 
 	for (int r = 0; r < num_rays; ++r) {
-		const auto off_facing = vec2::from_degrees(ray_degrees(r)).degrees_between(vec2::from_degrees(rating.facing));
+		const auto off_facing = vec2::from_degrees(::ray_degrees(r, num_rays)).degrees_between(vec2::from_degrees(rating.facing));
 
 		if (off_facing > 112.5f) {
 			++behind;
@@ -279,6 +367,19 @@ patrol_spot_rating rate_patrol_spot(
 	return rating;
 }
 
+patrol_spot_rating rate_patrol_spot(
+	const vec2 pos,
+	const int num_rays,
+	const std::function<real32(vec2 from, vec2 to)>& free_distance
+) {
+	if (num_rays <= 0 || !free_distance) {
+		return {};
+	}
+
+	const auto lengths = ::cast_patrol_rays(pos, num_rays, free_distance);
+	return ::rate_patrol_facing(lengths, ::find_longest_ray_within(lengths, 0.0f, 180.0f));
+}
+
 std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_input& in) {
 	std::vector<random_waypoint> output;
 
@@ -287,7 +388,13 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	}
 
 	auto rng = randomization(in.seed);
-	const auto density = std::clamp(in.density, 0.1f, 2.0f);
+
+	/*
+		Density 1 has twice the waypoints the official maps' authors placed (and half their spacing) -
+		patrols are split between the teams, so each team gets about as many as the authors placed for both.
+	*/
+
+	const auto density = std::clamp(in.density, 0.1f, 2.0f) * 2.0f;
 	const auto cells = navmesh_cells(*in.navmesh);
 	const auto num_cells = cells.layout.total;
 
@@ -298,8 +405,8 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 
 	/*
 		The free cells reachable from any spawn are the playable area - the counts follow its size,
-		tuned so that de_silo, de_cyberaqua and fy_minilab get about as many as their authors placed
-		(1.6 patrols per million square pixels of free cells at most, a few pushes per side).
+		tuned so that at density 0.5 de_silo, de_cyberaqua and fy_minilab get about as many as their authors placed
+		(0.8 patrols per million square pixels of free cells at most, a few pushes per side) - density 1 doubles that.
 		The spacing usually stops the sampling earlier on a small or a twisted map.
 	*/
 
@@ -322,9 +429,11 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 		return static_cast<int>(v + 0.5f);
 	};
 
-	const auto patrol_cap = std::clamp(rounded(area_mpx * 1.6f * density), 4, 60);
-	const auto resistance_push_cap = std::clamp(rounded((3.0f + area_mpx / 20.0f) * density), 1, 8);
-	const auto metropolis_push_cap = std::clamp(rounded((2.0f + area_mpx / 30.0f) * density), 1, 6);
+	const auto patrol_cap = std::clamp(rounded(area_mpx * 1.6f * density), 4, 120);
+	const auto metropolis_patrol_cap = std::max(2, rounded(static_cast<real32>(patrol_cap) * 0.6f));
+	const auto resistance_patrol_cap = std::max(2, patrol_cap - metropolis_patrol_cap);
+	const auto resistance_push_cap = std::clamp(rounded((3.0f + area_mpx / 20.0f) * density), 1, 16);
+	const auto metropolis_push_cap = std::clamp(rounded((2.0f + area_mpx / 30.0f) * density), 1, 12);
 
 	/*
 		The nearest bombsite of every cell, by path.
@@ -489,76 +598,86 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	const bool has_sites = !in.bombsites.empty();
 
 	/*
-		Patrols - shared by both teams, between the spawns (in gun game anywhere reachable),
-		each guarding the bombsite nearest to it.
+		Patrols - in a bomb mode one set per team, each guarding the bombsite nearest to it:
+		the defenders' where they get first, along the routes and around the bombsites,
+		the attackers' anywhere around a bombsite - where they wait for the plant and guard the bomb,
+		some in sight of it, some hidden. Without both sides and bombsites (gun game) one set for everyone.
 	*/
 
-	std::vector<std::size_t> patrol_outputs;
+	enum class patrol_facing {
+		/* Where it sees the farthest. */
+		LONGEST_VIEW,
+		/* The longest view towards where the attackers come from - never the back to them. */
+		TOWARDS_ATTACKERS,
+		/* Any open direction, the longer the view the likelier - the defenders come from anywhere late in the round. */
+		RANDOM_OPEN
+	};
 
-	{
-		std::vector<std::size_t> candidates;
+	struct patrol_output {
+		std::size_t index = 0;
+		patrol_facing facing = patrol_facing::LONGEST_VIEW;
+		std::optional<real32> attackers_from;
+	};
 
-		for (std::size_t c = 0; c < num_cells; ++c) {
-			if (!cells.free(c)) {
-				continue;
-			}
+	std::vector<patrol_output> patrol_outputs;
 
-			const auto own = from_resistance[c];
-			const auto other = from_metropolis[c];
+	const bool per_team_patrols = has_both_sides && has_sites;
 
-			/*
-				Around a bombsite always - even one right next to a spawn.
-			*/
+	const auto site_scale = static_cast<uint64_t>(spacing) * 2;
 
-			const bool near_site = from_site[c] != unreachable && from_site[c] <= spacing * 2;
-
-			if (has_both_sides && !near_site) {
-				if (own == unreachable || other == unreachable) {
-					continue;
-				}
-
-				const auto front = ::calc_front_permille(own, other);
-
-				if (front < 150 || front > 850) {
-					continue;
-				}
-			}
-			else if (own == unreachable && other == unreachable) {
-				continue;
-			}
-
-			candidates.push_back(c);
+	auto calc_site_weight = [&](const std::size_t c) -> uint64_t {
+		if (from_site[c] == unreachable) {
+			return 1000;
 		}
 
-		/*
-			Patrols guard the bombsites - like on the official maps, most stand around them, the rest along the routes.
-		*/
+		return 1000 * site_scale / (site_scale + from_site[c]);
+	};
 
-		const auto site_scale = static_cast<uint64_t>(spacing) * 2;
+	/*
+		Where the attackers come to a cell from: the farthest point of their shortest path to it still in sight -
+		where they show up. Up to 3000 px back along the path, at most 6 rays per patrol to find it.
+	*/
 
-		auto calc_site_weight = [&](const std::size_t c) -> uint64_t {
-			if (from_site[c] == unreachable) {
-				return 1000;
-			}
+	const auto approach_cells = std::max(1, static_cast<int>(3000.0f / cell_size));
 
-			return 1000 * site_scale / (site_scale + from_site[c]);
-		};
+	auto calc_attackers_from = [&](const std::size_t cell) -> std::optional<real32> {
+		const auto path = cells.path_towards(cell, from_resistance, approach_cells);
 
-		std::vector<uint32_t> weights;
+		if (path.empty()) {
+			return std::nullopt;
+		}
 
-		for (const auto c : candidates) {
-			if (in.gun_game || !has_sites) {
-				weights.push_back(in.gun_game ? 1000u : calc_route_weight(c));
-			}
-			else {
-				weights.push_back(static_cast<uint32_t>((calc_site_weight(c) * 7 + calc_route_weight(c) * 3) / 10));
+		const auto from = cells.center(cell);
+		auto seen = path.front();
+
+		if (in.free_distance) {
+			const auto num = static_cast<int>(path.size());
+			const auto step = std::max(1, num / 6);
+
+			for (int i = num - 1; i > 0; i -= step) {
+				const auto to = cells.center(path[i]);
+
+				if (in.free_distance(from, to) >= (to - from).length() - 1.0f) {
+					seen = path[i];
+					break;
+				}
 			}
 		}
 
-		auto picks = sample(candidates, weights, existing_cells(point_marker_type::BOT_WAYPOINT_PATROL, faction_type::ANY), patrol_cap, spacing);
+		return (cells.center(seen) - from).degrees();
+	};
+
+	auto make_patrols = [&](
+		const faction_type faction,
+		const std::vector<std::size_t>& candidates,
+		const std::vector<uint32_t>& weights,
+		const int cap,
+		const patrol_facing facing
+	) {
+		auto picks = sample(candidates, weights, existing_cells(point_marker_type::BOT_WAYPOINT_PATROL, faction), cap, spacing);
 
 		/*
-			Bots patrol the bombsite they are assigned to, so every bombsite needs its own patrols -
+			Bots patrol the bombsite they are assigned to, so every bombsite needs patrols of each team -
 			one the sampling left without any gets the free cells nearest to it, spaced among themselves.
 		*/
 
@@ -574,7 +693,8 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 					}
 
 					for (const auto& w : in.existing) {
-						n += w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.letter == letter ? 1 : 0;
+						const bool same_side = faction == faction_type::ANY || w.faction == faction_type::ANY || w.faction == faction;
+						n += same_side && w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.letter == letter ? 1 : 0;
 					}
 
 					return n;
@@ -620,13 +740,119 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 			random_waypoint w;
 			w.pos = cells.center(cell);
 			w.type = point_marker_type::BOT_WAYPOINT_PATROL;
-			w.faction = faction_type::ANY;
+			w.faction = faction;
 			w.letter = !in.gun_game && has_sites ? nearest_site[cell] : marker_letter_type::A;
 			w.camp = true;
 
-			patrol_outputs.push_back(output.size());
+			patrol_output entry;
+			entry.index = output.size();
+			entry.facing = facing;
+
+			if (facing == patrol_facing::TOWARDS_ATTACKERS) {
+				entry.attackers_from = calc_attackers_from(cell);
+			}
+
+			patrol_outputs.push_back(entry);
 			output.push_back(w);
 		}
+	};
+
+	if (per_team_patrols) {
+		/*
+			Defenders: cells they get to first, and around the bombsites - even one right next to the attackers' spawn.
+		*/
+
+		{
+			std::vector<std::size_t> candidates;
+			std::vector<uint32_t> weights;
+
+			for (std::size_t c = 0; c < num_cells; ++c) {
+				if (!cells.free(c) || from_resistance[c] == unreachable || from_metropolis[c] == unreachable) {
+					continue;
+				}
+
+				const bool near_site = from_site[c] != unreachable && from_site[c] <= spacing * 2;
+				const auto front = ::calc_front_permille(from_metropolis[c], from_resistance[c]);
+
+				if (!near_site && (front < 50 || front > 550)) {
+					continue;
+				}
+
+				candidates.push_back(c);
+				weights.push_back(static_cast<uint32_t>((calc_site_weight(c) * 7 + calc_route_weight(c) * 3) / 10));
+			}
+
+			make_patrols(faction_type::METROPOLIS, candidates, weights, metropolis_patrol_cap, patrol_facing::TOWARDS_ATTACKERS);
+		}
+
+		/*
+			Attackers: anywhere around a bombsite, evenly - not only by the bomb.
+		*/
+
+		{
+			std::vector<std::size_t> candidates;
+			std::vector<uint32_t> weights;
+
+			for (std::size_t c = 0; c < num_cells; ++c) {
+				if (!cells.free(c) || from_resistance[c] == unreachable) {
+					continue;
+				}
+
+				if (from_site[c] == unreachable || from_site[c] > spacing * 3 / 2) {
+					continue;
+				}
+
+				candidates.push_back(c);
+				weights.push_back(1000);
+			}
+
+			make_patrols(faction_type::RESISTANCE, candidates, weights, resistance_patrol_cap, patrol_facing::RANDOM_OPEN);
+		}
+	}
+	else {
+		std::vector<std::size_t> candidates;
+		std::vector<uint32_t> weights;
+
+		for (std::size_t c = 0; c < num_cells; ++c) {
+			if (!cells.free(c)) {
+				continue;
+			}
+
+			const auto own = from_resistance[c];
+			const auto other = from_metropolis[c];
+
+			/*
+				Around a bombsite always - even one right next to a spawn.
+			*/
+
+			const bool near_site = from_site[c] != unreachable && from_site[c] <= spacing * 2;
+
+			if (has_both_sides && !near_site) {
+				if (own == unreachable || other == unreachable) {
+					continue;
+				}
+
+				const auto front = ::calc_front_permille(own, other);
+
+				if (front < 150 || front > 850) {
+					continue;
+				}
+			}
+			else if (own == unreachable && other == unreachable) {
+				continue;
+			}
+
+			candidates.push_back(c);
+
+			if (in.gun_game || !has_sites) {
+				weights.push_back(in.gun_game ? 1000u : calc_route_weight(c));
+			}
+			else {
+				weights.push_back(static_cast<uint32_t>((calc_site_weight(c) * 7 + calc_route_weight(c) * 3) / 10));
+			}
+		}
+
+		make_patrols(faction_type::ANY, candidates, weights, patrol_cap, patrol_facing::LONGEST_VIEW);
 	}
 
 	/*
@@ -691,9 +917,56 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	if (in.free_distance && !patrol_outputs.empty()) {
 		const auto rays_per_patrol = std::clamp(max_total_rays / static_cast<int>(patrol_outputs.size()), min_rays_per_patrol, max_rays_per_patrol);
 
-		for (const auto index : patrol_outputs) {
-			auto& w = output[index];
-			const auto rating = ::rate_patrol_spot(w.pos, rays_per_patrol, in.free_distance);
+		for (const auto& entry : patrol_outputs) {
+			auto& w = output[entry.index];
+			const auto lengths = ::cast_patrol_rays(w.pos, rays_per_patrol, in.free_distance);
+
+			const auto facing_ray = [&]() {
+				switch (entry.facing) {
+					case patrol_facing::TOWARDS_ATTACKERS:
+						if (entry.attackers_from.has_value()) {
+							return ::find_longest_ray_within(lengths, *entry.attackers_from, attackers_cone_degrees);
+						}
+
+						return ::find_longest_ray_within(lengths, 0.0f, 180.0f);
+
+					case patrol_facing::RANDOM_OPEN: {
+						/*
+							Weighted by the view - an open direction, never a wall right ahead.
+						*/
+
+						auto total = uint64_t(0);
+						std::vector<uint32_t> ray_weights;
+
+						for (const auto length : lengths) {
+							const auto weight = length > covering_ray_length ? static_cast<uint32_t>(length) : 0u;
+							ray_weights.push_back(weight);
+							total += weight;
+						}
+
+						if (total == 0) {
+							return ::find_longest_ray_within(lengths, 0.0f, 180.0f);
+						}
+
+						auto drawn = static_cast<uint64_t>(rng.randval(0u, static_cast<unsigned>(std::min<uint64_t>(total - 1, 0xffffffffu))));
+
+						for (std::size_t r = 0; r < ray_weights.size(); ++r) {
+							if (drawn < ray_weights[r]) {
+								return static_cast<int>(r);
+							}
+
+							drawn -= ray_weights[r];
+						}
+
+						return static_cast<int>(ray_weights.size()) - 1;
+					}
+
+					default:
+						return ::find_longest_ray_within(lengths, 0.0f, 180.0f);
+				}
+			}();
+
+			const auto rating = ::rate_patrol_facing(lengths, facing_ray);
 
 			w.rotation = rating.facing;
 

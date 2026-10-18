@@ -16,10 +16,12 @@ struct cosmos_navmesh;
 	the author's waypoints to complement, and a ray query.
 
 	Path distances over the navmesh cells from each team's spawns tell where the middle of the map is:
-	pushes lie a little past it towards the enemy (the attackers' towards the bombsites), patrols between the spawns.
+	pushes lie a little past it towards the enemy (the attackers' towards the bombsites).
+	With bombsites each team has its own patrols: the defenders' where they get first, facing where the attackers come from,
+	the attackers' anywhere around the bombsites (waiting for the plant, guarding the bomb), facing any open direction.
 	Within each kind, weighted Poisson disk sampling spreads them out - never closer by path than the spacing
 	to each other or to the author's waypoints, preferring the main routes between the spawns and the bombsites.
-	Rays only rate the chosen patrols: how covered the spot is decides how long a bot camps there,
+	Rays only rate the chosen patrols: which way the bot faces, how covered the spot is - how long a bot camps there,
 	how far it sees ahead - whether it looks far.
 */
 
