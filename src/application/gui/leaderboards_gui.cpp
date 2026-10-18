@@ -194,24 +194,11 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		return;
 	}
 
-	const bool showing_changelog = in.show_changelog || reopened_changelog;
-
-	auto perform_changelog = [&]() {
-		if (::perform_changelog_view(in.changelog)) {
-			acknowledged_changelog = true;
-			reopened_changelog = false;
-		}
-	};
-
 	/*
-		Brings the changelog back after OK - plain gray text, highlighted only on hover.
+		Opens the changelog window - plain gray text, highlighted only on hover.
 	*/
 
 	auto changelog_button = [&]() {
-		if (showing_changelog) {
-			return;
-		}
-
 		const auto label = "Changelog";
 		const auto label_w = ImGui::CalcTextSize(label).x;
 
@@ -236,11 +223,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 		if (ImGui::Button("Try to refresh")) {
 			request_refresh();
-		}
-
-		if (showing_changelog) {
-			ImGui::Separator();
-			perform_changelog();
 		}
 
 		return;
@@ -282,12 +264,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	if (refresh_in_progress() && !refreshed_once) {
 		text_color("Downloading leaderboards...", yellow);
-
-		if (showing_changelog) {
-			ImGui::Separator();
-			perform_changelog();
-		}
-
 		return;
 	}
 
@@ -684,11 +660,6 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			ImGui::NextColumn();
 		}
 	};
-
-	if (showing_changelog) {
-		perform_changelog();
-		return;
-	}
 
 	simple_two_tabs(
 		type,

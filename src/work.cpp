@@ -4203,14 +4203,7 @@ work_result work(
 			config.website_url + "/user/" + account,
 			signed_in_account ? std::string() : identity_key::full_form(identity->public_key()),
 			provider_name(),
-			identity->sign_in_failed(in, now) && !identity->is_requesting(),
-
-			/*
-				The changelog drawn in place of the leaderboards - kept for comparison, not triggered for now.
-			*/
-
-			false,
-			get_changelog_input()
+			identity->sign_in_failed(in, now) && !identity->is_requesting()
 #if PLATFORM_WEB
 			/*
 				Outside CrazyGames the account is the key in the browser - always there.
@@ -4225,11 +4218,6 @@ work_result work(
 		if (leaderboards_gui.wants_sign_in_retry) {
 			leaderboards_gui.wants_sign_in_retry = false;
 			retry_sign_in();
-		}
-
-		if (leaderboards_gui.acknowledged_changelog) {
-			leaderboards_gui.acknowledged_changelog = false;
-			acknowledge_changelog();
 		}
 
 		if (leaderboards_gui.wants_changelog_window) {
