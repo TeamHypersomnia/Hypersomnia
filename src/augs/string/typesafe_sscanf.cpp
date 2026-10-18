@@ -43,6 +43,11 @@ namespace {
 	}
 }
 
+bool is_valid_version(const std::string& version) {
+	parsed_version unused;
+	return ::parse_version(version, unused);
+}
+
 bool is_more_recent(const std::string& next_version, const std::string& current_version) {
 	parsed_version a;
 	parsed_version b;

@@ -52,7 +52,7 @@ changelog_entries parse_changelog(const std::string& source) {
 	auto bodies = std::vector<std::string>();
 
 	/*
-		Only collects text of the versions we keep. Unreleased and the intro are skipped.
+		Only collects text of the versions we keep. The intro, [Unreleased] and any other ## heading without an X.Y.Z version are skipped.
 	*/
 
 	bool collecting = false;
@@ -75,7 +75,7 @@ changelog_entries parse_changelog(const std::string& source) {
 				return header.substr(0, header.find(' '));
 			}();
 
-			collecting = !version.empty() && version != "Unreleased";
+			collecting = ::is_valid_version(version);
 
 			if (collecting) {
 				auto entry = changelog_entry();
@@ -143,6 +143,8 @@ TEST_CASE("ParseChangelog", "[changelog]") {
 		"\n"
 		"## [3.0.0] - 1970-01-02\n"
 		"- Old.\n"
+		"## Notes\n"
+		"- Not a version.\n"
 		"## 1.0.0\n"
 	);
 

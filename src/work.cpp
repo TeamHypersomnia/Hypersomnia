@@ -2059,7 +2059,7 @@ work_result work(
 #endif
 
 	/*
-		Development builds pick up edits to CHANGELOG.md within a second, whichever view shows it.
+		Development builds pick up edits to CHANGELOG.md within a second.
 	*/
 
 	WEBSTATIC auto reload_changelog_if_changed = [&]() {
@@ -2094,7 +2094,14 @@ work_result work(
 	*/
 
 	WEBSTATIC bool reopen_settings_after_changelog = false;
-	WEBSTATIC bool changelog_auto_opened = false;
+	WEBSTATIC bool changelog_auto_open_checked = false;
+
+	/*
+		As at the start - leaving the tutorial for the menu sets skip_tutorial before the menu's first frame.
+	*/
+
+	WEBSTATIC const bool left_tutorial_before_this_run = config.skip_tutorial;
+	(void)left_tutorial_before_this_run;
 
 	WEBSTATIC auto open_changelog_window = [&]() {
 		if (settings_gui.is_open()) {
@@ -2102,16 +2109,16 @@ work_result work(
 			settings_gui.close();
 		}
 
+		/*
+			Always opens on the newest version.
+		*/
+
+		changelog_view.selected = 0;
 		changelog_window.open();
 	};
 
 	WEBSTATIC auto perform_changelog_window = [&]() {
 		reload_changelog_if_changed();
-
-		if (settings_gui.wants_changelog) {
-			settings_gui.wants_changelog = false;
-			open_changelog_window();
-		}
 
 		if (changelog_window.perform(get_changelog_input())) {
 			acknowledge_changelog();
@@ -4164,9 +4171,26 @@ work_result work(
 			A release not acknowledged yet opens the changelog once per run (production builds only - see should_show_changelog).
 		*/
 
-		if (!changelog_auto_opened && ::should_show_changelog(changelog, config.last_seen_changelog_version)) {
-			changelog_auto_opened = true;
-			open_changelog_window();
+		if (!changelog_auto_open_checked) {
+			changelog_auto_open_checked = true;
+
+			if (::should_show_changelog(changelog, config.last_seen_changelog_version)) {
+#if PLATFORM_WEB
+				/*
+					A CrazyGames player who has not even left the tutorial yet is new - the release is acknowledged
+					for them quietly, and only the next one opens.
+				*/
+
+				if (params.is_crazygames && !left_tutorial_before_this_run) {
+					acknowledge_changelog();
+				}
+				else {
+					open_changelog_window();
+				}
+#else
+				open_changelog_window();
+#endif
+			}
 		}
 
 		leaderboards_gui.show = !browse_servers_gui.show && !changelog_window.is_open();
@@ -5122,8 +5146,15 @@ work_result work(
 #endif
 			
 
-				if (!has_current_setup() && !changelog_window.is_open()) {
+				/*
+					A modal - the changelog yields to it.
+				*/
+
+				if (!has_current_setup()) {
 					perform_last_exit_incorrect();
+				}
+
+				if (!has_current_setup() && !changelog_window.is_open()) {
 #if BUILD_NETWORKING
 					perform_start_client_gui();
 					perform_start_server_gui();

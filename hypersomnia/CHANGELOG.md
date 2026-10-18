@@ -10,7 +10,7 @@
 
 - **Game speeds.**
 	- **Official servers** now have 25% slower gameplay.
-	- This is to acommodate newbies.
+	- This is to accommodate newbies.
 	- **You can customize speeds** in your own matches!
 	- You can easily host a match with the **original 1.0x speed.**
 	- Tweak this easily from `Host a server` or use `/speed` and `/bspeed` in-game.
@@ -30,7 +30,7 @@
 	- Carry up to 2 guns by default.
 	- A backpack lets you carry 3, and halves the weight of holstered weapons.
 	- Buying at the limit drops your cheapest gun.
-	- "Pickup swaps wielded firearm" setting in Controls → Inventory.
+	- "Pickup swaps wielded firearm" setting in Controls > Inventory.
 - **Public-key cryptography.**
 	- We're now using `Ed25519` to identify servers and players.
 	- Connections are secure - every server has its own public key.
@@ -70,7 +70,7 @@
 	- Exactly like was the case with grenades.
 - After planting, the gun goes back to your hand.
 	- The bomb key works like a hotbar number.
-- Shortened bullet traces a bit as they werea bit excessive.
+- Shortened bullet traces a bit as they were a bit excessive.
 - Bots see only as far as a player standing in their spot would.
 - Bots using sniper rifles wait a moment before the first shot. 
 

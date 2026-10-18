@@ -225,6 +225,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 			request_refresh();
 		}
 
+		changelog_button();
 		return;
 	}
 
@@ -264,6 +265,7 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	if (refresh_in_progress() && !refreshed_once) {
 		text_color("Downloading leaderboards...", yellow);
+		changelog_button();
 		return;
 	}
 

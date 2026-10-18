@@ -37,3 +37,9 @@ struct hypersomnia_version {
 };
 
 bool is_more_recent(const std::string& next_version, const std::string& current_version);
+
+/*
+	X.Y.Z, optionally with -preN.
+*/
+
+bool is_valid_version(const std::string& version);

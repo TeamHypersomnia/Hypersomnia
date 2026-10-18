@@ -7,7 +7,7 @@ description: Write or update CHANGELOG.md entries for a new Hypersomnia version 
 
 The real file is `hypersomnia/CHANGELOG.md`. The repository root `CHANGELOG.md` is a symlink to it.
 It ships with the game and is parsed at runtime (`application/gui/changelog_entry.cpp` + `augs/string/simple_markdown.cpp`).
-It is shown in place of the leaderboards until the player clicks OK, and from `Settings -> General -> Show changelog`.
+It opens as a window once per release until the player acknowledges it (OK, X or Escape), and from the Changelog button next to the leaderboards' "Welcome home,".
 Versions older than `CHANGELOG_SINCE_VERSION` (`changelog_entry.h`) are not shown in-game.
 
 The parser understands only a small markdown subset. Anything else shows up as literal text.
@@ -45,13 +45,15 @@ Rules:
    `## [Unreleased]` is skipped in-game.
 3. Section headings with `###`. Use `Added`, `Changed`, `Fixed`, `Removed` - they get their own colors (green, amber, blue, red). Other names render white.
 4. Bullets with `- `. Nest with one tab per level. A non-empty line right under a bullet continues it - leave an empty line before a new paragraph.
-   A top-level bullet with nested ones is drawn collapsed with an arrow and expands on click.
+   A top-level bullet with nested ones is drawn collapsed with a + and expands on click.
    So: a bold headline, and its explanation as nested points (`- **Game speeds.**` + `\t- Servers run at 0.75x by default.`).
    Short items stay on one line without nesting (`- **Changelog.** You're reading it.`).
 5. Inline: `**bold**`, `*italic*` / `_italic_`, `` `code` ``. Bold is the main emphasis - use it for headline features and `**Balance:**`-style prefixes.
    Links `[text](url)` show only the text. Images `![..](..)` on their own line are dropped.
 6. No tables, no HTML, no numbered lists (they render as plain paragraphs).
-7. Plain paragraphs are fine for a short intro under a heading, e.g. `Most bugs were introduced by bots in 1.3.0:`.
+7. Latin characters only - no arrows (→), emoji or other symbols: the game's fonts have no glyphs for them and show `?`.
+   Write `Controls > Inventory`, not `Controls → Inventory`.
+8. Plain paragraphs are fine for a short intro under a heading, e.g. `Most bugs were introduced by bots in 1.3.0:`.
 
 ## Style
 
@@ -62,5 +64,5 @@ Rules:
 
 ## Verify
 
-1. Run a development build and open the changelog (the leaderboards' Changelog button or `Settings -> General -> Show changelog`). It reloads `hypersomnia/CHANGELOG.md` within a second of every save - production builds read it once.
+1. Run a development build and open the changelog (the Changelog button next to the leaderboards' "Welcome home,"). It reloads `hypersomnia/CHANGELOG.md` within a second of every save - production builds read it once.
 2. Stray `*`, `_` or `` ` `` in the rendered text mean unbalanced markers.

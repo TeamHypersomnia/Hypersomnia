@@ -66,18 +66,13 @@ static bool is_new_version(
 	*/
 
 	return index < 2;
-#endif
-
+#else
 	/*
-		A fresh config has seen nothing,
-		but flooding it with (NEW!) on every version would be pointless.
+		A fresh config (empty) has seen nothing, but only the newest is (NEW!) then - is_more_recent is false for it.
 	*/
 
-	if (in.last_seen_version.empty()) {
-		return index == 0;
-	}
-
 	return ::is_more_recent(entry.version, in.last_seen_version);
+#endif
 }
 
 static std::string format_days_ago(const int64_t timestamp) {
@@ -486,7 +481,11 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 	}
 }
 
-bool perform_changelog_view(const changelog_input in) {
+/*
+	Fills the remaining space of the current window. Returns true when OK was pressed.
+*/
+
+static bool perform_changelog_view(const changelog_input in) {
 	using namespace augs::imgui;
 
 	const auto& entries = in.entries;
@@ -593,8 +592,15 @@ bool perform_changelog_view(const changelog_input in) {
 static bool is_other_popup_open(const std::string& own_title) {
 	const auto own_id = ImGui::GetID(own_title.c_str());
 
+	/*
+		Only popups still drawn count - one whose window is no longer submitted (e.g. hidden by the changelog itself)
+		stays in the stack and would make the changelog wait for good.
+	*/
+
 	for (const auto& popup : ImGui::GetCurrentContext()->OpenPopupStack) {
-		if (popup.PopupId != own_id) {
+		const bool still_drawn = popup.Window != nullptr && popup.Window->WasActive;
+
+		if (popup.PopupId != own_id && still_drawn) {
 			return true;
 		}
 	}
@@ -628,13 +634,20 @@ bool changelog_window_state::perform(const changelog_input in) {
 		ImGuiWindowFlags_NoDocking
 	;
 
+	/*
+		OK, X and Escape all acknowledge it.
+	*/
+
 	auto imgui_window = scoped_modal_popup(get_title(), &show, flags);
 
 	if (!imgui_window) {
-		return false;
+		return !show;
 	}
 
-	if (::perform_changelog_view(in)) {
+	const bool ok_pressed = ::perform_changelog_view(in);
+	const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
+
+	if (ok_pressed || escape_pressed || !show) {
 		show = false;
 		ImGui::CloseCurrentPopup();
 		return true;
