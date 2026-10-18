@@ -118,6 +118,14 @@ private:
 		netcode_address_t target;
 	};
 
+	/*
+		Messages to native endpoints wait here for the main thread to send them a few times over
+		the next half a second - at most this many at once, so that neither a flood nor a peer in
+		a loop grows the queue without end. A message that misses its window is stale anyway.
+	*/
+
+	static constexpr std::size_t max_pending_signalling_packets = 4096;
+
 	double when_last_processed_timeouts = -1;
 	double when_last_sent_packets = -1;
 	/*
@@ -600,7 +608,10 @@ private:
 
 				{
 					std::scoped_lock pending_lk(pending_packets_mutex);
-					pending_packets.emplace_back(std::move(packet));
+
+					if (pending_packets.size() < max_pending_signalling_packets) {
+						pending_packets.emplace_back(std::move(packet));
+					}
 				}
 			}
 			else {
