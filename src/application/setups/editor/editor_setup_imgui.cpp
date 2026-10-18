@@ -552,6 +552,11 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			redirect_or_missing_popup = std::nullopt;
 		}
 	}
+	else if (scratchpad_refused_popup) {
+		if (scratchpad_refused_popup->perform()) {
+			scratchpad_refused_popup = std::nullopt;
+		}
+	}
 	else if (remove_unused_resources_popup) {
 		if (pending_unused_resources.empty()) {
 			if (remove_unused_resources_popup->perform()) {

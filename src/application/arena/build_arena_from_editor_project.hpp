@@ -310,6 +310,19 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	nodes_dependent_on_nodes.clear();
 
 	auto populate = [&](const logic_step step) {
+		/*
+			Only nodes of Layers get entities below. The others (e.g. the scratchpad's) must not keep an id from a build
+			before they were moved there - it would point at whatever entity took its place.
+		*/
+
+		project.nodes.for_each(
+			[](const auto& pool) {
+				for (const auto& node : pool) {
+					node.scene_entity_id.unset();
+				}
+			}
+		);
+
 		for (const auto layer_id : reverse(project.layers.order)) {
 			auto layer = project.find_layer(layer_id);
 			ensure(layer != nullptr);

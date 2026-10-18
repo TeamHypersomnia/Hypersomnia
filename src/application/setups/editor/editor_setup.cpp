@@ -332,18 +332,24 @@ bool editor_setup::handle_input_before_imgui(
 		const bool has_shift{ state[key::LSHIFT] };
 		const bool no_modifiers = !has_alt && !has_ctrl && !has_shift;
 
-		if (gui.layers.is_focused()) {
+		/*
+			Layers or the scratchpad - whichever window has the focus.
+		*/
+
+		auto& focused_layers = gui.scratchpad.is_focused() ? gui.scratchpad : gui.layers;
+
+		if (focused_layers.is_focused()) {
 			if ((k == key::UP && no_modifiers) || (k == key::TAB && has_shift)) {
-				gui.layers.pressed_arrow = vec2i(0, -1);
+				focused_layers.pressed_arrow = vec2i(0, -1);
 				ImGui::GetIO().KeysDown[int(key::ENTER)] = true;
-				gui.layers.request_confirm_rename = true;
+				focused_layers.request_confirm_rename = true;
 
 				return true;
 			}
 			else if ((k == key::DOWN && no_modifiers) || k == key::TAB) {
-				gui.layers.pressed_arrow = vec2i(0, 1);
+				focused_layers.pressed_arrow = vec2i(0, 1);
 				ImGui::GetIO().KeysDown[int(key::ENTER)] = true;
-				gui.layers.request_confirm_rename = true;
+				focused_layers.request_confirm_rename = true;
 
 				return true;
 			}
@@ -351,10 +357,10 @@ bool editor_setup::handle_input_before_imgui(
 
 		if (no_modifiers && !ImGui::GetIO().WantCaptureKeyboard) {
 			switch (k) {
-				case key::LEFT: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(-1, 0); return true; } else break;
-				case key::RIGHT: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(1, 0); return true; } else break;
-				case key::UP: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(0, -1); return true; } else break;
-				case key::DOWN: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(0, 1); return true; } else break;
+				case key::LEFT: if (focused_layers.is_focused()) { focused_layers.pressed_arrow = vec2i(-1, 0); return true; } else break;
+				case key::RIGHT: if (focused_layers.is_focused()) { focused_layers.pressed_arrow = vec2i(1, 0); return true; } else break;
+				case key::UP: if (focused_layers.is_focused()) { focused_layers.pressed_arrow = vec2i(0, -1); return true; } else break;
+				case key::DOWN: if (focused_layers.is_focused()) { focused_layers.pressed_arrow = vec2i(0, 1); return true; } else break;
 
 				default: break;
 			}
@@ -379,6 +385,10 @@ bool editor_setup::confirm_modal_popup() {
 	}
 	else if (redirect_or_missing_popup) {
 		redirect_or_missing_popup = std::nullopt;
+		return true;
+	}
+	else if (scratchpad_refused_popup) {
+		scratchpad_refused_popup = std::nullopt;
 		return true;
 	}
 
@@ -1534,15 +1544,78 @@ bool editor_setup::is_in_scratchpad(const inspected_variant& inspected) const {
 	return false;
 }
 
+static bool is_layer_or_node(const inspected_variant& inspected) {
+	return std::holds_alternative<editor_node_id>(inspected) || std::holds_alternative<editor_layer_id>(inspected);
+}
+
+/*
+	Whether the selected layers and nodes are the scratchpad's - none selected gives nullopt.
+	They always come from one list (see separate_scratchpad_selection), so the first one tells.
+*/
+
+std::optional<bool> editor_setup::is_selection_in_scratchpad() const {
+	for (const auto& inspected : gui.inspector.all_inspected) {
+		if (::is_layer_or_node(inspected)) {
+			return is_in_scratchpad(inspected);
+		}
+	}
+
+	return std::nullopt;
+}
+
+/*
+	Refuses (with a message) to move into the scratchpad a node that something outside the moved ones refers to,
+	e.g. a portal's exit - the game never reads the scratchpad, so the map would not load.
+*/
+
+bool editor_setup::can_move_to_scratchpad(const std::vector<editor_node_id>& nodes) {
+	const auto referencing_and_referenced = ::find_reference_into(
+		project,
+		std::unordered_set<editor_node_id>(nodes.begin(), nodes.end())
+	);
+
+	if (referencing_and_referenced.has_value()) {
+		auto popup = simple_popup();
+
+		popup.title = "Can't move to the Scratchpad";
+		popup.message = typesafe_sprintf(
+			"%x is referred to by %x, which stays in Layers.\n"
+			"The game does not read the Scratchpad, so the map would not load.\n\n"
+			"Remove the reference first, or move both.",
+			get_name(referencing_and_referenced->second),
+			get_name(referencing_and_referenced->first)
+		);
+
+		scratchpad_refused_popup = popup;
+		return false;
+	}
+
+	return true;
+}
+
 /*
 	The scratchpad's layers and nodes are never selected together with the others.
+	Decided by the first selected one, not each - adding many items (Ctrl+A) stays linear.
 */
 
 void editor_setup::separate_scratchpad_selection(const inspected_variant& new_inspected) {
+	if (project.layers.scratchpad.empty()) {
+		return;
+	}
+
 	const bool new_in_scratchpad = is_in_scratchpad(new_inspected);
+	const auto selection_in_scratchpad = is_selection_in_scratchpad();
+
+	if (selection_in_scratchpad.value_or(false) == new_in_scratchpad) {
+		return;
+	}
+
+	/*
+		Anything else selected (e.g. resources) is in neither - it goes only when the scratchpad's is selected.
+	*/
 
 	erase_if(gui.inspector.all_inspected, [&](const inspected_variant& existing) {
-		return is_in_scratchpad(existing) != new_in_scratchpad;
+		return ::is_layer_or_node(existing) || new_in_scratchpad;
 	});
 }
 
@@ -1856,7 +1929,8 @@ void editor_setup::start_renaming_selection() {
 		gui.filesystem.request_rename = true;
 	}
 	else {
-		gui.layers.request_rename = true;
+		auto& owning_window = is_selection_in_scratchpad().value_or(false) ? gui.scratchpad : gui.layers;
+		owning_window.request_rename = true;
 	}
 }
 
@@ -2259,7 +2333,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			for (uint32_t cy = first.y; cy < last.y; ++cy) {
 				for (uint32_t cx = first.x; cx < last.x; ++cx) {
 					const auto cell_xy = vec2u(cx, cy);
-					const auto world_xy = vec2(island.bound.lt()) + cell_xy * cell_size;
+					const auto world_xy = island_lt + cell_xy * cell_size;
 					const auto cell_value = island.get_cell(cell_xy);
 
 					/*
@@ -2899,6 +2973,10 @@ setup_escape_result editor_setup::escape() {
 		redirect_or_missing_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
+	else if (scratchpad_refused_popup) {
+		scratchpad_refused_popup = std::nullopt;
+		return setup_escape_result::JUST_FETCH;
+	}
 	else if (mover.escape()) {
 		undo();
 		return setup_escape_result::JUST_FETCH;
@@ -3027,6 +3105,14 @@ void inspect_command::redo(const editor_command_input in) {
 }
 
 void editor_setup::move_inspected_to_new_layer() {
+	/*
+		The new layer would be in Layers - moving the scratchpad's nodes into the game.
+	*/
+
+	if (is_selection_in_scratchpad().value_or(false)) {
+		return;
+	}
+
 	const auto all_inspected = get_all_inspected<editor_node_id>();
 
 	if (all_inspected.empty()) {
@@ -3056,17 +3142,24 @@ void editor_setup::move_inspected_to_new_layer() {
 }
 
 void editor_setup::move_dragged_to_new_layer(const editor_node_id dragged_node) {
+	const auto parent = find_parent_layer(dragged_node);
+
+	if (!parent.has_value()) {
+		return;
+	}
+
 	const auto all_inspected = get_all_inspected<editor_node_id>();
 
 	reorder_nodes_command command;
 
 	command.create_layer = create_layer_command();
 	command.create_layer->created_layer.unique_name = get_free_layer_name();
-	{
-		const auto parent_of_topmost = find_parent_layer(all_inspected[0]);
-		ensure(parent_of_topmost.has_value());
-		command.create_layer->at_index = parent_of_topmost->layer_index;
-	}
+
+	/*
+		The new layer is in Layers, next to the dragged node's - or on top if the node comes from the scratchpad.
+	*/
+
+	command.create_layer->at_index = parent->in_scratchpad ? 0 : parent->layer_index;
 
 	if (is_inspected(dragged_node) && all_inspected.size() > 1) {
 		command.nodes_to_move = all_inspected;
@@ -3086,6 +3179,14 @@ static auto peel_clone_suffix(std::string s) {
 
 void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_clone) {
 	if (gui.inspector.empty()) {
+		return;
+	}
+
+	/*
+		The scratchpad is never cloned or mirrored - a clone would land in Layers, i.e. in the game.
+	*/
+
+	if (is_selection_in_scratchpad().value_or(false)) {
 		return;
 	}
 

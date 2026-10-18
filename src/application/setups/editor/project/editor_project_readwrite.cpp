@@ -1635,3 +1635,32 @@ editor_project_meta read_meta_from(const augs::path_type& arena_folder_path) {
 
 	return editor_project_readwrite::read_only_project_meta(paths.project_json);
 }
+
+std::optional<std::pair<editor_node_id, editor_node_id>> find_reference_into(
+	editor_project& project,
+	const std::unordered_set<editor_node_id>& nodes
+) {
+	std::optional<std::pair<editor_node_id, editor_node_id>> result;
+
+	project.nodes.for_each(
+		[&](auto& node_pool) {
+			node_pool.for_each_id_and_object([&]<typename T>(const auto id, T& node) {
+				const auto referencing = editor_typed_node_id<T> { id }.operator editor_node_id();
+
+				if (result.has_value() || found_in(nodes, referencing)) {
+					return;
+				}
+
+				::on_each_node_id_in_object(node.editable, [&](const auto& reference) {
+					const auto referenced = reference.operator editor_node_id();
+
+					if (!result.has_value() && found_in(nodes, referenced)) {
+						result = std::make_pair(referencing, referenced);
+					}
+				});
+			});
+		}
+	);
+
+	return result;
+}

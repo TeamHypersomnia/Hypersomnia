@@ -1,6 +1,10 @@
 #pragma once
+#include <optional>
+#include <unordered_set>
+#include <utility>
 #include "augs/filesystem/path.h"
 #include "augs/misc/secure_hash.h"
+#include "application/setups/editor/nodes/editor_node_id.h"
 
 struct editor_view;
 struct editor_project;
@@ -68,6 +72,16 @@ namespace editor_project_readwrite {
 	void write_editor_view(const augs::path_type& json_path, const editor_view&);
 	editor_view read_editor_view(const augs::path_type& json_path);
 }
+
+/*
+	A node outside of the given ones that refers to one of them (e.g. a portal's exit), as { referencing, referenced }.
+	Here, as the JSON overloads of the node ids that on_each_node_id_in_object needs live in editor_project_readwrite.cpp.
+*/
+
+std::optional<std::pair<editor_node_id, editor_node_id>> find_reference_into(
+	editor_project& project,
+	const std::unordered_set<editor_node_id>& nodes
+);
 
 editor_project_about read_about_from(const augs::path_type& arena_folder_path);
 editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);

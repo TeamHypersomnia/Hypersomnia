@@ -21,6 +21,21 @@
 #include "application/setups/editor/editor_setup_find_aabb_of_nodes.hpp"
 #include "application/setups/editor/editor_official_resource_map.hpp"
 
+/*
+	The node a "dragged_node" payload carries - it may come from the other window (Layers or Scratchpad),
+	whose own dragged_node this window does not know.
+*/
+
+static editor_node_id dragged_node_of(const ImGuiPayload* const payload) {
+	auto id = editor_node_id();
+
+	if (payload != nullptr && payload->DataSize == static_cast<int>(sizeof(editor_node_id))) {
+		std::memcpy(std::addressof(id), payload->Data, sizeof(editor_node_id));
+	}
+
+	return id;
+}
+
 #include "application/setups/editor/detail/make_command_from_selections.h"
 
 void editor_layers_gui::perform(const editor_layers_input in) {
@@ -168,15 +183,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	*/
 
 	const bool own_inspected = [&]() {
-		for (const auto& inspected : in.setup.get_all_inspected()) {
-			const bool layer_or_node = std::holds_alternative<editor_node_id>(inspected) || std::holds_alternative<editor_layer_id>(inspected);
-
-			if (layer_or_node && in.setup.is_in_scratchpad(inspected) == in.scratchpad) {
-				return true;
-			}
-		}
-
-		return false;
+		const auto selection_in_scratchpad = in.setup.is_selection_in_scratchpad();
+		return selection_in_scratchpad.has_value() && *selection_in_scratchpad == in.scratchpad;
 	}();
 
 	thread_local ImGuiTextFilter layers_filter;
@@ -217,7 +225,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	auto new_layer_drag_drop_callback = [&]() {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
-				in.setup.move_dragged_to_new_layer(dragged_node);
+				if (const auto node = ::dragged_node_of(payload); node.is_set()) {
+					in.setup.move_dragged_to_new_layer(node);
+				}
 			}
 
 			ImGui::EndDragDropTarget();
@@ -453,14 +463,23 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(anchor_node_id));
 		}
 
+		if (in.setup.get_project().is_scratchpad_layer(target_layer_id)) {
+			if (!in.setup.can_move_to_scratchpad(command.nodes_to_move)) {
+				return;
+			}
+		}
+
 		in.setup.post_new_command(command);
 	};
 
 	auto accept_dragged_nodes = [&](
+		const ImGuiPayload* const payload,
 		editor_layer_id target_layer_id, 
 		const std::size_t target_index
 	) {
-		move_nodes_to_layer(dragged_node, target_layer_id, target_index);
+		if (const auto node = ::dragged_node_of(payload); node.is_set()) {
+			move_nodes_to_layer(node, target_layer_id, target_index);
+		}
 	};
 
 	/*
@@ -497,7 +516,22 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			command.built_description = verb + in.setup.get_name(anchor_layer_id);
 		}
 
+		if (to_scratchpad && from_other_list) {
+			auto moved_nodes = std::vector<editor_node_id>();
+
+			for (const auto layer_id : command.layers_to_move) {
+				if (const auto layer = in.setup.find_layer(layer_id)) {
+					concatenate(moved_nodes, layer->hierarchy.nodes);
+				}
+			}
+
+			if (!in.setup.can_move_to_scratchpad(moved_nodes)) {
+				return false;
+			}
+		}
+
 		in.setup.post_new_command(command);
+		return true;
 	};
 
 	auto dragged_layer_of = [](const ImGuiPayload* const payload) {
@@ -775,7 +809,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				if (ImGui::BeginDragDropSource()) {
 					dragged_node = node_id;
 
-					ImGui::SetDragDropPayload("dragged_node", nullptr, 0);
+					ImGui::SetDragDropPayload("dragged_node", std::addressof(node_id), sizeof(editor_node_id));
 					text(label);
 					ImGui::EndDragDropSource();
 				}
@@ -786,7 +820,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
-						accept_dragged_nodes(layer_id, node_index);
+						accept_dragged_nodes(payload, layer_id, node_index);
 					}
 
 					ImGui::EndDragDropTarget();
@@ -1070,7 +1104,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
-						accept_dragged_nodes(layer_id, 0);
+						accept_dragged_nodes(payload, layer_id, 0);
 						layer.is_open = true;
 					}
 
@@ -1346,9 +1380,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	if (move_layers_from_menu.is_set()) {
 		const bool to_scratchpad = !in.scratchpad;
-		move_layers_to(move_layers_from_menu, to_scratchpad, 0);
+		const bool moved = move_layers_to(move_layers_from_menu, to_scratchpad, 0);
 
-		if (to_scratchpad) {
+		if (to_scratchpad && moved) {
 			in.setup.open_scratchpad();
 		}
 	}

@@ -153,6 +153,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	std::optional<simple_popup> autosave_popup;
 	std::optional<simple_popup> invalid_filenames_popup;
 	std::optional<simple_popup> redirect_or_missing_popup;
+	std::optional<simple_popup> scratchpad_refused_popup;
 	std::optional<simple_popup> remove_unused_resources_popup;
 
 	std::vector<editor_resource_id> pending_unused_resources;
@@ -451,6 +452,8 @@ public:
 	void inspect_add_quiet(inspected_variant);
 
 	bool is_in_scratchpad(const inspected_variant&) const;
+	std::optional<bool> is_selection_in_scratchpad() const;
+	bool can_move_to_scratchpad(const std::vector<editor_node_id>& nodes);
 	void separate_scratchpad_selection(const inspected_variant&);
 	void quiet_set_last_inspected_layer_or_node(inspected_variant);
 	void quiet_set_last_inspected_any(inspected_variant);

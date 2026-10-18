@@ -46,13 +46,21 @@ inline void reorder_nodes_command::redo(editor_command_input in) {
 		return false;
 	};
 
-	for (const auto& id : in.setup.get_layers()) {
-		auto layer = in.setup.find_layer(id);
-		ensure(layer != nullptr);
+	/*
+		The scratchpad's layers too - nodes are moved within it and between it and Layers.
+	*/
 
-		auto& nodes = layer->hierarchy.nodes;
-		original_orders[id] = nodes;
-		erase_if(nodes, should_move);
+	const auto& layers = in.setup.get_project().layers;
+
+	for (const auto* const list : { &layers.order, &layers.scratchpad }) {
+		for (const auto& id : *list) {
+			auto layer = in.setup.find_layer(id);
+			ensure(layer != nullptr);
+
+			auto& nodes = layer->hierarchy.nodes;
+			original_orders[id] = nodes;
+			erase_if(nodes, should_move);
+		}
 	}
 
 	if (create_layer.has_value()) {
