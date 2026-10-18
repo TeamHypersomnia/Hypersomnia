@@ -6048,17 +6048,7 @@ bool server_setup::allow_handshake(const netcode_address_t& from) {
 		}
 	}
 
-	auto& b = handshakes_by_address.try_emplace(key, handshake_bucket { burst, now }).first->second;
-
-	b.tokens = std::min(burst, b.tokens + (now - b.when_last) * per_second);
-	b.when_last = now;
-
-	if (b.tokens < 1.0) {
-		return false;
-	}
-
-	b.tokens -= 1.0;
-	return true;
+	return handshakes_by_address[key].take(now, per_second, burst);
 }
 
 const server_ban* server_setup::find_ban(const std::string& account, const std::string& ip) const {

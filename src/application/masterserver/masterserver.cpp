@@ -38,6 +38,39 @@
 #include "application/masterserver/signalling_server.h"
 #include "application/network/network_adapters.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "augs/misc/token_bucket.h"
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Masterserver signalling message tokens") {
+	using peer_type = signalling_server::signalling_peer;
+
+	auto peer = peer_type();
+	const auto client_burst = static_cast<int>(peer_type::client_message_burst);
+
+	for (int i = 0; i < client_burst; ++i) {
+		REQUIRE(peer.take_message_token(0.0));
+	}
+
+	REQUIRE(!peer.take_message_token(0.0));
+
+	/*
+		A server gets a higher allowance - but a finite one.
+	*/
+
+	peer.time_last_heartbeat = 1.0;
+	REQUIRE(peer.is_server());
+
+	const auto refilled = static_cast<int>(peer_type::server_messages_per_sec);
+
+	for (int i = 0; i < refilled; ++i) {
+		REQUIRE(peer.take_message_token(1.0));
+	}
+
+	REQUIRE(!peer.take_message_token(1.0));
+}
+#endif
 
 extern std::mutex rtc_errors_lk;
 extern bool track_rtc_errors;
@@ -45,6 +78,111 @@ extern std::vector<std::string> rtc_errors;
 
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
+
+/*
+	Anyone can send tell_me_my_address and its answer goes to the packet's source address,
+	so spoofed sources could bounce a flood of answers off the masterserver at a victim.
+
+	Limited per network (augs::network_of) - not per ip:port, or a new port for every packet
+	would get past it - to far more than the NAT detection of one game ever asks for.
+	The table of networks is cleared wholesale when full, so a flood from ever new spoofed sources
+	can not grow it - but also could reset the victim's limit, hence the limit on all answers at once.
+*/
+
+struct tell_me_my_address_limiter {
+	static constexpr std::size_t max_remembered_networks = 8192;
+
+	static constexpr double network_answers_per_sec = 50.0;
+	static constexpr double network_burst = 100.0;
+
+	static constexpr double total_answers_per_sec = 2000.0;
+	static constexpr double total_burst = 4000.0;
+
+	std::unordered_map<netcode_address_t, augs::token_bucket> by_network;
+	augs::token_bucket total;
+
+	bool try_answer(const netcode_address_t& from, const double now) {
+		if (by_network.size() >= max_remembered_networks) {
+			by_network.clear();
+		}
+
+		if (!by_network[augs::network_of(from)].take(now, network_answers_per_sec, network_burst)) {
+			return false;
+		}
+
+		return total.take(now, total_answers_per_sec, total_burst);
+	}
+};
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Masterserver tell_me_my_address limiter") {
+	auto address = [](const uint8_t last_octet, const uint16_t port) {
+		auto out = netcode_address_t();
+		out.type = NETCODE_ADDRESS_IPV4;
+		out.data.ipv4[0] = 10;
+		out.data.ipv4[1] = 0;
+		out.data.ipv4[2] = 0;
+		out.data.ipv4[3] = last_octet;
+		out.port = port;
+		return out;
+	};
+
+	using limiter_type = tell_me_my_address_limiter;
+
+	SECTION("A network gets its burst, then its rate") {
+		auto limiter = limiter_type();
+		const auto burst = static_cast<int>(limiter_type::network_burst);
+
+		for (int i = 0; i < burst; ++i) {
+			REQUIRE(limiter.try_answer(address(1, 1000), 0.0));
+		}
+
+		REQUIRE(!limiter.try_answer(address(1, 1000), 0.0));
+
+		/*
+			Another port of the same network shares its limit.
+		*/
+
+		REQUIRE(!limiter.try_answer(address(1, 2000), 0.0));
+
+		/*
+			Another network does not.
+		*/
+
+		REQUIRE(limiter.try_answer(address(2, 1000), 0.0));
+
+		/*
+			A second later, the rate's worth of answers again.
+		*/
+
+		const auto refilled = static_cast<int>(limiter_type::network_answers_per_sec);
+
+		for (int i = 0; i < refilled; ++i) {
+			REQUIRE(limiter.try_answer(address(1, 1000), 1.0));
+		}
+
+		REQUIRE(!limiter.try_answer(address(1, 1000), 1.0));
+	}
+
+	SECTION("All answers at once are limited too") {
+		auto limiter = limiter_type();
+		const auto total_burst = static_cast<int>(limiter_type::total_burst);
+
+		auto answered = 0;
+
+		for (int i = 0; i < total_burst + 1000; ++i) {
+			auto from = address(static_cast<uint8_t>(i % 256), 1000);
+			from.data.ipv4[2] = static_cast<uint8_t>(i / 256);
+
+			answered += limiter.try_answer(from, 0.0) ? 1 : 0;
+		}
+
+		REQUIRE(answered == total_burst);
+	}
+}
+#endif
 
 #if PLATFORM_UNIX
 extern std::atomic<int> signal_status;
@@ -67,6 +205,22 @@ void MSR_LOG(Args&&... args) {
 #define MSR_LOG_NVPS MSR_LOG
 #endif
 
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Nicknames and server names reject control characters") {
+	REQUIRE(::is_nickname_valid_characters(std::string("Pythagoras")));
+	REQUIRE(::is_nickname_valid_characters(std::string("z\xc5\xbc\xc3\xb3\xc5\x82w")));
+
+	REQUIRE(!::is_nickname_valid_characters(std::string("   ")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\tb")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\nb")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\x1b[31mb")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\x7f")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\0b", 3)));
+}
+#endif
+
 
 static void set_cors(httplib::Response& res) {
 	res.set_header("Access-Control-Allow-Origin", "*"); // Allows any domain
@@ -80,7 +234,7 @@ static void set_cors(httplib::Response& res) {
 */
 
 static bool is_acceptable_domain(const std::string& domain, const bool is_official) {
-	if (domain.empty() || domain.size() > 253 || domain.front() == '.' || domain.back() == '.' || domain.front() == '-') {
+	if (domain.empty() || domain.size() > 253 || domain.front() == '.' || domain.back() == '.') {
 		return false;
 	}
 
@@ -92,8 +246,20 @@ static bool is_acceptable_domain(const std::string& domain, const bool is_offici
 		}
 	}
 
-	if (domain.find("..") != std::string::npos) {
-		return false;
+	/*
+		Every label (the parts between dots): 1 to 63 characters, neither beginning nor ending with a hyphen.
+	*/
+
+	for (std::size_t label_begin = 0; label_begin < domain.size();) {
+		const auto dot = domain.find('.', label_begin);
+		const auto label_end = dot == std::string::npos ? domain.size() : dot;
+		const auto label_length = label_end - label_begin;
+
+		if (label_length == 0 || label_length > 63 || domain[label_begin] == '-' || domain[label_end - 1] == '-') {
+			return false;
+		}
+
+		label_begin = label_end + 1;
 	}
 
 	/*
@@ -123,6 +289,32 @@ static bool is_acceptable_domain(const std::string& domain, const bool is_offici
 
 	return is_official || !under_hypersomnia_io;
 }
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Masterserver acceptable domains") {
+	REQUIRE(::is_acceptable_domain("example.com", false));
+	REQUIRE(::is_acceptable_domain("my-server.example.com", false));
+	REQUIRE(::is_acceptable_domain(std::string(63, 'a') + ".com", false));
+
+	REQUIRE(!::is_acceptable_domain("", false));
+	REQUIRE(!::is_acceptable_domain(".example.com", false));
+	REQUIRE(!::is_acceptable_domain("example.com.", false));
+	REQUIRE(!::is_acceptable_domain("example..com", false));
+	REQUIRE(!::is_acceptable_domain("-example.com", false));
+	REQUIRE(!::is_acceptable_domain("example.com-", false));
+	REQUIRE(!::is_acceptable_domain("example-.com", false));
+	REQUIRE(!::is_acceptable_domain("sub.-example.com", false));
+	REQUIRE(!::is_acceptable_domain(std::string(64, 'a') + ".com", false));
+	REQUIRE(!::is_acceptable_domain("exa mple.com", false));
+	REQUIRE(!::is_acceptable_domain("1.2.3.4", false));
+	REQUIRE(!::is_acceptable_domain("localhost", false));
+
+	REQUIRE(!::is_acceptable_domain("ranked.hypersomnia.io", false));
+	REQUIRE(::is_acceptable_domain("ranked.hypersomnia.io", true));
+}
+#endif
 
 static auto to_webrtc_alias(
 	const bool is_ranked,
@@ -413,7 +605,13 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		}
 	};
 
-	auto previous_peers = signalling_server::peer_map();
+	auto previous_web_servers = signalling_server::servers_map();
+
+	/*
+		See tell_me_my_address_limiter.
+	*/
+
+	auto address_answers = tell_me_my_address_limiter();
 
 	/*
 		A browser joins an official server by its alias (e.g. /game/ranked-pl:1) - only an official server has one.
@@ -476,7 +674,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		rebuild_webrtc_aliases();
 
-		const auto peer_map = signalling.get_new_peers_map();
+		const auto web_servers = signalling.get_new_servers_map();
 
 		std::lock_guard<std::shared_mutex> lock(serialized_list_mutex);
 
@@ -496,11 +694,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 
-		for (auto& server : peer_map) {
-			if (!server.second.is_server()) {
-				continue;
-			}
-
+		for (auto& server : web_servers) {
 			if (!server.second.last_heartbeat.show_on_server_list) {
 				continue;
 			}
@@ -518,18 +712,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 
-			bool push_webhook = false;
-
-			if (!found_in(previous_peers, server.first)) {
-				push_webhook = true;
-			}
-			else {
-				if (!previous_peers[server.first].is_server()) {
-					push_webhook = true;
-				}
-			}
-
-			if (push_webhook) {
+			if (!found_in(previous_web_servers, server.first)) {
 				push_new_server_webhook(
 					ip_address,
 					server.second.last_heartbeat,
@@ -538,7 +721,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 		}
 
-		previous_peers = peer_map;
+		previous_web_servers = web_servers;
 
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
@@ -644,11 +827,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			);
 		}
 
-		for (const auto& server : peer_map) {
-			if (!server.second.is_server()) {
-				continue;
-			}
-
+		for (const auto& server : web_servers) {
 			if (!server.second.last_heartbeat.show_on_server_list) {
 				continue;
 			}
@@ -1181,11 +1360,20 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {
+						if (!address_answers.try_answer(from, augs::steady_secs())) {
+							static uint64_t last_logged_ms = 0;
+
+							if (::official_log_allowed(last_logged_ms)) {
+								LOG("Too many tell_me_my_address requests from %x - ignoring some.", ::ToString(from));
+							}
+
+							return;
+						}
+
 						masterserver_out::tell_me_my_address response;
 						response.address = from;
 						response.session_timestamp = typed_request.session_timestamp;
 
-						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
 					}
 				};

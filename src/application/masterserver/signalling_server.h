@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
 #include "augs/network/address_network.h"
+#include "augs/misc/token_bucket.h"
 
 #include "augs/string/path_sanitization.h"
 #include "augs/templates/bit_cast.h"
@@ -12,49 +13,60 @@ void yojimbo_random_bytes( uint8_t * data, int bytes );
 
 class signalling_server {
 public:
-	struct signalling_peer {
-		std::shared_ptr<rtc::WebSocket> ws;
+	/*
+		What the server list shows of a peer - all the main thread is given of it (see get_new_servers_map).
+	*/
+
+	struct signalling_peer_listing {
 		netcode_address_t ip_informational = {};
 
 		double time_hosted = 0.0;
 		double time_last_heartbeat = -1;
-		double time_last_correct_message = -1;
-
-		/*
-			Messages a peer may send: 20 a second, bursts of 100 - plenty for any ICE negotiation.
-		*/
-
-		double message_tokens = 100.0;
-		double when_last_message = -1;
-
-		bool take_message_token(const double now) {
-			if (when_last_message >= 0.0) {
-				message_tokens = std::min(100.0, message_tokens + (now - when_last_message) * 20.0);
-			}
-
-			when_last_message = now;
-
-			if (message_tokens < 1.0) {
-				return false;
-			}
-
-			message_tokens -= 1.0;
-			return true;
-		}
 
 		server_heartbeat last_heartbeat;
 		std::array<uint8_t, 32> server_public_key = {};
-
-		std::unordered_set<uint64_t> recvd_messages;
 
 		bool is_server() const {
 			return time_last_heartbeat != -1.0;
 		}
 	};
 
+	struct signalling_peer : signalling_peer_listing {
+		std::shared_ptr<rtc::WebSocket> ws;
+		double time_last_correct_message = -1;
+
+		/*
+			Messages a peer may send: 20 a second, bursts of 100 - plenty for any ICE negotiation.
+			A server answers every joining client with its candidates, so it gets ten times that -
+			but never an unlimited allowance, as anyone can make itself a server with its own key.
+		*/
+
+		static constexpr double client_messages_per_sec = 20.0;
+		static constexpr double client_message_burst = 100.0;
+		static constexpr double server_messages_per_sec = 200.0;
+		static constexpr double server_message_burst = 1000.0;
+
+		augs::token_bucket messages;
+
+		bool take_message_token(const double now) {
+			if (is_server()) {
+				return messages.take(now, server_messages_per_sec, server_message_burst);
+			}
+
+			return messages.take(now, client_messages_per_sec, client_message_burst);
+		}
+
+		std::unordered_set<uint64_t> recvd_messages;
+	};
+
 	using peer_map = std::unordered_map<
 		std::string,
 		signalling_peer
+	>;
+
+	using servers_map = std::unordered_map<
+		std::string,
+		signalling_peer_listing
 	>;
 
 private:
@@ -94,6 +106,14 @@ private:
 		int times = 5;
 		netcode_address_t target;
 	};
+
+	/*
+		Messages to native endpoints wait here for the main thread to send them a few times over
+		the next half a second - at most this many at once, so that neither a flood nor a peer in
+		a loop grows the queue without end. A message that misses its window is stale anyway.
+	*/
+
+	static constexpr std::size_t max_pending_signalling_packets = 4096;
 
 	double when_last_processed_timeouts = -1;
 	double when_last_sent_packets = -1;
@@ -160,23 +180,32 @@ private:
 									const auto webrtc_id = get_webrtc_id(peers, client);
 
 									/*
+										Only a registered peer may relay: the id is chosen as its socket
+										opens, so a socket without one failed to register (e.g. too many peers).
+									*/
+
+									const auto peer = mapped_or_nullptr(peers, webrtc_id);
+
+									if (peer == nullptr) {
+										return;
+									}
+
+									/*
 										A client still negotiating (offers, candidates, a slow ICE or TURN) is alive too -
 										timed out after its registration, its join would hang.
 									*/
 
-									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
-										const auto now = augs::high_precision_secs();
+									const auto now = augs::high_precision_secs();
 
-										/*
-											A server in the browser answers every joining client with its candidates - not limited.
-										*/
+									/*
+										Servers too, with a higher allowance (see signalling_peer).
+									*/
 
-										if (!peer->is_server() && !peer->take_message_token(now)) {
-											return;
-										}
-
-										peer->time_last_correct_message = now;
+									if (!peer->take_message_token(now)) {
+										return;
 									}
+
+									peer->time_last_correct_message = now;
 
 									relay_message(peers, json_message, webrtc_id);
 								}
@@ -212,46 +241,63 @@ private:
 							on_peers(
 								[&](auto& peers) {
 									const auto webrtc_id = get_webrtc_id(peers, client);
+									const auto peer = mapped_or_nullptr(peers, webrtc_id);
+
+									if (peer == nullptr) {
+										LOG("Wrong peer id: %x", webrtc_id);
+										return;
+									}
+
+									/*
+										A heartbeat costs a message token like any other - a peer changing a field
+										with every one of them would otherwise have the whole list written anew,
+										and its id logged, up to the WebSocket's throughput.
+									*/
+
+									const auto now = augs::high_precision_secs();
+
+									if (!peer->take_message_token(now)) {
+										return;
+									}
 
 									if (signed_cookie != ::web_session_cookie(webrtc_id)) {
 										LOG("Ignoring a heartbeat from Web peer %x signed for another session.", webrtc_id);
 										return;
 									}
 
-									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
-										const auto unix_time = augs::date_time::secs_since_epoch();
+									static uint64_t last_logged_ms = 0;
 
-										LOG("Received heartbeat from Web peer: %x", webrtc_id);
-
-										if (!peer->is_server()) {
-											peer->time_hosted = unix_time;
-											peer->server_public_key = public_key;
-										}
-										else if (peer->server_public_key != public_key) {
-											LOG("Ignoring a heartbeat from Web peer %x signed with another key.", webrtc_id);
-											return;
-										}
-
-										/*
-											The list is written anew only when what it shows changed - not for every heartbeat.
-										*/
-
-										/*
-											Neither carries its signature - taken off above.
-										*/
-
-										const bool changed = !(peer->last_heartbeat == hb);
-
-										peer->last_heartbeat = hb;
-										peer->time_last_heartbeat = unix_time;
-										peer->time_last_correct_message = augs::high_precision_secs();
-
-										if (changed) {
-											dirty = true;
-										}
+									if (::official_log_allowed(last_logged_ms)) {
+										LOG("Received a heartbeat from Web peer: %x", webrtc_id);
 									}
-									else {
-										LOG("Wrong peer id: %x", webrtc_id);
+
+									const auto unix_time = augs::date_time::secs_since_epoch();
+
+									if (!peer->is_server()) {
+										peer->time_hosted = unix_time;
+										peer->server_public_key = public_key;
+									}
+									else if (peer->server_public_key != public_key) {
+										LOG("Ignoring a heartbeat from Web peer %x signed with another key.", webrtc_id);
+										return;
+									}
+
+									/*
+										The list is written anew only when what it shows changed - not for every heartbeat.
+									*/
+
+									/*
+										Neither carries its signature - taken off above.
+									*/
+
+									const bool changed = !(peer->last_heartbeat == hb);
+
+									peer->last_heartbeat = hb;
+									peer->time_last_heartbeat = unix_time;
+									peer->time_last_correct_message = now;
+
+									if (changed) {
+										dirty = true;
 									}
 								}
 							);
@@ -367,10 +413,15 @@ private:
 		}
 
 		/*
-			Remove : to not overshadow ip:port addresses
+			Remove : to not overshadow ip:port addresses, and any control character -
+			nothing a peer names itself with may end up corrupting a log line or a terminal.
 		*/
 
-		erase_if(requested, [](const auto c) { return c == ':'; });
+		erase_if(requested, [](const auto c) {
+			const auto uc = static_cast<unsigned char>(c);
+
+			return c == ':' || uc < 0x20 || uc == 0x7f;
+		});
 
 		if (requested.empty()) {
 			return find_free_id(peers);
@@ -498,6 +549,8 @@ private:
 	void relay_message(peer_map& peers, nlohmann::json message, webrtc_id_type source_id) {
 		/*
 			Only the masterserver tells a peer its id.
+
+			Every peer may relay many messages a second, so the logs here come at most once in 10 seconds each.
 		*/
 
 		if (!message.is_object()) {
@@ -513,7 +566,12 @@ private:
 				std::scoped_lock lk(aliases_mutex);
 
 				if (const auto target = mapped_or_nullptr(webrtc_id_aliases, dest_id)) {
-					LOG("Destination Alias '%x' resolved to '%x'", dest_id, *target);
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("Destination Alias '%x' resolved to '%x'", dest_id, *target);
+					}
+
 					dest_id = *target;
 				}
 
@@ -522,7 +580,12 @@ private:
 				*/
 
 				if (const auto target = key_or_default(webrtc_id_aliases, source_id); target != "") {
-					LOG("Source '%x' aliased to '%x'", source_id, target);
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("Source '%x' aliased to '%x'", source_id, target);
+					}
+
 					message["alias"] = target;
 				}
 				else {
@@ -537,7 +600,11 @@ private:
 			if (NETCODE_OK == netcode_parse_address(dest_id.c_str(), &maybe_native)) {
 				/* WebRTC id is IP address */
 
-				LOG("Relaying to native endpoint: %x", dest_id);
+				static uint64_t last_logged_ms = 0;
+
+				if (::official_log_allowed(last_logged_ms)) {
+					LOG("Relaying to native endpoint: %x", dest_id);
+				}
 
 				pending_signalling_packet packet;
 				yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&packet.guid), sizeof(packet.guid));
@@ -547,19 +614,34 @@ private:
 
 				{
 					std::scoped_lock pending_lk(pending_packets_mutex);
-					pending_packets.emplace_back(std::move(packet));
+
+					if (pending_packets.size() < max_pending_signalling_packets) {
+						pending_packets.emplace_back(std::move(packet));
+					}
 				}
 			}
 			else {
-				LOG("Relaying to peer with id %x", dest_id);
-
 				if (const auto target = mapped_or_nullptr(peers, dest_id)) {
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("Relaying to peer with id %x", dest_id);
+					}
+
 					ensure(target->ws != nullptr);
 
 					target->ws->send(message.dump());
 				}
 				else {
-					LOG("No peer like that!");
+					/*
+						Not logged as it came: only a registered peer's id is safe to log (see choose_webrtc_id).
+					*/
+
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("No peer like that!");
+					}
 				}
 			}
 		}
@@ -635,15 +717,23 @@ private:
 	}
 
 public:
-	auto get_new_peers_map() {
-		peer_map cp;
+	/*
+		Only the servers: the list shows nothing else, and copying thousands of clients
+		(their sockets and received guids) for every change wasted memory and time under the lock.
+	*/
 
-		{
-			on_peers([&](const auto& peers) { 
-				cp = peers; 
-				dirty = false;
-			});
-		}
+	auto get_new_servers_map() {
+		servers_map cp;
+
+		on_peers([&](const auto& peers) {
+			for (const auto& p : peers) {
+				if (p.second.is_server()) {
+					cp.emplace(p.first, static_cast<const signalling_peer_listing&>(p.second));
+				}
+			}
+
+			dirty = false;
+		});
 
 		return cp;
 	}
