@@ -228,6 +228,22 @@ void MSR_LOG(Args&&... args) {
 #define MSR_LOG_NVPS MSR_LOG
 #endif
 
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Nicknames and server names reject control characters") {
+	REQUIRE(::is_nickname_valid_characters(std::string("Pythagoras")));
+	REQUIRE(::is_nickname_valid_characters(std::string("z\xc5\xbc\xc3\xb3\xc5\x82w")));
+
+	REQUIRE(!::is_nickname_valid_characters(std::string("   ")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\tb")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\nb")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\x1b[31mb")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\x7f")));
+	REQUIRE(!::is_nickname_valid_characters(std::string("a\0b", 3)));
+}
+#endif
+
 
 static void set_cors(httplib::Response& res) {
 	res.set_header("Access-Control-Allow-Origin", "*"); // Allows any domain

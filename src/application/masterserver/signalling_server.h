@@ -428,10 +428,15 @@ private:
 		}
 
 		/*
-			Remove : to not overshadow ip:port addresses
+			Remove : to not overshadow ip:port addresses, and any control character -
+			nothing a peer names itself with may end up corrupting a log line or a terminal.
 		*/
 
-		erase_if(requested, [](const auto c) { return c == ':'; });
+		erase_if(requested, [](const auto c) {
+			const auto uc = static_cast<unsigned char>(c);
+
+			return c == ':' || uc < 0x20 || uc == 0x7f;
+		});
 
 		if (requested.empty()) {
 			return find_free_id(peers);
@@ -615,14 +620,18 @@ private:
 				}
 			}
 			else {
-				LOG("Relaying to peer with id %x", dest_id);
-
 				if (const auto target = mapped_or_nullptr(peers, dest_id)) {
+					LOG("Relaying to peer with id %x", dest_id);
+
 					ensure(target->ws != nullptr);
 
 					target->ws->send(message.dump());
 				}
 				else {
+					/*
+						Not logged as it came: only a registered peer's id is safe to log (see choose_webrtc_id).
+					*/
+
 					LOG("No peer like that!");
 				}
 			}

@@ -87,9 +87,10 @@ inline bool nickname_len_in_range(const std::size_t len) {
 	return len >= min_nickname_length_v && len <= max_nickname_length_v;
 }
 
-inline bool is_wrong_whitespace(const char c) {
-	return std::isspace(static_cast<unsigned char>(c)) && c != ' ';
-}
+/*
+	What a player's nickname or a server's name may contain: anything printable, but no control
+	characters - a name with one would corrupt a log line, a terminal, or the game's UI.
+*/
 
 template <class T>
 inline bool is_nickname_valid_characters(const T& nickname) {
@@ -100,11 +101,9 @@ inline bool is_nickname_valid_characters(const T& nickname) {
 	}
 
 	for (const auto& c : nickname) {
-		if (c == '\0') {
-			return false;
-		}
+		const auto uc = static_cast<unsigned char>(c);
 
-		if (is_wrong_whitespace(c)) {
+		if (uc < 0x20 || uc == 0x7f) {
 			return false;
 		}
 	}
