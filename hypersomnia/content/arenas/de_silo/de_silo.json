@@ -17,6 +17,9 @@
         },
         "warmup_theme": {
             "id": "arabesque"
+        },
+        "bot_waypoints": {
+            "mode": "RANDOM_EVERY_ROUND"
         }
     },
     "playtesting": {

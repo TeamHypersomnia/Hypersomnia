@@ -67,11 +67,9 @@ example) with:
   the user has decided or commented on it) · a label (zostaje, wycięte, zrobić inaczej, pominięte, a replacement such
   as "etykiety", and ↻ when the item comes back to something already cut or changed) · the state and assessment after
   all decisions, in a sentence or two.
-- **Row color - decided by complexity first:**
-  - green - removes complexity, or is a minimal necessary fix, or is planned to be done that way (even if not in the
-    code yet);
-  - red - adds complexity (a map, a flag, a second path, a new endpoint), goes in circles, or is still broken /
-    unresolved (skipped counts as unresolved).
+- **Row color - decided by complexity first,** by the green/red rules in `.claude/skills/audit-green-red/SKILL.md`
+  ("Green or red"). On top of them, here: a row is also green when the fix is planned to be done that way (even if not
+  in the code yet), and red when it goes in circles or is still broken / unresolved (skipped counts as unresolved).
 - **A cut proposal on every row where one exists** ("wyciąć X", "zamiast Y przenieść do Z") - also on green rows,
   when something there could still go.
 - **A "Gdzie się kręciliśmy" section:** one card per loop, the chain of states with arrows

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hypersomnia Audit</title>
+<style>
+:root {
+	--bg: #f7f7f5; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --line: #e2e2dc; --accent: #2b5cd6;
+	--crash: #c62828; --desync: #8e24aa; --lag: #d84315; --bug: #e65100; --perf: #1565c0;
+	--quality: #2e7d32; --nit: #757575; --decision: #b8860b;
+	--green: #2e7d32; --red: #c62828;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #151514; --fg: #e8e8e3; --muted: #9a9a93; --card: #1e1e1c; --line: #33332f; --accent: #7aa2ff;
+		--crash: #ef5350; --desync: #ce93d8; --lag: #ff8a65; --bug: #ffb74d; --perf: #64b5f6;
+		--quality: #81c784; --nit: #a0a0a0; --decision: #e6c34a;
+		--green: #66bb6a; --red: #ef5350;
+	}
+}
+:root[data-theme="dark"] {
+	--bg: #151514; --fg: #e8e8e3; --muted: #9a9a93; --card: #1e1e1c; --line: #33332f; --accent: #7aa2ff;
+	--crash: #ef5350; --desync: #ce93d8; --lag: #ff8a65; --bug: #ffb74d; --perf: #64b5f6;
+	--quality: #81c784; --nit: #a0a0a0; --decision: #e6c34a;
+	--green: #66bb6a; --red: #ef5350;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { padding: 20px 16px 0; max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 20px; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: 13px; }
+nav { display: flex; flex-wrap: wrap; gap: 4px; max-width: 1200px; margin: 16px auto 0; padding: 0 16px; border-bottom: 1px solid var(--line); }
+nav button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 8px 12px; font: inherit; cursor: pointer; }
+nav button.on { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+nav .count { font-size: 12px; opacity: .7; margin-left: 4px; }
+main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.filters label { font-size: 13px; display: inline-flex; gap: 4px; align-items: center; cursor: pointer; }
+.clean { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+.item { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.item h3 { font-size: 15px; margin: 0 0 6px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.num { color: var(--muted); font-variant-numeric: tabular-nums; }
+.badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 4px; color: #fff; }
+.b-crash { background: var(--crash); } .b-desync { background: var(--desync); } .b-lag { background: var(--lag); }
+.b-bug { background: var(--bug); } .b-perf { background: var(--perf); } .b-quality { background: var(--quality); }
+.b-nit { background: var(--nit); } .b-decision { background: var(--decision); }
+.sysname { font-size: 12px; color: var(--muted); }
+.row { display: grid; grid-template-columns: 70px 1fr; gap: 2px 10px; font-size: 14px; }
+.row dt { color: var(--muted); font-size: 12px; padding-top: 2px; }
+.row dd { margin: 0; }
+code { font-family: ui-monospace, "JetBrains Mono", monospace; font-size: 12.5px; background: color-mix(in srgb, var(--line) 60%, transparent); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
+.done { opacity: .45; }
+.item input[type=checkbox] { margin-left: auto; }
+.item.g { border-left: 5px solid var(--green); background: color-mix(in srgb, var(--green) 14%, var(--card)); }
+.item.r { border-left: 5px solid var(--red); background: color-mix(in srgb, var(--red) 14%, var(--card)); }
+.state { font-size: 12px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid currentColor; }
+.state.fixed { color: var(--green); } .state.todo { color: var(--red); }
+.summary { display: flex; flex-wrap: wrap; gap: 16px; margin: 10px 0 0; font-size: 14px; }
+.summary b.g { color: var(--green); } .summary b.r { color: var(--red); }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+	<h1>Audyt: przykładowy ficzer</h1>
+	<div class="sub">2026-10-18 · checklista: <code>.claude/skills/audit-gameplay/SKILL.md</code> · zielone = poprawka nie dokłada złożoności (jednolinijkowiec, wycięcie), czerwone = dokłada albo do decyzji · checkbox = zrobione (zapamiętywane lokalnie)</div>
+	<div class="summary" id="summary"></div>
+</header>
+<nav id="tabs"></nav>
+<main>
+	<div class="filters" id="filters"></div>
+	<div id="list"></div>
+	<p class="clean" id="clean"></p>
+</main>
+<script>
+const SEV = ["crash", "desync", "lag", "bug", "perf", "quality", "nit", "decision"];
+const SEV_LABEL = { crash: "crash", desync: "desync", lag: "lag", bug: "bug", perf: "perf", quality: "jakość", nit: "nit", decision: "decyzja" };
+
+const SYSTEMS = [
+{
+	id: "example", name: "Przykład",
+	clean: "Czyste: determinizm, RNG, web, martwy kod.",
+	items: [
+		["g", "crash", "Dzielenie przez 0 przy pustym obszarze",
+			"<code>draw_minimap.cpp:238</code>",
+			"Obszar o zerowej szerokości daje NaN w skali minimapy.",
+			"Wczesny return przy <code>w() == 0</code>. Jedna linijka.",
+			"fixed"],
+		["r", "lag", "Dwa różne zegary na kliencie z predykcją",
+			"<code>draw_minimap.cpp:555</code>",
+			"Sightingi nagrywane w czasie referential, rysowane w predicted.",
+			"Dokłada pole <code>clock_secs</code> w systemie i drugą ścieżkę czasu. Alternatywa bez złożoności: rysować w czasie referential.",
+			"todo"]
+	]
+}
+];
+
+const TOP = [
+	["example", 0], ["example", 1]
+];
+
+const DONE_KEY = "hs-audit-done";
+let done = {};
+try { done = JSON.parse(localStorage.getItem(DONE_KEY) || "{}"); } catch (e) {}
+const save_done = () => { try { localStorage.setItem(DONE_KEY, JSON.stringify(done)); } catch (e) {} };
+
+let active = "top";
+let sev_on = Object.fromEntries(SEV.map(s => [s, true]));
+
+const tabs = [{ id: "top", name: "Top", n: TOP.length }].concat(SYSTEMS.map(s => ({ id: s.id, name: s.name, n: s.items.length })));
+
+function render_tabs() {
+	const nav = document.getElementById("tabs");
+	nav.innerHTML = "";
+	for (const t of tabs) {
+		const b = document.createElement("button");
+		b.className = t.id === active ? "on" : "";
+		b.innerHTML = `${t.name}<span class="count">${t.n}</span>`;
+		b.onclick = () => { active = t.id; location.hash = t.id; render(); };
+		nav.appendChild(b);
+	}
+}
+
+function render_filters() {
+	const f = document.getElementById("filters");
+	f.innerHTML = "";
+	for (const s of SEV) {
+		const l = document.createElement("label");
+		l.innerHTML = `<input type="checkbox" ${sev_on[s] ? "checked" : ""}> <span class="badge b-${s}">${SEV_LABEL[s]}</span>`;
+		l.querySelector("input").onchange = e => { sev_on[s] = e.target.checked; render(); };
+		f.appendChild(l);
+	}
+}
+
+function render_summary() {
+	const all = SYSTEMS.flatMap(s => s.items);
+	const g = all.filter(it => it[0] === "g").length;
+	const fixed = all.filter(it => it[6] === "fixed").length;
+	document.getElementById("summary").innerHTML =
+		`<span><b class="g">${g}</b> zielonych</span><span><b class="r">${all.length - g}</b> czerwonych</span>` +
+		`<span><b class="g">${fixed}</b> poprawionych</span><span><b class="r">${all.length - fixed}</b> do decyzji</span>`;
+}
+
+function card(sys, idx, show_sys) {
+	const [color, sev, title, where, problem, fix, state] = sys.items[idx];
+	const key = `${sys.id}:${idx}`;
+	const d = document.createElement("div");
+	d.className = `item ${color}` + (done[key] ? " done" : "");
+	d.innerHTML = `
+		<h3><span class="num">${idx + 1}.</span><span class="badge b-${sev}">${SEV_LABEL[sev]}</span>${title}
+			<span class="state ${state}">${state === "fixed" ? "poprawione" : "do decyzji"}</span>
+			${show_sys ? `<span class="sysname">· ${sys.name}</span>` : ""}
+			<input type="checkbox" title="zrobione" ${done[key] ? "checked" : ""}></h3>
+		<dl class="row">
+			<dt>Gdzie</dt><dd>${where}</dd>
+			<dt>Problem</dt><dd>${problem}</dd>
+			<dt>Fix</dt><dd>${fix}</dd>
+		</dl>`;
+	d.querySelector("input").onchange = e => {
+		if (e.target.checked) { done[key] = 1; } else { delete done[key]; }
+		save_done();
+		d.classList.toggle("done", e.target.checked);
+	};
+	return d;
+}
+
+function render() {
+	render_tabs();
+	const list = document.getElementById("list");
+	const clean = document.getElementById("clean");
+	list.innerHTML = "";
+	if (active === "top") {
+		for (const [sid, idx] of TOP) {
+			const sys = SYSTEMS.find(s => s.id === sid);
+			if (sev_on[sys.items[idx][1]]) { list.appendChild(card(sys, idx, true)); }
+		}
+		clean.textContent = "Najgorsze findingi ze wszystkich systemów, od najpoważniejszych.";
+		return;
+	}
+	const sys = SYSTEMS.find(s => s.id === active);
+	sys.items.forEach((it, i) => { if (sev_on[it[1]]) { list.appendChild(card(sys, i, false)); } });
+	clean.textContent = sys.clean;
+}
+
+const h = location.hash.slice(1);
+if (tabs.some(t => t.id === h)) { active = h; }
+render_summary();
+render_filters();
+render();
+</script>
+</body>
+</html>

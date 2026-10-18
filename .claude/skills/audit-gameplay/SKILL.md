@@ -1,6 +1,6 @@
 ---
 name: audit-gameplay
-description: Audit/review a Hypersomnia feature or system (recently added gameplay, rendering, UI code) against the project's review checklist - crash safety, simulation determinism, lag-robust RNG, comments, performance, web compatibility, parameter plumbing, logic vs audiovisual placement, deduplication, header hygiene, dead code, settings/editor UI. Use whenever the user says "zreviewuj mi X", "zaudytuj mi X", "zrób review X", "audyt X", "review X", "audit X".
+description: Audit/review a Hypersomnia feature or system (recently added gameplay, rendering, UI code) against the project's review checklist - crash safety, simulation determinism, lag-robust RNG, comments, performance, web compatibility, parameter plumbing, logic vs audiovisual placement, deduplication, header hygiene, dead code, settings/editor UI. Use whenever the user says "zreviewuj mi X", "zaudytuj mi X", "zrób review X", "audyt X", "review X", "audit X". When the prompt says "z raportem złożonościowym", use `audit-green-red` instead (it runs this checklist).
 ---
 
 # Feature audit
