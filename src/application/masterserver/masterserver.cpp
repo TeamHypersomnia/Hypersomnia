@@ -79,6 +79,134 @@ extern std::vector<std::string> rtc_errors;
 std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
 
+/*
+	Anyone can send tell_me_my_address and its answer goes to the packet's source address,
+	so spoofed sources could bounce a flood of answers off the masterserver at a victim.
+
+	Limited per network (augs::network_of) - not per ip:port, or a new port for every packet
+	would get past it - to far more than the NAT detection of one game ever asks for.
+	The table of networks is cleared wholesale when full, so a flood from ever new spoofed sources
+	can not grow it - but also could reset the victim's limit, hence the limit on all answers at once.
+*/
+
+struct tell_me_my_address_limiter {
+	struct token_bucket {
+		double tokens = -1.0;
+		double when_last = -1.0;
+
+		bool take(const double now, const double per_sec, const double burst) {
+			if (when_last < 0.0) {
+				tokens = burst;
+			}
+			else {
+				tokens = std::min(burst, tokens + (now - when_last) * per_sec);
+			}
+
+			when_last = now;
+
+			if (tokens < 1.0) {
+				return false;
+			}
+
+			tokens -= 1.0;
+			return true;
+		}
+	};
+
+	static constexpr std::size_t max_remembered_networks = 8192;
+
+	static constexpr double network_answers_per_sec = 50.0;
+	static constexpr double network_burst = 100.0;
+
+	static constexpr double total_answers_per_sec = 2000.0;
+	static constexpr double total_burst = 4000.0;
+
+	std::unordered_map<netcode_address_t, token_bucket> by_network;
+	token_bucket total;
+
+	bool try_answer(const netcode_address_t& from, const double now) {
+		if (by_network.size() >= max_remembered_networks) {
+			by_network.clear();
+		}
+
+		if (!by_network[augs::network_of(from)].take(now, network_answers_per_sec, network_burst)) {
+			return false;
+		}
+
+		return total.take(now, total_answers_per_sec, total_burst);
+	}
+};
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Masterserver tell_me_my_address limiter") {
+	auto address = [](const uint8_t last_octet, const uint16_t port) {
+		auto out = netcode_address_t();
+		out.type = NETCODE_ADDRESS_IPV4;
+		out.data.ipv4[0] = 10;
+		out.data.ipv4[1] = 0;
+		out.data.ipv4[2] = 0;
+		out.data.ipv4[3] = last_octet;
+		out.port = port;
+		return out;
+	};
+
+	using limiter_type = tell_me_my_address_limiter;
+
+	SECTION("A network gets its burst, then its rate") {
+		auto limiter = limiter_type();
+		const auto burst = static_cast<int>(limiter_type::network_burst);
+
+		for (int i = 0; i < burst; ++i) {
+			REQUIRE(limiter.try_answer(address(1, 1000), 0.0));
+		}
+
+		REQUIRE(!limiter.try_answer(address(1, 1000), 0.0));
+
+		/*
+			Another port of the same network shares its limit.
+		*/
+
+		REQUIRE(!limiter.try_answer(address(1, 2000), 0.0));
+
+		/*
+			Another network does not.
+		*/
+
+		REQUIRE(limiter.try_answer(address(2, 1000), 0.0));
+
+		/*
+			A second later, the rate's worth of answers again.
+		*/
+
+		const auto refilled = static_cast<int>(limiter_type::network_answers_per_sec);
+
+		for (int i = 0; i < refilled; ++i) {
+			REQUIRE(limiter.try_answer(address(1, 1000), 1.0));
+		}
+
+		REQUIRE(!limiter.try_answer(address(1, 1000), 1.0));
+	}
+
+	SECTION("All answers at once are limited too") {
+		auto limiter = limiter_type();
+		const auto total_burst = static_cast<int>(limiter_type::total_burst);
+
+		auto answered = 0;
+
+		for (int i = 0; i < total_burst + 1000; ++i) {
+			auto from = address(static_cast<uint8_t>(i % 256), 1000);
+			from.data.ipv4[2] = static_cast<uint8_t>(i / 256);
+
+			answered += limiter.try_answer(from, 0.0) ? 1 : 0;
+		}
+
+		REQUIRE(answered == total_burst);
+	}
+}
+#endif
+
 #if PLATFORM_UNIX
 extern std::atomic<int> signal_status;
 #endif
@@ -459,6 +587,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	};
 
 	auto previous_web_servers = signalling_server::servers_map();
+
+	/*
+		See tell_me_my_address_limiter.
+	*/
+
+	auto address_answers = tell_me_my_address_limiter();
 
 	/*
 		A browser joins an official server by its alias (e.g. /game/ranked-pl:1) - only an official server has one.
@@ -1203,11 +1337,20 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {
+						if (!address_answers.try_answer(from, augs::steady_secs())) {
+							static uint64_t last_logged_ms = 0;
+
+							if (::official_log_allowed(last_logged_ms)) {
+								LOG("Too many tell_me_my_address requests from %x - ignoring some.", ::ToString(from));
+							}
+
+							return;
+						}
+
 						masterserver_out::tell_me_my_address response;
 						response.address = from;
 						response.session_timestamp = typed_request.session_timestamp;
 
-						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
 					}
 				};
