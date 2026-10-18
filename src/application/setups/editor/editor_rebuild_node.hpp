@@ -246,6 +246,7 @@ bool setup_entity_from_node(
 			if (const auto marker = agg.template find<components::marker>()) {
 				marker->shape = editable.shape;
 				marker->zoom = editable.zoom;
+				marker->bots_can_use = editable.bots_can_use;
 			}
 		}
 		else {

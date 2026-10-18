@@ -15,6 +15,18 @@ bool buy_area_in_range(const E& subject) {
 	const auto capability = subject.get_owning_transfer_capability();
 	const auto matched_faction = capability.alive() ? capability.get_official_faction() : faction_type::SPECTATOR;
 
+	/*
+		Some buy zones are for players only (components::marker::bots_can_use) - the server checks bots' purchases here too.
+	*/
+
+	const bool is_bot = [&]() {
+		if (const auto sentience = subject.template find<components::sentience>()) {
+			return sentience->is_bot;
+		}
+
+		return false;
+	}();
+
 	auto& entities = thread_local_visible_entities();
 
 	entities.reacquire_all({
@@ -38,6 +50,10 @@ bool buy_area_in_range(const E& subject) {
 				const auto& marker = typed_handle.template get<invariants::area_marker>();
 
 				if (area_marker_type::BUY_ZONE == marker.type) {
+					if (is_bot && !typed_handle.template get<components::marker>().bots_can_use) {
+						return callback_result::CONTINUE;
+					}
+
 					const auto zone_faction = typed_handle.get_official_faction();
 					const bool faction_matches = 
 						matched_faction == zone_faction || 

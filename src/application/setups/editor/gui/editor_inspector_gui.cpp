@@ -967,6 +967,11 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	const bool is_hurt = type == area_marker_type::HAZARD;
 	(void)is_hurt;
 
+	if (type == area_marker_type::BUY_ZONE) {
+		MULTIPROPERTY("Bots can buy here", bots_can_use);
+		tooltip_on_hover("Uncheck for a buy zone only players should use,\ne.g. a secret one in the middle of the map - bots never buy in it.");
+	}
+
 	if (type == area_marker_type::CAMERA_ZOOM) {
 		MULTIPROPERTY("Zoom", zoom);
 		tooltip_on_hover("The camera will smoothly change zoom to this value\nwhenever the viewed character is inside this area.\nValues below 1 zoom the camera out - useful for large open spaces.\n\nIf zoom areas overlap, the one higher in the layer hierarchy wins.");

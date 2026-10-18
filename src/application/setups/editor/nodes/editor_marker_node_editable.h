@@ -118,6 +118,7 @@ struct editor_area_marker_node_editable {
 	faction_type faction = faction_type::ANY;
 	marker_letter_type letter = marker_letter_type::A;
 	marker_shape_type shape = marker_shape_type::BOX;
+	bool bots_can_use = true;
 
 	vec2 pos;
 	real32 rotation = 0.0f;
