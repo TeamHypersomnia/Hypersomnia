@@ -154,10 +154,12 @@ struct main_menu_gui {
 
 		root.buttons[int(main_menu_button_type::STEAM)].special_image = assets::necessary_image_id::STEAM_BUTTON;
 		root.buttons[int(main_menu_button_type::DISCORD)].special_image = assets::necessary_image_id::DISCORD_BUTTON;
+		root.buttons[int(main_menu_button_type::TELEGRAM)].special_image = assets::necessary_image_id::TELEGRAM_BUTTON;
 		root.buttons[int(main_menu_button_type::GITHUB)].special_image = assets::necessary_image_id::GITHUB_BUTTON;
 
 		root.buttons[int(main_menu_button_type::STEAM)].colorize = white * menu_buttons_colors;
 		root.buttons[int(main_menu_button_type::DISCORD)].colorize = white * menu_buttons_colors;
+		root.buttons[int(main_menu_button_type::TELEGRAM)].colorize = white * menu_buttons_colors;
 		root.buttons[int(main_menu_button_type::GITHUB)].colorize = white * menu_buttons_colors;
 
 		world.advance_elements(context, vdt);

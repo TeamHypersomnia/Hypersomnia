@@ -71,6 +71,7 @@ public:
 
 		auto& s_rc = buttons[int(Enum::STEAM)].rc;
 		auto& d_rc = buttons[int(Enum::DISCORD)].rc;
+		auto& t_rc = buttons[int(Enum::TELEGRAM)].rc;
 		auto& g_rc = buttons[int(Enum::GITHUB)].rc;
 
 
@@ -97,12 +98,16 @@ public:
 		d_rc.l = s_rc.r + 10;
 		d_rc.w(s_rc.w());
 
-		g_rc = d_rc;
-		g_rc.l = d_rc.r + 10;
-		g_rc.w(d_rc.w());
+		t_rc = d_rc;
+		t_rc.l = d_rc.r + 10;
+		t_rc.w(d_rc.w());
 
-		g_rc.t = s_rc.t = d_rc.t = t;
-		g_rc.b = s_rc.b = d_rc.b = b;
+		g_rc = t_rc;
+		g_rc.l = t_rc.r + 10;
+		g_rc.w(t_rc.w());
+
+		g_rc.t = s_rc.t = d_rc.t = t_rc.t = t;
+		g_rc.b = s_rc.b = d_rc.b = t_rc.b = b;
 	}
 
 	template <class M>

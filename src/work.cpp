@@ -5167,6 +5167,10 @@ work_result work(
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
 
+			case T::TELEGRAM:
+				augs::open_url("https://t.me/hypersomnia_io");
+				break;
+
 			case T::GITHUB:
 				augs::open_url("https://github.com/TeamHypersomnia/Hypersomnia");
 				break;
@@ -5272,6 +5276,10 @@ work_result work(
 		switch (t) {
 			case T::DISCORD:
 				augs::open_url("https://discord.com/invite/YC49E4G");
+				break;
+
+			case T::TELEGRAM:
+				augs::open_url("https://t.me/hypersomnia_io");
 				break;
 
 			case T::GITHUB:

@@ -104,6 +104,7 @@ struct ingame_menu_gui {
 
 		root.buttons[int(ingame_menu_button_type::STEAM)].special_image = assets::necessary_image_id::STEAM_BUTTON;
 		root.buttons[int(ingame_menu_button_type::DISCORD)].special_image = assets::necessary_image_id::DISCORD_BUTTON;
+		root.buttons[int(ingame_menu_button_type::TELEGRAM)].special_image = assets::necessary_image_id::TELEGRAM_BUTTON;
 		root.buttons[int(ingame_menu_button_type::GITHUB)].special_image = assets::necessary_image_id::GITHUB_BUTTON;
 
 		root.set_menu_buttons_colors(cyan);
@@ -111,6 +112,7 @@ struct ingame_menu_gui {
 
 		root.buttons[int(ingame_menu_button_type::STEAM)].colorize = white;
 		root.buttons[int(ingame_menu_button_type::DISCORD)].colorize = white;
+		root.buttons[int(ingame_menu_button_type::TELEGRAM)].colorize = white;
 		root.buttons[int(ingame_menu_button_type::GITHUB)].colorize = white;
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {

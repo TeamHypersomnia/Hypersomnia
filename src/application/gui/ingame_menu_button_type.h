@@ -4,6 +4,7 @@ enum class ingame_menu_button_type {
 	// GEN INTROSPECTOR enum class ingame_menu_button_type
 	STEAM,
 	DISCORD,
+	TELEGRAM,
 	GITHUB,
 
 	RESUME,

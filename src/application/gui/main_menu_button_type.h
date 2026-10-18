@@ -4,6 +4,7 @@ enum class main_menu_button_type {
 	// GEN INTROSPECTOR enum class main_menu_button_type
 	STEAM,
 	DISCORD,
+	TELEGRAM,
 	GITHUB,
 	QUICK_PLAY,
 	DOWNLOAD_MAPS,
