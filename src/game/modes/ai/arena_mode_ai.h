@@ -1,4 +1,5 @@
 #pragma once
+#include "game/modes/detail/item_purchase_structs.h"
 #include "game/modes/arena_mode.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 
@@ -28,7 +29,8 @@ arena_ai_result update_arena_mode_ai(
 	const std::size_t bot_index,
 	const std::size_t num_bots,
 	const fog_of_war_settings& fog_of_war,
-	const std::optional<real32> zoom_override
+	const std::optional<real32> zoom_override,
+	const item_purchases_vector& shop_allowed_firearms
 );
 
 void update_arena_mode_ai_team(

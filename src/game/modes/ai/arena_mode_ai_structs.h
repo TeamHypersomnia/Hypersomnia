@@ -427,6 +427,12 @@ real32 get_melee_reaction_time_secs(const difficulty_type difficulty);
 */
 real32 get_bullet_reaction_time_secs(const difficulty_type difficulty);
 
+/*
+	How much longer than invariants::gun::bot_aim_settle_secs the bot settles its aim,
+	and how much faster it drains back - easier bots settle longer and forget faster.
+*/
+real32 get_aim_settle_mult(const difficulty_type difficulty);
+
 struct arena_mode_ai_state {
 	// GEN INTROSPECTOR struct arena_mode_ai_state
 	ai_behavior_variant last_behavior = ai_behavior_idle();
@@ -462,6 +468,10 @@ struct arena_mode_ai_state {
 	vec2 avoided_bullet_dodge = {};
 
 	real32 melee_reaction_timer = 0.0f;
+	real32 aim_settle = 0.0f;
+
+	entity_id item_to_retrieve;
+	entity_id unreachable_item;
 	// END GEN INTROSPECTOR
 
 	bool is_navigating() const {

@@ -159,7 +159,14 @@ inline ai_behavior_variant eval_behavior_tree(
 	}
 
 	/*
-		Priority 5: PATROL behavior (with optional push_waypoint).
+		Priority 5: RETRIEVE_ITEM - a firearm lying nearby, found outside combat (see arena_mode_ai.cpp).
+	*/
+	if (ai_state.item_to_retrieve.is_set()) {
+		return ai_behavior_retrieve_item{};
+	}
+
+	/*
+		Priority 6: PATROL behavior (with optional push_waypoint).
 		
 		If push_phase == NOT_DECIDED, assign a push waypoint and transition to IN_PROGRESS.
 		Once the push waypoint is reached, patrol_process sets push_phase = COMPLETED.

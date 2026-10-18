@@ -24,6 +24,7 @@ struct arena_buy_menu_gui {
 		const bool is_in_buy_zone;
 		const item_purchases_vector& done_purchases;
 		const bool give_extra_mags_on_first_purchase;
+		const item_purchases_vector& shop_allowed_firearms;
 		const buy_menu_gui_settings& settings;
 	};
 

@@ -340,6 +340,7 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 						true,
 						p->stats.round_state.done_purchases,
 						mode_input.rules.economy.give_extra_mags_on_first_purchase,
+						mode_input.rules.economy.shop_allowed_firearms,
 						mode_in.config.arena_mode_gui.buy_menu_settings
 					});
 

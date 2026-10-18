@@ -2804,7 +2804,8 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			bot_index,
 			num_bots,
 			in.rules.view.fog_of_war,
-			get_zoom_override()
+			get_zoom_override(),
+			in.rules.economy.shop_allowed_firearms
 		);
 		
 		if (ai_result.item_purchase.has_value()) {
@@ -2909,6 +2910,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 								}
 
 								if (::owns_once_owning_category_of(player_handle, f_id)) {
+									return;
+								}
+
+								if (!::is_sold_in_shop(cosm, in.rules.economy.shop_allowed_firearms, f_id)) {
 									return;
 								}
 

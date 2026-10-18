@@ -45,6 +45,8 @@
 #include "game/modes/ai/behaviors/ai_behavior_patrol_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_defuse_process.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_retrieve_bomb_process.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_retrieve_item_process.hpp"
+#include "game/modes/ai/tasks/find_retrievable_firearm.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_plant_process.hpp"
 #include "game/modes/ai/intents/calc_navigation_request.hpp"
 #include "game/modes/ai/intents/calc_movement_and_crosshair.hpp"
@@ -280,7 +282,8 @@ arena_ai_result update_arena_mode_ai(
 	const std::size_t bot_index,
 	const std::size_t num_bots,
 	const fog_of_war_settings& fog_of_war,
-	const std::optional<real32> zoom_override
+	const std::optional<real32> zoom_override,
+	const item_purchases_vector& shop_allowed_firearms
 ) {
 	auto stable_rng = randomization(stable_round_rng);
 
@@ -678,6 +681,48 @@ arena_ai_result update_arena_mode_ai(
 	}
 
 	/*
+		Outside combat, missions and buying, a bot with room for one more firearm goes for the nearest one lying around.
+		The cheap checks come first; the area is searched once a second, spread over the steps by the bot's index.
+	*/
+	{
+		auto& wanted = ai_state.item_to_retrieve;
+
+		const bool free_to_wander =
+			::is_behavior<ai_behavior_patrol>(ai_state.last_behavior)
+			|| ::is_behavior<ai_behavior_idle>(ai_state.last_behavior)
+			|| ::is_behavior<ai_behavior_retrieve_item>(ai_state.last_behavior)
+		;
+
+		const bool can_go_for_items =
+			!is_gun_game
+			&& !in_buy_area
+			&& !is_freeze_time
+			&& !has_visual
+			&& free_to_wander
+			&& ::count_carried_firearms(character_handle) < ::calc_max_firearms(character_handle)
+		;
+
+		/*
+			Taken by someone else - look for the next one right away.
+		*/
+
+		const bool lost_target = wanted.is_set() && !::is_retrievable_firearm(cosm[wanted], ai_state.unreachable_item);
+
+		if (!can_go_for_items || lost_target) {
+			wanted = entity_id();
+		}
+
+		if (can_go_for_items && !wanted.is_set()) {
+			const auto steps_per_search = std::max(1u, static_cast<uint32_t>(1.0f / dt_secs + 0.5f));
+			const bool search_due = lost_target || (cosm.get_total_steps_passed() + bot_index) % steps_per_search == 0;
+
+			if (search_due) {
+				wanted = ::find_nearest_retrievable_firearm(cosm, character_pos, ai_state.unreachable_item);
+			}
+		}
+	}
+
+	/*
 		===========================================================================
 		PHASE 2: Evaluate behavior tree to get desired behavior.
 		===========================================================================
@@ -940,7 +985,8 @@ arena_ai_result update_arena_mode_ai(
 		navmesh,
 		stable_rng,
 		aim_radius_to_shoot,
-		has_direct_los_to_enemy
+		has_direct_los_to_enemy,
+		ai_state.item_to_retrieve
 	);
 
 	/* Check if request changed - reinitialize navigation. */
@@ -999,7 +1045,14 @@ arena_ai_result update_arena_mode_ai(
 				/*
 					Don't cache the failed request — leave current_navigation_request
 					at nullopt so the next AI tick re-enters this branch and retries.
+					An unreachable item is given up on instead.
 				*/
+
+				if (::is_behavior<ai_behavior_retrieve_item>(ai_state.last_behavior)) {
+					ai_state.unreachable_item = ai_state.item_to_retrieve;
+					ai_state.item_to_retrieve = entity_id();
+				}
+
 				LOG("AI ERROR: start_navigating_to FAILED for bot at (%x,%x) -> target (%x,%x). Waypoint unreachable?",
 					character_pos.x, character_pos.y, effective_request->target.pos.x, effective_request->target.pos.y);
 			}
@@ -1245,6 +1298,46 @@ arena_ai_result update_arena_mode_ai(
 				sentience->hand_flags[0] = false;
 				sentience->hand_flags[1] = false;
 			}
+
+			/*
+				With a gun that needs settling (a sniper rifle) the first shot comes only after the target
+				has been seen for bot_aim_settle_secs - time for the player to react, while the crosshair keeps aiming.
+				Once settled it stays so while the target is seen, and drains back over bot_aim_settle_drain_secs
+				after losing it, so a quick re-peek waits shorter than a peek after a while.
+			*/
+
+			auto settle_secs = 0.0f;
+			auto drain_secs = 0.0f;
+
+			for (const auto& wielded : character_handle.get_wielded_guns()) {
+				if (const auto gun_def = cosm[wielded].find<invariants::gun>()) {
+					if (gun_def->bot_aim_settle_secs > settle_secs) {
+						settle_secs = gun_def->bot_aim_settle_secs;
+						drain_secs = gun_def->bot_aim_settle_drain_secs;
+					}
+				}
+			}
+
+			auto& settle = ai_state.aim_settle;
+
+			if (settle_secs <= 0.0f) {
+				settle = 0.0f;
+			}
+			else {
+				const auto mult = ::get_aim_settle_mult(difficulty);
+
+				if (!target_acquired) {
+					settle = drain_secs > 0.0f ? std::max(0.0f, settle - dt_secs * mult / drain_secs) : 0.0f;
+				}
+				else {
+					settle = std::min(1.0f, settle + dt_secs / (settle_secs * mult));
+				}
+
+				if (settle < 1.0f) {
+					sentience->hand_flags[0] = false;
+					sentience->hand_flags[1] = false;
+				}
+			}
 		}
 	}
 
@@ -1258,7 +1351,7 @@ arena_ai_result update_arena_mode_ai(
 		Only attempt purchases when in buy area.
 	*/
 	if (in_buy_area) {
-		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng);
+		result.item_purchase = ::handle_purchases(ctx, money, dt_secs, stable_rng, shop_allowed_firearms);
 	}
 
 	if (move_result.path_completed) {
@@ -1453,6 +1546,15 @@ real32 get_reaction_time_secs(const difficulty_type difficulty) {
 		case difficulty_type::MEDIUM:      return 0.50f;
 		case difficulty_type::HARD:        return 0.35f;
 		default:                           return 0.20f;
+	}
+}
+
+real32 get_aim_settle_mult(const difficulty_type difficulty) {
+	switch (difficulty) {
+		case difficulty_type::VERY_EASY:   return 3.0f;
+		case difficulty_type::EASY:        return 2.0f;
+		case difficulty_type::HARD:        return 1.0f;
+		default:                           return 1.5f;
 	}
 }
 

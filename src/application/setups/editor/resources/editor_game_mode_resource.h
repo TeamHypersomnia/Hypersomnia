@@ -63,6 +63,8 @@ struct editor_bomb_defusal_mode {
 
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
 	per_actual_faction<editor_requested_equipment> round_start_equipment;
+
+	std::vector<editor_typed_resource_id<editor_firearm_resource>> shop_allowed_firearms;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_bomb_defusal_mode&) const = default;

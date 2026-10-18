@@ -202,6 +202,14 @@ auto setup_ruleset_from_editor_mode(
 
 		if constexpr(subrules.has_economy()) {
 			rules.buy_secs_after_freeze = vars.buy_time;
+
+			/*
+				Empty sells every firearm.
+			*/
+
+			for (const auto& firearm : vars.shop_allowed_firearms) {
+				rules.economy.shop_allowed_firearms.push_back(to_flavour(firearm));
+			}
 		}
 
 		if constexpr(is_gun_game_v) {

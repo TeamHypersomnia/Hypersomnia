@@ -3,6 +3,7 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/modes/detail/flavour_getters.h"
 #include "game/modes/detail/spell_getters.h"
+#include "game/modes/detail/item_purchase_structs.h"
 #include "game/cosmos/logic_step.h"
 #include "game/enums/filters.h"
 #include "game/detail/inventory/firearm_limit.h"
@@ -42,6 +43,18 @@ inline bool is_firearm_like(const cosmos& cosm, const item_flavour_id& id) {
 	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
 		return ::is_firearm_like(typed_flavour.template get<invariants::item>().categories_for_slot_compatibility);
 	});
+}
+
+/*
+	A map may limit which firearms the shop sells (arena_mode_economy_rules::shop_allowed_firearms) - empty means all.
+*/
+
+inline bool is_sold_in_shop(const cosmos& cosm, const item_purchases_vector& shop_allowed_firearms, const item_flavour_id& id) {
+	if (shop_allowed_firearms.empty() || !::is_firearm_like(cosm, id)) {
+		return true;
+	}
+
+	return found_in(shop_allowed_firearms, id);
 }
 
 inline bool is_armor_like(const cosmos& cosm, const item_flavour_id& id) {

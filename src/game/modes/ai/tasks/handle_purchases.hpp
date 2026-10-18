@@ -13,7 +13,8 @@ inline std::optional<item_flavour_id> handle_purchases(
 	const ai_character_context& ctx,
 	const money_type money,
 	const float dt_secs,
-	randomization& stable_rng
+	randomization& stable_rng,
+	const item_purchases_vector& shop_allowed_firearms
 ) {
 	if (money <= 0) {
 		ctx.ai_state.already_nothing_more_to_buy = true;
@@ -132,6 +133,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 			}
 
 			if (flavour.template get<invariants::gun>().bots_ban) {
+				return;
+			}
+
+			if (!::is_sold_in_shop(ctx.cosm, shop_allowed_firearms, item_flavour_id(id))) {
 				return;
 			}
 

@@ -9,6 +9,7 @@ struct ai_behavior_process_ctx;
 #include "game/modes/ai/behaviors/ai_behavior_defuse.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_retrieve_bomb.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_plant.hpp"
+#include "game/modes/ai/behaviors/ai_behavior_retrieve_item.hpp"
 
 /*
 	Variant type holding all possible AI behaviors.
@@ -26,7 +27,8 @@ using ai_behavior_variant = std::variant<
 	ai_behavior_patrol,
 	ai_behavior_defuse,
 	ai_behavior_retrieve_bomb,
-	ai_behavior_plant
+	ai_behavior_plant,
+	ai_behavior_retrieve_item
 >;
 
 /*

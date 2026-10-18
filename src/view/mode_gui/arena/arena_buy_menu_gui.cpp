@@ -819,6 +819,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 						return;
 					}
 
+					if (!::is_sold_in_shop(cosm, in.shop_allowed_firearms, item_flavour_id(id))) {
+						return;
+					}
+
 					if (considered_stance.has_value()) {
 						if (item.holding_stance != *considered_stance) {
 							const bool but_its_sniper_and_we_want_rifles = item.holding_stance == item_holding_stance::SNIPER_LIKE && considered_stance == item_holding_stance::RIFLE_LIKE;

@@ -79,7 +79,8 @@ inline std::optional<ai_navigation_request> calc_current_navigation_request(
 	const cosmos_navmesh& navmesh,
 	randomization& rng,
 	const real32 aim_radius_to_shoot,
-	const bool has_direct_los_to_enemy
+	const bool has_direct_los_to_enemy,
+	const entity_id item_to_retrieve
 ) {
 	(void)bot_player_id;
 	(void)global_time_secs;
@@ -124,6 +125,13 @@ inline std::optional<ai_navigation_request> calc_current_navigation_request(
 					const auto bomb_target = ::find_bomb_pathfinding_target(bomb_handle, navmesh, character_pos);
 					return ::create_bomb_navigation_request(bomb_target);
 				}
+			}
+
+			return std::nullopt;
+		}
+		else if constexpr (std::is_same_v<T, ai_behavior_retrieve_item>) {
+			if (const auto item = cosm[item_to_retrieve]) {
+				return ::create_bomb_navigation_request(::find_bomb_pathfinding_target(item, navmesh, character_pos));
 			}
 
 			return std::nullopt;
