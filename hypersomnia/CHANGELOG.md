@@ -70,6 +70,7 @@
 	- Exactly like was the case with grenades.
 - After planting, the gun goes back to your hand.
 	- The bomb key works like a hotbar number.
+- Shortened bullet traces a bit as they werea bit excessive.
 - Bots see only as far as a player standing in their spot would.
 - Bots using sniper rifles wait a moment before the first shot. 
 

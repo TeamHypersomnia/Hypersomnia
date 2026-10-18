@@ -4466,7 +4466,7 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
-			gun_def.bot_aim_settle_secs = 0.5f;
+			gun_def.bot_aim_settle_secs = 0.35f;
 			gun_def.muzzle_light_radius *= 1.4f;
 			gun_def.muzzle_light_color = muzzle_cyan;
 			gun_def.muzzle_light_duration *= 1.45f;
@@ -4525,7 +4525,8 @@ namespace test_flavours {
 
 			auto& gun_def = meta.get<invariants::gun>();
 
-			gun_def.bot_aim_settle_secs = 0.5f;
+			gun_def.bot_aim_settle_secs = 0.35f;
+			gun_def.bot_aim_settle_drain_secs = 2.f;
 			gun_def.muzzle_light_radius *= 1.2f;
 			gun_def.muzzle_light_color = yellow;
 			//gun_def.muzzle_light_duration *= 1.2f;
@@ -4717,7 +4718,9 @@ namespace test_flavours {
 			meta.template get<invariants::text_details>().name = "BullDup 2000";
 
 			auto& gun_def = meta.get<invariants::gun>();
-			gun_def.bot_aim_settle_secs = 0.5f;
+			gun_def.bot_aim_settle_secs = 0.35f;
+			gun_def.bot_aim_settle_drain_secs = 3.5f;
+			gun_def.bot_aim_settle_secs_min = 0.05f;
 			gun_def.muzzle_light_radius *= 1.25f;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_MUZZLE);
