@@ -22,6 +22,7 @@
 
 #include "application/setups/editor/gui/editor_inspector_gui.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
+#include "application/gui/pretty_tabs.h"
 
 #include "augs/misc/imgui/maybe_different.h"
 #include "application/setups/editor/resources/resource_traits.h"
@@ -2373,63 +2374,59 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 	return result;
 }
 
-SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings defaults, id_widget_handler special_handler) {
+SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings defaults, id_widget_handler special_handler, const arena_settings_section section) {
 	using namespace augs::imgui;
 	std::string result;
 
 	(void)defaults;
 
-	special_handler.allow_none = false;
+	if (section == arena_settings_section::GENERAL) {
+		special_handler.allow_none = false;
 
-	PROPERTY("Default server mode", default_server_mode);
+		PROPERTY("Default server mode", default_server_mode);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("When an actual server loads your arena,\nthis game mode will be chosen first.\n\nTo change the mode you're testing in the editor,\ngo to Playtesting tab.");
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("When an actual server loads your arena,\nthis game mode will be chosen first.\n\nTo change the mode you're testing in the editor,\ngo to Playtesting tab.");
+		}
+
+		special_handler.allow_none = true;
+		PROPERTY("Include disabled nodes", include_disabled_nodes);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If ticked, all nodes disabled with the \"eye\" icon\nwill still appear in-game (both when playtesting and live).\n\nThey will remain hidden when editing.");
+		}
+
+		PROPERTY("Default zoom", default_zoom);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("The camera zoom used wherever no Camera zoom area\ncovers the player.");
+		}
+
+		PROPERTY("Minimap tab shows all islands", minimap_tab_shows_all_islands);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If ticked, the extended minimap view (under Tab)\nshows the union of all Nav island areas,\ninstead of just the island the player is currently on.");
+		}
+
+		THEME_PROPERTY("Warmup theme", warmup_theme);
 	}
 
-	special_handler.allow_none = true;
-	PROPERTY("Include disabled nodes", include_disabled_nodes);
+	if (section == arena_settings_section::LIGHTS) {
+		PROPERTY("Ambient light color", ambient_light_color);
+		PROPERTY("Physical lights", physical_lights);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("If ticked, all nodes disabled with the \"eye\" icon\nwill still appear in-game (both when playtesting and live).\n\nThey will remain hidden when editing.");
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Point lights fade out smoothly to zero at their Radius, shaped by their Intensity and Falloff.\nOff: the legacy model for comparison - the same parameters approximated\nby the old attenuation with a visible edge, and Brighten lights in discrete bands.");
+		}
+
+		PROPERTY("Brighten lights", brighten_lights);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Turn off for maximum color fidelity.\nTurn on for brighter lights.");
+		}
 	}
 
-	PROPERTY("Default zoom", default_zoom);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("The camera zoom used wherever no Camera zoom area\ncovers the player.");
-	}
-
-	PROPERTY("Minimap tab shows all islands", minimap_tab_shows_all_islands);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("If ticked, the extended minimap view (under Tab)\nshows the union of all Nav island areas,\ninstead of just the island the player is currently on.");
-	}
-
-	THEME_PROPERTY("Warmup theme", warmup_theme);
-
-	ImGui::Separator();
-	text_color("Lighting", yellow);
-	ImGui::Separator();
-
-	PROPERTY("Ambient light color", ambient_light_color);
-	PROPERTY("Physical lights", physical_lights);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Point lights fade out smoothly to zero at their Radius, shaped by their Intensity and Falloff.\nOff: the legacy model for comparison - the same parameters approximated\nby the old attenuation with a visible edge, and Brighten lights in discrete bands.");
-	}
-
-	PROPERTY("Brighten lights", brighten_lights);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Turn off for maximum color fidelity.\nTurn on for brighter lights.");
-	}
-
-	ImGui::Separator();
-	text_color("Sun shadows", yellow);
-	ImGui::Separator();
-
-	{
+	if (section == arena_settings_section::SUN_SHADOWS) {
 		auto id = scoped_id("sun_shadows");
 		auto& sun = insp.sun_shadows;
 
@@ -2480,11 +2477,7 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		}
 	}
 
-	ImGui::Separator();
-	text_color("Point light shadows", yellow);
-	ImGui::Separator();
-
-	{
+	if (section == arena_settings_section::POINT_LIGHT_SHADOWS) {
 		auto id = scoped_id("point_light_shadows");
 
 		PROPERTY_RANGED("Smoothness mult", point_light_shadows.smoothness_mult, 0.0f, 4.0f);
@@ -2500,72 +2493,68 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		}
 	}
 
-	ImGui::Separator();
-	text_color("Navmesh", yellow);
-	ImGui::Separator();
+	if (section == arena_settings_section::NAVMESH) {
+		{
+			auto& val = insp.navmesh_cell_size;
+			const auto old_val = val;
 
-	{
-		auto& val = insp.navmesh_cell_size;
-		const auto old_val = val;
+			int vv = val;
+			if (ImGui::SliderInt("Navmesh cell size", &vv, 16, 256)) {
+				val = std::max(16, vv);
 
-		int vv = val;
-		if (ImGui::SliderInt("Navmesh cell size", &vv, 16, 256)) {
-			val = std::max(16, vv);
+				if (val != old_val) {
+					result = "Set navmesh cell size";
+				}
+			}
 
-			if (val != old_val) {
-				result = "Set navmesh cell size";
+			if (ImGui::IsItemHovered()) {
+				text_tooltip("Size of each navmesh grid cell in pixels.\nSmaller values give more precision but larger navmesh files.");
 			}
 		}
 
+		PROPERTY("Debug navmesh free color", debug_navmesh_free_color);
+
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("Size of each navmesh grid cell in pixels.\nSmaller values give more precision but larger navmesh files.");
+			text_tooltip("Color used to display free (walkable) navmesh cells in the editor.");
+		}
+
+		PROPERTY("Debug navmesh occupied color", debug_navmesh_occupied_color);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Color used to display occupied (blocked) navmesh cells in the editor.");
+		}
+
+		PROPERTY("Debug navmesh portal color", debug_navmesh_portal_color);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Color used to display portal cells in the navmesh.");
+		}
+
+		PROPERTY("Debug navigation color", debug_navigation_color);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Color used to display navigation debug path in the editor.");
 		}
 	}
 
-	PROPERTY("Debug navmesh free color", debug_navmesh_free_color);
+	if (section == arena_settings_section::BOT_WAYPOINTS) {
+		PROPERTY("Bot waypoints", bot_waypoints.mode);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Color used to display free (walkable) navmesh cells in the editor.");
-	}
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Where the bots' push and patrol waypoints come from.\n\nAutomatic: your waypoints if the map has any, otherwise generated every round.\nYours and generated: your waypoints, plus more generated around them every round.\nRandom every round: generated every round, your waypoints are ignored.");
+		}
 
-	PROPERTY("Debug navmesh occupied color", debug_navmesh_occupied_color);
+		PROPERTY_RANGED("Density", bot_waypoints.density, 0.1f, 2.0f);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Color used to display occupied (blocked) navmesh cells in the editor.");
-	}
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("How many waypoints get generated - more, closer to each other, with a higher density.\nUsed every round and by the preview below.");
+		}
 
-	PROPERTY("Debug navmesh portal color", debug_navmesh_portal_color);
+		PROPERTY("Preview seed", bot_waypoints_preview_seed);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Color used to display portal cells in the navmesh.");
-	}
-
-	PROPERTY("Debug navigation color", debug_navigation_color);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Color used to display navigation debug path in the editor.");
-	}
-
-	ImGui::Separator();
-	text_color("Bot waypoints", yellow);
-	ImGui::Separator();
-
-	PROPERTY("Bot waypoints", bot_waypoints.mode);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Where the bots' push and patrol waypoints come from.\n\nAutomatic: your waypoints if the map has any, otherwise generated every round.\nYours and generated: your waypoints, plus more generated around them every round.\nRandom every round: generated every round, your waypoints are ignored.");
-	}
-
-	PROPERTY_RANGED("Density", bot_waypoints.density, 0.1f, 2.0f);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("How many waypoints get generated - more, closer to each other, with a higher density.\nUsed every round and by the preview below.");
-	}
-
-	PROPERTY("Preview seed", bot_waypoints_preview_seed);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("The seed of the preview below - the same seed gives the same waypoints again.\nEvery round in game draws its own.");
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("The seed of the preview below - the same seed gives the same waypoints again.\nEvery round in game draws its own.");
+		}
 	}
 
 	return result;
@@ -2752,6 +2741,91 @@ EDIT_FUNCTION(
 			ImGui::Separator();
 
 			FACTION_EQUIPMENT_PROPERTY("Round start equipment", bomb_defusal.round_start_equipment);
+
+			ImGui::Separator();
+			text_color("Firearms sold in the shop", yellow);
+			ImGui::Separator();
+
+			{
+				auto& firearms = insp.bomb_defusal.shop_allowed_firearms;
+
+				auto list_of = [](auto& e) -> auto& {
+					return e.after.bomb_defusal.shop_allowed_firearms;
+				};
+
+				bool lists_different = false;
+
+				for (auto& e : es) {
+					if (!(firearms == list_of(e))) {
+						lists_different = true;
+					}
+				}
+
+				if (firearms.empty()) {
+					text_disabled("None listed - the shop sells every firearm.");
+				}
+				else {
+					text_disabled("Only these firearms are sold. Other items are sold as usual.");
+				}
+
+				if (ImGui::Button("Add firearm")) {
+					firearms.push_back({});
+					result = "Added new firearm in %x";
+
+					for (auto& e : es) {
+						list_of(e).push_back({});
+					}
+				}
+
+				auto cols = maybe_different_value_cols({}, lists_different);
+
+				std::optional<std::size_t> removed_i;
+
+				for (auto& firearm : firearms) {
+					const auto idx = index_in(firearms, firearm);
+
+					const auto id_but = typesafe_sprintf("-##Shop%x", idx);
+					const auto id_str = typesafe_sprintf("ShopFirearm%x", idx);
+					auto this_scope = scoped_id(id_str.c_str());
+
+					if (ImGui::Button(id_but.c_str())) {
+						removed_i = idx;
+					}
+
+					ImGui::SameLine();
+
+					auto write_to_others = [&]() {
+						for (auto& e : es) {
+							auto& lc = list_of(e);
+
+							if (idx < lc.size()) {
+								lc[idx] = firearm;
+							}
+						}
+					};
+
+					special_handler.allow_none = false;
+					const auto label = typesafe_sprintf("Firearm %x", idx);
+
+					if (edit_property(result, label, special_handler, firearm)) {
+						write_to_others();
+					}
+
+					special_handler.allow_none = true;
+				}
+
+				if (removed_i.has_value()) {
+					for (auto& e : es) {
+						auto& lc = list_of(e);
+
+						if (*removed_i < lc.size()) {
+							lc.erase(lc.begin() + *removed_i);
+						}
+					}
+
+					result = typesafe_sprintf("Removed Firearm %x in %x", *removed_i);
+				}
+			}
 		}
 		else if constexpr(std::is_same_v<I, editor_gun_game_mode>) {
 			MULTIPROPERTY("Free for all", gun_game.free_for_all);
@@ -3432,6 +3506,39 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		};
 
 		if (project_current_tab == inspected_project_tab_type::ARENA) {
+			/*
+				Every pane edits a part of the arena settings - Lighting and Bots have panes of their own.
+			*/
+
+			do_pretty_tabs(project_arena_current_pane);
+
+			const auto section = [&]() {
+				if (project_arena_current_pane == project_arena_pane::LIGHTING) {
+					do_pretty_tabs(project_lighting_current_pane);
+
+					switch (project_lighting_current_pane) {
+						case project_lighting_pane::SUN_SHADOWS:
+							return arena_settings_section::SUN_SHADOWS;
+						case project_lighting_pane::POINT_LIGHT_SHADOWS:
+							return arena_settings_section::POINT_LIGHT_SHADOWS;
+						default:
+							return arena_settings_section::LIGHTS;
+					}
+				}
+
+				if (project_arena_current_pane == project_arena_pane::BOTS) {
+					do_pretty_tabs(project_bots_current_pane);
+
+					if (project_bots_current_pane == project_bots_pane::NAVMESH) {
+						return arena_settings_section::NAVMESH;
+					}
+
+					return arena_settings_section::BOT_WAYPOINTS;
+				}
+
+				return arena_settings_section::GENERAL;
+			}();
+
 			edit_project_settings_command cmd;
 			cmd.tab = inspected_project_tab_type::ARENA;
 
@@ -3439,7 +3546,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			editor_arena_settings defaults;
 			const bool posted = do_reset_button_for_project_settings(cmd, defaults, edited_copy, "Arena");
-			const auto changed = perform_editable_gui_single(edited_copy, std::as_const(defaults), id_handler);
+			const auto changed = perform_editable_gui_single(edited_copy, std::as_const(defaults), id_handler, section);
 
 			if (!changed.empty() && !posted) {
 				cmd.after = edited_copy;
@@ -3447,7 +3554,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				post_new_or_rewrite(std::move(cmd));
 			}
 
-			{
+			if (section == arena_settings_section::BOT_WAYPOINTS) {
 				/*
 					What the chosen Bot waypoints mode does with this map, and the preview of generated waypoints.
 				*/
@@ -3496,32 +3603,36 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			}
 		}
 		else if (project_current_tab == inspected_project_tab_type::ABOUT) {
-			edit_project_settings_command cmd;
-			cmd.tab = inspected_project_tab_type::ABOUT;
+			do_pretty_tabs(project_about_current_pane, [](const project_about_pane p) -> std::optional<std::string> {
+				if (p == project_about_pane::SCREENSHOTS) {
+					return std::string("Miniatures & screenshots");
+				}
 
-			auto edited_copy = project.about;
-			const auto changed = perform_editable_gui_single(edited_copy);
+				return std::nullopt;
+			});
 
-			if (!changed.empty()) {
-				cmd.after = edited_copy;
-				cmd.built_description = typesafe_sprintf(changed, "About");
-				post_new_or_rewrite(std::move(cmd));
-			}
+			if (project_about_current_pane == project_about_pane::DESCRIPTION) {
+				edit_project_settings_command cmd;
+				cmd.tab = inspected_project_tab_type::ABOUT;
+
+				auto edited_copy = project.about;
+				const auto changed = perform_editable_gui_single(edited_copy);
+
+				if (!changed.empty()) {
+					cmd.after = edited_copy;
+					cmd.built_description = typesafe_sprintf(changed, "About");
+					post_new_or_rewrite(std::move(cmd));
+				}
 
 #if DEBUG_DESYNCS
-			if (ImGui::Button("Dump binary file")) {
-				in.setup.rebuild_arena(false);
-				in.setup.get_scene().save_as_bytes(intercosm_paths("/tmp", "dump"));
-			}
+				if (ImGui::Button("Dump binary file")) {
+					in.setup.rebuild_arena(false);
+					in.setup.get_scene().save_as_bytes(intercosm_paths("/tmp", "dump"));
+				}
 #endif
+			}
 
-			ImGui::Separator();
-
-			text_color("Miniatures & screenshots", yellow);
-
-			ImGui::Separator();
-
-			{
+			if (project_about_current_pane == project_about_pane::SCREENSHOTS) {
 				constexpr int standard_miniature_size = 400;
 
 				text_disabled("Generate a small 400x400 miniature.\nFor previewing arena in catalogues.");
@@ -3553,14 +3664,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				text_disabled("Screenshots are taken with the current zoom,\nthen scaled down if required.");
 			}
 
-			ImGui::Separator();
+			if (project_about_current_pane == project_about_pane::CLEANUP) {
+				text_disabled("Delete all images and sounds no longer\nin use by any node, even if they have\nnon-default settings.");
 
-			text_color("Cleanup", yellow);
-
-			ImGui::Separator();
-
-			text_disabled("Delete all images and sounds no longer\nin use by any node, even if they have\nnon-default settings.");
-			{
 				const auto& history = in.setup.get_history();
 
 				const bool has_unsaved = in.setup.is_dirty() || !history.at_saved_revision();

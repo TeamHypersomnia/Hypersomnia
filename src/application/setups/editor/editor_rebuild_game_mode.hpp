@@ -204,11 +204,13 @@ auto setup_ruleset_from_editor_mode(
 			rules.buy_secs_after_freeze = vars.buy_time;
 
 			/*
-				Empty sells every firearm.
+				Empty sells every firearm. An entry just added in the inspector is not set yet - left out.
 			*/
 
 			for (const auto& firearm : vars.shop_allowed_firearms) {
-				rules.economy.shop_allowed_firearms.push_back(to_flavour(firearm));
+				if (firearm.is_set()) {
+					rules.economy.shop_allowed_firearms.push_back(to_flavour(firearm));
+				}
 			}
 		}
 

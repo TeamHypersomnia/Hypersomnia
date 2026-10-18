@@ -593,6 +593,13 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 								}
 
 								handle.set_logic_transform(transformr(island_bounds.get_center(), 0.0f));
+
+								/*
+									No node stands behind it - in the editor a click on the map
+									would select it and show an empty inspector.
+								*/
+
+								::make_unselectable(agg);
 							}
 						);
 					},

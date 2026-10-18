@@ -49,6 +49,10 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	inspected_node_tab_type node_current_tab = inspected_node_tab_type::NODE;
 	inspected_project_tab_type project_current_tab = inspected_project_tab_type::ARENA;
+	project_arena_pane project_arena_current_pane = project_arena_pane::GENERAL;
+	project_lighting_pane project_lighting_current_pane = project_lighting_pane::LIGHTS;
+	project_bots_pane project_bots_current_pane = project_bots_pane::BOT_WAYPOINTS;
+	project_about_pane project_about_current_pane = project_about_pane::DESCRIPTION;
 
 	editor_tweaked_widget_tracker tweaked_widget;
 
