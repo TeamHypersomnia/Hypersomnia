@@ -46,15 +46,71 @@ inline bool is_firearm_like(const cosmos& cosm, const item_flavour_id& id) {
 }
 
 /*
-	A map may limit which firearms the shop sells (arena_mode_economy_rules::shop_allowed_firearms) - empty means all.
+	The map's whitelist of the item's category (arena_mode_economy_rules::shop_whitelists):
+	firearms, melee weapons, explosives, or anything else (armor, backpacks, the defuse kit).
 */
 
-inline bool is_sold_in_shop(const cosmos& cosm, const item_purchases_vector& shop_allowed_firearms, const item_flavour_id& id) {
-	if (shop_allowed_firearms.empty() || !::is_firearm_like(cosm, id)) {
+inline const arena_shop_whitelist& get_shop_whitelist_of(
+	const cosmos& cosm,
+	const arena_shop_whitelists& whitelists,
+	const item_flavour_id& id
+) {
+	if (::is_firearm_like(cosm, id)) {
+		return whitelists.firearms;
+	}
+
+	/*
+		A pointer - on_flavour returns the callback's result by value.
+	*/
+
+	const auto found = cosm.on_flavour(id, [&](const auto& typed_flavour) -> const arena_shop_whitelist* {
+		if (typed_flavour.template find<invariants::hand_fuse>() != nullptr) {
+			return &whitelists.explosives;
+		}
+
+		if (typed_flavour.template find<invariants::melee>() != nullptr) {
+			return &whitelists.melee;
+		}
+
+		return &whitelists.other_items;
+	});
+
+	return *found;
+}
+
+inline bool is_sold_in_shop(const cosmos& cosm, const arena_shop_whitelists& whitelists, const item_flavour_id& id) {
+	if (found_in(whitelists.blacklist, id)) {
+		return false;
+	}
+
+	/*
+		Ammunition - magazines and charges (e.g. shotgun shells) - goes with its guns: no category whitelist limits it,
+		or a whitelist of other items would leave the sold guns without ammo.
+	*/
+
+	const bool is_ammo = ::is_magazine_like(cosm, id) || cosm.on_flavour(id, [&](const auto& typed_flavour) {
+		return typed_flavour.template find<invariants::cartridge>() != nullptr;
+	});
+
+	if (is_ammo) {
 		return true;
 	}
 
-	return found_in(shop_allowed_firearms, id);
+	const auto& whitelist = ::get_shop_whitelist_of(cosm, whitelists, id);
+
+	if (!whitelist.enabled) {
+		return true;
+	}
+
+	return found_in(whitelist.items, id);
+}
+
+inline bool is_sold_in_shop(const arena_shop_whitelists& whitelists, const spell_id& id) {
+	if (!whitelists.spells.enabled) {
+		return true;
+	}
+
+	return found_in(whitelists.spells.spells, id);
 }
 
 inline bool is_armor_like(const cosmos& cosm, const item_flavour_id& id) {

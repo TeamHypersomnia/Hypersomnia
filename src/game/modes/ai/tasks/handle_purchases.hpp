@@ -14,7 +14,7 @@ inline std::optional<item_flavour_id> handle_purchases(
 	const money_type money,
 	const float dt_secs,
 	randomization& stable_rng,
-	const item_purchases_vector& shop_allowed_firearms
+	const arena_shop_whitelists& shop_whitelists
 ) {
 	if (money <= 0) {
 		ctx.ai_state.already_nothing_more_to_buy = true;
@@ -89,6 +89,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 				return;
 			}
 
+			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
+				return;
+			}
+
 			if (::is_backpack_like(flavour)) {
 				const auto price_opt = ::find_price_of(ctx.cosm, item_flavour_id(id));
 				if (price_opt.has_value() && *price_opt <= available_money && *price_opt < cheapest_price) {
@@ -107,6 +111,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 
 		ctx.cosm.for_each_flavour_having<invariants::tool>([&](const auto& id, const auto& flavour) {
 			if (!factions_compatible(ctx.character_handle, id)) {
+				return;
+			}
+
+			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
 				return;
 			}
 
@@ -132,11 +140,11 @@ inline std::optional<item_flavour_id> handle_purchases(
 				return;
 			}
 
-			if (flavour.template get<invariants::gun>().bots_ban) {
+			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
 				return;
 			}
 
-			if (!::is_sold_in_shop(ctx.cosm, shop_allowed_firearms, item_flavour_id(id))) {
+			if (flavour.template get<invariants::gun>().bots_ban) {
 				return;
 			}
 
@@ -181,6 +189,10 @@ inline std::optional<item_flavour_id> handle_purchases(
 
 		ctx.cosm.for_each_flavour_having<invariants::tool>([&](const auto& id, const auto& flavour) {
 			if (!factions_compatible(ctx.character_handle, id)) {
+				return;
+			}
+
+			if (!::is_sold_in_shop(ctx.cosm, shop_whitelists, item_flavour_id(id))) {
 				return;
 			}
 

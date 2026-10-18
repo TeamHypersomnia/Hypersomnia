@@ -859,7 +859,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		/*
 			What a category sells to this player - a category with nothing (e.g. all its firearms left out
-			by the map's shop_allowed_firearms) is not shown at all.
+			by the map's shop whitelists) is not shown at all.
 		*/
 
 		auto collect_buyable = [&](
@@ -875,7 +875,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					return;
 				}
 
-				if (!::is_sold_in_shop(cosm, in.shop_allowed_firearms, item_flavour_id(id))) {
+				if (!::is_sold_in_shop(cosm, in.shop_whitelists, item_flavour_id(id))) {
 					return;
 				}
 
@@ -924,7 +924,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		};
 
 		auto is_category_shown = [&](const buy_menu_type category) {
-			return category == buy_menu_type::SPELLS || !buyable_items_of(category).empty();
+			if (category == buy_menu_type::SPELLS) {
+				const auto& spells_whitelist = in.shop_whitelists.spells;
+				return !spells_whitelist.enabled || !spells_whitelist.spells.empty();
+			}
+
+			return !buyable_items_of(category).empty();
 		};
 
 		if (current_menu != buy_menu_type::MAIN && !is_category_shown(current_menu)) {
@@ -1008,6 +1013,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					spells,
 					[&]<typename S>(const S&) {
 						if (!factions_compatible(subject, spell_id::of<S>())) {
+							return;
+						}
+
+						if (!::is_sold_in_shop(in.shop_whitelists, spell_id::of<S>())) {
 							return;
 						}
 

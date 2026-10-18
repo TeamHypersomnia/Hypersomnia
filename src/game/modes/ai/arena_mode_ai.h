@@ -30,7 +30,7 @@ arena_ai_result update_arena_mode_ai(
 	const std::size_t num_bots,
 	const fog_of_war_settings& fog_of_war,
 	const std::optional<real32> zoom_override,
-	const item_purchases_vector& shop_allowed_firearms
+	const arena_shop_whitelists& shop_whitelists
 );
 
 void update_arena_mode_ai_team(

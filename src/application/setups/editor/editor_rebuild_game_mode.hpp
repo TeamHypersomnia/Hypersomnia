@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 #include "augs/templates/remove_cref.h"
+#include "augs/templates/for_each_type.h"
+#include "augs/templates/container_templates.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "game/modes/all_mode_includes.h"
 
@@ -204,14 +206,58 @@ auto setup_ruleset_from_editor_mode(
 			rules.buy_secs_after_freeze = vars.buy_time;
 
 			/*
-				Empty sells every firearm. An entry just added in the inspector is not set yet - left out.
+				An entry just added in the inspector is not set yet - left out.
+				Visited, as a tool resource may be a container item (a backpack).
 			*/
 
-			for (const auto& firearm : vars.shop_allowed_firearms) {
-				if (firearm.is_set()) {
-					rules.economy.shop_allowed_firearms.push_back(to_flavour(firearm));
+			auto to_shop_whitelist = [&]<typename R>(const editor_shop_whitelist<R>& whitelist) {
+				auto result = arena_shop_whitelist();
+				result.enabled = whitelist.enabled;
+
+				for (const auto& entry : whitelist.items) {
+					if (!entry.is_set()) {
+						continue;
+					}
+
+					if (const auto res = find_resource(entry)) {
+						std::visit(
+							[&](const auto& flavour_id) {
+								result.items.push_back(item_flavour_id(flavour_id));
+							},
+							res->scene_flavour_id
+						);
+					}
 				}
-			}
+
+				return result;
+			};
+
+			auto& whitelists = rules.economy.shop_whitelists;
+
+			whitelists.firearms = to_shop_whitelist(vars.shop_firearms);
+			whitelists.melee = to_shop_whitelist(vars.shop_melee);
+			whitelists.explosives = to_shop_whitelist(vars.shop_explosives);
+			whitelists.other_items = to_shop_whitelist(vars.shop_other_items);
+
+			whitelists.spells.enabled = vars.shop_spells.enabled;
+
+			for_each_type_in_list<spell_list_t<type_list>>([&]<typename S>(const S&) {
+				if (found_in(vars.shop_spells.spells, get_type_name_strip_namespace<S>())) {
+					whitelists.spells.spells.push_back(spell_id::of<S>());
+				}
+			});
+
+			auto blacklist_all = [&]<typename R>(const std::vector<editor_typed_resource_id<R>>& entries) {
+				auto as_list = editor_shop_whitelist<R>();
+				as_list.items = entries;
+
+				concatenate(whitelists.blacklist, to_shop_whitelist(as_list).items);
+			};
+
+			blacklist_all(vars.shop_blacklist.firearms);
+			blacklist_all(vars.shop_blacklist.melee);
+			blacklist_all(vars.shop_blacklist.explosives);
+			blacklist_all(vars.shop_blacklist.other_items);
 		}
 
 		if constexpr(is_gun_game_v) {

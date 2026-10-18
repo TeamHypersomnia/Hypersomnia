@@ -225,7 +225,7 @@ struct arena_mode_economy_rules {
 	money_type bomb_defuse_award = 1000;
 
 	bool give_extra_mags_on_first_purchase = true;
-	item_purchases_vector shop_allowed_firearms;
+	arena_shop_whitelists shop_whitelists;
 	// END GEN INTROSPECTOR
 };
 

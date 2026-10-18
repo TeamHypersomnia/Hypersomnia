@@ -2815,7 +2815,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 			num_bots,
 			in.rules.view.fog_of_war,
 			get_zoom_override(),
-			in.rules.economy.shop_allowed_firearms
+			in.rules.economy.shop_whitelists
 		);
 		
 		if (ai_result.item_purchase.has_value()) {
@@ -2923,7 +2923,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 									return;
 								}
 
-								if (!::is_sold_in_shop(cosm, in.rules.economy.shop_allowed_firearms, f_id)) {
+								if (!::is_sold_in_shop(cosm, in.rules.economy.shop_whitelists, f_id)) {
 									return;
 								}
 
@@ -2991,6 +2991,10 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 								}
 
 								if (!factions_compatible(player_handle, s_id)) {
+									return;
+								}
+
+								if (!::is_sold_in_shop(in.rules.economy.shop_whitelists, s_id)) {
 									return;
 								}
 

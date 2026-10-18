@@ -4,6 +4,7 @@
 #include <cstdint>
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/history.hpp"
+#include "augs/templates/for_each_type.h"
 #include "application/setups/editor/editor_setup.hpp"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
@@ -2742,38 +2743,26 @@ EDIT_FUNCTION(
 
 			FACTION_EQUIPMENT_PROPERTY("Round start equipment", bomb_defusal.round_start_equipment);
 
-			ImGui::Separator();
-			text_color("Firearms sold in the shop", yellow);
-			ImGui::Separator();
+			/*
+				Rows of resources with - before each and + under the last, for every selected game mode at once.
+			*/
 
-			{
-				auto& firearms = insp.bomb_defusal.shop_allowed_firearms;
+			auto edit_shop_list = [&](
+				const char* const title,
+				const char* const item_label,
+				auto get_items
+			) {
+				auto& items = get_items(insp.bomb_defusal);
 
-				auto list_of = [](auto& e) -> auto& {
-					return e.after.bomb_defusal.shop_allowed_firearms;
+				auto list_of = [&](auto& e) -> auto& {
+					return get_items(e.after.bomb_defusal);
 				};
 
 				bool lists_different = false;
 
 				for (auto& e : es) {
-					if (!(firearms == list_of(e))) {
+					if (!(items == list_of(e))) {
 						lists_different = true;
-					}
-				}
-
-				if (firearms.empty()) {
-					text_disabled("None listed - the shop sells every firearm.");
-				}
-				else {
-					text_disabled("Only these firearms are sold. Other items are sold as usual.");
-				}
-
-				if (ImGui::Button("Add firearm")) {
-					firearms.push_back({});
-					result = "Added new firearm in %x";
-
-					for (auto& e : es) {
-						list_of(e).push_back({});
 					}
 				}
 
@@ -2781,11 +2770,11 @@ EDIT_FUNCTION(
 
 				std::optional<std::size_t> removed_i;
 
-				for (auto& firearm : firearms) {
-					const auto idx = index_in(firearms, firearm);
+				for (auto& item : items) {
+					const auto idx = index_in(items, item);
 
 					const auto id_but = typesafe_sprintf("-##Shop%x", idx);
-					const auto id_str = typesafe_sprintf("ShopFirearm%x", idx);
+					const auto id_str = typesafe_sprintf("ShopItem%x", idx);
 					auto this_scope = scoped_id(id_str.c_str());
 
 					if (ImGui::Button(id_but.c_str())) {
@@ -2799,19 +2788,37 @@ EDIT_FUNCTION(
 							auto& lc = list_of(e);
 
 							if (idx < lc.size()) {
-								lc[idx] = firearm;
+								lc[idx] = item;
 							}
 						}
 					};
 
 					special_handler.allow_none = false;
-					const auto label = typesafe_sprintf("Firearm %x", idx);
+					const auto label = typesafe_sprintf("%x %x", item_label, idx);
 
-					if (edit_property(result, label, special_handler, firearm)) {
+					if (edit_property(result, label, special_handler, item)) {
 						write_to_others();
 					}
 
 					special_handler.allow_none = true;
+				}
+
+				/*
+					+ in the column of the - buttons, under the last row.
+				*/
+
+				if (ImGui::Button("+##ShopAdd")) {
+					items.push_back({});
+
+					/*
+						Concatenated - the trailing %x is filled in later with the mode's name.
+					*/
+
+					result = std::string("Added ") + item_label + " to " + title + " in %x";
+
+					for (auto& e : es) {
+						list_of(e).push_back({});
+					}
 				}
 
 				if (removed_i.has_value()) {
@@ -2823,8 +2830,177 @@ EDIT_FUNCTION(
 						}
 					}
 
-					result = typesafe_sprintf("Removed Firearm %x in %x", *removed_i);
+					result = std::string("Removed ") + item_label + " " + std::to_string(*removed_i) + " from " + title + " in %x";
 				}
+			};
+
+			/*
+				The checkbox of a whitelist, for every selected game mode at once. Returns whether it is checked.
+			*/
+
+			auto edit_whitelist_checkbox = [&](const char* const title, auto get, auto on_enabled) {
+				auto& whitelist = get(insp.bomb_defusal);
+
+				bool values_different = false;
+
+				for (auto& e : es) {
+					if (get(e.after.bomb_defusal).enabled != whitelist.enabled) {
+						values_different = true;
+					}
+				}
+
+				auto cols = maybe_different_value_cols({}, values_different);
+
+				if (edit_property(result, title, special_handler, whitelist.enabled)) {
+					on_enabled(whitelist);
+
+					for (auto& e : es) {
+						auto& other = get(e.after.bomb_defusal);
+						other.enabled = whitelist.enabled;
+						on_enabled(other);
+					}
+				}
+
+				return whitelist.enabled;
+			};
+
+			/*
+				A whitelist per category: unchecked sells everything of it,
+				checked sells only the listed items - none if the list is empty.
+			*/
+
+			auto shop_whitelist_property = [&](
+				const char* const title,
+				const char* const item_label,
+				const std::string& off_note,
+				const std::string& empty_note,
+				const std::string& listed_note,
+				auto get
+			) {
+				ImGui::Separator();
+
+				auto id_scope = scoped_id(title);
+
+				/*
+					A checked whitelist starts with one row to fill in.
+				*/
+
+				auto add_first_row = [](auto& whitelist) {
+					if (whitelist.enabled && whitelist.items.empty()) {
+						whitelist.items.push_back({});
+					}
+				};
+
+				if (!edit_whitelist_checkbox(title, get, add_first_row)) {
+					text_disabled(off_note);
+					return;
+				}
+
+				const auto& items = get(insp.bomb_defusal).items;
+				const bool none_set = std::none_of(items.begin(), items.end(), [](const auto& item) { return item.is_set(); });
+
+				text_disabled(none_set ? empty_note : listed_note);
+
+				edit_shop_list(title, item_label, [get](auto& m) -> auto& { return get(m).items; });
+			};
+
+			shop_whitelist_property(
+				"Shop firearm whitelist",
+				"Firearm",
+				"Off - the shop sells every firearm.",
+				"None listed - the shop sells no firearms.",
+				"Only these firearms are sold.",
+				[](auto& m) -> auto& { return m.shop_firearms; }
+			);
+
+			shop_whitelist_property(
+				"Shop melee whitelist",
+				"Melee",
+				"Off - the shop sells every melee weapon.",
+				"None listed - the shop sells no melee weapons.",
+				"Only these melee weapons are sold.",
+				[](auto& m) -> auto& { return m.shop_melee; }
+			);
+
+			shop_whitelist_property(
+				"Shop explosive whitelist",
+				"Explosive",
+				"Off - the shop sells every explosive.",
+				"None listed - the shop sells no explosives.",
+				"Only these explosives are sold.",
+				[](auto& m) -> auto& { return m.shop_explosives; }
+			);
+
+			shop_whitelist_property(
+				"Shop item whitelist",
+				"Item",
+				"Off - the shop sells all other items (armor, backpacks, the defuse kit). Ammo is always sold.",
+				"None listed - the shop sells no other items (armor, backpacks, the defuse kit). Ammo is always sold.",
+				"Only these of the other items (armor, backpacks, the defuse kit) are sold. Ammo is always sold.",
+				[](auto& m) -> auto& { return m.shop_other_items; }
+			);
+
+			{
+				ImGui::Separator();
+
+				auto id_scope = scoped_id("ShopSpells");
+
+				auto get_spells = [](auto& m) -> auto& {
+					return m.shop_spells;
+				};
+
+				if (!edit_whitelist_checkbox("Shop spell whitelist", get_spells, [](auto&) {})) {
+					text_disabled("Off - the shop sells every spell.");
+				}
+				else {
+					text_disabled("Only the checked spells are sold.");
+
+					for_each_type_in_list<spell_list_t<type_list>>([&]<typename S>(const S&) {
+						const auto& name = get_type_name_strip_namespace<S>();
+						auto& spells = insp.bomb_defusal.shop_spells.spells;
+
+						bool checked = found_in(spells, name);
+
+						if (checkbox(format_field_name(name).c_str(), checked)) {
+							auto toggle = [&](auto& list) {
+								erase_element(list, name);
+
+								if (checked) {
+									list.push_back(name);
+								}
+							};
+
+							toggle(spells);
+
+							for (auto& e : es) {
+								toggle(e.after.bomb_defusal.shop_spells.spells);
+							}
+
+							result = std::string(checked ? "Allowed " : "Disallowed ") + name + " in %x";
+						}
+					});
+				}
+			}
+
+			{
+				ImGui::Separator();
+
+				auto id_scope = scoped_id("ShopBlacklist");
+
+				text_color("Shop item blacklist", yellow);
+				text_disabled("Never sold, whatever the whitelists say.");
+
+				auto blacklist_part = [&](const char* const title, const char* const item_label, auto get_items) {
+					auto part_scope = scoped_id(title);
+
+					text_disabled(title);
+					edit_shop_list(title, item_label, get_items);
+				};
+
+				blacklist_part("Firearms", "Firearm", [](auto& m) -> auto& { return m.shop_blacklist.firearms; });
+				blacklist_part("Melee weapons", "Melee", [](auto& m) -> auto& { return m.shop_blacklist.melee; });
+				blacklist_part("Explosives", "Explosive", [](auto& m) -> auto& { return m.shop_blacklist.explosives; });
+				blacklist_part("Other items", "Item", [](auto& m) -> auto& { return m.shop_blacklist.other_items; });
 			}
 		}
 		else if constexpr(std::is_same_v<I, editor_gun_game_mode>) {

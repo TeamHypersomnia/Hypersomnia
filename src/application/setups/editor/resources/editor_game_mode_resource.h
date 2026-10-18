@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <string>
+#include <vector>
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "game/enums/faction_type.h"
 #include "augs/templates/type_in_list_id.h"
@@ -9,6 +11,50 @@
 struct editor_firearm_resource;
 struct editor_melee_resource;
 struct editor_explosive_resource;
+struct editor_tool_resource;
+
+/*
+	What the shop sells of one category. Disabled sells everything of it,
+	enabled sells only the listed items - none if the list is empty.
+*/
+
+template <class R>
+struct editor_shop_whitelist {
+	// GEN INTROSPECTOR struct editor_shop_whitelist class R
+	bool enabled = false;
+	std::vector<editor_typed_resource_id<R>> items;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_shop_whitelist&) const = default;
+};
+
+/*
+	Spells by their type names (e.g. "haste") - readable in the project file.
+*/
+
+struct editor_shop_spell_whitelist {
+	// GEN INTROSPECTOR struct editor_shop_spell_whitelist
+	bool enabled = false;
+	std::vector<std::string> spells;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_shop_spell_whitelist&) const = default;
+};
+
+/*
+	Never sold, whatever the whitelists say.
+*/
+
+struct editor_shop_blacklist {
+	// GEN INTROSPECTOR struct editor_shop_blacklist
+	std::vector<editor_typed_resource_id<editor_firearm_resource>> firearms;
+	std::vector<editor_typed_resource_id<editor_melee_resource>> melee;
+	std::vector<editor_typed_resource_id<editor_explosive_resource>> explosives;
+	std::vector<editor_typed_resource_id<editor_tool_resource>> other_items;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_shop_blacklist&) const = default;
+};
 
 struct editor_mode_common {
 	static constexpr bool json_serialize_in_parent = true;
@@ -64,7 +110,12 @@ struct editor_bomb_defusal_mode {
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
 	per_actual_faction<editor_requested_equipment> round_start_equipment;
 
-	std::vector<editor_typed_resource_id<editor_firearm_resource>> shop_allowed_firearms;
+	editor_shop_whitelist<editor_firearm_resource> shop_firearms;
+	editor_shop_whitelist<editor_melee_resource> shop_melee;
+	editor_shop_whitelist<editor_explosive_resource> shop_explosives;
+	editor_shop_whitelist<editor_tool_resource> shop_other_items;
+	editor_shop_spell_whitelist shop_spells;
+	editor_shop_blacklist shop_blacklist;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_bomb_defusal_mode&) const = default;
