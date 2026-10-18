@@ -394,44 +394,20 @@ private:
 		}
 	}
 
+	/*
+		A peer never names its own id: a client asks for a random one, anything else gets the next free one.
+		A chosen id could be taken in advance - a link with a server's id alone would lead to whoever took it.
+	*/
+
 	webrtc_id_type choose_webrtc_id(
 		peer_map& peers,
-		std::optional<std::string> maybe_requested
+		const std::optional<std::string>& path
 	) {
-		if (maybe_requested == std::nullopt) {
-			return find_free_id(peers);
-		}
-
-		auto requested = *maybe_requested;
-
-		if (requested.size() > 0 && requested[0] == '/') {
-			requested.erase(requested.begin());
-		}
-
-		if (requested == "random") {
+		if (path == "/random" || path == "random") {
 			return find_free_random_guid(peers);
 		}
 
-		/*
-			Remove : to not overshadow ip:port addresses, and any control character -
-			nothing a peer names itself with may end up corrupting a log line or a terminal.
-		*/
-
-		erase_if(requested, [](const auto c) {
-			const auto uc = static_cast<unsigned char>(c);
-
-			return c == ':' || uc < 0x20 || uc == 0x7f;
-		});
-
-		if (requested.empty()) {
-			return find_free_id(peers);
-		}
-
-		if (found_in(peers, webrtc_id_type(requested))) {
-			return find_free_id(peers);
-		}
-
-		return requested;
+		return find_free_id(peers);
 	}
 
 public:
