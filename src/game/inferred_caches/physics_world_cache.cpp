@@ -82,6 +82,7 @@ void rigid_body_cache::clear(cosmos& cosm, physics_world_cache& owner) {
 void colliders_cache::clear_fields() {
 	constructed_fixtures.clear();
 	connection = {};
+	has_bot_obstacle_fixtures = false;
 }
 
 void colliders_cache::clear(physics_world_cache&) {

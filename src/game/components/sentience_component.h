@@ -138,6 +138,7 @@ namespace components {
 		int pending_lying_gore_center = 0;
 		augs::stepped_timestamp when_lying_corpse_settled;
 		augs::stepped_timestamp when_lying_corpse_replaced;
+		augs::stepped_timestamp when_bot_item_knocked;
 
 		faction_type official_faction = faction_type::SPECTATOR;
 		// END GEN INTROSPECTOR

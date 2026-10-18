@@ -81,6 +81,83 @@ bool is_hung_on_back(const E& handle) {
 	return false;
 }
 
+/*
+	See cosmos_navmesh::calc_bot_obstacle_collider_scale.
+	On the standard navmesh (scale 1) bots collide exactly like humans.
+*/
+
+template <class E>
+bool bot_needs_obstacle_fixtures(const E& handle) {
+	return handle.get_cosmos().get_common_significant().navmesh.calc_bot_obstacle_collider_scale() < 1.f;
+}
+
+template <class E>
+bool is_bot_character(const E& handle) {
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		return sentience->is_bot && !sentience->has_exploded;
+	}
+
+	return false;
+}
+
+/*
+	An item in a bot's hands - not on its back - whose physics depend on the navmesh.
+*/
+
+template <class E>
+bool is_wielded_by_bot(const E& handle) {
+	const auto capability = handle.get_owning_transfer_capability();
+
+	if (capability && capability != handle) {
+		if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
+			return !::is_hung_on_back(handle);
+		}
+	}
+
+	return false;
+}
+
+/*
+	On a navmesh finer than the standard, bots go through obstacles with their real fixtures
+	and collide with them through additional ones:
+	- a character through its silhouette scaled down to the navmesh, with no mass;
+	- an item in its hands through a sensor copy, which only knocks (see sound_existence_system).
+	The real silhouette still takes all hits and collides with other characters.
+*/
+
+struct bot_obstacle_fixtures {
+	real32 scale = 1.f;
+	bool sensor = false;
+	filter_type filter;
+};
+
+template <class E>
+std::optional<bot_obstacle_fixtures> calc_bot_obstacle_fixtures(const E& handle) {
+	if (::is_bot_character(handle)) {
+		if (::bot_needs_obstacle_fixtures(handle)) {
+			const auto sentience = handle.template find<components::sentience>();
+
+			const auto standard_filter =
+				sentience->is_conscious() ?
+				filters[predefined_filter_type::CHARACTER] :
+				filters[predefined_filter_type::DEAD_CHARACTER]
+			;
+
+			const auto scale = handle.get_cosmos().get_common_significant().navmesh.calc_bot_obstacle_collider_scale();
+
+			return bot_obstacle_fixtures { scale, false, ::make_obstacle_only_filter(standard_filter) };
+		}
+
+		return std::nullopt;
+	}
+
+	if (::is_wielded_by_bot(handle) && ::bot_needs_obstacle_fixtures(handle)) {
+		return bot_obstacle_fixtures { 1.f, true, ::make_obstacle_only_filter(filters[predefined_filter_type::CHARACTER_WEAPON]) };
+	}
+
+	return std::nullopt;
+}
+
 template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
@@ -108,12 +185,15 @@ auto calc_filters(const E& handle) {
 
 		if (capability && capability != handle) {
 			if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
-				if (::is_hung_on_back(handle)) {
+				if (::is_hung_on_back(handle) || ::bot_needs_obstacle_fixtures(handle)) {
 					/*
 						Weapons hung on a bot's back never snag on obstacles, which the bot navigation
 						does not account for. Everything else stays as for a human's: bullets and knives
 						fly through them with their effects, they keep their mass.
 						is_bot is set before the bot gets any items, so nothing needs reinferring when it changes.
+
+						On a navmesh finer than the standard, the items in its hands don't snag either
+						- see calc_bot_obstacle_fixtures.
 					*/
 
 					return ::make_obstacle_free_filter(filters[predefined_filter_type::CHARACTER_WEAPON]);
@@ -132,11 +212,22 @@ auto calc_filters(const E& handle) {
 	}
 
 	if (const auto sentience = handle.template find<components::sentience>()) {
-		if (!sentience->is_conscious()) {
-			return filters[predefined_filter_type::DEAD_CHARACTER];
+		const auto standard_filter =
+			sentience->is_conscious() ?
+			filters[predefined_filter_type::CHARACTER] :
+			filters[predefined_filter_type::DEAD_CHARACTER]
+		;
+
+		if (::is_bot_character(handle) && ::bot_needs_obstacle_fixtures(handle)) {
+			/*
+				See calc_bot_obstacle_fixtures.
+				Also when dead, so a corpse is never pushed out through a thin wall.
+			*/
+
+			return ::make_obstacle_free_filter(standard_filter);
 		}
 
-		return filters[predefined_filter_type::CHARACTER];
+		return standard_filter;
 	}
 
 	if (const auto portal = handle.template find<components::portal>()) {
@@ -414,6 +505,12 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	auto& constructed_fixtures = cache.constructed_fixtures;
 	ensure(constructed_fixtures.empty());
 
+	/*
+		Scales the shapes of the bot obstacle fixtures - see calc_bot_obstacle_fixtures.
+	*/
+
+	real32 obstacle_fixtures_scale = 1.f;
+
 	auto flips = flip_flags();
 
 	if (const auto overridden_flip = handle.calc_flip_flags()) {
@@ -460,8 +557,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 		shape.offset_vertices(connection.shape_offset);
 
-		unsigned ci = 0;
-
 		auto scale = std::optional<vec2>();
 
 		if (const auto geo = handle.template find<components::overridden_geo>()) {
@@ -499,6 +594,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 					v.x *= scale->x;
 					v.y *= scale->y;
 				}
+
+				v *= obstacle_fixtures_scale;
 			}
 
 			polygon_shape.Set(b2verts.data(), static_cast<int32>(b2verts.size()));
@@ -506,8 +603,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			fixdef.shape = &polygon_shape;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
-			ensure_less(static_cast<short>(ci), std::numeric_limits<short>::max());
-			new_fix->index_in_component = static_cast<short>(ci++);
+			ensure_less(constructed_fixtures.size(), static_cast<std::size_t>(std::numeric_limits<short>::max()));
+			new_fix->index_in_component = static_cast<short>(constructed_fixtures.size());
 
 			constructed_fixtures.emplace_back(new_fix);
 		};
@@ -522,7 +619,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		fixdef.shape = &circle_shape;
 		b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
-		new_fix->index_in_component = 0u;
+		new_fix->index_in_component = static_cast<short>(constructed_fixtures.size());
 		constructed_fixtures.emplace_back(new_fix);
 	};
 
@@ -551,6 +648,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			}
 
 			v += off_meters;
+			v *= obstacle_fixtures_scale;
 		}
 
 		polygon_shape.Set(verts.data(), verts.size());
@@ -564,7 +662,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		fixdef.shape = &polygon_shape;
 		b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
-		new_fix->index_in_component = 0;
+		new_fix->index_in_component = static_cast<short>(constructed_fixtures.size());
 
 		constructed_fixtures.emplace_back(new_fix);
 	};
@@ -598,77 +696,99 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	if (const auto image_id = handle.get_image_id(); image_id.is_set()) {
 		const auto& offsets = logicals.get_offsets(image_id);
 
-		if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
-			from_convex_partition(shape);
-		}
-		else {
-			const image_shape_type* non_standard_shape = nullptr;
-
-			/*
-				The raw, unflipped body_rotation of the stance frame.
-				The mirroring in from_convex_partition negates it implicitly,
-				as flip(rotate(r, v)) == rotate(-r, flip(v)).
-			*/
-			real32 stance_shape_rotation = 0.f;
-
-			const auto additional_rotation = [&]() {
-				const auto& typed_self = handle;
-
-				if (const auto torso = typed_self.template find<invariants::torso>()) {
-					const bool consider_reloading = true;
-					const auto stance = torso->calc_stance(typed_self, typed_self.get_wielded_items(), consider_reloading);
-
-					const auto& logicals = cosm.get_logical_assets();
-
-					if (const auto anim = logicals.find(stance.carry)) {
-						if (anim->frames.size() > 0) {
-							auto& offsets = logicals.get_offsets(anim->frames[0].image_id);
-
-							if (!offsets.non_standard_shape.empty()) {
-								non_standard_shape = &offsets.non_standard_shape;
-								stance_shape_rotation = offsets.torso.body_rotation;
-							}
-
-							auto considered_offsets = offsets.torso;
-
-							if (typed_self.only_secondary_holds_item()) {
-								considered_offsets.flip_vertically();
-
-								/*
-									Mirror the custom collider shape as well,
-									as the torso sprite is drawn flipped.
-								*/
-								flips.vertically = !flips.vertically;
-							}
-
-							considered_offsets.apply_body_rotation();
-
-							const auto stance_rotation = considered_offsets.back.rotation;
-							return stance_rotation;
-						}
-					}
-				}
-
-				return 0.f;
-			}();
-
-			if (non_standard_shape) {
-				if (stance_shape_rotation != 0.f) {
-					auto rotated_shape = *non_standard_shape;
-
-					for (auto& v : rotated_shape.source_polygon) {
-						v.rotate(stance_shape_rotation);
-					}
-
-					from_convex_partition(rotated_shape);
-				}
-				else {
-					from_convex_partition(*non_standard_shape);
-				}
+		auto build_from_image = [&]() {
+			if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
+				from_convex_partition(shape);
 			}
 			else {
-				from_box_shape(handle.get_logical_size() * calc_ground_scale(), additional_rotation);
+				const image_shape_type* non_standard_shape = nullptr;
+
+				/*
+					The raw, unflipped body_rotation of the stance frame.
+					The mirroring in from_convex_partition negates it implicitly,
+					as flip(rotate(r, v)) == rotate(-r, flip(v)).
+				*/
+				real32 stance_shape_rotation = 0.f;
+
+				const auto additional_rotation = [&]() {
+					const auto& typed_self = handle;
+
+					if (const auto torso = typed_self.template find<invariants::torso>()) {
+						const bool consider_reloading = true;
+						const auto stance = torso->calc_stance(typed_self, typed_self.get_wielded_items(), consider_reloading);
+
+						const auto& logicals = cosm.get_logical_assets();
+
+						if (const auto anim = logicals.find(stance.carry)) {
+							if (anim->frames.size() > 0) {
+								auto& offsets = logicals.get_offsets(anim->frames[0].image_id);
+
+								if (!offsets.non_standard_shape.empty()) {
+									non_standard_shape = &offsets.non_standard_shape;
+									stance_shape_rotation = offsets.torso.body_rotation;
+								}
+
+								auto considered_offsets = offsets.torso;
+
+								if (typed_self.only_secondary_holds_item()) {
+									considered_offsets.flip_vertically();
+
+									/*
+										Mirror the custom collider shape as well,
+										as the torso sprite is drawn flipped.
+									*/
+									flips.vertically = !flips.vertically;
+								}
+
+								considered_offsets.apply_body_rotation();
+
+								const auto stance_rotation = considered_offsets.back.rotation;
+								return stance_rotation;
+							}
+						}
+					}
+
+					return 0.f;
+				}();
+
+				if (non_standard_shape) {
+					if (stance_shape_rotation != 0.f) {
+						auto rotated_shape = *non_standard_shape;
+
+						for (auto& v : rotated_shape.source_polygon) {
+							v.rotate(stance_shape_rotation);
+						}
+
+						from_convex_partition(rotated_shape);
+					}
+					else {
+						from_convex_partition(*non_standard_shape);
+					}
+				}
+				else {
+					from_box_shape(handle.get_logical_size() * calc_ground_scale(), additional_rotation);
+				}
 			}
+		};
+
+		/*
+			The stance may toggle the flips while building - restore them for the second build.
+		*/
+		const auto flips_before_build = flips;
+
+		build_from_image();
+
+		if (const auto obstacle_fixtures = ::calc_bot_obstacle_fixtures(handle)) {
+			flips = flips_before_build;
+
+			fixdef.filter = obstacle_fixtures->filter;
+			fixdef.isSensor = obstacle_fixtures->sensor;
+			fixdef.density = 0.f;
+			obstacle_fixtures_scale = obstacle_fixtures->scale;
+
+			build_from_image();
+
+			cache.has_bot_obstacle_fixtures = true;
 		}
 
 		if (thrown_melee) {
@@ -747,6 +867,13 @@ void physics_world_cache::specific_infer_colliders(const E& handle) {
 		}
 
 		if (cache.constructed_fixtures.empty()) {
+			only_update_properties = false;
+		}
+
+		/*
+			Updating the properties would give the bot obstacle fixtures those of the real ones.
+		*/
+		if (cache.has_bot_obstacle_fixtures || ::calc_bot_obstacle_fixtures(handle).has_value()) {
 			only_update_properties = false;
 		}
 

@@ -41,9 +41,13 @@ static auto thrown_melee_bouncing_categories() {
 	return make_flags(C::WALL, C::GLASS_OBSTACLE, C::CAR_FLOOR);
 }
 
-filter_type make_thrown_melee_bouncing_filter(filter_type f) {
+filter_type make_obstacle_only_filter(filter_type f) {
 	f.maskBits &= thrown_melee_bouncing_categories();
 	return f;
+}
+
+filter_type make_thrown_melee_bouncing_filter(filter_type f) {
+	return ::make_obstacle_only_filter(f);
 }
 
 filter_type make_obstacle_free_filter(filter_type f) {

@@ -201,8 +201,32 @@ struct cosmos_navmesh_island {
 	}
 };
 
+/*
+	The navmesh cell size the bots' silhouettes are tuned for.
+*/
+
+constexpr uint32_t standard_navmesh_cell_size_v = 128;
+
 struct cosmos_navmesh {
 	// GEN INTROSPECTOR struct cosmos_navmesh
 	std::vector<cosmos_navmesh_island> islands;
 	// END GEN INTROSPECTOR
+
+	/*
+		On a navmesh finer than the standard, bots collide with obstacles
+		through their silhouette scaled down in the same proportion,
+		so they fit wherever the navmesh lets them walk. 1 otherwise.
+	*/
+
+	float calc_bot_obstacle_collider_scale() const {
+		auto finest_cell_size = standard_navmesh_cell_size_v;
+
+		for (const auto& island : islands) {
+			if (island.cell_size > 0 && island.cell_size < finest_cell_size) {
+				finest_cell_size = island.cell_size;
+			}
+		}
+
+		return static_cast<float>(finest_cell_size) / static_cast<float>(standard_navmesh_cell_size_v);
+	}
 };

@@ -51,6 +51,12 @@ filter_type make_thrown_melee_hitting_filter(filter_type);
 
 filter_type make_obstacle_free_filter(filter_type);
 
+/*
+	Leaves only the obstacles - e.g. for the scaled-down silhouette of a bot on a fine navmesh.
+*/
+
+filter_type make_obstacle_only_filter(filter_type);
+
 enum class predefined_filter_type {
 	// GEN INTROSPECTOR enum class predefined_filter_type
 	WALL,

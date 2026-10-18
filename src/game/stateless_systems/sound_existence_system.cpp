@@ -185,6 +185,60 @@ void play_collision_sound(
 	}
 }
 
+/*
+	On a navmesh finer than the standard, the items in a bot's hands go through obstacles
+	and a sensor copy reports touching one - see calc_bot_obstacle_fixtures.
+	It knocks at most once per this many ms per bot, so a bot squeezing through can still be heard.
+*/
+
+static constexpr real32 bot_item_knock_interval_ms_v = 1500.f;
+
+/*
+	Maps the bot's speed to the strength of a collision impulse.
+*/
+
+static constexpr real32 bot_item_knock_strength_per_speed_v = 1.f / 40.f;
+
+static void play_bot_item_knock(
+	const entity_handle item,
+	const entity_handle obstacle,
+	const logic_step step
+) {
+	const auto obstacle_fixtures = obstacle.find<invariants::fixtures>();
+
+	if (obstacle_fixtures == nullptr || obstacle_fixtures->sensor) {
+		return;
+	}
+
+	if (item.find<components::item>() == nullptr) {
+		return;
+	}
+
+	const auto capability = item.get_owning_transfer_capability();
+
+	if (!capability || capability == item) {
+		return;
+	}
+
+	const auto sentience = capability.find<components::sentience>();
+
+	if (sentience == nullptr || !sentience->is_bot) {
+		return;
+	}
+
+	const auto& clk = step.get_cosmos().get_clock();
+
+	if (!clk.try_to_fire_and_reset(bot_item_knock_interval_ms_v, sentience->when_bot_item_knocked)) {
+		return;
+	}
+
+	const auto velocity = capability.get_effective_velocity();
+	const auto strength = velocity.length() * bot_item_knock_strength_per_speed_v;
+	const auto location = transformr(item.get_logic_transform().pos, velocity.degrees());
+
+	::play_collision_sound(strength, location, item, obstacle, step);
+}
+
 void sound_existence_system::play_sounds_from_events(const logic_step step) const {
 	const auto& collisions = step.get_queue<messages::collision_message>();
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();
@@ -197,6 +251,17 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 	for (size_t i = 0; i < collisions.size(); ++i) {
 		const auto& c = collisions[i];
+
+		if (c.type == messages::collision_message::event_type::BEGIN_CONTACT && c.one_is_sensor) {
+			const auto subject = cosm[c.subject];
+			const auto collider = cosm[c.collider];
+
+			if (subject.alive() && collider.alive()) {
+				::play_bot_item_knock(subject, collider, step);
+			}
+
+			continue;
+		}
 
 		if (c.type == messages::collision_message::event_type::POST_SOLVE) {
 			const auto subject = cosm[c.subject];

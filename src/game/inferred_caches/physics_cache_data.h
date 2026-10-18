@@ -25,6 +25,11 @@ struct colliders_cache {
 
 	colliders_connection connection;
 
+	/*
+		See calc_bot_obstacle_fixtures.
+	*/
+	bool has_bot_obstacle_fixtures = false;
+
 	void clear(physics_world_cache&);
 	void clear_fields();
 
