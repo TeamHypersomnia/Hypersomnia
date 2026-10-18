@@ -2449,7 +2449,8 @@ if (BUILD_NETWORKING)
 			target_compile_options(sodium PRIVATE -w)
 		endif()
 
-		target_include_directories(sodium PUBLIC "${PROJECT_SOURCE_DIR}/src/3rdparty/libsodium/include" PRIVATE "${PROJECT_SOURCE_DIR}/src/3rdparty/libsodium/include/sodium")
+		# BEFORE: the global include directories come first otherwise, and OpenAL's generated version.h shadows sodium's.
+		target_include_directories(sodium BEFORE PUBLIC "${PROJECT_SOURCE_DIR}/src/3rdparty/libsodium/include" PRIVATE "${PROJECT_SOURCE_DIR}/src/3rdparty/libsodium/include/sodium")
 		list(APPEND HYPERSOMNIA_LIBS sodium)
 	else()
 		prefer_static_libraries()
