@@ -56,29 +56,57 @@ auto calc_body_type(const E& handle) {
 }
 
 /*
-	Whether the item hangs on a character's back, also as an attachment of a weapon there, e.g. its magazine.
+	The function of the slot the item is in on a character (or another non-item container),
+	also as an attachment of an item there, e.g. a weapon's magazine.
 */
 
 template <class E>
-bool is_hung_on_back(const E& handle) {
+std::optional<slot_function> find_top_level_slot_function(const E& handle) {
 	const auto& cosm = handle.get_cosmos();
 	auto slot_id = handle.get_current_slot().get_id();
 
 	while (const auto slot = cosm[slot_id]) {
-		if (::is_back_weapon_slot(slot.get_type())) {
-			return true;
-		}
-
 		const auto container = slot.get_container();
 
 		if (container.template find<components::item>() == nullptr) {
-			return false;
+			return slot.get_type();
 		}
 
 		slot_id = container.get_current_slot().get_id();
 	}
 
-	return false;
+	return std::nullopt;
+}
+
+/*
+	Whether the item hangs on a character's back, also as an attachment of a weapon there.
+*/
+
+template <class E>
+bool is_hung_on_back(const E& handle) {
+	const auto top = ::find_top_level_slot_function(handle);
+	return top.has_value() && ::is_back_weapon_slot(*top);
+}
+
+template <class E>
+const components::sentience* find_bot_owner_sentience(const E& handle) {
+	const auto capability = handle.get_owning_transfer_capability();
+
+	if (capability && capability != handle) {
+		if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
+			return sentience;
+		}
+	}
+
+	return nullptr;
+}
+
+inline filter_type calc_standard_character_filter(const components::sentience& sentience) {
+	return
+		sentience.is_conscious() ?
+		filters[predefined_filter_type::CHARACTER] :
+		filters[predefined_filter_type::DEAD_CHARACTER]
+	;
 }
 
 /*
@@ -87,8 +115,13 @@ bool is_hung_on_back(const E& handle) {
 */
 
 template <class E>
+real32 calc_bot_obstacle_collider_scale(const E& handle) {
+	return handle.get_cosmos().get_common_significant().navmesh.calc_bot_obstacle_collider_scale();
+}
+
+template <class E>
 bool bot_needs_obstacle_fixtures(const E& handle) {
-	return handle.get_cosmos().get_common_significant().navmesh.calc_bot_obstacle_collider_scale() < 1.f;
+	return ::calc_bot_obstacle_collider_scale(handle) < 1.f;
 }
 
 template <class E>
@@ -101,17 +134,14 @@ bool is_bot_character(const E& handle) {
 }
 
 /*
-	An item in a bot's hands - not on its back - whose physics depend on the navmesh.
+	An item in a bot's hands (also an attachment of one, e.g. a magazine) - only those knock against obstacles.
 */
 
 template <class E>
 bool is_wielded_by_bot(const E& handle) {
-	const auto capability = handle.get_owning_transfer_capability();
-
-	if (capability && capability != handle) {
-		if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
-			return !::is_hung_on_back(handle);
-		}
+	if (::find_bot_owner_sentience(handle) != nullptr) {
+		const auto top = ::find_top_level_slot_function(handle);
+		return top == slot_function::PRIMARY_HAND || top == slot_function::SECONDARY_HAND;
 	}
 
 	return false;
@@ -134,17 +164,8 @@ struct bot_obstacle_fixtures {
 template <class E>
 std::optional<bot_obstacle_fixtures> calc_bot_obstacle_fixtures(const E& handle) {
 	if (::is_bot_character(handle)) {
-		if (::bot_needs_obstacle_fixtures(handle)) {
-			const auto sentience = handle.template find<components::sentience>();
-
-			const auto standard_filter =
-				sentience->is_conscious() ?
-				filters[predefined_filter_type::CHARACTER] :
-				filters[predefined_filter_type::DEAD_CHARACTER]
-			;
-
-			const auto scale = handle.get_cosmos().get_common_significant().navmesh.calc_bot_obstacle_collider_scale();
-
+		if (const auto scale = ::calc_bot_obstacle_collider_scale(handle); scale < 1.f) {
+			const auto standard_filter = ::calc_standard_character_filter(*handle.template find<components::sentience>());
 			return bot_obstacle_fixtures { scale, false, ::make_obstacle_only_filter(standard_filter) };
 		}
 
@@ -184,7 +205,7 @@ auto calc_filters(const E& handle) {
 		const auto capability = handle.get_owning_transfer_capability();
 
 		if (capability && capability != handle) {
-			if (const auto sentience = capability.template find<components::sentience>(); sentience != nullptr && sentience->is_bot) {
+			if (::find_bot_owner_sentience(handle) != nullptr) {
 				if (::is_hung_on_back(handle) || ::bot_needs_obstacle_fixtures(handle)) {
 					/*
 						Weapons hung on a bot's back never snag on obstacles, which the bot navigation
@@ -192,8 +213,8 @@ auto calc_filters(const E& handle) {
 						fly through them with their effects, they keep their mass.
 						is_bot is set before the bot gets any items, so nothing needs reinferring when it changes.
 
-						On a navmesh finer than the standard, the items in its hands don't snag either
-						- see calc_bot_obstacle_fixtures.
+						On a navmesh finer than the standard, nothing a bot carries snags either
+						- the items in its hands knock instead, see calc_bot_obstacle_fixtures.
 					*/
 
 					return ::make_obstacle_free_filter(filters[predefined_filter_type::CHARACTER_WEAPON]);
@@ -212,11 +233,7 @@ auto calc_filters(const E& handle) {
 	}
 
 	if (const auto sentience = handle.template find<components::sentience>()) {
-		const auto standard_filter =
-			sentience->is_conscious() ?
-			filters[predefined_filter_type::CHARACTER] :
-			filters[predefined_filter_type::DEAD_CHARACTER]
-		;
+		const auto standard_filter = ::calc_standard_character_filter(*sentience);
 
 		if (::is_bot_character(handle) && ::bot_needs_obstacle_fixtures(handle)) {
 			/*

@@ -15,7 +15,8 @@ static constexpr real32 base_spacing_px = 1100.0f;
 static constexpr real32 push_spacing_mult = 0.6f;
 
 /*
-	Rays rating the patrols - at most this many per round in total, so generating every round stays cheap.
+	Rays rating the patrols - this many per round shared among them, so generating every round stays cheap,
+	though never fewer than min_rays_per_patrol each.
 */
 
 static constexpr int max_total_rays = 400;
@@ -29,6 +30,14 @@ static constexpr real32 covering_ray_length = 450.0f;
 */
 
 static constexpr real32 attackers_cone_degrees = 60.0f;
+
+/*
+	Whether a waypoint of one faction counts for another - ANY on either side matches both.
+*/
+
+static bool is_same_side(const faction_type a, const faction_type b) {
+	return a == faction_type::ANY || b == faction_type::ANY || a == b;
+}
 
 /*
 	Where a cell lies between the two sides, in permille: 0 at the own side, 1000 at the other.
@@ -81,8 +90,7 @@ struct navmesh_cells {
 	}
 
 	std::size_t island_of(const std::size_t global) const {
-		const auto found = std::upper_bound(layout.offsets.begin(), layout.offsets.end(), global);
-		return static_cast<std::size_t>(found - layout.offsets.begin()) - 1;
+		return layout.grid_of(global);
 	}
 
 	uint8_t value(const std::size_t global) const {
@@ -464,7 +472,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	}
 
 	/*
-		The spacing in path cost, from the most common cell size.
+		The spacing in path cost, from the cell size of the first island - all islands of a map have the same one.
 	*/
 
 	const auto cell_size = [&]() {
@@ -477,8 +485,8 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 		return 128.0f;
 	}();
 
-	const auto spacing = static_cast<uint32_t>(base_spacing_px / density / cell_size * augs::grid_straight_step_cost_v);
-	const auto push_spacing = static_cast<uint32_t>(static_cast<real32>(spacing) * push_spacing_mult);
+	const auto spacing = std::max(1u, static_cast<uint32_t>(base_spacing_px / density / cell_size * augs::grid_straight_step_cost_v));
+	const auto push_spacing = std::max(1u, static_cast<uint32_t>(static_cast<real32>(spacing) * push_spacing_mult));
 
 	/*
 		Weighted Poisson disk sampling: the candidates in a random order where those with a higher weight tend to come first,
@@ -584,9 +592,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 		std::vector<vec2> positions;
 
 		for (const auto& w : in.existing) {
-			const bool same_side = faction == faction_type::ANY || w.faction == faction_type::ANY || w.faction == faction;
-
-			if (w.type == type && same_side) {
+			if (w.type == type && ::is_same_side(faction, w.faction)) {
 				positions.push_back(w.pos);
 			}
 		}
@@ -631,6 +637,10 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 		}
 
 		return 1000 * site_scale / (site_scale + from_site[c]);
+	};
+
+	auto calc_site_and_route_weight = [&](const std::size_t c) {
+		return static_cast<uint32_t>((calc_site_weight(c) * 7 + calc_route_weight(c) * 3) / 10);
 	};
 
 	/*
@@ -693,8 +703,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 					}
 
 					for (const auto& w : in.existing) {
-						const bool same_side = faction == faction_type::ANY || w.faction == faction_type::ANY || w.faction == faction;
-						n += same_side && w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.letter == letter ? 1 : 0;
+						n += ::is_same_side(faction, w.faction) && w.type == point_marker_type::BOT_WAYPOINT_PATROL && w.letter == letter ? 1 : 0;
 					}
 
 					return n;
@@ -723,9 +732,19 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 						break;
 					}
 
-					const auto too_close = std::any_of(added.begin(), added.end(), [&](const auto other) {
-						return (cells.center(other) - cells.center(entry.second)).length() < base_spacing_px / 3;
-					});
+					const auto pos = cells.center(entry.second);
+
+					auto is_near = [&](const vec2 other) {
+						return (other - pos).length() < base_spacing_px / 3;
+					};
+
+					const bool too_close =
+						std::any_of(added.begin(), added.end(), [&](const auto other) { return is_near(cells.center(other)); })
+						|| std::any_of(picks.begin(), picks.end(), [&](const auto other) { return is_near(cells.center(other)); })
+						|| std::any_of(in.existing.begin(), in.existing.end(), [&](const auto& w) {
+							return w.type == point_marker_type::BOT_WAYPOINT_PATROL && ::is_same_side(faction, w.faction) && is_near(w.pos);
+						})
+					;
 
 					if (!too_close) {
 						added.push_back(entry.second);
@@ -779,7 +798,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 				}
 
 				candidates.push_back(c);
-				weights.push_back(static_cast<uint32_t>((calc_site_weight(c) * 7 + calc_route_weight(c) * 3) / 10));
+				weights.push_back(calc_site_and_route_weight(c));
 			}
 
 			make_patrols(faction_type::METROPOLIS, candidates, weights, metropolis_patrol_cap, patrol_facing::TOWARDS_ATTACKERS);
@@ -848,7 +867,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 				weights.push_back(in.gun_game ? 1000u : calc_route_weight(c));
 			}
 			else {
-				weights.push_back(static_cast<uint32_t>((calc_site_weight(c) * 7 + calc_route_weight(c) * 3) / 10));
+				weights.push_back(calc_site_and_route_weight(c));
 			}
 		}
 
@@ -911,7 +930,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	}
 
 	/*
-		Rating the patrols with rays, at most max_total_rays of them in total.
+		Rating the patrols with rays, max_total_rays shared among them.
 	*/
 
 	if (in.free_distance && !patrol_outputs.empty()) {

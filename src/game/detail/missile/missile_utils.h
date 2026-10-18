@@ -5,7 +5,8 @@ void play_collision_sound(
 	const transformr location,
 	const const_entity_handle sub,
 	const const_entity_handle col,
-	const logic_step step
+	const logic_step step,
+	const predictability_info predictability
 );
 
 template <class R, class F>

@@ -20,7 +20,6 @@ struct editor_arena_settings {
 	editor_theme warmup_theme;
 	uint32_t navmesh_cell_size = 128;
 	bot_waypoints_settings bot_waypoints;
-	uint32_t bot_waypoints_preview_seed = 0;
 	rgba debug_navmesh_free_color = rgba(0, 255, 255, 60);
 	rgba debug_navmesh_occupied_color = rgba(255, 0, 0, 60);
 	rgba debug_navmesh_portal_color = rgba(0, 255, 0, 60);

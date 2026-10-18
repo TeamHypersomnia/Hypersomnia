@@ -9,6 +9,7 @@
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/ai/behaviors/ai_behavior_variant.hpp"
 #include "game/modes/ai/tasks/ai_waypoint_helpers.hpp"
+#include "game/modes/ai/tasks/ai_field_of_view.h"
 
 /*
 	A bot that hears an enemy it neither sees nor engages turns to where the enemy would show up:
@@ -20,15 +21,17 @@
 
 /*
 	The approach is recomputed at most this often - the newest sound waits in heard_for_approach meanwhile.
+	Every bot in another step of the interval (by its index), so the bots hearing the same steps never path all at once.
 */
 
 static constexpr real32 heard_approach_interval_secs = 0.5f;
 
 /*
-	Path cells to the sound looked through for the last one in sight - binary search, so at most log2 of it in rays.
+	How far along the path to the sound the last point in sight is looked for - binary search over its cells,
+	so at most log2 of their count in rays.
 */
 
-static constexpr int heard_approach_max_path_cells = 48;
+static constexpr real32 heard_approach_max_path_px = 6144.0f;
 
 inline std::optional<vec2> find_heard_approach_point(
 	const cosmos& cosm,
@@ -45,7 +48,8 @@ inline std::optional<vec2> find_heard_approach_point(
 	}
 
 	const auto& island = navmesh.islands[path->island_index];
-	const auto num = std::min(static_cast<int>(path->nodes.size()), heard_approach_max_path_cells);
+	const auto max_cells = std::max(1, static_cast<int>(heard_approach_max_path_px) / static_cast<int>(std::max(1u, island.cell_size)));
+	const auto num = std::min(static_cast<int>(path->nodes.size()), max_cells);
 	const auto si = cosm.get_si();
 
 	auto point_of = [&](const int i) {
@@ -57,11 +61,13 @@ inline std::optional<vec2> find_heard_approach_point(
 	};
 
 	/*
-		The first path cell out of sight - the one before it is where the enemy shows up.
+		A path cell in sight followed by one out of sight - where the enemy shows up.
+		Visibility along the path need not be monotonic, so it is any such transition the binary search lands on.
+		Cell 0 is the bot's own: its center out of sight, or the turn right at it, says nothing about the direction.
 	*/
 
 	if (!in_sight(0)) {
-		return point_of(0);
+		return std::nullopt;
 	}
 
 	auto lo = 0;
@@ -78,6 +84,10 @@ inline std::optional<vec2> find_heard_approach_point(
 		}
 	}
 
+	if (lo == 0) {
+		return std::nullopt;
+	}
+
 	return point_of(lo);
 }
 
@@ -91,16 +101,13 @@ inline std::optional<vec2> face_heard_approach(
 	const physics_world_cache& physics,
 	arena_mode_ai_state& ai_state,
 	const vec2 bot_pos,
+	const ai_field_of_view& fov,
 	const real32 dt_secs,
+	const std::size_t bot_index,
 	const bool is_freeze_time,
-	const bool target_acquired,
 	pathfinding_context* const pathfinding_ctx,
 	randomization& rng
 ) {
-	if (ai_state.approach_cooldown > 0.0f) {
-		ai_state.approach_cooldown -= dt_secs;
-	}
-
 	if (ai_state.approach_hold_timer > 0.0f) {
 		ai_state.approach_hold_timer -= dt_secs;
 	}
@@ -113,18 +120,24 @@ inline std::optional<vec2> face_heard_approach(
 		|| ::is_behavior<ai_behavior_idle>(ai_state.last_behavior)
 	);
 
-	if (is_freeze_time || target_acquired || ai_state.is_in_combat() || (!camping && !waiting)) {
+	if (is_freeze_time || ai_state.is_in_combat() || (!camping && !waiting)) {
+		/*
+			A sound heard while walking or fighting is stale by the time the bot stands again.
+		*/
+
 		ai_state.approach_hold_timer = 0.0f;
+		ai_state.heard_for_approach_pending = false;
 		return std::nullopt;
 	}
 
-	if (ai_state.heard_for_approach_pending && ai_state.approach_cooldown <= 0.0f) {
+	const auto steps_per_check = std::max(1u, static_cast<uint32_t>(heard_approach_interval_secs / dt_secs + 0.5f));
+	const bool check_due = (cosm.get_total_steps_passed() + bot_index) % steps_per_check == 0;
+
+	if (ai_state.heard_for_approach_pending && check_due) {
 		ai_state.heard_for_approach_pending = false;
-		ai_state.approach_cooldown = heard_approach_interval_secs;
 
 		if (const auto point = ::find_heard_approach_point(cosm, navmesh, physics, bot_pos, ai_state.heard_for_approach, pathfinding_ctx)) {
 			const auto dir = vec2(*point - bot_pos).normalize();
-
 
 			if (dir.is_nonzero()) {
 				/*
@@ -134,16 +147,23 @@ inline std::optional<vec2> face_heard_approach(
 				const auto share = rng.randval(0.5f, 1.0f);
 
 				if (camping) {
-					const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, patrol->patrol_waypoint);
+					const auto [min_secs, max_secs] = ::get_waypoint_camp_duration_range(cosm, patrol->calc_assigned_waypoint().waypoint_id);
 					const auto allowed = std::max(0.0f, max_secs * 2.0f - patrol->camp_stay_secs);
 					const auto extended = std::min(rng.randval(min_secs, max_secs) * share, allowed);
 
-					patrol->camp_look_direction = dir;
-					patrol->camp_look_far = false;
+					/*
+						Where a bot looking far already sees, it keeps looking far the same way.
+					*/
+
+					const bool already_in_view = patrol->camp_look_far && fov.within_angle(patrol->camp_look_direction, dir);
+
+					if (!already_in_view) {
+						patrol->camp_look_direction = dir;
+						patrol->camp_look_far = false;
+					}
 
 					if (extended > patrol->camp_timer) {
 						patrol->camp_timer = extended;
-						patrol->camp_duration = std::max(patrol->camp_duration, extended);
 					}
 				}
 				else {

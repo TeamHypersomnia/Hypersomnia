@@ -48,7 +48,11 @@ bool los_to_any_vertices_of(
 			const auto* f = fp.get();
 			const auto* shape = f->GetShape();
 
-			if (shape->GetType() != b2Shape::e_polygon) {
+			/*
+				Only the fixtures queries see - a bot on a fine navmesh also has a scaled-down copy colliding only with obstacles.
+			*/
+
+			if (shape->GetType() != b2Shape::e_polygon || (f->GetFilterData().maskBits & filter.categoryBits) == 0) {
 				continue;
 			}
 
@@ -107,12 +111,19 @@ float sense_free_space_from_vertices_of(
 		++num_rays;
 	};
 
+	/*
+		Only from the fixtures that collide with walls - a bot on a fine navmesh has its real silhouette
+		partly inside walls (a ray from inside one doesn't hit it), so its scaled-down copy is sensed from instead.
+	*/
+
+	const auto wall_bit = static_cast<uint16>(1u << static_cast<unsigned>(filter_category::WALL));
+
 	if (const auto* cc = ::find_colliders_cache(entity_handle)) {
 		for (const auto& fp : cc->constructed_fixtures) {
 			const auto* f = fp.get();
 			const auto* shape = f->GetShape();
 
-			if (shape->GetType() != b2Shape::e_polygon) {
+			if (shape->GetType() != b2Shape::e_polygon || (f->GetFilterData().maskBits & wall_bit) == 0) {
 				continue;
 			}
 

@@ -17,6 +17,7 @@ struct editor_view {
 	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;
 
 	std::vector<std::string> open_layers;
+	uint32_t bot_waypoints_preview_seed = 0;
 	// END GEN INTROSPECTOR
 
 	void toggle_grid() {

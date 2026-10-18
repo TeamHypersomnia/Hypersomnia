@@ -1261,8 +1261,22 @@ void arena_mode::setup_round(
 		fill_spawns(cosm, faction, factions[faction]);
 	});
 
+	/*
+		Waypoints are generated only for a round with bots (spawned below if missing) -
+		bots added in the middle of a round get them from the next one.
+	*/
+
+	const auto num_requested_bots = [&]() {
+		auto total = std::size_t(0);
+		calc_requested_bots(in).for_each([&](const auto n) { total += n; });
+		return total;
+	}();
+
 	generated_waypoints_seed = static_cast<uint32_t>(get_round_rng_seed(cosm));
-	generated_waypoints_this_round = ::create_random_waypoints(access, cosm, in.rules.is_gun_game(), generated_waypoints_seed);
+	generated_waypoints_this_round =
+		num_requested_bots > 0
+		&& ::create_random_waypoints(access, cosm, in.rules.is_gun_game(), generated_waypoints_seed)
+	;
 
 	/*
 		Gather waypoints for AI teams at round start.

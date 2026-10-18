@@ -2550,12 +2550,6 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("How many waypoints get generated - more, closer to each other, with a higher density.\nUsed every round and by the preview below.");
 		}
-
-		PROPERTY("Preview seed", bot_waypoints_preview_seed);
-
-		if (ImGui::IsItemHovered()) {
-			text_tooltip("The seed of the preview below - the same seed gives the same waypoints again.\nEvery round in game draws its own.");
-		}
 	}
 
 	return result;
@@ -3756,7 +3750,19 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 				text_disabled(note);
 
-				const auto current_seed = project.settings.bot_waypoints_preview_seed;
+				/*
+					The preview seed is the editor's view state (editor_view.json), not the map's.
+				*/
+
+				auto current_seed = in.setup.get_view().bot_waypoints_preview_seed;
+
+				if (ImGui::InputScalar("Preview seed", ImGuiDataType_U32, &current_seed)) {
+					in.setup.set_bot_waypoints_preview_seed(current_seed);
+				}
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("The seed of the preview below - the same seed gives the same waypoints again.\nEvery round in game draws its own.");
+				}
 
 				if (ImGui::Button("Generate into layer random_waypoints")) {
 					const auto new_seed = (static_cast<uint32_t>(augs::date_time().secs_since_epoch()) ^ (current_seed * 2654435761u)) & 0x7fffffffu;

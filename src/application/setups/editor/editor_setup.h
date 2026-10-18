@@ -47,6 +47,8 @@
 #include "game/stateless_systems/animation_system.h"
 #include "view/faction_view_settings.h"
 
+struct random_waypoint;
+
 #include "application/arena/arena_handle.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/setups/client/client_vars.h"
@@ -570,6 +572,10 @@ public:
 		return view;
 	}
 
+	void set_bot_waypoints_preview_seed(const uint32_t seed) {
+		view.bot_waypoints_preview_seed = seed;
+	}
+
 	void start_renaming_selection();
 
 	bool start_moving_selection();
@@ -858,6 +864,7 @@ public:
 	*/
 
 	std::size_t count_author_waypoints() const;
+	std::vector<random_waypoint> calc_random_waypoints_preview(uint32_t seed) const;
 	void generate_random_waypoints_preview(uint32_t seed);
 	bool is_generating_miniature() const;
 

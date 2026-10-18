@@ -547,6 +547,13 @@ arena_ai_result update_arena_mode_ai(
 							alert.enemy,
 							alert.enemy_pos
 						);
+
+						/*
+							The newest such sound also turns a standing bot towards where the enemy would show up (face_heard_approach).
+						*/
+
+						ai_state.heard_for_approach = alert.enemy_pos;
+						ai_state.heard_for_approach_pending = true;
 						break;
 				}
 			}
@@ -626,17 +633,17 @@ arena_ai_result update_arena_mode_ai(
 		return ::is_behavior<ai_behavior_combat>(ai_state.last_behavior);
 	};
 
-	if (!is_blinded) {
-		/*
-			Camping on a "look far" waypoint is like a player with the crosshair at the screen edge.
-		*/
-		const auto fov = ::calc_ai_field_of_view(
-			fog_of_war,
-			::calc_area_camera_zoom(cosm, character_pos, zoom_override),
-			::get_bot_fov_mult(difficulty),
-			::is_camping_and_looking_far(ai_state.last_behavior)
-		);
+	/*
+		Camping on a "look far" waypoint is like a player with the crosshair at the screen edge.
+	*/
+	const auto fov = ::calc_ai_field_of_view(
+		fog_of_war,
+		::calc_area_camera_zoom(cosm, character_pos, zoom_override),
+		::get_bot_fov_mult(difficulty),
+		::is_camping_and_looking_far(ai_state.last_behavior)
+	);
 
+	if (!is_blinded) {
 		const auto detected_enemy = ::find_closest_enemy(ctx, is_ffa, fov);
 
 		if (detected_enemy != ai_state.perceived_enemy) {
@@ -1369,7 +1376,7 @@ arena_ai_result update_arena_mode_ai(
 
 	auto crosshair_offset = move_result.crosshair_offset;
 
-	if (const auto approach = ::face_heard_approach(cosm, navmesh, physics, ai_state, character_pos, dt_secs, is_freeze_time, target_acquired, pathfinding_ctx, stable_rng)) {
+	if (const auto approach = ::face_heard_approach(cosm, navmesh, physics, ai_state, character_pos, fov, dt_secs, bot_index, is_freeze_time, pathfinding_ctx, stable_rng)) {
 		crosshair_offset = *approach;
 	}
 

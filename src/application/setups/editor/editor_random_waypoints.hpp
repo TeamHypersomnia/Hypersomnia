@@ -4,7 +4,6 @@
 #include "game/common_state/bot_waypoints_settings.h"
 #include "game/modes/ai/random_waypoints_generator.h"
 #include "game/modes/detail/create_random_waypoints.hpp"
-#include "game/detail/navmesh_generation.hpp"
 
 /*
 	The editor's side of random bot waypoints (see random_waypoints_generator.h):
@@ -12,69 +11,6 @@
 	and generating a preview into the random_waypoints layer - one undoable step, overwriting the previous preview.
 	The preview layer never counts as the author's waypoints and is never used in game.
 */
-
-/*
-	Spawns and bombsites from the project's nodes - the editor's scene leaves out the hidden ones, the game doesn't.
-*/
-
-inline void gather_spawns_and_sites_from_project(
-	const editor_project& project,
-	const editor_resource_pools& officials,
-	random_waypoints_input& input
-) {
-	input.resistance_spawns.clear();
-	input.metropolis_spawns.clear();
-	input.bombsites.clear();
-
-	std::vector<vec2> ffa_spawns;
-
-	/*
-		Not the scratchpad's nodes - as if they were not in the project.
-	*/
-
-	const auto scratchpad_nodes = project.make_scratchpad_node_set();
-
-	auto in_scratchpad = [&]<typename N>(const N&, const auto raw_id) {
-		return found_in(scratchpad_nodes, editor_typed_node_id<N>::from_raw(raw_id).operator editor_node_id());
-	};
-
-	project.nodes.template get_pool_for<editor_point_marker_node>().for_each_id_and_object([&](const auto& raw_id, const auto& node) {
-		if (in_scratchpad(node, raw_id)) {
-			return;
-		}
-
-		if (const auto resource = project.find_resource(officials, node.resource_id)) {
-			const auto type = resource->editable.type;
-
-			if (type == point_marker_type::TEAM_SPAWN) {
-				(node.editable.faction == faction_type::METROPOLIS ? input.metropolis_spawns : input.resistance_spawns).push_back(node.editable.pos);
-			}
-			else if (type == point_marker_type::FFA_SPAWN) {
-				ffa_spawns.push_back(node.editable.pos);
-			}
-		}
-	});
-
-	if (input.gun_game) {
-		auto& all = input.resistance_spawns;
-		all.insert(all.end(), input.metropolis_spawns.begin(), input.metropolis_spawns.end());
-		all.insert(all.end(), ffa_spawns.begin(), ffa_spawns.end());
-		input.metropolis_spawns.clear();
-		return;
-	}
-
-	project.nodes.template get_pool_for<editor_area_marker_node>().for_each_id_and_object([&](const auto& raw_id, const auto& node) {
-		if (in_scratchpad(node, raw_id)) {
-			return;
-		}
-
-		if (const auto resource = project.find_resource(officials, node.resource_id)) {
-			if (::is_bombsite(resource->editable.type)) {
-				input.bombsites.emplace_back(ltrb::center_and_size(node.editable.pos, vec2(node.editable.size)), node.editable.letter);
-			}
-		}
-	});
-}
 
 template <class F>
 void for_each_waypoint_node_with_layer(const editor_project& project, const editor_resource_pools& officials, F&& callback) {
@@ -113,57 +49,76 @@ std::size_t editor_setup::count_author_waypoints() const {
 	return count;
 }
 
-void editor_setup::generate_random_waypoints_preview(const uint32_t seed) {
-	const auto& settings = project.settings;
+std::vector<random_waypoint> editor_setup::calc_random_waypoints_preview(const uint32_t seed) const {
+	/*
+		The arena built like for a playtest (see start_playtesting), into a cosmos of its own -
+		so the preview has exactly the waypoints a round with this seed gets in the playtest:
+		the same nodes and layers, the same navmesh, the same game mode.
+	*/
 
-	const bool gun_game = [&]() {
-		if (const auto mode = project.find_resource(official.resources, settings.default_server_mode)) {
-			return mode->type.template is<editor_gun_game_mode>();
+	intercosm built_scene;
+	all_rulesets_variant built_ruleset;
+	all_modes_variant built_mode_state;
+	cosmos_solvable_significant built_clean_round_state;
+	synced_dynamic_vars built_dynamic_vars;
+
+	const auto built_handle = editor_arena_handle<false> {
+		built_mode_state,
+		built_scene,
+		built_scene.world,
+		built_ruleset,
+		built_clean_round_state,
+		built_dynamic_vars
+	};
+
+	const bool for_playtesting = true;
+	const bool editor_preview = false;
+	const bool showing_navmesh = true;
+
+	/*
+		Building writes the built entity ids into the nodes - into a copy, so the editor's scene keeps its own.
+	*/
+
+	const auto project_copy = project;
+
+	::build_arena_from_editor_project<editor_arena_handle<false>>(
+		built_handle,
+		{
+			project_copy,
+			game_mode_name_type(""),
+			paths.project_folder,
+			official,
+			nullptr,
+			nullptr,
+			for_playtesting,
+			editor_preview,
+			showing_navmesh
 		}
+	);
 
-		return false;
-	}();
+	const auto* const arena_rules = std::get_if<arena_mode_ruleset>(std::addressof(built_ruleset));
+	const bool gun_game = arena_rules != nullptr && arena_rules->is_gun_game();
 
-	auto input = ::gather_random_waypoints_input(scene.world, gun_game);
-	input.density = settings.bot_waypoints.density;
+	auto input = ::gather_random_waypoints_input(built_scene.world, gun_game);
 	input.seed = seed;
 
-	::gather_spawns_and_sites_from_project(project, official.resources, input);
-
 	/*
-		The editor's scene has a navmesh only while it is shown - otherwise one is made just for this.
+		Like create_random_waypoints - except that Automatic previews generated ones even when the map has the author's.
 	*/
 
-	cosmos_navmesh own_navmesh;
-
-	if (input.navmesh->islands.empty()) {
-		own_navmesh = ::generate_navmesh(scene.world, std::max(16u, settings.navmesh_cell_size));
-		input.navmesh = &own_navmesh;
+	if (project.settings.bot_waypoints.mode != bot_waypoints_mode::YOURS_AND_GENERATED) {
+		input.existing.clear();
 	}
 
-	/*
-		The scene shows the previous preview and the author's waypoints alike - the author's come from the project.
-	*/
+	return ::generate_random_waypoints(input);
+}
 
-	input.existing.clear();
+void editor_setup::generate_random_waypoints_preview(const uint32_t seed) {
+	const auto generated = calc_random_waypoints_preview(seed);
 
-	if (settings.bot_waypoints.mode == bot_waypoints_mode::YOURS_AND_GENERATED) {
-		::for_each_waypoint_node_with_layer(project, official.resources, [&](const editor_point_marker_node& node, const point_marker_type type, const editor_layer& layer) {
-			if (layer.unique_name != random_waypoints_layer_name_v) {
-				random_waypoint w;
-				w.pos = node.editable.pos;
-				w.type = type;
-				w.faction = node.editable.faction;
-				w.letter = node.editable.letter;
-				input.existing.push_back(w);
-			}
-		});
-	}
-
-	const auto generated = ::generate_random_waypoints(input);
+	view.bot_waypoints_preview_seed = seed;
 
 	auto after = std::make_unique<editor_project>(project);
-	after->settings.bot_waypoints_preview_seed = seed;
 
 	/*
 		A preview layer kept in the scratchpad stays there under a free name - it was moved there to be kept.

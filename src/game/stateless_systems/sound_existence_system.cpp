@@ -35,7 +35,8 @@ void play_collision_sound(
 	const transformr location,
 	const const_entity_handle sub,
 	const const_entity_handle col,
-	const logic_step step
+	const logic_step step,
+	const predictability_info predictability
 ) {
 	const auto& cosm = step.get_cosmos();
 	const auto& logicals = cosm.get_logical_assets();
@@ -80,7 +81,7 @@ void play_collision_sound(
 				effect.start(
 					step,
 					particle_effect_start_input::fire_and_forget(location),
-					always_predictable_v
+					predictability
 				);
 			}
 		}
@@ -112,7 +113,7 @@ void play_collision_sound(
 		/* TODO: properly determine predictability based on who threw the item! */
 		/* TODO: properly determine predictability based on if the collider's owning capability is a player! */
 
-		effect.start(step, start, always_predictable_v);
+		effect.start(step, start, predictability);
 	};
 
 
@@ -236,7 +237,11 @@ static void play_bot_item_knock(
 	const auto strength = velocity.length() * bot_item_knock_strength_per_speed_v;
 	const auto location = transformr(item.get_logic_transform().pos, velocity.degrees());
 
-	::play_collision_sound(strength, location, item, obstacle, step);
+	/*
+		The knock follows the bot's movement, which a client mispredicts.
+	*/
+
+	::play_collision_sound(strength, location, item, obstacle, step, predictable_only_by(capability));
 }
 
 void sound_existence_system::play_sounds_from_events(const logic_step step) const {
@@ -272,7 +277,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			if (subject.alive() && collider.alive()) {
 				auto impact_dir = c.collider_impact_velocity;
 				impact_dir.normalize();
-				::play_collision_sound(collision_sound_strength, transformr(c.point, impact_dir.degrees()), subject, collider, step);
+				::play_collision_sound(collision_sound_strength, transformr(c.point, impact_dir.degrees()), subject, collider, step, always_predictable_v);
 			}
 
 			// skip the next, swapped collision message

@@ -3557,7 +3557,7 @@ void editor_setup::stop_playtesting() {
 }
 
 void editor_setup::show_playtest_waypoints_seed(const uint32_t seed) {
-	auto& shown = project.settings.bot_waypoints_preview_seed;
+	auto& shown = view.bot_waypoints_preview_seed;
 
 	if (shown != seed) {
 		shown = seed;

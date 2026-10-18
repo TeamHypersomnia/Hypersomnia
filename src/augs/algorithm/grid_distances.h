@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -26,6 +27,11 @@ namespace augs {
 			sizes.push_back(size);
 			offsets.push_back(total);
 			total += static_cast<std::size_t>(size.x) * size.y;
+		}
+
+		std::size_t grid_of(const std::size_t index) const {
+			const auto found = std::upper_bound(offsets.begin(), offsets.end(), index);
+			return static_cast<std::size_t>(found - offsets.begin()) - 1;
 		}
 	};
 
@@ -96,12 +102,7 @@ namespace augs {
 
 				const auto dist = current;
 
-				std::size_t grid = 0;
-
-				while (grid + 1 < layout.offsets.size() && layout.offsets[grid + 1] <= index) {
-					++grid;
-				}
-
+				const auto grid = layout.grid_of(index);
 				const auto size = layout.sizes[grid];
 				const auto offset = layout.offsets[grid];
 				const auto local = index - offset;

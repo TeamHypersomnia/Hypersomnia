@@ -23,6 +23,7 @@
 #include "augs/log.h"
 
 #include "game/detail/navmesh_generation.hpp"
+#include "hypersomnia_version.h"
 
 template <class A>
 void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {
@@ -122,9 +123,14 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	editor_project_paths paths_for_nav(project_dir);
 	const auto nav_path = paths_for_nav.project_nav;
 
-	/* Derive a reusable secure hash from the version_timestamp */
+	/*
+		The cached navmesh is valid for this version of the map and of the game -
+		another game version may generate it differently, and every peer must have the same one
+		(the bots and their generated waypoints walk it in the simulation).
+	*/
+
 	const auto timestamp_str = static_cast<std::string>(project.meta.version_timestamp);
-	const auto derived_hash = augs::secure_hash(timestamp_str);
+	const auto derived_hash = augs::secure_hash(timestamp_str + hypersomnia_version().commit_hash);
 
 	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
 		lbd(official.resources.get_pool_for<editor_point_marker_resource>());
