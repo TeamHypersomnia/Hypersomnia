@@ -36,7 +36,7 @@ sleep 6
 Xvfb :81 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:81 timeout ${STEAM_SECS:-40} $SBIN --connect 127.0.0.1:10042 --appdata-dir $T/steam --no-update-on-launch > $T/steam.out 2>&1
+DISPLAY=:81 timeout ${STEAM_SECS:-40} $SBIN --connect 127.0.0.1:10042 --appdata-dir $T/steam --no-update-on-launch --mute > $T/steam.out 2>&1
 echo "=== steam client"
 grep -hE "identity cert|Connecting as|Received initial state|Reason|refused" $T/steam.out | sed 's/^\[[0-9:]*\] //' | head -6
 echo "=== server"

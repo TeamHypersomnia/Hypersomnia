@@ -4446,7 +4446,7 @@ work_result work(
 				config_copy.drawing.draw_character_status = false;
 			}
 
-			if (ad_state == ad_state_type::PLAYING) {
+			if (ad_state == ad_state_type::PLAYING || params.mute) {
 				config_copy.audio_volume.master = 0.0f;
 			}
 

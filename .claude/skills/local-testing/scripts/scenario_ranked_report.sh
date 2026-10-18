@@ -102,7 +102,7 @@ for c in alice:86 bob:87; do
 		cat > $T/alice/user/conf.d/menu.json <<J
 { "launch_at_startup": "MAIN_MENU", "window": { "fullscreen": false, "size": [1280, 720] }, "main_menu": { "leaderboards_provider_url": "$BROKER_URL/leaderboards" } }
 J
-		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 200 $CBIN --appdata-dir $T/$name --no-update-on-launch > $T/$name.out 2>&1 &)
+		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 200 $CBIN --appdata-dir $T/$name --no-update-on-launch --mute > $T/$name.out 2>&1 &)
 		sleep 12
 		DISPLAY=:$d import -window root $T/alice_menu_before.png
 		DISPLAY=:$d python3 "$HERE/xinput.py" click 199 323; sleep 2
@@ -110,7 +110,7 @@ J
 		DISPLAY=:$d python3 "$HERE/xinput.py" type "127.0.0.1:10060"
 		DISPLAY=:$d python3 "$HERE/xinput.py" click 380 524
 	else
-		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 150 $CBIN --connect 127.0.0.1:10060 --appdata-dir $T/$name --no-update-on-launch > $T/$name.out 2>&1 &)
+		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 150 $CBIN --connect 127.0.0.1:10060 --appdata-dir $T/$name --no-update-on-launch --mute > $T/$name.out 2>&1 &)
 	fi
 done
 
@@ -126,7 +126,7 @@ if [ -n "$REJOIN" ]; then
 	sleep ${REJOIN_AFTER:-5}
 	# No --connect: user/ranked_match.json brings the game back to the match by itself, on the account it was played on
 	echo "alice's ranked_match.json: $(cat $T/alice/user/ranked_match.json 2>/dev/null | sed 's/key_[0-9a-f]\{56\}/key_.../')"
-	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --appdata-dir $T/alice --no-update-on-launch > $T/alice_rejoin.out 2>&1 &)
+	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --appdata-dir $T/alice --no-update-on-launch --mute > $T/alice_rejoin.out 2>&1 &)
 	echo "alice rejoins at $(date +%T)"
 	for t in 4 8 12; do sleep 4; DISPLAY=:86 import -window root $T/rejoin_$t.png; done
 fi

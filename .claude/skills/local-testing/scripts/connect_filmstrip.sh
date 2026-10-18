@@ -12,7 +12,7 @@ cd $REPO/hypersomnia
 Xvfb :91 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:91 timeout $((SECS + 5)) $BIN --connect "$CONNECT" --appdata-dir $A --no-update-on-launch > $A/filmstrip.out 2>&1 &
+DISPLAY=:91 timeout $((SECS + 5)) $BIN --connect "$CONNECT" --appdata-dir $A --no-update-on-launch --mute > $A/filmstrip.out 2>&1 &
 G=$!
 for i in $(seq -w 1 $((SECS * 2))); do
 	sleep 0.5

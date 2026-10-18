@@ -72,7 +72,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `[USER_FILES=dir] prepare_web.sh <web build> <out>` | Copies a web build and points its packaged config at the local master and the broker on 13500 (see below); USER_FILES also writes files into its `/user` before start |
 | `webserve.py <dir> <port>` | Serves a web build with COOP/COEP; any path serves the game, so `/game/<id>` joins right away |
 | `steam_tickets.py IDENTITY...` | Steam Web API tickets from the user's running Steam client, to probe `AuthenticateUserTicket` without the game |
-| `xinput.py click x y` / `type TEXT` / `key NAME` / `scroll x y n` | Clicks, types, presses keys and scrolls on `$DISPLAY` through XTest (no xdotool needed) |
+| `xinput.py click x y` / `drag x1 y1 x2 y2` / `type TEXT` / `key NAME` / `scroll x y n` (0 notches = only move the mouse) | Clicks, drags (e.g. a window edge), types, presses keys and scrolls on `$DISPLAY` through XTest (no xdotool needed) |
 | `focus_bounce.py <window name> [secs]` | Takes the X focus from the game's window and gives it back (alt-tab to a browser and back - Xvfb has no window manager); `xclip -selection CLIPBOARD -in` sets the clipboard |
 | `local_stack.sh [web build] [hours]` | Leaves running, for the user to test by hand: master, official ranked [PL] and casual [DE] servers, the web build on http://localhost:8765 pointed at them; `local_stack.sh stop` |
 | `build_headless_ubuntu2204.sh` | Headless Release build inside an unprivileged Ubuntu 22.04 rootfs (bwrap) - glibc 2.35, runs on both arenaus and arena; prints where the libc++ to ship lies |
@@ -100,6 +100,9 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
   Unlink from Steam is one signed GET `/link_key/unlink?t&key&sig`, answered at once.
 
 ## UI checks
+
+Every game started for a test gets `--mute` (master volume 0 for that run only) - under Xvfb it still plays sound
+through the user's speakers. The scripts here pass it to every client.
 
 Run the game under `Xvfb :77 -screen 0 1280x720x24` with a 1280x720 non-fullscreen window (conf.d `"window"`),
 `import -window root shot.png` to screenshot, read the image, and `python3 xinput.py click x y` to click.

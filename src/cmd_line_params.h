@@ -64,6 +64,7 @@ struct cmd_line_params {
 	bool suppress_server_webhook = false;
 
 	bool no_update_on_launch = false;
+	bool mute = false;
 	bool update_once_now = false;
 	bool daily_autoupdate = false;
 
@@ -259,6 +260,13 @@ struct cmd_line_params {
 			}
 			else if (a == "--playtest") {
 				playtest = true;
+			}
+			else if (a == "--mute") {
+				/*
+					Master volume 0 for this run only - the config on disk keeps its own (e.g. for tests under Xvfb).
+				*/
+
+				mute = true;
 			}
 			else if (a == "--playtest-speed") {
 				playtest_speed = std::max(0.01, std::atof(get_next()));

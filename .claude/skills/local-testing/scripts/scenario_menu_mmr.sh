@@ -18,7 +18,7 @@ cd $REPO/hypersomnia
 Xvfb :89 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:89 timeout 40 $BIN --appdata-dir $A --no-update-on-launch > $A/menu.out 2>&1 &
+DISPLAY=:89 timeout 40 $BIN --appdata-dir $A --no-update-on-launch --mute > $A/menu.out 2>&1 &
 G=$!
 sleep 18
 DISPLAY=:89 import -window root ${1:-$S/menu_mmr.png}

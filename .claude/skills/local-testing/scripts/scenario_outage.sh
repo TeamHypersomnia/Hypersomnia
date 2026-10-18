@@ -45,7 +45,7 @@ sleep 8
 
 run() {
 	client_conf $1 $2
-	timeout 25 xvfb-run -a nice -n 10 $BIN --connect 127.0.0.1:$3 --appdata-dir $T/$1 --no-update-on-launch > $T/$1.out 2>&1
+	timeout 25 xvfb-run -a nice -n 10 $BIN --connect 127.0.0.1:$3 --appdata-dir $T/$1 --no-update-on-launch --mute > $T/$1.out 2>&1
 	echo "=== $1 -> $3"
 	grep -hE "identity cert|Connecting as|Received initial state|Reason|need an account" $T/$1.out | sed 's/^\[[0-9:]*\] //' | head -5
 }

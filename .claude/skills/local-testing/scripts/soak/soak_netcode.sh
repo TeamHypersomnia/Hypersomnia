@@ -45,7 +45,7 @@ echo "=== a real game client joins the by-address server"
 mk client <<J
 { "identity_broker_url": "http://127.0.0.1:1", "client": { "nickname": "after_soak" } }
 J
-timeout 40 xvfb-run -n 93 $BIN --connect 127.0.0.1:10020 --appdata-dir $T/client --no-update-on-launch > $T/client.out 2>&1
+timeout 40 xvfb-run -n 93 $BIN --connect 127.0.0.1:10020 --appdata-dir $T/client --no-update-on-launch --mute > $T/client.out 2>&1
 grep -hE "Received initial state" $T/client.out | head -1
 echo "=== full refusals logged by the servers"
 grep -hc "is full" $T/byaddress.out $T/keyed.out

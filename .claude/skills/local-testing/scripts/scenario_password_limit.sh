@@ -23,7 +23,7 @@ cd $REPO/hypersomnia
 timeout 200 $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 &
 sleep 6
 for i in 1 2 3 4 5 6 7; do
-	timeout 7 xvfb-run -a $BIN --connect 127.0.0.1:10040 --appdata-dir $T/c --no-update-on-launch > $T/c$i.out 2>&1
+	timeout 7 xvfb-run -a $BIN --connect 127.0.0.1:10040 --appdata-dir $T/c --no-update-on-launch --mute > $T/c$i.out 2>&1
 done
 grep -hE "\(reason=" $T/srv.out | sed 's/^\[[0-9:]*\] //' | uniq -c
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done

@@ -60,10 +60,10 @@ esac
 
 if [ -n "$CLIENT_RUN" ]; then
 	if [ "$KEEP" = 1 ]; then
-		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c --no-update-on-launch > $T/c.out 2>&1 &
+		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c --no-update-on-launch --mute > $T/c.out 2>&1 &
 		echo $! > $T/c.pid
 	else
-		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c --no-update-on-launch > $T/c.out 2>&1
+		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c --no-update-on-launch --mute > $T/c.out 2>&1
 	fi
 elif [ "$KEEP" != 1 ]; then
 	sleep $SECS

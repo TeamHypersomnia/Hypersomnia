@@ -37,7 +37,7 @@ J
 }
 
 background_client() { # dir connect secs
-	(cd $REPO/hypersomnia && setsid timeout $3 xvfb-run -a $BIN --connect "$2" --appdata-dir $1 --no-update-on-launch > $1/game.out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && setsid timeout $3 xvfb-run -a $BIN --connect "$2" --appdata-dir $1 --no-update-on-launch --mute > $1/game.out 2>&1 < /dev/null &)
 }
 
 game_pid() {
@@ -51,7 +51,7 @@ film() { # case connect secs - frames every 0.5 s, each named by seconds since s
 	local XV=$!
 	sleep 1
 	START=${START:-$(date +%s.%N)}
-	(cd $REPO/hypersomnia && DISPLAY=:92 timeout $(($3 + 5)) $BIN --connect "$2" --appdata-dir $C --no-update-on-launch > $C/game.out 2>&1 &)
+	(cd $REPO/hypersomnia && DISPLAY=:92 timeout $(($3 + 5)) $BIN --connect "$2" --appdata-dir $C --no-update-on-launch --mute > $C/game.out 2>&1 &)
 	while :; do
 		local E=$(echo "$(date +%s.%N) - $START" | bc)
 		[ $(echo "$E > $3" | bc) = 1 ] && break
@@ -102,7 +102,7 @@ for CASE in $CASES; do
 			server $CASE $PORT 8
 			START=$(date +%s.%N)
 			# A copy of the filmed player's directory - the same key - joins at 10 s, once the filmed one exists.
-			at 9 "the same key joins again" bash -c "cp -r $T/c_$CASE $T/c_elsewhere_twin; cd $REPO/hypersomnia; setsid timeout 25 xvfb-run -a $BIN --connect 127.0.0.1:$PORT --appdata-dir $T/c_elsewhere_twin --no-update-on-launch > /dev/null 2>&1 < /dev/null &"
+			at 9 "the same key joins again" bash -c "cp -r $T/c_$CASE $T/c_elsewhere_twin; cd $REPO/hypersomnia; setsid timeout 25 xvfb-run -a $BIN --connect 127.0.0.1:$PORT --appdata-dir $T/c_elsewhere_twin --no-update-on-launch --mute > /dev/null 2>&1 < /dev/null &"
 			film $CASE 127.0.0.1:$PORT 20
 			wait
 			srv_log $CASE

@@ -38,7 +38,7 @@ cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
 
 start_client() {
 	local out=$1; shift
-	(cd $REPO/hypersomnia && DISPLAY=:96 setsid timeout 120 $BIN "$@" --appdata-dir $T/alice --no-update-on-launch > $T/$out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && DISPLAY=:96 setsid timeout 120 $BIN "$@" --appdata-dir $T/alice --no-update-on-launch --mute > $T/$out 2>&1 < /dev/null &)
 }
 stop_client() {
 	for p in $(pgrep -f -- "Hypersomnia --appdata-dir $T/alice"); do kill $p; done

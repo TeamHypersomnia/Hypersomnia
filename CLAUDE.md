@@ -19,6 +19,7 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 - `../build/current/Hypersomnia --edit <project dir>` - opens the map in the editor, e.g. `--edit user/projects/de_cyberaqua` or an absolute path.
 - Add `--playtest` to start playtesting right away, like pressing Space.
 - Add `--playtest-speed X` to also start with a numpad-like speed warp, e.g. `10` for quick bot experiments.
+- Always add `--mute` to any game you start for a test (editor, client, under Xvfb too) - master volume 0 for that run only, the user hears it otherwise.
 - `--edit` leaves the last activity and `user/editor_last_project.txt` untouched, so the user's normal launch isn't affected.
 - The editor writes `editor_view.json`, autosaves and `navmesh.nav` into the project folder - for experiments, copy the map to the scratchpad under a distinct name first.
 

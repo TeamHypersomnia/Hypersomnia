@@ -20,13 +20,13 @@ J
 cd $REPO/hypersomnia
 timeout 90 $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 &
 sleep 6
-timeout 30 xvfb-run -a $BIN --connect 127.0.0.1:10090 --appdata-dir $T/c --no-update-on-launch > $T/record.out 2>&1
+timeout 30 xvfb-run -a $BIN --connect 127.0.0.1:10090 --appdata-dir $T/c --no-update-on-launch --mute > $T/record.out 2>&1
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/srv"); do kill $p; done
 # Demos are compressed when the game comes to the main menu - a client killed in game leaves it raw until then
 cat > $T/c/user/conf.d/menu.json <<J
 { "launch_at_startup": "MAIN_MENU" }
 J
-timeout 20 xvfb-run -a $BIN --appdata-dir $T/c --no-update-on-launch > $T/menu.out 2>&1
+timeout 20 xvfb-run -a $BIN --appdata-dir $T/c --no-update-on-launch --mute > $T/menu.out 2>&1
 rm $T/c/user/conf.d/menu.json
 DEMO=$(ls -t $T/c/user/demos/*.demc 2>/dev/null | head -1)
 echo "=== recorded: ${DEMO:-none} ($( [ -n "$DEMO" ] && stat -c %s "$DEMO") bytes)"
@@ -34,7 +34,7 @@ echo "=== recorded: ${DEMO:-none} ($( [ -n "$DEMO" ] && stat -c %s "$DEMO") byte
 Xvfb :88 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:88 timeout 25 $BIN --connect "demo://$DEMO" --appdata-dir $T/c --no-update-on-launch > $T/replay.out 2>&1 &
+DISPLAY=:88 timeout 25 $BIN --connect "demo://$DEMO" --appdata-dir $T/c --no-update-on-launch --mute > $T/replay.out 2>&1 &
 G=$!
 sleep 20
 DISPLAY=:88 import -window root $T/replay.png

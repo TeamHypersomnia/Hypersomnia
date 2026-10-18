@@ -94,7 +94,7 @@ echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"ht
 
 start_client() {
 	local name=$1 d=$2 out=$3; shift 3
-	(cd $REPO/hypersomnia && DISPLAY=:$d setsid timeout 280 $BIN "$@" --appdata-dir $T/$name --no-update-on-launch > $T/$out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && DISPLAY=:$d setsid timeout 280 $BIN "$@" --appdata-dir $T/$name --no-update-on-launch --mute > $T/$out 2>&1 < /dev/null &)
 }
 
 for d in 96 97; do (setsid Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &); done

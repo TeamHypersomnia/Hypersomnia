@@ -53,7 +53,7 @@ Xvfb :94 -screen 0 640x480x24 > /dev/null 2>&1 & XV=$!
 sleep 1
 
 for i in $(seq 1 $CYCLES); do
-	DISPLAY=:94 $BIN --connect rtc:$ID --appdata-dir $T/client --no-update-on-launch > $T/c.out 2>&1 &
+	DISPLAY=:94 $BIN --connect rtc:$ID --appdata-dir $T/client --no-update-on-launch --mute > $T/c.out 2>&1 &
 	C=$!
 	sleep $(python3 -c "import random; print(round(random.uniform(0.5, 8.0), 2))")
 	kill -9 $C 2>/dev/null
@@ -63,7 +63,7 @@ done
 
 sleep 70
 echo "=== after $CYCLES killed clients: a full join over WebRTC"
-DISPLAY=:94 timeout 60 $BIN --connect rtc:$ID --appdata-dir $T/client --no-update-on-launch > $T/final.out 2>&1
+DISPLAY=:94 timeout 60 $BIN --connect rtc:$ID --appdata-dir $T/client --no-update-on-launch --mute > $T/final.out 2>&1
 grep -hE "Received initial state" $T/final.out | head -1
 echo "RSS after: $(rss) kB"
 echo "=== server: clients still connected at the end (should be none but the final one, which was killed by timeout)"

@@ -34,7 +34,7 @@ setsid timeout 200 Xvfb :81 -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &
 XV=$!
 sleep 1
 START=$(date +%s)
-DISPLAY=:81 setsid timeout 180 $BIN --appdata-dir $T/cli --no-update-on-launch --connect 127.0.0.1:12101 > $T/cli.out 2>&1 < /dev/null &
+DISPLAY=:81 setsid timeout 180 $BIN --appdata-dir $T/cli --no-update-on-launch --mute --connect 127.0.0.1:12101 > $T/cli.out 2>&1 < /dev/null &
 CLI=$!
 
 if [ -n "$KILL_AT" ]; then

@@ -71,6 +71,25 @@ if mode == "click":
 	xtst.XTestFakeButtonEvent(display, 1, 0, 0)
 	x11.XFlush(display)
 	time.sleep(0.2)
+elif mode == "drag":
+	# drag x1 y1 x2 y2 - e.g. a window's edge, in steps so ImGui sees the motion
+	x1, y1, x2, y2 = (int(v) for v in sys.argv[2:6])
+	xtst.XTestFakeMotionEvent(display, -1, x1, y1, 0)
+	x11.XFlush(display)
+	time.sleep(0.3)
+	xtst.XTestFakeButtonEvent(display, 1, 1, 0)
+	x11.XFlush(display)
+	time.sleep(0.2)
+
+	for i in range(1, 21):
+		xtst.XTestFakeMotionEvent(display, -1, x1 + (x2 - x1) * i // 20, y1 + (y2 - y1) * i // 20, 0)
+		x11.XFlush(display)
+		time.sleep(0.03)
+
+	time.sleep(0.2)
+	xtst.XTestFakeButtonEvent(display, 1, 0, 0)
+	x11.XFlush(display)
+	time.sleep(0.2)
 elif mode == "scroll":
 	x, y, notches = int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
 	button = 5 if notches > 0 else 4

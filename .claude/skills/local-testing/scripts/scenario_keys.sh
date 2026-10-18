@@ -89,7 +89,7 @@ client_conf c_ranked
 client_conf c_community
 
 run_client() {
-	timeout $3 xvfb-run -a nice -n 10 $BIN --connect $2 --appdata-dir $T/$1 --no-update-on-launch > $T/$1.out 2>&1
+	timeout $3 xvfb-run -a nice -n 10 $BIN --connect $2 --appdata-dir $T/$1 --no-update-on-launch --mute > $T/$1.out 2>&1
 }
 
 run_client c_casual 127.0.0.1:10000 ${CLIENT_SECS:-20} &
