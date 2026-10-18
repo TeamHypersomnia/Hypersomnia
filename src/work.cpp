@@ -2030,11 +2030,18 @@ work_result work(
 	WEBSTATIC changelog_view_state changelog_view;
 	WEBSTATIC changelog_window_state changelog_window = std::string("What's new in Hypersomnia?");
 
+	/*
+		(NEW!) is decided by the version acknowledged before this run: OK saves the newest one at once (so it does not
+		open again), but a changelog opened again in the same run keeps its (NEW!) markers until the next start.
+	*/
+
+	WEBSTATIC const auto last_seen_changelog_at_start = config.last_seen_changelog_version;
+
 	WEBSTATIC auto get_changelog_input = [&]() {
 		return changelog_input {
 			changelog,
 			changelog_view,
-			config.last_seen_changelog_version
+			last_seen_changelog_at_start
 		};
 	};
 

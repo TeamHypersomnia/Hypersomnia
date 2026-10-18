@@ -26,6 +26,11 @@ struct changelog_view_state {
 struct changelog_input {
 	const changelog_entries& entries;
 	changelog_view_state& state;
+
+	/*
+		As it was when the game started - see work.cpp.
+	*/
+
 	const std::string& last_seen_version;
 };
 
