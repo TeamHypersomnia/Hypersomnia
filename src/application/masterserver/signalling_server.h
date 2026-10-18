@@ -564,6 +564,8 @@ private:
 	void relay_message(peer_map& peers, nlohmann::json message, webrtc_id_type source_id) {
 		/*
 			Only the masterserver tells a peer its id.
+
+			Every peer may relay many messages a second, so the logs here come at most once in 10 seconds each.
 		*/
 
 		if (!message.is_object()) {
@@ -579,7 +581,12 @@ private:
 				std::scoped_lock lk(aliases_mutex);
 
 				if (const auto target = mapped_or_nullptr(webrtc_id_aliases, dest_id)) {
-					LOG("Destination Alias '%x' resolved to '%x'", dest_id, *target);
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("Destination Alias '%x' resolved to '%x'", dest_id, *target);
+					}
+
 					dest_id = *target;
 				}
 
@@ -588,7 +595,12 @@ private:
 				*/
 
 				if (const auto target = key_or_default(webrtc_id_aliases, source_id); target != "") {
-					LOG("Source '%x' aliased to '%x'", source_id, target);
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("Source '%x' aliased to '%x'", source_id, target);
+					}
+
 					message["alias"] = target;
 				}
 				else {
@@ -603,7 +615,11 @@ private:
 			if (NETCODE_OK == netcode_parse_address(dest_id.c_str(), &maybe_native)) {
 				/* WebRTC id is IP address */
 
-				LOG("Relaying to native endpoint: %x", dest_id);
+				static uint64_t last_logged_ms = 0;
+
+				if (::official_log_allowed(last_logged_ms)) {
+					LOG("Relaying to native endpoint: %x", dest_id);
+				}
 
 				pending_signalling_packet packet;
 				yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&packet.guid), sizeof(packet.guid));
@@ -621,7 +637,11 @@ private:
 			}
 			else {
 				if (const auto target = mapped_or_nullptr(peers, dest_id)) {
-					LOG("Relaying to peer with id %x", dest_id);
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("Relaying to peer with id %x", dest_id);
+					}
 
 					ensure(target->ws != nullptr);
 
@@ -632,7 +652,11 @@ private:
 						Not logged as it came: only a registered peer's id is safe to log (see choose_webrtc_id).
 					*/
 
-					LOG("No peer like that!");
+					static uint64_t last_logged_ms = 0;
+
+					if (::official_log_allowed(last_logged_ms)) {
+						LOG("No peer like that!");
+					}
 				}
 			}
 		}
