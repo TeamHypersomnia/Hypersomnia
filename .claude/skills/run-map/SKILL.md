@@ -49,3 +49,15 @@ Items placed as nodes must also be listed in a layer's `nodes`, or the map fails
 
 Add a temporary `LOG("XYZDBG ...")` where the decision is made, build, run with `LOG_GREP=XYZDBG`, parse the lines,
 then remove the logs (`rg XYZDBG src` must be empty) and rebuild before committing.
+
+## Evaluating generated bot waypoints (random_waypoints_generator)
+
+`scripts/analyze_waypoints.py <log> <out.png>` compares many generated seeds with the author's waypoints on one map:
+counts, coverage (distance of free cells to the nearest waypoint), how often each author patrol spot gets a generated
+one within 400/600/800 px, seed-to-seed similarity, camp classes, and a picture (free cells, generated patrol density red,
+author patrols green, author pushes blue). It reads `XYZDBG cell x y`, `XYZDBG off <type> <faction> x y <quality> <ahead>`,
+`XYZDBG gen <seed> <type> <faction> x y <camp_secs_min> <look_far>` and `XYZDBG avg_us N` lines - log them from a temporary
+hook in `create_random_waypoints` (first round only: free navmesh cells, the author's waypoints with `rate_patrol_spot`,
+then 200 seeds of `generate_random_waypoints` with `existing` cleared, timed), run `MAP=<map> CLIENT=none SECS=20`
+with the hook behind an env var, and measure times with `BIN=build/current/Hypersomnia` (Debug is ~15x slower).
+Results of 2026-10-18: 81-88% of author patrol spots within 600 px per round, 0.2-1.3 ms per generation.
