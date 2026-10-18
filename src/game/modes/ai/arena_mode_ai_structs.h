@@ -472,6 +472,12 @@ struct arena_mode_ai_state {
 
 	entity_id item_to_retrieve;
 	entity_id unreachable_item;
+
+	vec2 heard_for_approach = vec2::zero;
+	bool heard_for_approach_pending = false;
+	real32 approach_cooldown = 0.0f;
+	vec2 approach_look_point = vec2::zero;
+	real32 approach_hold_timer = 0.0f;
 	// END GEN INTROSPECTOR
 
 	bool is_navigating() const {
@@ -528,5 +534,8 @@ struct arena_mode_ai_state {
 		avoided_bullet_timer = -1.0f;
 		avoided_bullet_dodge = {};
 		melee_reaction_timer = 0.0f;
+		heard_for_approach_pending = false;
+		approach_cooldown = 0.0f;
+		approach_hold_timer = 0.0f;
 	}
 };

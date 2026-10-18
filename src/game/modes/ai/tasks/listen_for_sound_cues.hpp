@@ -110,7 +110,12 @@ inline void listen_for_sound_cues(
 		/*
 			Default: Update last_known_pos through reaction time.
 			Uses HEARD_ONLY so it only updates position, doesn't force combat.
+			The newest such sound also turns a standing bot towards where the enemy would show up (face_heard_approach).
 		*/
+
+		ctx.ai_state.heard_for_approach = cue.position;
+		ctx.ai_state.heard_for_approach_pending = true;
+
 		ctx.ai_state.alertness.queue_alert({
 			cue.source_entity,
 			cue.position,

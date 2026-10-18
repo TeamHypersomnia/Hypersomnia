@@ -48,6 +48,12 @@ struct ai_behavior_patrol {
 	bool camp_look_far = false;
 
 	/*
+		How long the bot has camped at this waypoint so far - hearing enemies extends a camp only up to a limit.
+	*/
+
+	float camp_stay_secs = 0.0f;
+
+	/*
 		Twitch timers for camp movement.
 	*/
 	float twitch_move_timer = 0.0f;

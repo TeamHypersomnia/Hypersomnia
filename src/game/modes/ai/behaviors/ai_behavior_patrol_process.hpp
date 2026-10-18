@@ -163,6 +163,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 	*/
 	if (camp_timer > 0.0f) {
 		camp_timer -= dt_secs;
+		camp_stay_secs += dt_secs;
 	}
 
 	/*
@@ -221,6 +222,7 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 				}
 
 				camp_duration = camp_timer;
+				camp_stay_secs = 0.0f;
 				camp_center = wp_transform.pos;
 				camp_twitch_target = wp_transform.pos;
 				camp_look_direction = wp_transform.get_direction();

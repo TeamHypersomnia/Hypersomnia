@@ -34,6 +34,7 @@
 #include "game/modes/ai/ai_character_context.h"
 #include "game/modes/ai/tasks/find_closest_enemy.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
+#include "game/modes/ai/tasks/face_heard_approach.hpp"
 #include "game/modes/ai/tasks/handle_purchases.hpp"
 #include "game/modes/ai/tasks/listen_for_sound_cues.hpp"
 #include "game/modes/ai/tasks/find_best_weapon.hpp"
@@ -1362,8 +1363,18 @@ arena_ai_result update_arena_mode_ai(
 		}
 	}
 
+	/*
+		A heard enemy turns a standing bot towards where they would show up (see face_heard_approach.hpp).
+	*/
+
+	auto crosshair_offset = move_result.crosshair_offset;
+
+	if (const auto approach = ::face_heard_approach(cosm, navmesh, physics, ai_state, character_pos, dt_secs, is_freeze_time, target_acquired, pathfinding_ctx, stable_rng)) {
+		crosshair_offset = *approach;
+	}
+
 	if (!is_thinking_what_to_buy) {
-		::interpolate_crosshair(ctx, move_result.crosshair_offset, dt_secs, difficulty, move_result.is_navigating);
+		::interpolate_crosshair(ctx, crosshair_offset, dt_secs, difficulty, move_result.is_navigating);
 	}
 
 	arena_ai_result result;
