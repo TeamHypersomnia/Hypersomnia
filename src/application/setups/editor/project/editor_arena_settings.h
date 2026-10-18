@@ -3,6 +3,7 @@
 #include "augs/graphics/rgba.h"
 #include "game/balance_params.h"
 #include "game/cosmos/cosmos_light_settings.h"
+#include "game/common_state/bot_waypoints_settings.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
 
 struct editor_arena_settings {
@@ -18,6 +19,8 @@ struct editor_arena_settings {
 	point_light_shadow_settings point_light_shadows;
 	editor_theme warmup_theme;
 	uint32_t navmesh_cell_size = 128;
+	bot_waypoints_settings bot_waypoints;
+	uint32_t bot_waypoints_preview_seed = 0;
 	rgba debug_navmesh_free_color = rgba(0, 255, 255, 60);
 	rgba debug_navmesh_occupied_color = rgba(255, 0, 0, 60);
 	rgba debug_navmesh_portal_color = rgba(0, 255, 0, 60);

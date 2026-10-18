@@ -109,6 +109,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	common.light.sun_shadows = project.settings.sun_shadows;
 	common.light.point_light_shadows = project.settings.point_light_shadows;
 	common.default_zoom = project.settings.default_zoom;
+	common.bot_waypoints = project.settings.bot_waypoints;
 	common.minimap_tab_shows_all_islands = project.settings.minimap_tab_shows_all_islands;
 
 	/*
@@ -340,6 +341,23 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 				if (resource == nullptr) {
 					return;
+				}
+
+				if constexpr(std::is_same_v<node_type, editor_point_marker_node>) {
+					/*
+						In game, the editor's preview of generated waypoints is never used,
+						and the author's waypoints are left out when they're generated every round instead.
+						See create_random_waypoints.hpp.
+					*/
+
+					if (!in.editor_preview && ::is_waypoint(resource->editable.type)) {
+						const bool preview = layer->unique_name == random_waypoints_layer_name_v;
+						const bool replaced = project.settings.bot_waypoints.mode == bot_waypoints_mode::RANDOM_EVERY_ROUND;
+
+						if (preview || replaced) {
+							return;
+						}
+					}
 				}
 
 				auto apply_layer_modifiers_on_special_entity = [&](const auto new_entity_id) {

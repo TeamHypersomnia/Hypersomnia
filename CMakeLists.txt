@@ -829,6 +829,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/movement_component.cpp"
 	"src/game/cosmos/cosmos.cpp"
 	"src/game/modes/ai/arena_mode_ai.cpp"
+	"src/game/modes/ai/random_waypoints_generator.cpp"
+	"src/game/modes/ai/random_waypoints_tests.cpp"
 	"src/game/detail/entity_scripts.cpp"
 	"src/game/enums/filters.cpp"
 	"src/game/cosmos/cosmos_solvable_significant.cpp"

@@ -19,6 +19,7 @@
 
 #include "game/assets/all_logical_assets.h"
 #include "game/common_state/cosmos_navmesh.h"
+#include "game/common_state/bot_waypoints_settings.h"
 #include "game/cosmos/cosmos_light_settings.h"
 
 using meter_tuple = meter_list_t<std::tuple>;
@@ -56,6 +57,7 @@ struct cosmos_common_significant {
 
 	default_sound_properties_info default_sound_properties;
 	cosmos_navmesh navmesh;
+	bot_waypoints_settings bot_waypoints;
 	// END GEN INTROSPECTOR
 
 private:

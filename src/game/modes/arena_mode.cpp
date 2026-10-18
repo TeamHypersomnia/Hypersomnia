@@ -30,6 +30,7 @@ extern void yojimbo_random_bytes(uint8_t* data, int bytes);
 #include "game/messages/battle_event_message.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/modes/detail/item_purchase_room.hpp"
+#include "game/modes/detail/create_random_waypoints.hpp"
 #include "game/detail/buy_area_in_range.h"
 #include "game/cosmos/delete_entity.h"
 #include "augs/templates/logically_empty.h"
@@ -1253,6 +1254,8 @@ void arena_mode::setup_round(
 	for_each_faction([&](const auto faction) {
 		fill_spawns(cosm, faction, factions[faction]);
 	});
+
+	::create_random_waypoints(access, cosm, in.rules.is_gun_game(), static_cast<uint32_t>(get_round_rng_seed(cosm)));
 
 	/*
 		Gather waypoints for AI teams at round start.
