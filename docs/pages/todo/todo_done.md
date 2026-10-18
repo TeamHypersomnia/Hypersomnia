@@ -7569,3 +7569,6 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - pokazywac speedy w server monitorze
 - awka jak bedzie ciezka taka na plerach to trzeba jej zwiekszyc predkosc teraz duzo
 
+
+- tutorial o backpacku tera jedna awka tylko
+- tutorial zaktualizowac o granasy i jak to carrying dodamy na plerach to tez te przejscia

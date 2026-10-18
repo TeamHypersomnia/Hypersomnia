@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-09-25 13:20:44.892852 UTC"
+        "version_timestamp": "2026-10-17 23:57:56.838489 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1170,7 +1170,6 @@
         },
         {
             "id": "Level12",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level12 island",
                 "vent (50)",
@@ -1584,7 +1583,6 @@
         },
         {
             "id": "Level8",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level8 island",
                 "tip3_1 (12)",
@@ -1592,6 +1590,7 @@
                 "tip3_1 (67)",
                 "dev_floor_256 (138)",
                 "metropolis_backpack",
+                "awka (2)",
                 "awka (1)",
                 "awka",
                 "hazard (5)",
@@ -1990,6 +1989,7 @@
                 "floor_left",
                 "floor_top (8)",
                 "floor_top (7)",
+                "bulwark (1)",
                 "floor_top (6)",
                 "floor_top (5)",
                 "floor_top (4)",
@@ -6870,14 +6870,13 @@
             "pos": [-897.0, 1279.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -6886,14 +6885,13 @@
             "pos": [897.0, 1281.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -6902,14 +6900,13 @@
             "pos": [897.0, 9601.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -6918,14 +6915,13 @@
             "pos": [-1025.0, 9663.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -6934,14 +6930,13 @@
             "pos": [897.0, 18561.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -6950,59 +6945,54 @@
             "pos": [-1025.0, 18623.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
             "id": "point_light",
             "type": "point_light",
             "pos": [-513.0, 16769.0],
+            "color": [255, 0, 0, 80],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.92,
+                "intensity": 0.9200000166893005,
                 "falloff": 0.0
-            },
-            "color": [255, 0, 0, 80]
+            }
         },
         {
             "id": "point_light (1)",
             "type": "point_light",
             "pos": [511.0, 16769.0],
+            "color": [255, 0, 0, 80],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.92,
+                "intensity": 0.9200000166893005,
                 "falloff": 0.0
-            },
-            "color": [255, 0, 0, 80]
+            }
         },
         {
             "id": "point_light (2)",
             "type": "point_light",
             "pos": [511.0, 15999.0],
+            "color": [255, 0, 0, 80],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.92,
+                "intensity": 0.9200000166893005,
                 "falloff": 0.0
-            },
-            "color": [255, 0, 0, 80]
+            }
         },
         {
             "id": "point_light (3)",
             "type": "point_light",
             "pos": [-513.0, 15999.0],
+            "color": [255, 0, 0, 80],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.92,
+                "intensity": 0.9200000166893005,
                 "falloff": 0.0
-            },
-            "color": [255, 0, 0, 80]
+            }
         },
         {
             "id": "Strong lamp (6)",
@@ -7010,14 +7000,13 @@
             "pos": [897.0, 27521.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7026,37 +7015,34 @@
             "pos": [-1025.0, 27583.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
             "id": "point_light (4)",
             "type": "point_light",
             "pos": [513.0, 25729.0],
+            "color": [0, 0, 255, 80],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.92,
+                "intensity": 0.9200000166893005,
                 "falloff": 0.0
-            },
-            "color": [0, 0, 255, 80]
+            }
         },
         {
             "id": "point_light (5)",
             "type": "point_light",
             "pos": [-513.0, 25729.0],
+            "color": [0, 0, 255, 80],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.92,
+                "intensity": 0.9200000166893005,
                 "falloff": 0.0
-            },
-            "color": [0, 0, 255, 80]
+            }
         },
         {
             "id": "Strong lamp (8)",
@@ -7064,14 +7050,13 @@
             "pos": [769.0, 46273.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7080,114 +7065,103 @@
             "pos": [-1153.0, 46335.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
             "id": "obs1 (2)",
             "type": "point_light",
             "pos": [1012.0, 43759.0],
+            "color": [255, 0, 0, 158],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.93,
-                "falloff": 0.33
-            },
-            "color": [255, 0, 0, 158]
+                "intensity": 0.9300000071525574,
+                "falloff": 0.33000001311302185
+            }
         },
         {
             "id": "point_light (7)",
             "type": "point_light",
             "pos": [1296.0, 43840.0],
+            "color": [1, 255, 0, 255],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.67,
-                "falloff": 0.4
-            },
-            "color": [1, 255, 0, 255]
+                "intensity": 0.6700000166893005,
+                "falloff": 0.4000000059604645
+            }
         },
         {
             "id": "point_light (8)",
             "type": "point_light",
             "pos": [1296.0, 44481.0],
+            "color": [0, 255, 0, 255],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.67,
-                "falloff": 0.4
-            },
-            "color": [0, 255, 0, 255]
+                "intensity": 0.6700000166893005,
+                "falloff": 0.4000000059604645
+            }
         },
         {
             "id": "point_light (9)",
             "type": "point_light",
             "pos": [2783.0, 44484.0],
+            "color": [255, 255, 0, 47],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 1.18,
+                "intensity": 1.1799999475479126,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 47]
+            }
         },
         {
             "id": "point_light (10)",
             "type": "point_light",
             "pos": [2782.0, 43842.0],
+            "color": [255, 255, 0, 47],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 1.18,
+                "intensity": 1.1799999475479126,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 47]
+            }
         },
         {
             "id": "point_light (11)",
             "type": "point_light",
             "pos": [5378.0, 44483.0],
+            "color": [255, 255, 0, 47],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 1.18,
+                "intensity": 1.1799999475479126,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 47]
+            }
         },
         {
             "id": "point_light (12)",
             "type": "point_light",
             "pos": [5639.0, 43320.0],
+            "color": [255, 0, 0, 91],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 1.0,
-                "falloff": 0.06
-            },
-            "color": [255, 0, 0, 91]
+                "falloff": 0.05999999865889549
+            }
         },
         {
             "id": "point_light (13)",
             "type": "point_light",
             "pos": [3935.0, 42015.0],
+            "color": [255, 255, 0, 73],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.98,
+                "intensity": 0.9800000190734863,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 73]
+            }
         },
         {
             "id": "point_light (14)",
             "type": "point_light",
             "pos": [6752.0, 44512.0],
+            "color": [0, 255, 0, 74],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.97,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
-            },
-            "color": [0, 255, 0, 74]
+            }
         },
         {
             "id": "Strong lamp (10)",
@@ -7195,14 +7169,13 @@
             "pos": [12353.0, -95.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7211,14 +7184,13 @@
             "pos": [10431.0, -33.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7227,14 +7199,13 @@
             "pos": [19969.0, -95.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7243,14 +7214,13 @@
             "pos": [18047.0, -33.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7259,14 +7229,13 @@
             "pos": [24161.0, 8447.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7275,14 +7244,13 @@
             "pos": [24223.0, 10369.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7291,14 +7259,13 @@
             "pos": [19071.0, 9985.0],
             "color": [255, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7307,14 +7274,13 @@
             "pos": [19071.0, 8959.0],
             "color": [255, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7323,14 +7289,13 @@
             "pos": [26241.0, 97.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7339,14 +7304,13 @@
             "pos": [24319.0, 159.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7355,14 +7319,13 @@
             "pos": [39297.0, 14113.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7371,14 +7334,13 @@
             "pos": [37375.0, 14175.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7387,14 +7349,13 @@
             "pos": [48321.0, 14241.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7403,14 +7364,13 @@
             "pos": [46399.0, 14303.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7419,14 +7379,13 @@
             "pos": [56191.0, 13151.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7435,70 +7394,64 @@
             "pos": [58113.0, 13089.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
             "id": "point_light (15)",
             "type": "point_light",
             "pos": [6655.0, 43391.0],
+            "color": [255, 255, 0, 74],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.97,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 74]
+            }
         },
         {
             "id": "point_light (16)",
             "type": "point_light",
             "pos": [7810.0, 44018.0],
+            "color": [255, 255, 0, 74],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.97,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 74]
+            }
         },
         {
             "id": "point_light (17)",
             "type": "point_light",
             "pos": [9857.0, 43327.0],
+            "color": [255, 255, 0, 74],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.97,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 74]
+            }
         },
         {
             "id": "point_light (18)",
             "type": "point_light",
             "pos": [8895.0, 43967.0],
+            "color": [255, 255, 0, 74],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.97,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 74]
+            }
         },
         {
             "id": "point_light (19)",
             "type": "point_light",
             "pos": [9921.0, 45247.0],
+            "color": [255, 255, 0, 74],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.97,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 74]
+            }
         },
         {
             "id": "Strong lamp (28)",
@@ -7506,14 +7459,13 @@
             "pos": [18511.0, 21075.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7522,14 +7474,13 @@
             "pos": [18519.0, 19492.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7538,14 +7489,13 @@
             "pos": [17916.0, 21075.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7554,14 +7504,13 @@
             "pos": [18113.0, 19495.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7570,14 +7519,13 @@
             "pos": [15521.0, 27391.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7586,14 +7534,13 @@
             "pos": [15583.0, 29313.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7602,14 +7549,13 @@
             "pos": [20159.0, 29247.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7618,14 +7564,13 @@
             "pos": [17471.0, 29057.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7634,14 +7579,13 @@
             "pos": [20161.0, 27585.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7650,14 +7594,13 @@
             "pos": [19521.0, 29247.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7666,14 +7609,13 @@
             "pos": [19777.0, 27583.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7682,14 +7624,13 @@
             "pos": [17503.0, 21112.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7698,14 +7639,13 @@
             "pos": [18185.0, 21079.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7714,14 +7654,13 @@
             "pos": [17679.0, 19486.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7730,14 +7669,13 @@
             "pos": [19393.0, 19457.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7746,14 +7684,13 @@
             "pos": [19385.0, 21085.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7762,14 +7699,13 @@
             "pos": [21121.0, 19585.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 986.877,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 986.8770141601563,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7778,14 +7714,13 @@
             "pos": [21117.0, 21020.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 986.877,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 986.8770141601563,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7794,14 +7729,13 @@
             "pos": [17345.0, 19455.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7810,14 +7744,13 @@
             "pos": [19711.0, 19583.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7826,14 +7759,13 @@
             "pos": [19700.0, 21017.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7842,14 +7774,13 @@
             "pos": [21686.0, 21036.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 986.877,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 986.8770141601563,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7858,14 +7789,13 @@
             "pos": [20640.0, 21035.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 986.877,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 986.8770141601563,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7874,14 +7804,13 @@
             "pos": [20696.0, 19592.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 986.877,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 986.8770141601563,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7890,14 +7819,13 @@
             "pos": [21667.0, 19566.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 986.877,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 986.8770141601563,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7906,14 +7834,13 @@
             "pos": [32189.0, 27824.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7922,14 +7849,13 @@
             "pos": [32486.0, 29288.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7938,14 +7864,13 @@
             "pos": [31529.0, 27823.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7954,14 +7879,13 @@
             "pos": [31765.0, 29260.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7970,14 +7894,13 @@
             "pos": [35553.0, 29441.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -7986,14 +7909,13 @@
             "pos": [35615.0, 27519.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8002,14 +7924,13 @@
             "pos": [54979.0, 29136.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8018,14 +7939,13 @@
             "pos": [53699.0, 27687.0],
             "color": [254, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8034,14 +7954,13 @@
             "pos": [55639.0, 29137.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8050,14 +7969,13 @@
             "pos": [55403.0, 27700.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8066,14 +7984,13 @@
             "pos": [54119.0, 28247.0],
             "color": [254, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8082,14 +7999,13 @@
             "pos": [55745.0, 28673.0],
             "color": [255, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8098,14 +8014,13 @@
             "pos": [54335.0, 27711.0],
             "color": [254, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8114,14 +8029,13 @@
             "pos": [53249.0, 29119.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8130,14 +8044,13 @@
             "pos": [52929.0, 27777.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8146,14 +8059,13 @@
             "pos": [57151.0, 29057.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8162,14 +8074,13 @@
             "pos": [56767.0, 27649.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8178,14 +8089,13 @@
             "pos": [15487.0, 20993.0],
             "color": [0, 249, 255, 61],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.73,
-                "falloff": 0.16
+                "radius": 752.2059936523438,
+                "intensity": 0.7300000190734863,
+                "falloff": 0.1599999964237213
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8194,14 +8104,13 @@
             "pos": [15487.0, 19583.0],
             "color": [0, 249, 255, 67],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.71,
-                "falloff": 0.21
+                "radius": 752.2059936523438,
+                "intensity": 0.7099999785423279,
+                "falloff": 0.20999999344348907
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8210,14 +8119,13 @@
             "pos": [53953.0, 29119.0],
             "color": [254, 0, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8226,14 +8134,13 @@
             "pos": [58495.0, 27393.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8242,14 +8149,13 @@
             "pos": [26689.0, 50111.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8258,14 +8164,13 @@
             "pos": [26433.0, 51775.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8274,14 +8179,13 @@
             "pos": [27073.0, 50113.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8290,14 +8194,13 @@
             "pos": [27071.0, 51775.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8306,14 +8209,13 @@
             "pos": [24095.0, 51841.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8322,14 +8224,13 @@
             "pos": [24033.0, 49919.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8338,14 +8239,13 @@
             "pos": [44865.0, 49983.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8354,14 +8254,13 @@
             "pos": [44609.0, 51647.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8370,14 +8269,13 @@
             "pos": [45249.0, 49985.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8386,14 +8284,13 @@
             "pos": [45247.0, 51647.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8402,14 +8299,13 @@
             "pos": [42271.0, 51713.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8418,14 +8314,13 @@
             "pos": [42209.0, 49791.0],
             "color": [80, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -8435,8 +8330,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8446,8 +8341,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8457,8 +8352,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8468,8 +8363,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8479,8 +8374,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8490,8 +8385,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8501,8 +8396,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8512,8 +8407,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8523,8 +8418,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8534,8 +8429,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8545,8 +8440,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8556,8 +8451,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8567,8 +8462,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8578,8 +8473,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8589,8 +8484,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8600,31 +8495,29 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
             "id": "obs1 (1)",
             "type": "point_light",
             "pos": [1007.0, 44560.0],
+            "color": [255, 0, 0, 158],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 0.93,
-                "falloff": 0.33
-            },
-            "color": [255, 0, 0, 158]
+                "intensity": 0.9300000071525574,
+                "falloff": 0.33000001311302185
+            }
         },
         {
             "id": "point_light (6)",
             "type": "point_light",
             "pos": [6209.0, 43327.0],
+            "color": [255, 0, 0, 63],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 1.06,
+                "intensity": 1.059999942779541,
                 "falloff": 0.0
-            },
-            "color": [255, 0, 0, 63]
+            }
         },
         {
             "id": "point_light (49)",
@@ -8633,8 +8526,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8644,8 +8537,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8655,8 +8548,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8666,8 +8559,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8677,8 +8570,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8688,8 +8581,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8699,8 +8592,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8710,8 +8603,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8721,8 +8614,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8732,8 +8625,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8743,8 +8636,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8754,8 +8647,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8765,8 +8658,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8776,8 +8669,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8787,8 +8680,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8798,8 +8691,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8809,8 +8702,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8820,8 +8713,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8830,9 +8723,9 @@
             "pos": [53887.0, 109249.0],
             "color": [255, 255, 255, 109],
             "falloff": {
-                "radius": 620.865,
-                "intensity": 0.99,
-                "falloff": 0.17
+                "radius": 620.864990234375,
+                "intensity": 0.9900000095367432,
+                "falloff": 0.17000000178813934
             }
         },
         {
@@ -8842,8 +8735,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8853,8 +8746,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8864,8 +8757,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8875,8 +8768,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8886,8 +8779,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8897,8 +8790,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8908,8 +8801,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8919,8 +8812,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8930,8 +8823,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8941,8 +8834,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8952,8 +8845,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8963,8 +8856,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8974,8 +8867,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8985,8 +8878,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -8996,8 +8889,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9007,8 +8900,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9018,8 +8911,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9029,8 +8922,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9040,8 +8933,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9051,8 +8944,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9062,8 +8955,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9073,8 +8966,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9084,8 +8977,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9095,8 +8988,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9106,8 +8999,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9117,8 +9010,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9128,8 +9021,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9139,8 +9032,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9150,8 +9043,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9161,8 +9054,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9172,8 +9065,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9183,8 +9076,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9194,8 +9087,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9205,8 +9098,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9216,8 +9109,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9227,8 +9120,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9238,8 +9131,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9249,8 +9142,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9260,8 +9153,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9271,8 +9164,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9282,8 +9175,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9293,8 +9186,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9304,8 +9197,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9315,8 +9208,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9326,8 +9219,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9337,8 +9230,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9348,8 +9241,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9359,8 +9252,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9370,8 +9263,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9381,8 +9274,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9392,8 +9285,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9403,8 +9296,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9414,8 +9307,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9425,8 +9318,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9436,8 +9329,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9447,8 +9340,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9458,8 +9351,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9469,8 +9362,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9480,8 +9373,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9491,8 +9384,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9502,8 +9395,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9513,8 +9406,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9524,8 +9417,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9535,8 +9428,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9546,8 +9439,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9557,8 +9450,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9568,8 +9461,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9579,8 +9472,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9590,8 +9483,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9601,8 +9494,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9612,8 +9505,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9623,8 +9516,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9634,8 +9527,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9645,8 +9538,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9656,8 +9549,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9667,8 +9560,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9678,8 +9571,8 @@
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0,
-                "intensity": 0.98,
-                "falloff": 0.16
+                "intensity": 0.9800000190734863,
+                "falloff": 0.1599999964237213
             }
         },
         {
@@ -9688,8 +9581,8 @@
             "pos": [-13377.0, 28415.0],
             "falloff": {
                 "radius": 1000.0,
-                "intensity": 0.66,
-                "falloff": 0.39
+                "intensity": 0.6600000262260437,
+                "falloff": 0.38999998569488525
             }
         },
         {
@@ -9698,21 +9591,20 @@
             "pos": [-14273.0, 28929.0],
             "color": [255, 0, 255, 255],
             "falloff": {
-                "radius": 340.426,
-                "intensity": 0.7,
-                "falloff": 0.42
+                "radius": 340.4259948730469,
+                "intensity": 0.699999988079071,
+                "falloff": 0.41999998688697815
             }
         },
         {
             "id": "point_light (134)",
             "type": "point_light",
             "pos": [3324.0, 43140.0],
+            "color": [255, 255, 0, 47],
             "falloff": {
-                "radius": 600.0,
-                "intensity": 1.18,
+                "intensity": 1.1799999475479126,
                 "falloff": 0.0
-            },
-            "color": [255, 255, 0, 47]
+            }
         },
         {
             "id": "Strong lamp (84)",
@@ -9720,14 +9612,13 @@
             "pos": [20403.0, 10020.0],
             "color": [255, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -9736,14 +9627,13 @@
             "pos": [20422.0, 8955.0],
             "color": [255, 255, 0, 94],
             "falloff": {
-                "radius": 752.206,
-                "intensity": 0.81,
-                "falloff": 0.46
+                "radius": 752.2059936523438,
+                "intensity": 0.8100000023841858,
+                "falloff": 0.46000000834465027
             },
             "wall_falloff": {
-                "radius": 962.963,
-                "intensity": 0.66,
-                "falloff": 0.5
+                "radius": 962.9630126953125,
+                "intensity": 0.6600000262260437
             }
         },
         {
@@ -9752,8 +9642,8 @@
             "pos": [-16001.0, 27839.0],
             "color": [0, 255, 0, 54],
             "falloff": {
-                "radius": 1430.1071,
-                "intensity": 1.14,
+                "radius": 1430.1070556640625,
+                "intensity": 1.1399999856948853,
                 "falloff": 0.0
             }
         },
@@ -9763,8 +9653,8 @@
             "pos": [-13377.0, 29183.0],
             "color": [255, 255, 255, 55],
             "falloff": {
-                "radius": 424.731,
-                "intensity": 1.1,
+                "radius": 424.7309875488281,
+                "intensity": 1.100000023841858,
                 "falloff": 0.0
             }
         },
@@ -9774,9 +9664,9 @@
             "pos": [37633.0, 9727.0],
             "color": [255, 0, 255, 255],
             "falloff": {
-                "radius": 340.426,
-                "intensity": 0.7,
-                "falloff": 0.42
+                "radius": 340.4259948730469,
+                "intensity": 0.699999988079071,
+                "falloff": 0.41999998688697815
             }
         },
         {
@@ -9785,8 +9675,8 @@
             "pos": [38847.0, 9729.0],
             "color": [255, 0, 255, 74],
             "falloff": {
-                "radius": 658.833,
-                "intensity": 0.97,
+                "radius": 658.8330078125,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
             }
         },
@@ -9796,8 +9686,8 @@
             "pos": [38143.0, 9729.0],
             "color": [255, 0, 255, 74],
             "falloff": {
-                "radius": 658.833,
-                "intensity": 0.97,
+                "radius": 658.8330078125,
+                "intensity": 0.9700000286102295,
                 "falloff": 0.0
             }
         },
@@ -9807,8 +9697,8 @@
             "pos": [-20415.0, 27647.0],
             "color": [0, 255, 0, 54],
             "falloff": {
-                "radius": 1430.1071,
-                "intensity": 1.14,
+                "radius": 1430.1070556640625,
+                "intensity": 1.1399999856948853,
                 "falloff": 0.0
             }
         },
@@ -9818,9 +9708,9 @@
             "pos": [-22143.0, 28737.0],
             "color": [255, 217, 0, 255],
             "falloff": {
-                "radius": 340.426,
-                "intensity": 0.7,
-                "falloff": 0.42
+                "radius": 340.4259948730469,
+                "intensity": 0.699999988079071,
+                "falloff": 0.41999998688697815
             }
         },
         {
@@ -9829,9 +9719,9 @@
             "pos": [-23039.0, 28991.0],
             "color": [255, 217, 0, 255],
             "falloff": {
-                "radius": 424.731,
-                "intensity": 0.67,
-                "falloff": 0.4
+                "radius": 424.7309875488281,
+                "intensity": 0.6700000166893005,
+                "falloff": 0.4000000059604645
             }
         },
         {
@@ -9840,8 +9730,8 @@
             "pos": [-23039.0, 28223.0],
             "falloff": {
                 "radius": 1000.0,
-                "intensity": 0.66,
-                "falloff": 0.39
+                "intensity": 0.6600000262260437,
+                "falloff": 0.38999998569488525
             }
         },
         {
@@ -11128,6 +11018,17 @@
             "id": "blunaz",
             "type": "blunaz",
             "pos": [46730.0, 50822.0]
+        },
+        {
+            "id": "awka (2)",
+            "type": "awka",
+            "pos": [25345.0, -1676.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "bulwark (1)",
+            "type": "bulwark",
+            "pos": [25350.0, -3145.0]
         },
         {
             "id": "metropolis_backpack",
@@ -13065,7 +12966,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Pressing {HOLSTER} won't free your hands anymore..."
+            "context_tip": "A third one won't fit..."
         },
         {
             "id": "tip3_1 (17)",
@@ -13170,7 +13071,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "This is bad if you want to run fast.\nYou also won't fit inside tight corridors."
+            "context_tip": "You are also painfully slow."
         },
         {
             "id": "tip3_1 (19)",
@@ -13228,7 +13129,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Now just press {HOLSTER} and walk through the corridor.\nYou must face to the side."
+            "context_tip": "Guns weigh 50% less!\nAnd you can pick a third one."
         },
         {
             "id": "tip3_1 (12)",
@@ -14082,7 +13983,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {SHOOT_SECONDARY} to throw a grenade close."
+            "context_tip": "Grenades land exactly where the crosshair is.\nTry throwing them close."
         },
         {
             "id": "tip3_1 (35)",
@@ -14301,7 +14202,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: To reach around corners, bounce grenades against walls."
+            "context_tip": "Tip: To reach around corners, bounce grenades against walls.\n{SPRINT} to quickly double the distance."
         },
         {
             "id": "exit14",
