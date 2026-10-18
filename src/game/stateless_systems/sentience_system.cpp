@@ -1055,11 +1055,19 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 	/*
 		Items not held by anyone - lying, dropped or thrown - aren't pushed by impacts (explosions, bullets) either.
 		Otherwise e.g. a corpse explosion would blast the items its victim has just dropped far away.
+		Melee hits (a swing or a thrown knife) still push them - that is deliberate.
 	*/
 
 	const bool lying_item = !owning_capability && subject.template has<components::item>();
+	const bool hit_by_melee = [&]() {
+		if (const auto cause = cosm[d.origin.cause.entity]) {
+			return cause.template has<invariants::melee>();
+		}
 
-	if (!held_item && !lying_item) {
+		return false;
+	}();
+
+	if (!held_item && (!lying_item || hit_by_melee)) {
 		const bool conscious = sentience && sentience->is_conscious();
 		(void)conscious;
 
