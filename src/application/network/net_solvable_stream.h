@@ -1,13 +1,18 @@
 #pragma once
 #include <cstdint>
 
+/*
+	Pools a joining client takes from its own clean round state instead of receiving them.
+	Point markers are not among them: bot waypoints may be generated anew every round (create_random_waypoints.hpp),
+	so a client joining mid-round would lack them.
+*/
+
 template <class V>
 constexpr bool never_changes_in_game = is_one_of_v<V,
 	make_entity_pool<static_decoration>,
 	make_entity_pool<area_marker>,
 	make_entity_pool<particles_decoration>,
 	make_entity_pool<wandering_pixels_decoration>,
-	make_entity_pool<point_marker>,
 	make_entity_pool<static_light>,
 	make_entity_pool<area_sensor>
 >;
