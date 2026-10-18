@@ -3,7 +3,7 @@
 # of the local site - the header must show her place and MMR. Then she goes to a casual... (not needed):
 # the leaderboards are downloaded once at start and not again on coming back to the menu.
 # Usage: [PLAYER=bob] [BIN=<steam build>] scenario_menu_mmr.sh <screenshot.png>
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
@@ -18,7 +18,7 @@ cd $REPO/hypersomnia
 Xvfb :89 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:89 timeout 40 $BIN --appdata-dir $A --no-update-on-launch --mute > $A/menu.out 2>&1 &
+DISPLAY=:89 timeout 40 $BIN --appdata-dir $A $GAME_TEST_FLAGS --mute > $A/menu.out 2>&1 &
 G=$!
 sleep 18
 DISPLAY=:89 import -window root ${1:-$S/menu_mmr.png}

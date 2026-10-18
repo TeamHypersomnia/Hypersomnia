@@ -3,7 +3,7 @@
 # Start the broker first (broker.sh start) and prepare the build with prepare_web.sh - it points the game at both.
 # Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on 8765, broker on 13500, Xvfb :78.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
-export ALSOFT_DRIVERS=null
+. "$(dirname "$0")/test_env.sh"
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
 umask 077
@@ -82,9 +82,9 @@ $BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]
 # "@KEY" in the connect string is the server's key - e.g. "pl,@KEY", as the site's Browser links are
 CONNECT=${CONNECT//@KEY/$(cat $T/official_servers.d/pl)}
 
-timeout $((WAIT + EXTRA + 60)) $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
+timeout $((WAIT + EXTRA + 60)) $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
-timeout $((WAIT + EXTRA + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
+timeout $((WAIT + EXTRA + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
 timeout $((WAIT + EXTRA + 50)) python3 "$HERE/webserve.py" $WEB 8765 > $T/web.out 2>&1 &
 sleep 14
 

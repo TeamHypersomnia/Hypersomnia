@@ -31,7 +31,7 @@ start)
 EOF
 
 	cd $B/hypersomnia
-	setsid nohup timeout ${SECS:-7200} $B/Hypersomnia --masterserver --appdata-dir $B/ms --no-update-on-launch > $B/ms.out 2>&1 < /dev/null &
+	setsid nohup timeout ${SECS:-7200} $B/Hypersomnia --masterserver --appdata-dir $B/ms --no-update-on-launch --no-open-logs > $B/ms.out 2>&1 < /dev/null &
 	echo $! > $B/ms.pid
 
 	# A new session secret every start, readable only here - fake_steam_session.sh signs cookies with it

@@ -2,7 +2,7 @@
 # The user's running Steam: the Steam build joins a local ranked server with a cert the local broker made from a real
 # Steam Web API ticket. Needs broker.sh started with STEAM_API_KEY_FILE and BROKER_URL / BROKER_PUBLIC_KEY exported.
 # Usage: scenario_steam.sh
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
@@ -31,12 +31,12 @@ cat > $T/steam/user/conf.d/test.json <<J
   "window": { "fullscreen": false, "size": [1280, 720] }, "client": { "nickname": "steamtest" } }
 J
 cd $REPO/hypersomnia
-timeout 120 nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked --no-update-on-launch > $T/ranked.out 2>&1 &
+timeout 120 nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked $GAME_TEST_FLAGS > $T/ranked.out 2>&1 &
 sleep 6
 Xvfb :81 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:81 timeout ${STEAM_SECS:-40} $SBIN --connect 127.0.0.1:10042 --appdata-dir $T/steam --no-update-on-launch --mute > $T/steam.out 2>&1
+DISPLAY=:81 timeout ${STEAM_SECS:-40} $SBIN --connect 127.0.0.1:10042 --appdata-dir $T/steam $GAME_TEST_FLAGS --mute > $T/steam.out 2>&1
 echo "=== steam client"
 grep -hE "identity cert|Connecting as|Received initial state|Reason|refused" $T/steam.out | sed 's/^\[[0-9:]*\] //' | head -6
 echo "=== server"

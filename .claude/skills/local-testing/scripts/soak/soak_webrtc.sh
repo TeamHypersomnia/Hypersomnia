@@ -3,7 +3,7 @@
 # (before ICE, mid-handshake, right after joining) - more cycles than the server's 64 WebRTC ids.
 # Then a full join must still work and the server must not hold zombie clients.
 # Usage: soak_webrtc.sh [cycles]   (default 150, ~20 min)
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/../test_env.sh"
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 CYCLES=${1:-150}
@@ -30,9 +30,9 @@ mk client <<J
 J
 
 cd $REPO/hypersomnia
-timeout 3600 $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 & MS=$!
+timeout 3600 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 & MS=$!
 sleep 3
-timeout 3600 $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 & SRV=$!
+timeout 3600 $BIN --dedicated-server --appdata-dir $T/srv $GAME_TEST_FLAGS > $T/srv.out 2>&1 & SRV=$!
 
 # A native community server's WebRTC id is its address - the list's browser_connect_string
 ID=""
@@ -53,7 +53,7 @@ Xvfb :94 -screen 0 640x480x24 > /dev/null 2>&1 & XV=$!
 sleep 1
 
 for i in $(seq 1 $CYCLES); do
-	DISPLAY=:94 $BIN --connect rtc:$ID --appdata-dir $T/client --no-update-on-launch --mute > $T/c.out 2>&1 &
+	DISPLAY=:94 $BIN --connect rtc:$ID --appdata-dir $T/client $GAME_TEST_FLAGS --mute > $T/c.out 2>&1 &
 	C=$!
 	sleep $(python3 -c "import random; print(round(random.uniform(0.5, 8.0), 2))")
 	kill -9 $C 2>/dev/null
@@ -63,7 +63,7 @@ done
 
 sleep 70
 echo "=== after $CYCLES killed clients: a full join over WebRTC"
-DISPLAY=:94 timeout 60 $BIN --connect rtc:$ID --appdata-dir $T/client --no-update-on-launch --mute > $T/final.out 2>&1
+DISPLAY=:94 timeout 60 $BIN --connect rtc:$ID --appdata-dir $T/client $GAME_TEST_FLAGS --mute > $T/final.out 2>&1
 grep -hE "Received initial state" $T/final.out | head -1
 echo "RSS after: $(rss) kB"
 echo "=== server: clients still connected at the end (should be none but the final one, which was killed by timeout)"

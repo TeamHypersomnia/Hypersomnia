@@ -4,7 +4,7 @@
 # Prints the client's download progress, its disconnect reason and whether it got into the game.
 # Usage: MAP=<arena in hypersomnia/user/downloads/arenas> [EXT=..] [LATENCY=..] [LOSS=..] [KILL_AT=..] scenario_map_download.sh <out dir>
 # A long download: EXT=http://127.0.0.1:12180/arenas with slow_http.py <dir with arenas/> 12180 50000 (the provider is the arenas folder).
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 REPO=$HOME/Hypersomnia
 BIN=$REPO/build/Debug-x64-clang-claude/Hypersomnia
 T=$1
@@ -27,14 +27,14 @@ cat > $T/cli/user/conf.d/test.json <<EOF
 EOF
 
 cd $REPO/hypersomnia
-setsid timeout 300 $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 < /dev/null &
+setsid timeout 300 $BIN --dedicated-server --appdata-dir $T/srv $GAME_TEST_FLAGS > $T/srv.out 2>&1 < /dev/null &
 SRV=$!
 sleep 4
 setsid timeout 200 Xvfb :81 -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &
 XV=$!
 sleep 1
 START=$(date +%s)
-DISPLAY=:81 setsid timeout 180 $BIN --appdata-dir $T/cli --no-update-on-launch --mute --connect 127.0.0.1:12101 > $T/cli.out 2>&1 < /dev/null &
+DISPLAY=:81 setsid timeout 180 $BIN --appdata-dir $T/cli $GAME_TEST_FLAGS --mute --connect 127.0.0.1:12101 > $T/cli.out 2>&1 < /dev/null &
 CLI=$!
 
 if [ -n "$KILL_AT" ]; then

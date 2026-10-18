@@ -45,7 +45,7 @@ Build into `build/Debug-x64-clang-claude` first (`BIN` defaults to it), never `b
 
 ## The editor and playtest
 
-`../build/Debug-x64-clang-claude/Hypersomnia --edit <project dir> --playtest --mute` from `hypersomnia/` - always on a scratch
+`../build/Debug-x64-clang-claude/Hypersomnia --edit <project dir> --playtest $GAME_TEST_FLAGS` (after `. ../.claude/skills/local-testing/scripts/test_env.sh`) from `hypersomnia/` - always on a scratch
 copy under a distinct name (the editor writes `editor_view.json`, autosaves and `navmesh.nav` into it).
 Items placed as nodes must also be listed in a layer's `nodes`, or the map fails to load. Keys held with
 `local-testing/scripts/hold_keys.py`; don't move the mouse - the crosshair moves relatively.

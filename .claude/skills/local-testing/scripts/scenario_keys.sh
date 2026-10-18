@@ -2,7 +2,7 @@
 # Local end-to-end test of the server keys, the handshake with certs and the identity broker.
 # Everything on localhost, heartbeats only to the local test master, the broker is a scratch copy of the site.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
-export ALSOFT_DRIVERS=null
+. "$(dirname "$0")/test_env.sh"
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
 umask 077
@@ -69,10 +69,10 @@ mkconf $1 <<EOF
 EOF
 }
 
-timeout ${MS_SECS:-200} $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
+timeout ${MS_SECS:-200} $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
 for s in casual_de ranked_pl community; do
-	timeout ${SERVER_SECS:-190} nice -n 10 $BIN --dedicated-server --appdata-dir $T/$s --no-update-on-launch > $T/$s.out 2>&1 &
+	timeout ${SERVER_SECS:-190} nice -n 10 $BIN --dedicated-server --appdata-dir $T/$s $GAME_TEST_FLAGS > $T/$s.out 2>&1 &
 done
 sleep 12
 
@@ -89,7 +89,7 @@ client_conf c_ranked
 client_conf c_community
 
 run_client() {
-	timeout $3 xvfb-run -a nice -n 10 $BIN --connect $2 --appdata-dir $T/$1 --no-update-on-launch --mute > $T/$1.out 2>&1
+	timeout $3 xvfb-run -a nice -n 10 $BIN --connect $2 --appdata-dir $T/$1 $GAME_TEST_FLAGS --mute > $T/$1.out 2>&1
 }
 
 run_client c_casual 127.0.0.1:10000 ${CLIENT_SECS:-20} &

@@ -3,7 +3,7 @@
 # a casual and a ranked server heartbeating to nowhere; a client whose broker is unreachable (self-signed cert)
 # and one with the live broker (BROKER_URL, BROKER_PUBLIC_KEY - see broker.sh).
 # Expected: the self-signed client plays casual and is told ranked needs an account; the broker client plays both.
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
@@ -39,13 +39,13 @@ J
 
 cd $REPO/hypersomnia
 for s in casual ranked; do
-	timeout 120 nice -n 10 $BIN --dedicated-server --appdata-dir $T/$s --no-update-on-launch > $T/$s.out 2>&1 &
+	timeout 120 nice -n 10 $BIN --dedicated-server --appdata-dir $T/$s $GAME_TEST_FLAGS > $T/$s.out 2>&1 &
 done
 sleep 8
 
 run() {
 	client_conf $1 $2
-	timeout 25 xvfb-run -a nice -n 10 $BIN --connect 127.0.0.1:$3 --appdata-dir $T/$1 --no-update-on-launch --mute > $T/$1.out 2>&1
+	timeout 25 xvfb-run -a nice -n 10 $BIN --connect 127.0.0.1:$3 --appdata-dir $T/$1 $GAME_TEST_FLAGS --mute > $T/$1.out 2>&1
 	echo "=== $1 -> $3"
 	grep -hE "identity cert|Connecting as|Received initial state|Reason|need an account" $T/$1.out | sed 's/^\[[0-9:]*\] //' | head -5
 }

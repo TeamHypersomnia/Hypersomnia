@@ -3,7 +3,7 @@
 # The client's cert comes from the broker (BROKER_URL, BROKER_PUBLIC_KEY - see broker.sh); without one, ranked refuses it.
 # Everything on localhost.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
-export ALSOFT_DRIVERS=null
+. "$(dirname "$0")/test_env.sh"
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
 umask 077
@@ -55,9 +55,9 @@ cd $GAME
 # Official by its public key
 $BIN --print-server-key --appdata-dir $T/ranked 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
 
-timeout 120 $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
+timeout 120 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
-timeout 110 nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked --no-update-on-launch > $T/ranked.out 2>&1 &
+timeout 110 nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked $GAME_TEST_FLAGS > $T/ranked.out 2>&1 &
 sleep 12
 
 echo "=== list (webrtc ids)"
@@ -65,7 +65,7 @@ curl -s http://127.0.0.1:18420/server_list_json | python3 -c "
 import json,sys
 for e in json.load(sys.stdin): print(' ', e['name'], e['ip'], 'webrtc_id=', e.get('webrtc_id'), 'official=', e.get('is_official'), 'ranked=', e.get('is_ranked'))"
 
-timeout 30 xvfb-run -a nice -n 10 $BIN --connect "rtc:ranked-pl:1" --appdata-dir $T/c_rtc --no-update-on-launch --mute > $T/c_rtc.out 2>&1
+timeout 30 xvfb-run -a nice -n 10 $BIN --connect "rtc:ranked-pl:1" --appdata-dir $T/c_rtc $GAME_TEST_FLAGS --mute > $T/c_rtc.out 2>&1
 
 echo "=== client"
 grep -hE "WebRTC|Connecting as|identity cert|client connected to server|Received initial|last_disconnect_reason" $T/c_rtc.out | sed 's/^\[[0-9:]*\] //' | head -10

@@ -53,7 +53,7 @@ start)
 EOF
 
 	cd $E/hypersomnia
-	setsid nohup timeout ${SECS:-900} $E/Hypersomnia --dedicated-server --appdata-dir $C --no-update-on-launch > $C.out 2>&1 < /dev/null &
+	setsid nohup timeout ${SECS:-900} $E/Hypersomnia --dedicated-server --appdata-dir $C --no-update-on-launch --no-open-logs > $C.out 2>&1 < /dev/null &
 	echo $! > $C.pid
 	sleep 5
 	$E/Hypersomnia --print-server-key --appdata-dir $C 2>/dev/null | grep -E '^[0-9a-f]{64}$'

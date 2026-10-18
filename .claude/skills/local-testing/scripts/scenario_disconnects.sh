@@ -4,7 +4,7 @@
 # Cases: shutdown (server SIGTERM), killed (server SIGKILL), frozen (server SIGSTOP 6 s), full, elsewhere (the same key
 # joins again), password (wrong), afk, client_frozen (client SIGSTOP 6 s), client_killed and client_quit (when the slot frees).
 # Usage: CASES="full afk" scenario_disconnects.sh
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
@@ -22,7 +22,7 @@ server() { # name port slots extra-server-json extra-top-json
   "server": { "server_name": "disc $1", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
               "webrtc_port_range_begin": $(($2 + 9000)), "webrtc_port_range_end": $(($2 + 9005)) $4 } $5 }
 J
-	(cd $REPO/hypersomnia && setsid timeout 150 $BIN --dedicated-server --appdata-dir $T/srv_$1 --no-update-on-launch > $T/srv_$1.out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && setsid timeout 150 $BIN --dedicated-server --appdata-dir $T/srv_$1 $GAME_TEST_FLAGS > $T/srv_$1.out 2>&1 < /dev/null &)
 	sleep 5
 	SPID=$(pgrep -f "^$BIN --dedicated-server --appdata-dir $T/srv_$1 ")
 }
@@ -37,7 +37,7 @@ J
 }
 
 background_client() { # dir connect secs
-	(cd $REPO/hypersomnia && setsid timeout $3 xvfb-run -a $BIN --connect "$2" --appdata-dir $1 --no-update-on-launch --mute > $1/game.out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && setsid timeout $3 xvfb-run -a $BIN --connect "$2" --appdata-dir $1 $GAME_TEST_FLAGS --mute > $1/game.out 2>&1 < /dev/null &)
 }
 
 game_pid() {
@@ -51,7 +51,7 @@ film() { # case connect secs - frames every 0.5 s, each named by seconds since s
 	local XV=$!
 	sleep 1
 	START=${START:-$(date +%s.%N)}
-	(cd $REPO/hypersomnia && DISPLAY=:92 timeout $(($3 + 5)) $BIN --connect "$2" --appdata-dir $C --no-update-on-launch --mute > $C/game.out 2>&1 &)
+	(cd $REPO/hypersomnia && DISPLAY=:92 timeout $(($3 + 5)) $BIN --connect "$2" --appdata-dir $C $GAME_TEST_FLAGS --mute > $C/game.out 2>&1 &)
 	while :; do
 		local E=$(echo "$(date +%s.%N) - $START" | bc)
 		[ $(echo "$E > $3" | bc) = 1 ] && break
@@ -102,7 +102,7 @@ for CASE in $CASES; do
 			server $CASE $PORT 8
 			START=$(date +%s.%N)
 			# A copy of the filmed player's directory - the same key - joins at 10 s, once the filmed one exists.
-			at 9 "the same key joins again" bash -c "cp -r $T/c_$CASE $T/c_elsewhere_twin; cd $REPO/hypersomnia; setsid timeout 25 xvfb-run -a $BIN --connect 127.0.0.1:$PORT --appdata-dir $T/c_elsewhere_twin --no-update-on-launch --mute > /dev/null 2>&1 < /dev/null &"
+			at 9 "the same key joins again" bash -c "cp -r $T/c_$CASE $T/c_elsewhere_twin; cd $REPO/hypersomnia; setsid timeout 25 xvfb-run -a $BIN --connect 127.0.0.1:$PORT --appdata-dir $T/c_elsewhere_twin $GAME_TEST_FLAGS --mute > /dev/null 2>&1 < /dev/null &"
 			film $CASE 127.0.0.1:$PORT 20
 			wait
 			srv_log $CASE

@@ -2,6 +2,7 @@
 # srv.sh start|stop <name> <port> [ranked: NEVER|TEAMS_EQUAL] - a local server trusting the scratch broker
 #   SERVER_EXTRA / PRIVATE_EXTRA: more JSON fields for "server" / "server_private", each starting with a comma, e.g.
 #   PRIVATE_EXTRA=', "admin_profiles": [ { "account": "key_..", "rcon": "RCON" } ]'
+. "$(dirname "$0")/../test_env.sh"
 S=${SCRATCH_ROOT:-/tmp/hypersomnia-ui}
 BIN=${BIN:-$(cd "$(dirname "$0")/../../../../.." && pwd)/build/Debug-x64-clang-claude/Hypersomnia}
 eval "$(cat $S/nettest/broker_env)"
@@ -17,5 +18,5 @@ cat > $T/user/conf.d/test.json <<J
               "ranked": { }, "webrtc_port_range_begin": $((port + 9000)), "webrtc_port_range_end": $((port + 9005)) ${SERVER_EXTRA:-} },
   "server_private": { "identity_broker_public_keys": $broker_keys ${PRIVATE_EXTRA:-} } }
 J
-(cd $(cd "$(dirname "$0")/../../../../.." && pwd)/hypersomnia && setsid timeout ${SECS:-3000} $BIN --dedicated-server --appdata-dir $T --no-update-on-launch > $T.out 2>&1 < /dev/null &)
+(cd $(cd "$(dirname "$0")/../../../../.." && pwd)/hypersomnia && setsid timeout ${SECS:-3000} $BIN --dedicated-server --appdata-dir $T $GAME_TEST_FLAGS > $T.out 2>&1 < /dev/null &)
 sleep 5

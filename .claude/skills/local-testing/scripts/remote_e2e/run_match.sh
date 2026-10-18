@@ -67,8 +67,8 @@ import json,sys
 for e in json.load(sys.stdin): print(' ', e['name'], e['ip'], 'official=', e.get('is_official'), 'ranked=', e.get('is_ranked'), 'domain=', e.get('domain'), 'shown=', e.get('site_displayed_address'))"
 
 cd $REPO/hypersomnia
-xvfb-run -a $BIN --connect $ARENA_IP:9005 --appdata-dir $E/client_$A --no-update-on-launch --mute > $E/$A.out 2>&1 &
-xvfb-run -a $BIN --connect $ARENA_IP:9005 --appdata-dir $E/client_$B --no-update-on-launch --mute > $E/$B.out 2>&1 &
+xvfb-run -a $BIN --connect $ARENA_IP:9005 --appdata-dir $E/client_$A --no-update-on-launch --no-open-logs --mute > $E/$A.out 2>&1 &
+xvfb-run -a $BIN --connect $ARENA_IP:9005 --appdata-dir $E/client_$B --no-update-on-launch --no-open-logs --mute > $E/$B.out 2>&1 &
 
 sleep $LIVE_WAIT
 

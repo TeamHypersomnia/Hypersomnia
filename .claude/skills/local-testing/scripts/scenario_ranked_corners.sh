@@ -11,7 +11,7 @@
 # Needs broker.sh running (BROKER_URL, BROKER_PUBLIC_KEY exported, SCRATCH as for broker.sh).
 # Resources: port 18710 (+ WebRTC 19710-19715), broker proxy 13710, displays :96 :97.
 # Usage: CASE=unlink|broker_down [ROUND_TIME=15] scenario_ranked_corners.sh
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
@@ -84,7 +84,7 @@ echo "$KEY" > $S/broker_site/private/official_servers.d/corners
 (setsid python3 "$HERE/identity_ui/slow_broker.py" $PROXY 0 > $T/proxy.out 2>&1 < /dev/null &)
 sleep 1
 
-timeout 300 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
+timeout 300 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
 sleep 8
 
 mkdir -p $T/alice/user/conf.d $T/bob/user/conf.d
@@ -94,7 +94,7 @@ echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"ht
 
 start_client() {
 	local name=$1 d=$2 out=$3; shift 3
-	(cd $REPO/hypersomnia && DISPLAY=:$d setsid timeout 280 $BIN "$@" --appdata-dir $T/$name --no-update-on-launch --mute > $T/$out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && DISPLAY=:$d setsid timeout 280 $BIN "$@" --appdata-dir $T/$name $GAME_TEST_FLAGS --mute > $T/$out 2>&1 < /dev/null &)
 }
 
 for d in 96 97; do (setsid Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &); done

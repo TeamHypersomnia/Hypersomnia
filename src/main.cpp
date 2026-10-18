@@ -82,6 +82,10 @@ int main(const int argc, const char* const * const argv) {
 
 	auto params = cmd_line_params(argc, argv);
 
+	if (params.no_open_logs) {
+		augs::disable_text_editor();
+	}
+
 	if (params.version_line_only) {
 		std::cout << hypersomnia_version().get_version_string() << std::endl;
 

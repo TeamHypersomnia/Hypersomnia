@@ -40,10 +40,10 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 4. **Port 3000 is the user's local hypersomnia.io** (the site repo, `node app.js`, its `private/mmr.db`). Never post to it.
 5. **Check ports are free first** (`ss -tulpn`, `lsof -ti tcp:<port>`) and abort if busy - a server that fails to bind
    silently leaves the requests going to whatever else listens there.
-6. **Silence.** Test clients play sound on the user's speakers. Run native clients with `ALSOFT_DRIVERS=null`
-   (OpenAL's null backend, "No Output"; the scenario scripts export it) and give Firefox profiles
-   `user_pref("media.volume_scale", "0.0");`.
-   Also `VISUAL=true`: a game that exits with a failure opens its failure log with `$VISUAL` - a tab in the user's editor.
+6. **Silence, nothing on the user's screen.** Every script sources `scripts/test_env.sh` (the one place for it:
+   `ALSOFT_DRIVERS=null`, `VISUAL=true`, and `$GAME_TEST_FLAGS` = `--no-update-on-launch --mute --no-open-logs`)
+   and passes `$GAME_TEST_FLAGS` to every game it starts - a new script does the same, a game started by hand too
+   (`. .claude/skills/local-testing/scripts/test_env.sh` first). Firefox profiles get `user_pref("media.volume_scale", "0.0");`.
 7. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
    Work only in `~/yojimbo-test`, restart only by your own PIDs, and verify afterwards that the production processes still
    have their old uptime (`ps -eo etime,args | grep Hypersomnia-Headless`).
@@ -101,8 +101,10 @@ Pass/fail is read from the logs - the scripts grep the meaningful lines: `Receiv
 
 ## UI checks
 
-Every game started for a test gets `--mute` (master volume 0 for that run only) - under Xvfb it still plays sound
-through the user's speakers. The scripts here pass it to every client.
+Every game started for a test gets `$GAME_TEST_FLAGS` (see point 6): `--mute` - master volume 0 for that run only (under
+Xvfb it still plays sound through the user's speakers); `--no-open-logs` - a failure log is saved but never opened in the
+user's `$VISUAL`, which pops up on their screen and blocks the process until closed. Read the logs yourself from
+`<appdata>/logs/` (`exit_failure_debug_log.txt`, `ensure_failed_debug_log.txt`).
 
 Run the game under `Xvfb :77 -screen 0 1280x720x24` with a 1280x720 non-fullscreen window (conf.d `"window"`),
 `import -window root shot.png` to screenshot, read the image, and `python3 xinput.py click x y` to click.

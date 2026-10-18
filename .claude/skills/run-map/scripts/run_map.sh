@@ -12,7 +12,7 @@
 #   BIN, PORT, SCRATCH, LOG_GREP (printed from the server log at the end), LOG_TAIL
 #
 # Prints the run dir (server log <dir>/srv.out, client log <dir>/c.out). Heartbeats go to 127.0.0.1:1, never production.
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/../../local-testing/scripts/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 MAP=${MAP:-de_cyberaqua}
@@ -48,7 +48,7 @@ cat > $T/c/user/conf.d/test.json <<J
 J
 
 cd $REPO/hypersomnia
-timeout $((SECS + 20)) $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 &
+timeout $((SECS + 20)) $BIN --dedicated-server --appdata-dir $T/srv $GAME_TEST_FLAGS > $T/srv.out 2>&1 &
 echo $! > $T/srv.pid
 sleep 6
 
@@ -60,10 +60,10 @@ esac
 
 if [ -n "$CLIENT_RUN" ]; then
 	if [ "$KEEP" = 1 ]; then
-		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c --no-update-on-launch --mute > $T/c.out 2>&1 &
+		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c $GAME_TEST_FLAGS --mute > $T/c.out 2>&1 &
 		echo $! > $T/c.pid
 	else
-		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c --no-update-on-launch --mute > $T/c.out 2>&1
+		timeout $SECS $CLIENT_RUN --connect 127.0.0.1:$PORT --appdata-dir $T/c $GAME_TEST_FLAGS --mute > $T/c.out 2>&1
 	fi
 elif [ "$KEEP" != 1 ]; then
 	sleep $SECS

@@ -3,7 +3,7 @@
 # one joined by address (any key) and one joined with its key, like from the server list. The servers must never refuse anyone,
 # then a real game client must still get in. Catches anything that fills up after N connections.
 # Usage: soak_netcode.sh [scale]   (scale 1 = ~9000 cycles, ~35 min on a Debug build; build_soak.sh first)
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/../test_env.sh"
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 SCALE=${1:-1}
@@ -28,8 +28,8 @@ done
 cd $REPO/hypersomnia
 KEY=$($BIN --print-server-key --appdata-dir $T/keyed 2>/dev/null | grep -E '^[0-9a-f]{64}$')
 [ -n "$KEY" ] || { echo "no server key printed"; exit 1; }
-timeout 6000 $BIN --dedicated-server --appdata-dir $T/byaddress --no-update-on-launch > $T/byaddress.out 2>&1 & C=$!
-timeout 6000 $BIN --dedicated-server --appdata-dir $T/keyed --no-update-on-launch > $T/keyed.out 2>&1 & O=$!
+timeout 6000 $BIN --dedicated-server --appdata-dir $T/byaddress $GAME_TEST_FLAGS > $T/byaddress.out 2>&1 & C=$!
+timeout 6000 $BIN --dedicated-server --appdata-dir $T/keyed $GAME_TEST_FLAGS > $T/keyed.out 2>&1 & O=$!
 sleep 10
 rss() { ps -o rss= -p $(pgrep -f "^$BIN --dedicated-server --appdata-dir $T/$1" | head -1) | tr -d ' '; }
 echo "RSS before: byaddress $(rss byaddress) kB, keyed $(rss keyed) kB"
@@ -45,7 +45,7 @@ echo "=== a real game client joins the by-address server"
 mk client <<J
 { "identity_broker_url": "http://127.0.0.1:1", "client": { "nickname": "after_soak" } }
 J
-timeout 40 xvfb-run -n 93 $BIN --connect 127.0.0.1:10020 --appdata-dir $T/client --no-update-on-launch --mute > $T/client.out 2>&1
+timeout 40 xvfb-run -n 93 $BIN --connect 127.0.0.1:10020 --appdata-dir $T/client $GAME_TEST_FLAGS --mute > $T/client.out 2>&1
 grep -hE "Received initial state" $T/client.out | head -1
 echo "=== full refusals logged by the servers"
 grep -hc "is full" $T/byaddress.out $T/keyed.out

@@ -7,6 +7,14 @@
 #include "augs/misc/mutex.h"
 #include "all_paths.h"
 
+namespace augs {
+	static bool text_editor_disabled = false;
+
+	void disable_text_editor() {
+		text_editor_disabled = true;
+	}
+}
+
 #if PLATFORM_WEB
 namespace augs {
 	int shell(const std::string&) { return 0; }
@@ -33,6 +41,10 @@ namespace augs {
 	}
 
 	void open_text_editor(const std::string& on_file) {
+		if (text_editor_disabled) {
+			return;
+		}
+
 		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
 	}
 }
@@ -46,6 +58,11 @@ namespace augs {
 	}
 
 	void open_text_editor(const std::string& on_file) {
+		if (text_editor_disabled) {
+			LOG("Not opening %x in a text editor (--no-open-logs).", on_file);
+			return;
+		}
+
 #if HEADLESS
 		(void)on_file;
 #else

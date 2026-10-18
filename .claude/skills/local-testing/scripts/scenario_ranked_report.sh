@@ -13,7 +13,7 @@
 # (use a longer ROUND_TIME, e.g. 15).
 # AVATAR=<png>: both play with this avatar - the report carries it, the site keeps it for the accounts.
 # Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] [REJOIN=1] [AVATAR=<png>] scenario_ranked_report.sh
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
@@ -75,7 +75,7 @@ cd $REPO/hypersomnia
 KEY=$($BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$')
 echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
 
-timeout 180 $BIN --dedicated-server --appdata-dir $T/server --no-update-on-launch > $T/server.out 2>&1 &
+timeout 180 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
 sleep 8
 
 AVATAR_JSON=""
@@ -102,7 +102,7 @@ for c in alice:86 bob:87; do
 		cat > $T/alice/user/conf.d/menu.json <<J
 { "launch_at_startup": "MAIN_MENU", "window": { "fullscreen": false, "size": [1280, 720] }, "main_menu": { "leaderboards_provider_url": "$BROKER_URL/leaderboards" } }
 J
-		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 200 $CBIN --appdata-dir $T/$name --no-update-on-launch --mute > $T/$name.out 2>&1 &)
+		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 200 $CBIN --appdata-dir $T/$name $GAME_TEST_FLAGS --mute > $T/$name.out 2>&1 &)
 		sleep 12
 		DISPLAY=:$d import -window root $T/alice_menu_before.png
 		DISPLAY=:$d python3 "$HERE/xinput.py" click 199 323; sleep 2
@@ -110,7 +110,7 @@ J
 		DISPLAY=:$d python3 "$HERE/xinput.py" type "127.0.0.1:10060"
 		DISPLAY=:$d python3 "$HERE/xinput.py" click 380 524
 	else
-		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 150 $CBIN --connect 127.0.0.1:10060 --appdata-dir $T/$name --no-update-on-launch --mute > $T/$name.out 2>&1 &)
+		(cd $REPO/hypersomnia && DISPLAY=:$d timeout 150 $CBIN --connect 127.0.0.1:10060 --appdata-dir $T/$name $GAME_TEST_FLAGS --mute > $T/$name.out 2>&1 &)
 	fi
 done
 
@@ -126,7 +126,7 @@ if [ -n "$REJOIN" ]; then
 	sleep ${REJOIN_AFTER:-5}
 	# No --connect: user/ranked_match.json brings the game back to the match by itself, on the account it was played on
 	echo "alice's ranked_match.json: $(cat $T/alice/user/ranked_match.json 2>/dev/null | sed 's/key_[0-9a-f]\{56\}/key_.../')"
-	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --appdata-dir $T/alice --no-update-on-launch --mute > $T/alice_rejoin.out 2>&1 &)
+	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/alice_rejoin.out 2>&1 &)
 	echo "alice rejoins at $(date +%T)"
 	for t in 4 8 12; do sleep 4; DISPLAY=:86 import -window root $T/rejoin_$t.png; done
 fi

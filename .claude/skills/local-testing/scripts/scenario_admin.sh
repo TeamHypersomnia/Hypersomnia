@@ -5,7 +5,7 @@
 #   B: admin_profiles = steam_ + the key_ -> joins without the password (an admin through its key)
 # The client's first start answers [Link] to "is it yours?" (centered modal), which saves steam_cert.json.
 # Prints "== case A: <n> wrong password, ..." lines. Needs broker.sh started with this SCRATCH.
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
@@ -38,7 +38,7 @@ cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
 
 start_client() {
 	local out=$1; shift
-	(cd $REPO/hypersomnia && DISPLAY=:96 setsid timeout 120 $BIN "$@" --appdata-dir $T/alice --no-update-on-launch --mute > $T/$out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && DISPLAY=:96 setsid timeout 120 $BIN "$@" --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/$out 2>&1 < /dev/null &)
 }
 stop_client() {
 	for p in $(pgrep -f -- "Hypersomnia --appdata-dir $T/alice"); do kill $p; done
@@ -68,7 +68,7 @@ run_case() {
               "webrtc_port_range_begin": 19720, "webrtc_port_range_end": 19725 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "server_password": "secretpw", "admin_profiles": $profiles } }
 J
-	(cd $REPO/hypersomnia && setsid timeout 60 $BIN --dedicated-server --appdata-dir $D --no-update-on-launch > $D.out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && setsid timeout 60 $BIN --dedicated-server --appdata-dir $D $GAME_TEST_FLAGS > $D.out 2>&1 < /dev/null &)
 	sleep 6
 	start_client $name.out --connect 127.0.0.1:$PORT
 	sleep 15

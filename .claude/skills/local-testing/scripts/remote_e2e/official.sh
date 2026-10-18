@@ -47,7 +47,7 @@ start)
 EOF
 
 	cd $E/hypersomnia
-	setsid nohup timeout ${SECS:-7200} $E/Hypersomnia --dedicated-server --appdata-dir $O --no-update-on-launch > $O.out 2>&1 < /dev/null &
+	setsid nohup timeout ${SECS:-7200} $E/Hypersomnia --dedicated-server --appdata-dir $O --no-update-on-launch --no-open-logs > $O.out 2>&1 < /dev/null &
 	echo $! > $O.pid
 	sleep 8
 	grep -hE "Starting .* server instance|heartbeat through UDP" $O.out | sort -u | head -6

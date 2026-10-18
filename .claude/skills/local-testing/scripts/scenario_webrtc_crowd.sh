@@ -2,7 +2,7 @@
 # A class joining together: N native clients over WebRTC from one address start at the same moment
 # against one community server. All must get in.
 # Usage: scenario_webrtc_crowd.sh [N=10]
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
@@ -27,9 +27,9 @@ mk srv <<J
 J
 
 cd $REPO/hypersomnia
-timeout 300 $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
+timeout 300 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
-timeout 290 $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 &
+timeout 290 $BIN --dedicated-server --appdata-dir $T/srv $GAME_TEST_FLAGS > $T/srv.out 2>&1 &
 
 ID=""
 for attempt in $(seq 1 30); do
@@ -47,7 +47,7 @@ for i in $(seq 1 $N); do
 { "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:18420", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
   "client": { "nickname": "crowd$i" } }
 J
-	timeout 90 xvfb-run -a $BIN --connect rtc:$ID --appdata-dir $T/c$i --no-update-on-launch --mute > $T/c$i.out 2>&1 &
+	timeout 90 xvfb-run -a $BIN --connect rtc:$ID --appdata-dir $T/c$i $GAME_TEST_FLAGS --mute > $T/c$i.out 2>&1 &
 done
 wait $(jobs -p | tail -n $N) 2>/dev/null
 sleep 2

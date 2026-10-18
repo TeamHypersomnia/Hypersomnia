@@ -65,6 +65,7 @@ struct cmd_line_params {
 
 	bool no_update_on_launch = false;
 	bool mute = false;
+	bool no_open_logs = false;
 	bool update_once_now = false;
 	bool daily_autoupdate = false;
 
@@ -267,6 +268,13 @@ struct cmd_line_params {
 				*/
 
 				mute = true;
+			}
+			else if (a == "--no-open-logs") {
+				/*
+					Failure logs are saved but never opened in $VISUAL - which would block a test until the editor closes.
+				*/
+
+				no_open_logs = true;
 			}
 			else if (a == "--playtest-speed") {
 				playtest_speed = std::max(0.01, std::atof(get_next()));

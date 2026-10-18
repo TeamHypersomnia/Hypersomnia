@@ -1,7 +1,7 @@
 #!/bin/bash
 # Screenshots of a client joining, every half second for N seconds, put together into one contact sheet - to see
 # everything the game draws while connecting. Usage: connect_filmstrip.sh <connect string> <appdata dir> <out.png> [seconds=10] [bin]
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 CONNECT=$1; A=$2; OUT=$3; SECS=${4:-10}
@@ -12,7 +12,7 @@ cd $REPO/hypersomnia
 Xvfb :91 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:91 timeout $((SECS + 5)) $BIN --connect "$CONNECT" --appdata-dir $A --no-update-on-launch --mute > $A/filmstrip.out 2>&1 &
+DISPLAY=:91 timeout $((SECS + 5)) $BIN --connect "$CONNECT" --appdata-dir $A $GAME_TEST_FLAGS --mute > $A/filmstrip.out 2>&1 &
 G=$!
 for i in $(seq -w 1 $((SECS * 2))); do
 	sleep 0.5

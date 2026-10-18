@@ -4,6 +4,7 @@
 # pointed at both on http://localhost:8765.
 # Usage: local_stack.sh [web build dir] [hours]     Stop: local_stack.sh stop
 # A failing game opens its failure log with $VISUAL - never in the user's editor
+. "$(dirname "$0")/test_env.sh"
 export VISUAL=true
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
@@ -68,10 +69,10 @@ for s in ranked:pl casual:de; do
 	$BIN --print-server-key --appdata-dir $T/${s%%:*} 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/${s##*:}
 done
 
-timeout $SECS $BIN --masterserver --appdata-dir $T/ms --no-update-on-launch > $T/ms.out 2>&1 &
+timeout $SECS $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
-timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked --no-update-on-launch > $T/ranked.out 2>&1 &
-timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/casual --no-update-on-launch > $T/casual.out 2>&1 &
+timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/ranked $GAME_TEST_FLAGS > $T/ranked.out 2>&1 &
+timeout $SECS nice -n 10 $BIN --dedicated-server --appdata-dir $T/casual $GAME_TEST_FLAGS > $T/casual.out 2>&1 &
 timeout $SECS python3 "$HERE/webserve.py" $T/web 8765 > $T/web.out 2>&1 &
 sleep 10
 

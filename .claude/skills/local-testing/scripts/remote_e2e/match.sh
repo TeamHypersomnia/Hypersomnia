@@ -68,7 +68,7 @@ EOF
 EOF
 
 	cd $E/hypersomnia
-	setsid nohup timeout 600 $E/Hypersomnia --dedicated-server --appdata-dir $E/server --no-update-on-launch > $E/server.out 2>&1 < /dev/null &
+	setsid nohup timeout 600 $E/Hypersomnia --dedicated-server --appdata-dir $E/server --no-update-on-launch --no-open-logs > $E/server.out 2>&1 < /dev/null &
 	echo $! > $E/server.pid
 	sleep 6
 	grep -hE "Tournament|listening|heartbeat through UDP" $E/server.out | head -4

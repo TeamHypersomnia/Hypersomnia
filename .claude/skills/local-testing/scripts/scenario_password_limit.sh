@@ -1,7 +1,7 @@
 #!/bin/bash
 # Wrong server passwords: a password-protected server (localhost not auto-authorized), 7 joins without the password.
 # Expected: 5 times "Wrong password", then "Too many wrong passwords" for the rest of the minute.
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$(dirname "$0")/test_env.sh"
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
@@ -20,10 +20,10 @@ cat > $T/c/user/conf.d/test.json <<J
 { "identity_broker_url": "http://127.0.0.1:1", "client": { "nickname": "pwtest" } }
 J
 cd $REPO/hypersomnia
-timeout 200 $BIN --dedicated-server --appdata-dir $T/srv --no-update-on-launch > $T/srv.out 2>&1 &
+timeout 200 $BIN --dedicated-server --appdata-dir $T/srv $GAME_TEST_FLAGS > $T/srv.out 2>&1 &
 sleep 6
 for i in 1 2 3 4 5 6 7; do
-	timeout 7 xvfb-run -a $BIN --connect 127.0.0.1:10040 --appdata-dir $T/c --no-update-on-launch --mute > $T/c$i.out 2>&1
+	timeout 7 xvfb-run -a $BIN --connect 127.0.0.1:10040 --appdata-dir $T/c $GAME_TEST_FLAGS --mute > $T/c$i.out 2>&1
 done
 grep -hE "\(reason=" $T/srv.out | sed 's/^\[[0-9:]*\] //' | uniq -c
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
