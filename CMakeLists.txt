@@ -17,6 +17,43 @@ message("Hypersomnia project source dir: ${PROJECT_SOURCE_DIR}")
 message("Hypersomnia project binary dir: ${PROJECT_BINARY_DIR}")
 message("Hypersomnia current binary dir: ${CMAKE_CURRENT_BINARY_DIR}")
 
+# Ninja runs as many compilations as there are cores plus two by default, but one of ours takes up to ~1.5 GB -
+# 26 of them ran out of 31 GB of memory without swap and froze the whole desktop.
+# So the compilations are capped by the memory (8 GB left for the rest of the system), links run one at a time,
+# and on Unix they run at a lower priority, so the desktop stays responsive.
+
+if (CMAKE_GENERATOR MATCHES "Ninja")
+	cmake_host_system_information(RESULT HOST_TOTAL_MEMORY_MB QUERY TOTAL_PHYSICAL_MEMORY)
+	cmake_host_system_information(RESULT HOST_LOGICAL_CORES QUERY NUMBER_OF_LOGICAL_CORES)
+
+	set(MEMORY_PER_COMPILE_JOB_MB 1536)
+	set(MEMORY_LEFT_FOR_SYSTEM_MB 8192)
+
+	math(EXPR MAX_COMPILE_JOBS "(${HOST_TOTAL_MEMORY_MB} - ${MEMORY_LEFT_FOR_SYSTEM_MB}) / ${MEMORY_PER_COMPILE_JOB_MB}")
+
+	if (MAX_COMPILE_JOBS GREATER HOST_LOGICAL_CORES)
+		set(MAX_COMPILE_JOBS ${HOST_LOGICAL_CORES})
+	endif()
+
+	if (MAX_COMPILE_JOBS LESS 1)
+		set(MAX_COMPILE_JOBS 1)
+	endif()
+
+	message("Compile jobs at most: ${MAX_COMPILE_JOBS} (${HOST_TOTAL_MEMORY_MB} MB of memory, ${HOST_LOGICAL_CORES} cores)")
+
+	set_property(GLOBAL APPEND PROPERTY JOB_POOLS compile_pool=${MAX_COMPILE_JOBS} link_pool=1)
+	set(CMAKE_JOB_POOL_COMPILE compile_pool)
+	set(CMAKE_JOB_POOL_LINK link_pool)
+
+	if (UNIX)
+		find_program(NICE_PROGRAM nice)
+
+		if (NICE_PROGRAM)
+			set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${NICE_PROGRAM} -n 10")
+		endif()
+	endif()
+endif()
+
 # Determine the used compiler.
 # In case of MSVC, CMake sets the MSVC variable to ON on its own.
 
