@@ -112,7 +112,7 @@ public:
 	}
 
 	auto escape() {
-		return setup_escape_result::IGNORE;
+		return setup_escape_result::IGNORED;
 	}
 
 	void launch_creators_screen();

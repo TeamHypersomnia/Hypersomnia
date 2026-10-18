@@ -12,7 +12,7 @@
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX || PLATFORM_MACOS
 #include <mutex>
 
 std::mutex clipboard_mutex;
@@ -510,7 +510,7 @@ namespace augs {
 
 		platform->unhandled_focuses.clear();
 
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX || PLATFORM_MACOS
 		std::lock_guard<std::mutex> lock(clipboard_mutex);
 
 		if (set_clipboard_op) {
@@ -521,7 +521,7 @@ namespace augs {
 #endif
 	}
 
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX || PLATFORM_MACOS
 	void window::refresh_clipboard_snapshot() {
 		if (platform == nullptr || platform->window == nullptr) {
 			return;

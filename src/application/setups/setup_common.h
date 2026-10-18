@@ -20,7 +20,7 @@ enum class custom_imgui_result {
 };
 
 enum class setup_escape_result {
-	IGNORE,
+	IGNORED,
 	LAUNCH_INGAME_MENU,
 	GO_TO_MAIN_MENU,
 	JUST_FETCH,

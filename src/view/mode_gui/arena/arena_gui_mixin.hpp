@@ -35,14 +35,14 @@ setup_escape_result arena_gui_mixin<D>::escape() {
 	auto& self = static_cast<D&>(*this);
 
 	if (!self.is_gameplay_on()) {
-		return setup_escape_result::IGNORE;
+		return setup_escape_result::IGNORED;
 	}
 
 	if (arena_gui.escape()) {
 		return setup_escape_result::JUST_FETCH;
 	}
 
-	return setup_escape_result::IGNORE;
+	return setup_escape_result::IGNORED;
 }
 
 template <class D>
