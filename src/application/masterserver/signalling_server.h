@@ -36,14 +36,24 @@ public:
 
 		/*
 			Messages a peer may send: 20 a second, bursts of 100 - plenty for any ICE negotiation.
+			A server answers every joining client with its candidates, so it gets ten times that -
+			but never an unlimited allowance, as anyone can make itself a server with its own key.
 		*/
 
-		double message_tokens = 100.0;
+		static constexpr double client_messages_per_sec = 20.0;
+		static constexpr double client_message_burst = 100.0;
+		static constexpr double server_messages_per_sec = 200.0;
+		static constexpr double server_message_burst = 1000.0;
+
+		double message_tokens = client_message_burst;
 		double when_last_message = -1;
 
 		bool take_message_token(const double now) {
+			const auto burst = is_server() ? server_message_burst : client_message_burst;
+			const auto refill_per_sec = is_server() ? server_messages_per_sec : client_messages_per_sec;
+
 			if (when_last_message >= 0.0) {
-				message_tokens = std::min(100.0, message_tokens + (now - when_last_message) * 20.0);
+				message_tokens = std::min(burst, message_tokens + (now - when_last_message) * refill_per_sec);
 			}
 
 			when_last_message = now;
@@ -173,23 +183,32 @@ private:
 									const auto webrtc_id = get_webrtc_id(peers, client);
 
 									/*
+										Only a registered peer may relay: the id is chosen as its socket
+										opens, so a socket without one failed to register (e.g. too many peers).
+									*/
+
+									const auto peer = mapped_or_nullptr(peers, webrtc_id);
+
+									if (peer == nullptr) {
+										return;
+									}
+
+									/*
 										A client still negotiating (offers, candidates, a slow ICE or TURN) is alive too -
 										timed out after its registration, its join would hang.
 									*/
 
-									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
-										const auto now = augs::high_precision_secs();
+									const auto now = augs::high_precision_secs();
 
-										/*
-											A server in the browser answers every joining client with its candidates - not limited.
-										*/
+									/*
+										Servers too, with a higher allowance (see signalling_peer).
+									*/
 
-										if (!peer->is_server() && !peer->take_message_token(now)) {
-											return;
-										}
-
-										peer->time_last_correct_message = now;
+									if (!peer->take_message_token(now)) {
+										return;
 									}
+
+									peer->time_last_correct_message = now;
 
 									relay_message(peers, json_message, webrtc_id);
 								}
@@ -228,47 +247,64 @@ private:
 							on_peers(
 								[&](auto& peers) {
 									const auto webrtc_id = get_webrtc_id(peers, client);
+									const auto peer = mapped_or_nullptr(peers, webrtc_id);
+
+									if (peer == nullptr) {
+										LOG("Wrong peer id: %x", webrtc_id);
+										return;
+									}
+
+									/*
+										A heartbeat costs a message token like any other - a peer changing a field
+										with every one of them would otherwise have the whole list written anew,
+										and its id logged, up to the WebSocket's throughput.
+									*/
+
+									const auto now = augs::high_precision_secs();
+
+									if (!peer->take_message_token(now)) {
+										return;
+									}
 
 									if (signed_cookie != ::web_session_cookie(webrtc_id)) {
 										LOG("Ignoring a heartbeat from Web peer %x signed for another session.", webrtc_id);
 										return;
 									}
 
-									if (const auto peer = mapped_or_nullptr(peers, webrtc_id)) {
-										const auto unix_time = augs::date_time::secs_since_epoch();
+									static uint64_t last_logged_ms = 0;
 
-										LOG("Received heartbeat from Web peer: %x", webrtc_id);
-
-										if (!peer->is_server()) {
-											peer->time_hosted = unix_time;
-											peer->server_public_key = public_key;
-										}
-										else if (peer->server_public_key != public_key) {
-											LOG("Ignoring a heartbeat from Web peer %x signed with another key.", webrtc_id);
-											return;
-										}
-
-										/*
-											The list is written anew only when what it shows changed - not for every heartbeat.
-										*/
-
-										auto without_signature = [](server_heartbeat h) {
-											h.signature.reset();
-											return h;
-										};
-
-										const bool changed = !(without_signature(peer->last_heartbeat) == without_signature(hb));
-
-										peer->last_heartbeat = hb;
-										peer->time_last_heartbeat = unix_time;
-										peer->time_last_correct_message = augs::high_precision_secs();
-
-										if (changed) {
-											dirty = true;
-										}
+									if (::official_log_allowed(last_logged_ms)) {
+										LOG("Received a heartbeat from Web peer: %x", webrtc_id);
 									}
-									else {
-										LOG("Wrong peer id: %x", webrtc_id);
+
+									const auto unix_time = augs::date_time::secs_since_epoch();
+
+									if (!peer->is_server()) {
+										peer->time_hosted = unix_time;
+										peer->server_public_key = public_key;
+									}
+									else if (peer->server_public_key != public_key) {
+										LOG("Ignoring a heartbeat from Web peer %x signed with another key.", webrtc_id);
+										return;
+									}
+
+									/*
+										The list is written anew only when what it shows changed - not for every heartbeat.
+									*/
+
+									auto without_signature = [](server_heartbeat h) {
+										h.signature.reset();
+										return h;
+									};
+
+									const bool changed = !(without_signature(peer->last_heartbeat) == without_signature(hb));
+
+									peer->last_heartbeat = hb;
+									peer->time_last_heartbeat = unix_time;
+									peer->time_last_correct_message = now;
+
+									if (changed) {
+										dirty = true;
 									}
 								}
 							);

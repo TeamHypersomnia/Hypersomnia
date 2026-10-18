@@ -40,6 +40,38 @@
 #include "application/network/network_adapters.h"
 #include "augs/string/typesafe_sscanf.h"
 
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Masterserver signalling message tokens") {
+	using peer_type = signalling_server::signalling_peer;
+
+	auto peer = peer_type();
+	const auto client_burst = static_cast<int>(peer_type::client_message_burst);
+
+	for (int i = 0; i < client_burst; ++i) {
+		REQUIRE(peer.take_message_token(0.0));
+	}
+
+	REQUIRE(!peer.take_message_token(0.0));
+
+	/*
+		A server gets a higher allowance - but a finite one.
+	*/
+
+	peer.time_last_heartbeat = 1.0;
+	REQUIRE(peer.is_server());
+
+	const auto refilled = static_cast<int>(peer_type::server_messages_per_sec);
+
+	for (int i = 0; i < refilled; ++i) {
+		REQUIRE(peer.take_message_token(1.0));
+	}
+
+	REQUIRE(!peer.take_message_token(1.0));
+}
+#endif
+
 extern std::mutex rtc_errors_lk;
 extern bool track_rtc_errors;
 extern std::vector<std::string> rtc_errors;
