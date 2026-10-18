@@ -257,7 +257,7 @@ static void set_cors(httplib::Response& res) {
 */
 
 static bool is_acceptable_domain(const std::string& domain, const bool is_official) {
-	if (domain.empty() || domain.size() > 253 || domain.front() == '.' || domain.back() == '.' || domain.front() == '-') {
+	if (domain.empty() || domain.size() > 253 || domain.front() == '.' || domain.back() == '.') {
 		return false;
 	}
 
@@ -269,8 +269,20 @@ static bool is_acceptable_domain(const std::string& domain, const bool is_offici
 		}
 	}
 
-	if (domain.find("..") != std::string::npos) {
-		return false;
+	/*
+		Every label (the parts between dots): 1 to 63 characters, neither beginning nor ending with a hyphen.
+	*/
+
+	for (std::size_t label_begin = 0; label_begin < domain.size();) {
+		const auto dot = domain.find('.', label_begin);
+		const auto label_end = dot == std::string::npos ? domain.size() : dot;
+		const auto label_length = label_end - label_begin;
+
+		if (label_length == 0 || label_length > 63 || domain[label_begin] == '-' || domain[label_end - 1] == '-') {
+			return false;
+		}
+
+		label_begin = label_end + 1;
 	}
 
 	/*
@@ -300,6 +312,32 @@ static bool is_acceptable_domain(const std::string& domain, const bool is_offici
 
 	return is_official || !under_hypersomnia_io;
 }
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+TEST_CASE("Masterserver acceptable domains") {
+	REQUIRE(::is_acceptable_domain("example.com", false));
+	REQUIRE(::is_acceptable_domain("my-server.example.com", false));
+	REQUIRE(::is_acceptable_domain(std::string(63, 'a') + ".com", false));
+
+	REQUIRE(!::is_acceptable_domain("", false));
+	REQUIRE(!::is_acceptable_domain(".example.com", false));
+	REQUIRE(!::is_acceptable_domain("example.com.", false));
+	REQUIRE(!::is_acceptable_domain("example..com", false));
+	REQUIRE(!::is_acceptable_domain("-example.com", false));
+	REQUIRE(!::is_acceptable_domain("example.com-", false));
+	REQUIRE(!::is_acceptable_domain("example-.com", false));
+	REQUIRE(!::is_acceptable_domain("sub.-example.com", false));
+	REQUIRE(!::is_acceptable_domain(std::string(64, 'a') + ".com", false));
+	REQUIRE(!::is_acceptable_domain("exa mple.com", false));
+	REQUIRE(!::is_acceptable_domain("1.2.3.4", false));
+	REQUIRE(!::is_acceptable_domain("localhost", false));
+
+	REQUIRE(!::is_acceptable_domain("ranked.hypersomnia.io", false));
+	REQUIRE(::is_acceptable_domain("ranked.hypersomnia.io", true));
+}
+#endif
 
 static auto to_webrtc_alias(
 	const bool is_ranked,
