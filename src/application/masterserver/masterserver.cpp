@@ -39,6 +39,7 @@
 #include "application/masterserver/signalling_server.h"
 #include "application/network/network_adapters.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "augs/misc/token_bucket.h"
 
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
@@ -90,29 +91,6 @@ std::string ToString(const netcode_address_t&);
 */
 
 struct tell_me_my_address_limiter {
-	struct token_bucket {
-		double tokens = -1.0;
-		double when_last = -1.0;
-
-		bool take(const double now, const double per_sec, const double burst) {
-			if (when_last < 0.0) {
-				tokens = burst;
-			}
-			else {
-				tokens = std::min(burst, tokens + (now - when_last) * per_sec);
-			}
-
-			when_last = now;
-
-			if (tokens < 1.0) {
-				return false;
-			}
-
-			tokens -= 1.0;
-			return true;
-		}
-	};
-
 	static constexpr std::size_t max_remembered_networks = 8192;
 
 	static constexpr double network_answers_per_sec = 50.0;
@@ -121,8 +99,8 @@ struct tell_me_my_address_limiter {
 	static constexpr double total_answers_per_sec = 2000.0;
 	static constexpr double total_burst = 4000.0;
 
-	std::unordered_map<netcode_address_t, token_bucket> by_network;
-	token_bucket total;
+	std::unordered_map<netcode_address_t, augs::token_bucket> by_network;
+	augs::token_bucket total;
 
 	bool try_answer(const netcode_address_t& from, const double now) {
 		if (by_network.size() >= max_remembered_networks) {

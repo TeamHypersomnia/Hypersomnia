@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
 #include "augs/network/address_network.h"
+#include "augs/misc/token_bucket.h"
 
 #include "augs/string/path_sanitization.h"
 #include "augs/templates/bit_cast.h"
@@ -45,25 +46,14 @@ public:
 		static constexpr double server_messages_per_sec = 200.0;
 		static constexpr double server_message_burst = 1000.0;
 
-		double message_tokens = client_message_burst;
-		double when_last_message = -1;
+		augs::token_bucket messages;
 
 		bool take_message_token(const double now) {
-			const auto burst = is_server() ? server_message_burst : client_message_burst;
-			const auto refill_per_sec = is_server() ? server_messages_per_sec : client_messages_per_sec;
-
-			if (when_last_message >= 0.0) {
-				message_tokens = std::min(burst, message_tokens + (now - when_last_message) * refill_per_sec);
+			if (is_server()) {
+				return messages.take(now, server_messages_per_sec, server_message_burst);
 			}
 
-			when_last_message = now;
-
-			if (message_tokens < 1.0) {
-				return false;
-			}
-
-			message_tokens -= 1.0;
-			return true;
+			return messages.take(now, client_messages_per_sec, client_message_burst);
 		}
 
 		// TODO_SECURITY: use proper secure channels

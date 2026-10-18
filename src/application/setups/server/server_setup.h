@@ -27,6 +27,7 @@
 #include "application/setups/server/crash_recovery/server_crash_recovery.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/misc/serialization_buffers.h"
+#include "augs/misc/token_bucket.h"
 
 #include "application/network/server_step_entropy.h"
 #if !HEADLESS
@@ -248,12 +249,7 @@ class server_setup :
 
 	bool handle_auxiliary_command(const netcode_address_t& from, const std::byte* packet, int n);
 
-	struct handshake_bucket {
-		double tokens = 0.0;
-		double when_last = 0.0;
-	};
-
-	std::unordered_map<std::string, handshake_bucket> handshakes_by_address;
+	std::unordered_map<std::string, augs::token_bucket> handshakes_by_address;
 	bool allow_handshake(const netcode_address_t& from);
 	bool send_packet_override(const netcode_address_t&,const std::byte*,int);
 	int receive_packet_override(netcode_address_t&,std::byte*,int);
