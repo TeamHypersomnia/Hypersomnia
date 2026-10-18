@@ -3447,7 +3447,20 @@ void editor_setup::start_playtesting() {
 		}
 	});
 
-	dummy_dynamic_vars.bot_override_difficulty = project.playtesting.bot_difficulty;
+	dummy_dynamic_vars.bot_override_difficulty = [&]() {
+		const auto chosen = project.playtesting.bot_difficulty;
+
+		/*
+			Progressive sets its own bot quota, which would override the enemy-only one -
+			such a playtest gets very easy bots instead (the setting itself is left as it is).
+		*/
+
+		if (project.playtesting.spawn_only_enemy_bots && chosen == difficulty_type::PROGRESSIVE) {
+			return difficulty_type::VERY_EASY;
+		}
+
+		return chosen;
+	}();
 	dummy_dynamic_vars.friendly_fire = project.playtesting.friendly_fire;
 
 	cosm.request_resample();
