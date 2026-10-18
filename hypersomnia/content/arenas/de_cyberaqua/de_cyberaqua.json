@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_cyberaqua",
-        "version_timestamp": "2026-10-17 17:53:20.016402 UTC"
+        "version_timestamp": "2026-10-18 21:30:33.289235 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -15,6 +15,9 @@
         },
         "warmup_theme": {
             "id": "arabesque"
+        },
+        "bot_waypoints": {
+            "mode": "YOURS_AND_GENERATED"
         }
     },
     "playtesting": {
@@ -2816,6 +2819,22 @@
     ],
     "layers": [
         {
+            "id": "added_waypoints",
+            "nodes": [
+                "bot_waypoint_patrol (46)",
+                "bot_waypoint_patrol (48)",
+                "bot_waypoint_patrol (52)",
+                "bot_waypoint_patrol (55)",
+                "bot_waypoint_patrol (54)",
+                "bot_waypoint_patrol (53)",
+                "bot_waypoint_patrol (51)",
+                "bot_waypoint_patrol (47)",
+                "bot_waypoint_patrol (50)",
+                "bot_waypoint_patrol (49)",
+                "bot_waypoint_patrol (45)"
+            ]
+        },
+        {
             "id": "Layer 2",
             "nodes": [
                 "camera_zoom (1)",
@@ -2932,7 +2951,6 @@
         },
         {
             "id": "New layer 4",
-            "is_open_in_editor": false,
             "nodes": [
                 "Vent wall end-Dup-1 (16)",
                 "Vent wall end-Dup-1 (1)"
@@ -2940,7 +2958,6 @@
         },
         {
             "id": "New layer 3",
-            "is_open_in_editor": false,
             "nodes": [
                 "lab_wall_smooth_end (1)",
                 "lab_wall_smooth_end"
@@ -2991,7 +3008,6 @@
         },
         {
             "id": "cargo",
-            "is_open_in_editor": false,
             "nodes": [
                 "Strong lamp (10)",
                 "Strong lamp (12)",
@@ -4727,7 +4743,6 @@
     "scratchpad_layers": [
         {
             "id": "callouts",
-            "is_open_in_editor": false,
             "active": false,
             "nodes": [
                 "Jungle",
@@ -4789,6 +4804,7 @@
         },
         {
             "id": "waypoints_A",
+            "active": false,
             "nodes": [
                 "bot_waypoint_patrol (11)",
                 "bot_waypoint_patrol (10)",
@@ -4813,6 +4829,7 @@
         },
         {
             "id": "waypoints_push",
+            "active": false,
             "nodes": [
                 "bot_waypoint_push (11)",
                 "bot_waypoint_push (6)",
@@ -4828,6 +4845,7 @@
         },
         {
             "id": "waypoints_C",
+            "active": false,
             "nodes": [
                 "bot_waypoint_patrol (25)",
                 "bot_waypoint_patrol (26)",
@@ -4845,6 +4863,7 @@
         },
         {
             "id": "waypoints_B",
+            "active": false,
             "nodes": [
                 "bot_waypoint_patrol (43)",
                 "bot_waypoint_patrol (42)",
@@ -17522,6 +17541,84 @@
             "letter": "B",
             "pos": [2391.0, -4924.0],
             "rotation": 160.484130859375
+        },
+        {
+            "id": "bot_waypoint_patrol (45)",
+            "type": "bot_waypoint_patrol",
+            "letter": "C",
+            "pos": [905.0, 3382.0],
+            "rotation": -171.13238525390625
+        },
+        {
+            "id": "bot_waypoint_patrol (46)",
+            "type": "bot_waypoint_patrol",
+            "letter": "C",
+            "pos": [999.0, 3387.0],
+            "rotation": -32.31672668457031
+        },
+        {
+            "id": "bot_waypoint_patrol (47)",
+            "type": "bot_waypoint_patrol",
+            "letter": "C",
+            "camp_look_far": true,
+            "pos": [609.0, 3381.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "bot_waypoint_patrol (48)",
+            "type": "bot_waypoint_patrol",
+            "letter": "C",
+            "camp_look_far": true,
+            "pos": [1303.0, 3382.0],
+            "rotation": -90.37942504882813
+        },
+        {
+            "id": "bot_waypoint_patrol (49)",
+            "type": "bot_waypoint_patrol",
+            "letter": "C",
+            "camp_look_far": true,
+            "pos": [3253.0, 2367.0],
+            "rotation": -154.5195770263672
+        },
+        {
+            "id": "bot_waypoint_patrol (50)",
+            "type": "bot_waypoint_patrol",
+            "letter": "C",
+            "camp_look_far": true,
+            "pos": [3253.0, 1860.0],
+            "rotation": -206.6573028564453
+        },
+        {
+            "id": "bot_waypoint_patrol (51)",
+            "type": "bot_waypoint_patrol",
+            "pos": [1358.0, -449.0],
+            "rotation": 12.326492309570313
+        },
+        {
+            "id": "bot_waypoint_patrol (52)",
+            "type": "bot_waypoint_patrol",
+            "pos": [2233.0, -723.0]
+        },
+        {
+            "id": "bot_waypoint_patrol (53)",
+            "type": "bot_waypoint_patrol",
+            "pos": [1940.0, -440.0],
+            "rotation": 88.98779296875
+        },
+        {
+            "id": "bot_waypoint_patrol (54)",
+            "type": "bot_waypoint_patrol",
+            "faction": "RESISTANCE",
+            "letter": "B",
+            "pos": [3840.0, -3209.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "bot_waypoint_patrol (55)",
+            "type": "bot_waypoint_patrol",
+            "letter": "B",
+            "pos": [3837.0, -4209.0],
+            "rotation": -180.0
         },
         {
             "id": "Servers (8)",

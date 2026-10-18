@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-10-17 17:51:42.223220 UTC"
+        "version_timestamp": "2026-10-18 21:40:33.523572 UTC"
     },
     "about": {
         "author": "lia",
@@ -554,34 +554,6 @@
             ]
         },
         {
-            "id": "Layer 1",
-            "nodes": [
-                "bot_waypoint_patrol (11)",
-                "bot_waypoint_patrol (10)",
-                "bot_waypoint_patrol (9)",
-                "bot_waypoint_patrol (8)",
-                "bot_waypoint_patrol (7)",
-                "bot_waypoint_patrol (13)",
-                "bot_waypoint_patrol (12)",
-                "bot_waypoint_patrol (6)",
-                "bot_waypoint_patrol (4)",
-                "bot_waypoint_patrol (5)",
-                "bot_waypoint_push (2)",
-                "bot_waypoint_push (1)",
-                "bot_waypoint_push",
-                "bot_waypoint_patrol (3)",
-                "bot_waypoint_patrol (2)",
-                "bot_waypoint_patrol (15)",
-                "bot_waypoint_push (5)",
-                "bot_waypoint_push (4)",
-                "bot_waypoint_push (6)",
-                "bot_waypoint_push (3)",
-                "bot_waypoint_patrol (14)",
-                "bot_waypoint_patrol (1)",
-                "bot_waypoint_patrol"
-            ]
-        },
-        {
             "id": "New layer 1",
             "opacity": 0.0,
             "nodes": [
@@ -765,7 +737,6 @@
         },
         {
             "id": "sounds",
-            "is_open_in_editor": false,
             "nodes": [
                 "Air ambience left",
                 "Air ambience right",
@@ -1217,6 +1188,36 @@
                 "Tile11 (2)",
                 "Tile11 (3)",
                 "Tile7 (1)"
+            ]
+        }
+    ],
+    "scratchpad_layers": [
+        {
+            "id": "waypoints",
+            "nodes": [
+                "bot_waypoint_patrol (11)",
+                "bot_waypoint_patrol (10)",
+                "bot_waypoint_patrol (9)",
+                "bot_waypoint_patrol (8)",
+                "bot_waypoint_patrol (7)",
+                "bot_waypoint_patrol (13)",
+                "bot_waypoint_patrol (12)",
+                "bot_waypoint_patrol (6)",
+                "bot_waypoint_patrol (4)",
+                "bot_waypoint_patrol (5)",
+                "bot_waypoint_push (2)",
+                "bot_waypoint_push (1)",
+                "bot_waypoint_push",
+                "bot_waypoint_patrol (3)",
+                "bot_waypoint_patrol (2)",
+                "bot_waypoint_patrol (15)",
+                "bot_waypoint_push (5)",
+                "bot_waypoint_push (4)",
+                "bot_waypoint_push (6)",
+                "bot_waypoint_push (3)",
+                "bot_waypoint_patrol (14)",
+                "bot_waypoint_patrol (1)",
+                "bot_waypoint_patrol"
             ]
         }
     ],

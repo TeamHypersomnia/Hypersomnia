@@ -2,7 +2,7 @@
     "meta": {
         "game_version": "1.1.7967",
         "name": "fy_minilab",
-        "version_timestamp": "2026-10-17 17:53:44.105775 UTC"
+        "version_timestamp": "2026-10-18 21:39:56.545591 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -13,6 +13,9 @@
         "ambient_light_color": [51, 93, 98, 255],
         "sun_shadows": {
             "strength": 0.6000000238418579
+        },
+        "bot_waypoints": {
+            "mode": "RANDOM_EVERY_ROUND"
         }
     },
     "playtesting": {
@@ -47,49 +50,6 @@
             "id": "Layer 2",
             "nodes": [
                 "nav_island"
-            ]
-        },
-        {
-            "id": "waypoints_push",
-            "nodes": [
-                "bot_waypoint_push (6)",
-                "bot_waypoint_push (5)",
-                "bot_waypoint_push (4)",
-                "bot_waypoint_push (3)",
-                "bot_waypoint_push (8)",
-                "bot_waypoint_push (7)",
-                "bot_waypoint_push (2)",
-                "bot_waypoint_push (1)",
-                "bot_waypoint_push"
-            ]
-        },
-        {
-            "id": "waypoints_b",
-            "nodes": [
-                "bot_waypoint_patrol (15)",
-                "bot_waypoint_patrol (18)",
-                "bot_waypoint_patrol (17)",
-                "bot_waypoint_patrol (16)",
-                "bot_waypoint_patrol (14)",
-                "bot_waypoint_patrol (13)",
-                "bot_waypoint_patrol (12)",
-                "bot_waypoint_patrol (11)",
-                "bot_waypoint_patrol (10)",
-                "bot_waypoint_patrol (9)",
-                "bot_waypoint_patrol (8)"
-            ]
-        },
-        {
-            "id": "waypoints_a",
-            "nodes": [
-                "bot_waypoint_patrol (7)",
-                "bot_waypoint_patrol (6)",
-                "bot_waypoint_patrol (5)",
-                "bot_waypoint_patrol (4)",
-                "bot_waypoint_patrol (3)",
-                "bot_waypoint_patrol (2)",
-                "bot_waypoint_patrol (1)",
-                "bot_waypoint_patrol"
             ]
         },
         {
@@ -360,6 +320,51 @@
             "id": "ground",
             "nodes": [
                 "soil"
+            ]
+        }
+    ],
+    "scratchpad_layers": [
+        {
+            "id": "waypoints_push",
+            "nodes": [
+                "bot_waypoint_push (6)",
+                "bot_waypoint_push (5)",
+                "bot_waypoint_push (4)",
+                "bot_waypoint_push (3)",
+                "bot_waypoint_push (8)",
+                "bot_waypoint_push (7)",
+                "bot_waypoint_push (2)",
+                "bot_waypoint_push (1)",
+                "bot_waypoint_push"
+            ]
+        },
+        {
+            "id": "waypoints_b",
+            "nodes": [
+                "bot_waypoint_patrol (15)",
+                "bot_waypoint_patrol (18)",
+                "bot_waypoint_patrol (17)",
+                "bot_waypoint_patrol (16)",
+                "bot_waypoint_patrol (14)",
+                "bot_waypoint_patrol (13)",
+                "bot_waypoint_patrol (12)",
+                "bot_waypoint_patrol (11)",
+                "bot_waypoint_patrol (10)",
+                "bot_waypoint_patrol (9)",
+                "bot_waypoint_patrol (8)"
+            ]
+        },
+        {
+            "id": "waypoints_a",
+            "nodes": [
+                "bot_waypoint_patrol (7)",
+                "bot_waypoint_patrol (6)",
+                "bot_waypoint_patrol (5)",
+                "bot_waypoint_patrol (4)",
+                "bot_waypoint_patrol (3)",
+                "bot_waypoint_patrol (2)",
+                "bot_waypoint_patrol (1)",
+                "bot_waypoint_patrol"
             ]
         }
     ],
