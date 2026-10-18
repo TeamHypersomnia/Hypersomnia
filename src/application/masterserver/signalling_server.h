@@ -12,12 +12,26 @@ void yojimbo_random_bytes( uint8_t * data, int bytes );
 
 class signalling_server {
 public:
-	struct signalling_peer {
-		std::shared_ptr<rtc::WebSocket> ws;
+	/*
+		What the server list shows of a peer - all the main thread is given of it (see get_new_servers_map).
+	*/
+
+	struct signalling_peer_listing {
 		netcode_address_t ip_informational = {};
 
 		double time_hosted = 0.0;
 		double time_last_heartbeat = -1;
+
+		server_heartbeat last_heartbeat;
+		std::array<uint8_t, 32> server_public_key = {};
+
+		bool is_server() const {
+			return time_last_heartbeat != -1.0;
+		}
+	};
+
+	struct signalling_peer : signalling_peer_listing {
+		std::shared_ptr<rtc::WebSocket> ws;
 		double time_last_correct_message = -1;
 
 		/*
@@ -42,20 +56,18 @@ public:
 			return true;
 		}
 
-		server_heartbeat last_heartbeat;
-		std::array<uint8_t, 32> server_public_key = {};
-
 		// TODO_SECURITY: use proper secure channels
 		std::unordered_set<uint64_t> recvd_messages;
-
-		bool is_server() const {
-			return time_last_heartbeat != -1.0;
-		}
 	};
 
 	using peer_map = std::unordered_map<
 		std::string,
 		signalling_peer
+	>;
+
+	using servers_map = std::unordered_map<
+		std::string,
+		signalling_peer_listing
 	>;
 
 private:
@@ -640,15 +652,23 @@ private:
 	}
 
 public:
-	auto get_new_peers_map() {
-		peer_map cp;
+	/*
+		Only the servers: the list shows nothing else, and copying thousands of clients
+		(their sockets and received guids) for every change wasted memory and time under the lock.
+	*/
 
-		{
-			on_peers([&](const auto& peers) { 
-				cp = peers; 
-				dirty = false;
-			});
-		}
+	auto get_new_servers_map() {
+		servers_map cp;
+
+		on_peers([&](const auto& peers) {
+			for (const auto& p : peers) {
+				if (p.second.is_server()) {
+					cp.emplace(p.first, static_cast<const signalling_peer_listing&>(p.second));
+				}
+			}
+
+			dirty = false;
+		});
 
 		return cp;
 	}

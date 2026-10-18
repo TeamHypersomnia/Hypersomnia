@@ -426,7 +426,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		}
 	};
 
-	auto previous_peers = signalling_server::peer_map();
+	auto previous_web_servers = signalling_server::servers_map();
 
 	/*
 		A browser joins an official server by its alias (e.g. /game/ranked-pl:1) - only an official server has one.
@@ -479,7 +479,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 		rebuild_webrtc_aliases();
 
-		const auto peer_map = signalling.get_new_peers_map();
+		const auto web_servers = signalling.get_new_servers_map();
 
 		std::lock_guard<std::shared_mutex> lock(serialized_list_mutex);
 
@@ -499,11 +499,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 
-		for (auto& server : peer_map) {
-			if (!server.second.is_server()) {
-				continue;
-			}
-
+		for (auto& server : web_servers) {
 			if (!server.second.last_heartbeat.show_on_server_list) {
 				continue;
 			}
@@ -521,18 +517,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			augs::write_bytes(ss, meta);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 
-			bool push_webhook = false;
-
-			if (!found_in(previous_peers, server.first)) {
-				push_webhook = true;
-			}
-			else {
-				if (!previous_peers[server.first].is_server()) {
-					push_webhook = true;
-				}
-			}
-
-			if (push_webhook) {
+			if (!found_in(previous_web_servers, server.first)) {
 				push_new_server_webhook(
 					ip_address,
 					server.second.last_heartbeat,
@@ -541,7 +526,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 		}
 
-		previous_peers = peer_map;
+		previous_web_servers = web_servers;
 
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
@@ -647,11 +632,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			);
 		}
 
-		for (const auto& server : peer_map) {
-			if (!server.second.is_server()) {
-				continue;
-			}
-
+		for (const auto& server : web_servers) {
 			if (!server.second.last_heartbeat.show_on_server_list) {
 				continue;
 			}
