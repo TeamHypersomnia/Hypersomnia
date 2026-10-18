@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cctype>
 #include "augs/string/string_templates.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/arena/arena_paths.h"
@@ -137,17 +139,34 @@ bool editor_project_paths::should_hide_in_explorer(const augs::path_type& path) 
 	}
 
 	/*
-		Stamps, generated neon maps and desaturations are cache artifacts, never project resources.
-		Older builds generated them next to the source images.
+		Stamps, generated neon maps, desaturations and gif frames (anim.gif.0.png) are cache artifacts,
+		never project resources. Older builds generated them next to the source images.
 		A custom neon map (image.neon_map.png) is auxiliary to its image, not a resource either.
 	*/
 
 	const auto filename = path.filename().string();
 
+	const bool is_gif_frame = [&]() {
+		if (!ends_with(filename, ".png")) {
+			return false;
+		}
+
+		const auto stem = path.stem().string();
+		const auto frame_index = path.stem().extension().string();
+
+		const bool numeric_index =
+			frame_index.size() > 1
+			&& std::all_of(frame_index.begin() + 1, frame_index.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)) != 0; })
+		;
+
+		return numeric_index && ends_with(augs::path_type(stem).stem().string(), ".gif");
+	}();
+
 	const bool is_cache_artifact =
 		path.extension() == ".stamp"
 		|| ends_with(filename, ".neon_map.png")
 		|| ends_with(filename, ".desaturation.png")
+		|| is_gif_frame
 	;
 
 	if (is_cache_artifact) {
