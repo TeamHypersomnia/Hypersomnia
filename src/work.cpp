@@ -3757,13 +3757,19 @@ work_result work(
 							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
 						}
 						catch (...) {
-
+							const auto full_content = typesafe_sprintf("Failed to load: %x", loaded_path);
+							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
 						}
 					}
 					catch (...) {
 						LOG("No %x detected. Launching the project selector.", get_editor_last_project_path());
 					}
-					break;
+
+					/*
+						The last project failed to load or there is none - the project selector shows the error, if any.
+					*/
+
+					[[fallthrough]];
 				}
 
 			case activity_type::EDITOR_PROJECT_SELECTOR:
