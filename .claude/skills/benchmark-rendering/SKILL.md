@@ -38,6 +38,16 @@ One run with alternating phases cancels out scene, thermal and clock differences
     Still never name the copy like the original.
   - The editor camera comes from `editor_view.json` (`panned_camera.transform.pos`, `zoom`) - set it to frame
     what is measured, e.g. zoom 0.45 at the average position of the lights to catch many of them.
+  - A frame "saved" by the user reaches `editor_view.json` only when their editor quits - ask them to quit it first,
+    and check that the camera lies within the map (the min/max of the nodes' `pos` in the map json).
+    `Num visible entities: 0` and ~1200 FPS in the profile mean an empty camera, not a fast scene.
+  - Downloaded maps: `hypersomnia/user/downloads/arenas` may be a symlink (to `~/poprawionemapy` in Oct 2026) - resolve it
+    with `readlink -f` before deciding which copy the user edits. `~/.config/Hypersomnia/...` holds older copies.
+  - Editor playtests run the map's `playtesting.mode`. `quick_test` spawns no bots even with `spawn_bots` -
+    set `"mode": "bomb_defusal"` in the scratch copy to measure bots.
+- **Screenshots of the game:** `import -window $(xwininfo -name <title> | awk '/Window id/{print $4}') out.png`.
+  Never `import -window root` - it captures whatever the user has on screen. A window on another i3 workspace is unmapped
+  and comes out black; on X11 without a compositor it still renders (the timings stay valid).
 - **Never use `--apply-config` for a benchmark variant:** the patch lands in `user/runtime_prefs.json` when the game quits
   (even on `timeout`'s SIGTERM), silently changing the user's settings. Back up `runtime_prefs.json` and diff it after the run,
   or toggle the setting in code with a `/* BENCH TEMP */` flag. The editor also saves its camera to `editor_view.json` on quit -
@@ -58,7 +68,33 @@ One run with alternating phases cancels out scene, thermal and clock differences
   The user often keeps one open (launched via `ninja run -C build/current`), or plays the release AppImage between runs -
   it runs as `/tmp/.mount_*/usr/bin/Hypersomnia`, which a `build/` grep misses, and took 320% CPU in one case. It skews the absolute CPU numbers and FPS -
   ask them to close it rather than killing it, then rerun. An A/B in one run keeps the ratio roughly right even then.
-
+- **Detect disturbances during every run, not only before it:** the user compiles, plays and runs other agents meanwhile.
+  Sample every second with `top -b -n2 -d1` (the second iteration - `ps` pcpu is a lifetime average and misleads)
+  for `ninja|clang++|cc1plus|ld.lld|Hypersomnia|Xvfb` above ~3% CPU, and drop and rerun a run that had any.
+  Also drop runs whose `BENCHPROF` shows `Debug details` (~0.4-0.5 ms) - the user opened the performance overlay in the window.
+  A game started from Claude's shell inherits nice 5 (only root can lower it) - fine when the machine is idle.
+- **Name the benchmark binary:** a symlink in `build/current` (e.g. `HypersomniaBenchJedrula -> Hypersomnia`) makes the process
+  distinct from the user's game. Kill it with `pkill -x HypersomniaBenc` (comm is cut to 15 chars) - `pkill -f <pattern>`
+  kills Claude's own shell, whose command line contains the pattern.
+- **A separate worktree for the instrumentation** (`git worktree add --detach`, submodules copied as described below):
+  the user and other agents keep building the main checkout. `git stash` in a worktree shares the stash list with
+  the main checkout - save the instrumentation with `git diff > patch` instead, and `git apply --3way` it onto a newer master.
+  Port the final fix to the main checkout without the `/* BENCH TEMP */` hunks and commit only those files (`git commit -o`).
+- **Ready instrumentation** in `instrumentation/` next to this file (header-only, include them where marked):
+  - `bench_gpu_segments.h` - the per pass GPU timing below. Hooks: `bench_gpu::set_fbo(id)` in `fbo::set_as_current_impl`
+    (0 in `set_current_to_none_impl`), `set_prog(id)` in `shader_program::set_as_current_impl`, `set_tag(int)` for the
+    `light_pass` uniform in `shader_program::perform(set_uniform_command)`, `on_draw(tris)` after `glDrawArrays`,
+    `begin_frame()` / `end_frame(frame_s)` around the `renderer_backend.perform` loop in `work.cpp`.
+    `BENCH_GPU=0` switches the blocking readback off and keeps only `BENCHFRAME` (FPS, p50/p90/p99/max frame time).
+  - `bench_jobs.h` - CPU time of the thread pool jobs per frame: `bench_jobs::scope(bench_jobs::FOW)` at the top of
+    `fow_job`, `LIGHT` in `light_job` (`launch_visibility_jobs.cpp`), `ILLUM` / `GAME_GUI` / `POST_GUI` in the jobs of `work.cpp`,
+    `HELP_WALL` around `help_until_no_tasks` + `wait_for_all_tasks_to_complete`, `end_frame()` after it.
+    The other slots served as plain counters (`ns[slot] += n`, printed /1e6 per frame).
+  - `bench_cpu_timers.h` - per simulation step: `report_and_reset()` + `scope(STEP)` at the top of `standard_solve`,
+    `scope(...)` in the AI and pathfinding functions. When `report_and_reset()` returns true, log the cosmos profiler too
+    (`performance.prepare_summary_info(); performance.summary(s);` - needs `augs/templates/introspect.h` in that file).
+- **"Help tasks" in the game thread profile is the wait for the thread pool** - the frame waits for its longest job.
+  Time each job (`bench_jobs.h`): the parallel light jobs sum up high but rarely matter; a single long job does.
 - **Which pass eats the GPU:** time segments of the command stream - `glQueryCounter(GL_TIMESTAMP)` in `renderer_backend::perform`
   at every change of the bound FBO (`fbo::set_as_current_impl`) or program (`shader_program::set_as_current_impl`), read back
   blocking at the frame end, summed per (fbo id, program id). Log the ids at creation (`fbo::fbo`, the path ctor of `shader_program`)
@@ -188,3 +224,18 @@ Skipping pass 3 with a scissored reach saved only ~0.05 ms - not worth the mask 
 
 The shell smoke `overlay_smoke` FBO pass with no shells on screen (Sep 2026, RX 5700, 1918×1060):
 0.518 vs 0.498 ms GPU per frame (+0.02 ms, ~4%), no FPS difference (~1110 both), 8 MB of VRAM.
+
+de_jedrula (Oct 2026, RX 5700, 1918x1060, a big map of 64 px wall tiles) - the slowdowns were CPU, not lights:
+- Editor with the navmesh overlay on drew every cell of the map (~26k quads): GUI 1.6-2.7 ms of CPU, ~200 vs ~370 FPS off.
+  Fixed by drawing only the cells in view (34406820e).
+- Playtest by the portal ~425 FPS with only 2 ms of GPU: the thread pool waited 1.65 ms for `fow_job` - the viewer's
+  fog of war polygon, single-threaded, ~500 rays over the whole fog of war area (size * 2 = 5100x2900 px).
+  Rays only within the screen and the field of view angle (`only_within` of the visibility request, 172c5650b):
+  0.29 ms, ~835 FPS. Checked against the full polygon on a grid of 8 px cells within the screen and the angle -
+  at most 2 of 58140 cells differ; the eye must stay off the bounds of the rect (looking straight up broke the polygon).
+- Tried and dropped: the fog of war as shadows extruded from every obstacle (like the masks of lights with a height,
+  no ray casts). CPU 0.75 ms for the full area, 0.27 ms clipped, but the long overlapping shadows of the many tiles
+  overdraw the stencil on screen: +0.07-0.09 ms GPU (~2300 triangles instead of ~100), and ~790 vs ~830 FPS against
+  the clipped ray casts. Rasterizing off screen costs nothing - the overdraw on screen does.
+- Bots (9, HARD, bomb_defusal): the AI 0.1-0.3 ms per step, pathfinding spikes up to ~1.8 ms in a step
+  (`find_path_across_islands_many`), 630-1130 FPS - not what dropped the FPS.
