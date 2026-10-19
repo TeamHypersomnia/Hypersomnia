@@ -22,8 +22,9 @@
 	- "Sun" has its own shadow.
 	- Point lights are fully physical.
 	- Shadows of walls, characters, corpses, everything.
+- **Better portals.**
 - **Favorite servers.**
-- **Pixel-art explosions.**
+- **Better explosions.**
 - **Realistic gun shells.**
 	- Casings bounce, roll and get kicked around.
 - **Simplified inventory.**

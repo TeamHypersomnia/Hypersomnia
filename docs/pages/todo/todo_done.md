@@ -7572,3 +7572,10 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 
 - tutorial o backpacku tera jedna awka tylko
 - tutorial zaktualizowac o granasy i jak to carrying dodamy na plerach to tez te przejscia
+
+- randomizacja waypointow co runde, fajnie by bylo, mozna na bazie kwerend widzialnosci kilku przy starcie rundy jakby to byla milisekunda lub dwie.
+
+- changelog, wpis i zeby dzialalo w liderbordach
+
+- przeniesc fixy z jedruli na master
+- is open in editor -> editor view

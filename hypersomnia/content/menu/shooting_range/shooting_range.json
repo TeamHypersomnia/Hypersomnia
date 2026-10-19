@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-10-05 00:52:10.487298 UTC"
+        "version_timestamp": "2026-10-19 14:56:14.113168 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -250,14 +250,12 @@
         },
         {
             "id": "Layer 30",
-            "is_open_in_editor": false,
             "nodes": [
                 "bombsite"
             ]
         },
         {
             "id": "Layer 29",
-            "is_open_in_editor": false,
             "nodes": [
                 "bomb (1)",
                 "bomb"
@@ -265,7 +263,6 @@
         },
         {
             "id": "Layer 28",
-            "is_open_in_editor": false,
             "nodes": [
                 "minimap_marker (1)",
                 "minimap_marker",
@@ -294,19 +291,16 @@
             ]
         },
         {
-            "id": "Layer 26",
-            "is_open_in_editor": false
+            "id": "Layer 26"
         },
         {
             "id": "Layer 25",
-            "is_open_in_editor": false,
             "nodes": [
                 "nav_island"
             ]
         },
         {
             "id": "Layer 24",
-            "is_open_in_editor": false,
             "nodes": [
                 "green_coin (5)",
                 "green_coin (4)",
@@ -326,16 +320,13 @@
             ]
         },
         {
-            "id": "Layer 23",
-            "is_open_in_editor": false
+            "id": "Layer 23"
         },
         {
-            "id": "Layer 22",
-            "is_open_in_editor": false
+            "id": "Layer 22"
         },
         {
-            "id": "Layer 21",
-            "is_open_in_editor": false
+            "id": "Layer 21"
         },
         {
             "id": "Layer 20",
@@ -346,8 +337,7 @@
             ]
         },
         {
-            "id": "Layer 19",
-            "is_open_in_editor": false
+            "id": "Layer 19"
         },
         {
             "id": "Layer 33",
@@ -409,7 +399,6 @@
         },
         {
             "id": "Layer 17",
-            "is_open_in_editor": false,
             "nodes": [
                 "sword-right (1)",
                 "sword-right",
@@ -418,24 +407,20 @@
             ]
         },
         {
-            "id": "Layer 16",
-            "is_open_in_editor": false
+            "id": "Layer 16"
         },
         {
             "id": "Layer 15",
-            "is_open_in_editor": false,
             "nodes": [
                 "bilmik (1)",
                 "bilmik"
             ]
         },
         {
-            "id": "Layer 14",
-            "is_open_in_editor": false
+            "id": "Layer 14"
         },
         {
             "id": "Layer 13",
-            "is_open_in_editor": false,
             "nodes": [
                 "vindicator (2)",
                 "vindicator"
@@ -443,7 +428,6 @@
         },
         {
             "id": "Layer 10",
-            "is_open_in_editor": false,
             "nodes": [
                 "szczur (2)",
                 "szczur"
@@ -451,7 +435,6 @@
         },
         {
             "id": "Layer 6",
-            "is_open_in_editor": false,
             "nodes": [
                 "aquarium_ambience_right",
                 "aquarium_ambience_left"
@@ -467,7 +450,6 @@
         },
         {
             "id": "Layer 4",
-            "is_open_in_editor": false,
             "nodes": [
                 "portal (7)",
                 "portal (6)",
@@ -479,14 +461,12 @@
         },
         {
             "id": "Layer 3",
-            "is_open_in_editor": false,
             "nodes": [
                 "aquarium"
             ]
         },
         {
             "id": "knifes",
-            "is_open_in_editor": false,
             "nodes": [
                 "assault_rattle-right (1)",
                 "fury_thrower-right (1)",
@@ -520,7 +500,6 @@
         },
         {
             "id": "portals",
-            "is_open_in_editor": false,
             "nodes": [
                 "portal (1)",
                 "portal (3)",
@@ -530,7 +509,6 @@
         },
         {
             "id": "Layer 2",
-            "is_open_in_editor": false,
             "nodes": [
                 "Water room floor 2 (4)",
                 "range_spawn"
@@ -538,7 +516,6 @@
         },
         {
             "id": "Layer 12",
-            "is_open_in_editor": false,
             "nodes": [
                 "force_grenade (1)-down-down (1)",
                 "flashbang (1)-down-down (1)",
@@ -607,12 +584,10 @@
             ]
         },
         {
-            "id": "Layer 11",
-            "is_open_in_editor": false
+            "id": "Layer 11"
         },
         {
-            "id": "Layer 9",
-            "is_open_in_editor": false
+            "id": "Layer 9"
         },
         {
             "id": "Layer 8",
@@ -639,7 +614,6 @@
         },
         {
             "id": "weapons2-right",
-            "is_open_in_editor": false,
             "nodes": [
                 "cyberspray-right",
                 "warx-right",
@@ -658,7 +632,6 @@
         },
         {
             "id": "weapons1-right",
-            "is_open_in_editor": false,
             "nodes": [
                 "elon-right",
                 "lews-right",
@@ -675,7 +648,6 @@
         },
         {
             "id": "weapons1",
-            "is_open_in_editor": false,
             "nodes": [
                 "elon",
                 "lews",
@@ -694,7 +666,6 @@
         },
         {
             "id": "weapons2",
-            "is_open_in_editor": false,
             "nodes": [
                 "cyberspray",
                 "warx",
@@ -1682,13 +1653,10 @@
             "pos": [2945.0, 1297.0],
             "color": [255, 183, 71, 94],
             "falloff": {
-                "radius": 752.2059936523438,
-                "intensity": 0.8100000023841858,
-                "falloff": 0.46000000834465027
+                "radius": 752.2059936523438
             },
             "wall_falloff": {
-                "radius": 962.9630126953125,
-                "intensity": 0.6600000262260437
+                "radius": 962.9630126953125
             }
         },
         {
@@ -1697,9 +1665,7 @@
             "pos": [1.0, 4095.0],
             "color": [0, 180, 255, 65],
             "falloff": {
-                "radius": 676.364013671875,
-                "intensity": 0.9300000071525574,
-                "falloff": 0.0
+                "radius": 676.364013671875
             },
             "intensity_vibration": 0.0
         },
@@ -1709,9 +1675,7 @@
             "pos": [-1.0, 4609.0],
             "color": [255, 255, 255, 13],
             "falloff": {
-                "radius": 676.364013671875,
-                "intensity": 1.399999976158142,
-                "falloff": 0.0
+                "radius": 676.364013671875
             },
             "intensity_vibration": 0.0,
             "height": 0.0
@@ -1722,9 +1686,7 @@
             "pos": [-1.0, 5117.0],
             "color": [0, 255, 126, 46],
             "falloff": {
-                "radius": 676.364013671875,
-                "intensity": 1.1200000047683716,
-                "falloff": 0.0
+                "radius": 676.364013671875
             },
             "intensity_vibration": 0.0,
             "height": 100.0
@@ -1735,9 +1697,7 @@
             "pos": [-3585.0, 4483.0],
             "color": [0, 157, 255, 41],
             "falloff": {
-                "radius": 1240.0,
-                "intensity": 1.2400000095367432,
-                "falloff": 0.0
+                "radius": 1240.0
             },
             "intensity_vibration": 0.0,
             "cast_shadows": false
@@ -1748,9 +1708,7 @@
             "pos": [-3585.0, 3201.0],
             "color": [0, 157, 255, 41],
             "falloff": {
-                "radius": 1240.0,
-                "intensity": 1.2400000095367432,
-                "falloff": 0.0
+                "radius": 1240.0
             },
             "intensity_vibration": 0.0,
             "cast_shadows": false
@@ -1760,9 +1718,7 @@
             "type": "point_light",
             "pos": [-3777.0, 4161.0],
             "falloff": {
-                "radius": 221.8179931640625,
-                "intensity": 0.7599999904632568,
-                "falloff": 0.4699999988079071
+                "radius": 221.8179931640625
             },
             "intensity_vibration": 0.0
         },
@@ -1771,9 +1727,7 @@
             "type": "point_light",
             "pos": [-3265.0, 4033.0],
             "falloff": {
-                "radius": 221.8179931640625,
-                "intensity": 0.7599999904632568,
-                "falloff": 0.4699999988079071
+                "radius": 221.8179931640625
             },
             "intensity_vibration": 0.0
         },
@@ -1782,9 +1736,7 @@
             "type": "point_light",
             "pos": [-3393.0, 3521.0],
             "falloff": {
-                "radius": 221.8179931640625,
-                "intensity": 0.7599999904632568,
-                "falloff": 0.4699999988079071
+                "radius": 221.8179931640625
             },
             "intensity_vibration": 0.0
         },
@@ -1794,9 +1746,7 @@
             "pos": [-153.0, 2234.0],
             "color": [255, 0, 255, 60],
             "falloff": {
-                "radius": 676.364013671875,
-                "intensity": 0.9800000190734863,
-                "falloff": 0.0
+                "radius": 676.364013671875
             },
             "intensity_vibration": 0.0
         },
@@ -1806,9 +1756,7 @@
             "pos": [574.0, 2747.0],
             "color": [0, 255, 0, 60],
             "falloff": {
-                "radius": 676.364013671875,
-                "intensity": 0.9800000190734863,
-                "falloff": 0.0
+                "radius": 676.364013671875
             },
             "intensity_vibration": 0.0
         },

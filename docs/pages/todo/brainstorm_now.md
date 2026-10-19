@@ -6,14 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- rozlozyc generacje tych navpointow kiedys potem na kilka klatek
+- literki - domyslnie closest, mozna wybrac konkretna jak sie chce
+- poorganizowac te skile do audytow
+
 - potem do botow jakas taka fejkowa nawigacje zeby te sciany durne im nie przeszkadzaly bo i tak nikt tego nie zauwazy, byleby po navmeshu lazily i ewentualnie oznaczac jakies miejsca gdzie musza sie skitrac z ta bronia schowac to moze byc poza navmeshem tylko laczone jakims pseudoportalem kafelki jedna z druga na tej samej mapie to moze doslownie jak portal dzialac. imo boty powinny miec kolizje ze scianami w postaci malego koleczka w centrum ich pozycji a nie calej sylwetki, i rozmiar tego koleczka by zalezal od wielkosci navmesha tak by bylo idealnie, jedynie zeby trzymane bronie zawsze robily odglos na begin contact ze sciana np. z limitem uderzen na x sekund bo beda czesto wchodzily. albo jeszcze leipej bralbym ksztalt sylwetki gracza ale pomniejszalbym ja proporcjonalnie do tego jaki jest ratio teraz miedzy kafelkiem navmesha a wielkoscia sylwetki bo tak jak mamy tearz to jest dopracowane, i w tych mniejszych bym po prostu totalnie wylaczal te kolizje z bronmi. bo jakbysmy tez pomniejszali te bronie to dziwnie by wychodzily do kolidery albo bylyby odstepy jakies dziwne. no niby mozna byloby do samych kolizji ale to do dupy bo jak ustawimy je w miejscu gdize sa te bronie to nadal kolidery beda sumarycznie rozpiete na  ta iweksza odleglosc aj ak bedziemy je przyblizac do gracza to wypadna w innych miejscach zupelnie niz sa te kolidery. wiec chyba bym za sylwetka gracza sama optowal.
  
-
-- randomizacja waypointow co runde, fajnie by bylo, mozna na bazie kwerend widzialnosci kilku przy starcie rundy jakby to byla milisekunda lub dwie.
-
 - inventory jest przekurwienie przekomplikowany, zaproponuj jakies kardynalne uproszczenia architektury inventory bez utraty wszystkich zalozen gameplayowych ktore mamy juz. np nie wiem rzeczy typu w chamberze nie musi byc prawdziwy entity tylko np. zaznaczyc czy istnieje w chamberze bulet juz i z flavora dla tej broni juz mozna potem spawnowac ten entity. magazynki tez nie musza miec stackow pociskow bo nie mamy i tak ladowania roznych rodzajow pociskow do magazynku. stackable charge chyba musza byc bo strzelby to wiadomo, stack pociskow sie przelewa do komory.
-
-- changelog, wpis i zeby dzialalo w liderbordach
 
 - jakis lepszy feedback kamery przy strzelaniu
 - glosne alerty kiedys zapiac na failure rankedow lub polaczen, na telegrama
