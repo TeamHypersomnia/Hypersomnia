@@ -74,7 +74,8 @@
 - Shortened bullet traces a bit as they were a bit excessive.
 - Bots see only as far as a player standing in their spot would.
 - Bots using sniper rifles wait a moment before the first shot. 
-- Losing to a **weaker opponent** costs at most as much MMR as losing to an equal one.
+- Ranked: losing to a **weaker opponent** is as if you lost to an equal one.
+	- No need to fear a catastrophic MMR loss when you're a high-ranked player.
 
 ### Fixed
 
