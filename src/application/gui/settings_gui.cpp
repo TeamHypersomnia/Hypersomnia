@@ -4198,11 +4198,17 @@ void settings_gui_state::perform(
 
 							copy_icon_button("AccountId", is_key ? "0x" + current_account_id.substr(4) : current_account_id);
 
+#if !WEB_CRAZYGAMES
+							/*
+								No links out of the game on CrazyGames.
+							*/
+
 							ImGui::SameLine();
 
 							if (ImGui::Button("View profile")) {
 								augs::open_url(config.website_url + "/user/" + current_account_id);
 							}
+#endif
 
 							if (is_key && !signed_in.provider_label.empty()) {
 								/*
