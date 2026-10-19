@@ -35,7 +35,7 @@ namespace augs {
 		}
 
 		const auto dir = vec2(direction).normalize();
-		const auto min_dot = std::cos(half_angle_degrees * DEG_TO_RAD<real32>);
+		const auto min_dot = repro::cos(half_angle_degrees * DEG_TO_RAD<real32>);
 
 		const std::array<vec2, 4> corners = { rect.lt(), rect.rt(), rect.rb(), rect.lb() };
 
@@ -56,7 +56,7 @@ namespace augs {
 			const auto edge = b - a;
 			const auto denom = ray_dir.cross(edge);
 
-			if (std::abs(denom) < AUGS_EPSILON<real32>) {
+			if (repro::fabs(denom) < AUGS_EPSILON<real32>) {
 				return std::nullopt;
 			}
 
@@ -75,7 +75,7 @@ namespace augs {
 			const auto side_dir = vec2(dir).rotate(side);
 
 			for (std::size_t i = 0; i < corners.size(); ++i) {
-				if (const auto hit = ray_segment_hit(side_dir, corners[i], corners[(i + 1) % corners.size()])) {
+				if (const auto hit = ray_segment_hit(side_dir, corners[i], corners[(i + 1) % corners.size()]); hit.has_value()) {
 					contain(*hit);
 				}
 			}

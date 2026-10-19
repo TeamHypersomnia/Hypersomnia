@@ -262,6 +262,13 @@ struct minimap_settings {
 	}
 
 	/*
+		The minimap overlay draws the fog of war beyond the screen.
+	*/
+	bool can_draw_fog_of_war_overlay() const {
+		return is_ever_visible() && fog_of_war_color.a > 0;
+	}
+
+	/*
 		Whether the minimap permanently occupies the given corner,
 		so the other HUD elements have to make room for it there.
 	*/

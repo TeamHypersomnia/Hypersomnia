@@ -7520,14 +7520,22 @@ work_result work(
 				*/
 
 				const auto fow_needed_only_in = [&]() -> std::optional<ltrb> {
-					if (new_viewing_config.drawing.minimap.fog_of_war_color.a > 0) {
+					if (new_viewing_config.drawing.minimap.can_draw_fog_of_war_overlay()) {
 						return std::nullopt;
 					}
 
+					const auto pixel_snap_margin = 16.0f;
+
 					auto screen = get_camera_cone(new_viewing_config).get_visible_world_rect_aabb();
-					screen.expand_from_center(vec2::square(16.0f));
+					screen.expand_from_center(vec2::square(pixel_snap_margin));
 					return screen;
 				}();
+
+				const auto fow_look_direction =
+					viewed_character ?
+					::calc_look_direction(viewed_character, calc_pre_step_crosshair_displacement(new_viewing_config)) :
+					vec2::zero
+				;
 
 				const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
@@ -7552,7 +7560,7 @@ work_result work(
 					viewed_character_transform ? *viewed_character_transform : transformr(),
 					fog_of_war,
 					fow_needed_only_in,
-					viewed_character ? ::calc_look_direction(viewed_character, calc_pre_step_crosshair_displacement(new_viewing_config)) : vec2::zero,
+					fow_look_direction,
 					new_viewing_config.performance.point_light_shadows.smoothness_mult,
 					new_viewing_config.performance.point_light_shadows.soft,
 					new_viewing_config.performance.point_light_shadows.heights
@@ -7768,7 +7776,7 @@ work_result work(
 
 				const bool draw_fow_overlay =
 					minimap.is_visible(minimap_state) &&
-					minimap.fog_of_war_color.a > 0 &&
+					minimap.can_draw_fog_of_war_overlay() &&
 					minimap_transform.valid &&
 					!fow_triangles.empty()
 				;

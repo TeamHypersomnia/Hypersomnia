@@ -297,14 +297,18 @@ void enqueue_visibility_jobs(
 			Rays only where the fog of war can show at all: within the screen, if it's needed only there,
 			and within the field of view angle - both its consumers draw it through fog_of_war.fsh, which cuts the rest.
 			Every point of that part is seen along a segment from the eye that stays within its bounding box with the eye,
-			so the obstacles past the box can't hide it. A few degrees of margin cover rounding.
+			so the obstacles past the box can't hide it. A few degrees of margin cover the rounding of fog_of_war.fsh at pixel centers.
 		*/
 
 		const auto only_within = [&]() {
 			auto needed = ltrb::center_and_size(eye, full_size);
 
-			if (fow_needed_only_in.has_value()) {
-				needed.clip_by(*fow_needed_only_in);
+			if (fow_needed_only_in.has_value() && !needed.clip_by(*fow_needed_only_in)) {
+				/*
+					Nothing of the fog of war is on the screen - clip_by would leave the world's origin.
+				*/
+
+				needed = ltrb::center_and_size(eye, vec2::zero);
 			}
 
 			const auto fov_margin_degrees = 3.0f;
@@ -319,6 +323,7 @@ void enqueue_visibility_jobs(
 			/*
 				The eye must never lie on the bounds - looking straight up, the sides of the sector run almost level,
 				and the rays grazing the bottom bound right at the eye would break the polygon.
+				Well over the eye's nudge and the 1 px / 3 px epsilons of the visibility system.
 			*/
 
 			const auto eye_margin = 64.0f;
