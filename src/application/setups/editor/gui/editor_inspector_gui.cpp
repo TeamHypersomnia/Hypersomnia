@@ -1076,7 +1076,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 					MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
 
 					MULTIPROPERTY("Pixel particles", as_portal.rings_effect.value.pixel_particles);
-					tooltip_on_hover("Replaces the flat rings with the explosions' pixel art particles:\nevery pulse of each ring spawns a burst of them tracing the ring.");
+					tooltip_on_hover("Replaces the flat rings with the pixel art swirl.\nSettings > Portal effects picks how it is drawn: the real particles (shaped by the parameters below)\nor a shader approximating them (the parameters below don't apply to it).");
 
 					if (insp.as_portal.rings_effect.value.pixel_particles) {
 						auto scope = scoped_indent();

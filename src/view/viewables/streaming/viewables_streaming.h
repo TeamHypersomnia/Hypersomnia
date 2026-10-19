@@ -127,6 +127,12 @@ class viewables_streaming {
 
 public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
+
+	/*
+		The portal swirl shader's data (see portal_swirl.fsh).
+	*/
+
+	std::optional<augs::graphics::texture> portal_swirl_data;
 	std::optional<augs::path_type> requested_avatar_preview;
 
 	/*

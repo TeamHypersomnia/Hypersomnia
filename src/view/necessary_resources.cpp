@@ -94,6 +94,11 @@ all_necessary_shaders::all_necessary_shaders(
 
 	using U = augs::common_uniform_name;
 
+	if (portal_swirl) {
+		portal_swirl->set_as_current(renderer);
+		portal_swirl->set_uniform(renderer, U::basic_texture, portal_swirl_data_texture_unit);
+	}
+
 	if (illuminated) {
 		illuminated->set_as_current(renderer);
 		illuminated->set_uniform(renderer, U::basic_texture, 0);

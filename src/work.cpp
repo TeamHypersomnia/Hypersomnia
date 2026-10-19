@@ -2456,6 +2456,15 @@ work_result work(
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 
+	try {
+		augs::image portal_swirl_data;
+		portal_swirl_data.from_file(PORTAL_SWIRL_DATA);
+		streaming.portal_swirl_data.emplace(portal_swirl_data);
+	}
+	catch (const std::exception& err) {
+		LOG("Failed to load %x: %x. The portals fall back to the shader without data.", PORTAL_SWIRL_DATA, err.what());
+	}
+
 	WEBSTATIC auto get_my_avatar_bytes = [&]() {
 		std::vector<std::byte> avatar;
 
@@ -7280,7 +7289,8 @@ work_result work(
 					cached_visibility.light_requests,
 					viewing_config.streamer_mode && viewing_config.streamer_mode_flags.inworld_hud,
 					std::addressof(minimap_transform),
-					thread_pool
+					thread_pool,
+					streaming.portal_swirl_data ? std::addressof(*streaming.portal_swirl_data) : nullptr
 				};
 			};
 

@@ -45,6 +45,9 @@ namespace augs {
 		smoke_flat_intensity,
 		color_encodes_footprints,
 		smooth_brightening,
+		global_time,
+		zoom,
+		portal_mode,
 
 		COUNT
 		// END GEN INTROSPECTOR

@@ -79,6 +79,7 @@ struct illuminated_rendering_input {
 	const bool streamer_mode;
 	minimap_world_transform* const minimap_transform;
 	augs::thread_pool& pool;
+	const augs::graphics::texture* const portal_swirl_data = nullptr;
 
 	float get_environment_shadow_strength() const;
 	float get_environment_shadow_smoothness() const;

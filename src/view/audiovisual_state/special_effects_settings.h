@@ -86,6 +86,21 @@ struct explosions_settings {
 	bool operator==(const explosions_settings& b) const = default;
 };
 
+/*
+	How the portals' rings are drawn when they have pixel_particles (see continuous_rings_input):
+	the real particles, or a shader approximating them - from formulas, or from the statistics in a data texture.
+*/
+
+enum class portal_effects_type {
+	// GEN INTROSPECTOR enum class portal_effects_type
+	PARTICLES,
+	SHADER,
+	SHADER_WITH_DATA,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct special_effects_settings {
 	// GEN INTROSPECTOR struct special_effects_settings
 	explosions_settings explosions;
@@ -94,6 +109,7 @@ struct special_effects_settings {
 	float particle_stream_amount = 1.f;
 	float particle_burst_amount = 1.f;
 	float portal_particle_amount = 1.f;
+	portal_effects_type portal_effects = portal_effects_type::SHADER_WITH_DATA;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const special_effects_settings& b) const = default;

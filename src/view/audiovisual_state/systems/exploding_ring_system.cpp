@@ -438,7 +438,7 @@ void exploding_ring_system::spawn_portal_particles(
 		[&](const auto& typed_portal_handle) {
 			const auto& portal = typed_portal_handle.template get<components::portal>();
 
-			if (!portal.rings_effect.is_enabled || !portal.rings_effect.value.pixel_particles) {
+			if (!portal.rings_effect.is_enabled || !portal.rings_effect.value.pixel_particles || amount_mult <= 0.f) {
 				return;
 			}
 
@@ -620,6 +620,7 @@ void exploding_ring_system::advance(
 	const augs::delta dt,
 	const explosions_settings& settings,
 	const float portal_particle_amount,
+	const bool portal_particles_enabled,
 	particles_simulation_system& particles_output_for_effects
 ) {
 	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
@@ -825,11 +826,62 @@ void exploding_ring_system::advance(
 				settings,
 				effect->emissions[0],
 				particles,
-				portal_particle_amount,
+				portal_particles_enabled ? portal_particle_amount : 0.f,
 				static_cast<float>(dt.in_seconds())
 			);
 		}
 	}
+}
+
+/*
+	One quad per portal, up to twice its radius - see portal_swirl.fsh.
+*/
+
+void exploding_ring_system::draw_portal_swirls(
+	const cosmos& cosm,
+	const augs::drawer_with_default output,
+	augs::special_buffer& specials,
+	const camera_cone queried_cone,
+	const camera_cone actual_cone
+) const {
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
+	const auto& eye = actual_cone.eye;
+
+	cosm.for_each_having<components::portal>(
+		[&](const auto& typed_portal_handle) {
+			const auto& portal = typed_portal_handle.template get<components::portal>();
+
+			if (!portal.rings_effect.is_enabled) {
+				return;
+			}
+
+			const auto& e = portal.rings_effect.value;
+
+			if (!e.pixel_particles) {
+				return;
+			}
+
+			const auto radius = typed_portal_handle.get_logical_size().smaller_side() / 2;
+			const auto center = typed_portal_handle.get_logic_transform().pos;
+			const auto quad = ltrb::center_and_size(center, vec2::square(radius * 4));
+
+			if (!queried_camera_aabb.hover(quad)) {
+				return;
+			}
+
+			augs::special sp;
+			sp.v1 = actual_cone.to_screen_space(center);
+			sp.v1.y = actual_cone.screen_size.y - sp.v1.y;
+			sp.v2.x = radius * eye.zoom;
+			sp.v2.y = static_cast<float>(std::hash<entity_id>()(typed_portal_handle.get_id()) % 65536);
+
+			output.aabb(ltrbi(quad), e.inner_color);
+
+			for (int s = 0; s < 6; ++s) {
+				specials.push_back(sp);
+			}
+		}
+	);
 }
 
 void exploding_ring_system::draw_continuous_rings(

@@ -1415,6 +1415,24 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::SENTIENCE_INDICATORS);
 	renderer.call_triangles(D::INDICATORS_AND_CALLOUTS);
 
+	if (const auto portal_effects = in.perf_settings.special_effects.portal_effects;
+		shaders.portal_swirl && portal_effects != portal_effects_type::PARTICLES
+	) {
+		const bool with_data = portal_effects == portal_effects_type::SHADER_WITH_DATA && in.portal_swirl_data != nullptr;
+
+		if (with_data) {
+			renderer.set_active_texture(portal_swirl_data_texture_unit);
+			in.portal_swirl_data->set_as_current(renderer);
+			renderer.set_active_texture(0);
+		}
+
+		set_shader_with_matrix(shaders.portal_swirl);
+		set_uniform(shaders.portal_swirl, U::global_time, static_cast<float>(exploding_rings.global_time_seconds));
+		set_uniform(shaders.portal_swirl, U::zoom, cone.eye.zoom);
+		set_uniform(shaders.portal_swirl, U::portal_mode, with_data ? 1 : 0);
+		renderer.call_triangles(D::PORTAL_SWIRLS);
+	}
+
 	set_shader_with_matrix(shaders.exploding_rings);
 
 	renderer.call_triangles(D::EXPLODING_RINGS);

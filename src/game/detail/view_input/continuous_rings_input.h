@@ -50,7 +50,8 @@ struct continuous_rings_particles {
 /*
 	Note the radius is implied by other properties like object size.
 
-	pixel_particles replaces the flat rings with the explosions' pixel art particles (see continuous_rings_particles).
+	pixel_particles replaces the flat rings with the explosions' pixel art particles (see continuous_rings_particles) -
+	or, as the client's portal_effects setting picks, with a shader approximating them (portal_swirl.fsh).
 */
 
 struct continuous_rings_input {

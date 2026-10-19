@@ -102,10 +102,19 @@ public:
 		const augs::delta dt,
 		const explosions_settings& settings,
 		const float portal_particle_amount,
+		const bool portal_particles_enabled,
 		particles_simulation_system& particles_output_for_effects
 	);
 
 	void draw_rings(
+		const augs::drawer_with_default output,
+		augs::special_buffer& specials,
+		const camera_cone queried_cone,
+		const camera_cone actual_cone
+	) const;
+
+	void draw_portal_swirls(
+		const cosmos& cosm,
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
 		const camera_cone queried_cone,

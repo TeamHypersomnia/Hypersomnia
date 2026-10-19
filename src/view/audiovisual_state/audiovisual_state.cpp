@@ -122,6 +122,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			scaled_frame_dt, 
 			input.performance.special_effects.explosions,
 			input.performance.special_effects.portal_particle_amount,
+			input.performance.special_effects.portal_effects == portal_effects_type::PARTICLES,
 			particles
 		);
 	};

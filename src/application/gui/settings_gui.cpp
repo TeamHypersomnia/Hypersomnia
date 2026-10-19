@@ -2817,8 +2817,13 @@ void settings_gui_state::perform(
 							tooltip_on_hover("Shape of muzzle flashes - the same for every gun at 0.5.\nLower spreads them further out, higher concentrates them near the muzzle.");
 							revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
-							revertable_slider(SCOPE_CFG_NVP(portal_particle_amount), 0.f, 2.f);
-							tooltip_on_hover("Scales the pixel particles of every portal.\nAll the portals in view still share at most 20000.");
+							revertable_enum_rev("Portal effects:", scope_cfg.portal_effects);
+							tooltip_on_hover("PARTICLES: the real pixel particles - the most expensive.\nSHADER: a shader approximating them with formulas.\nSHADER_WITH_DATA: a shader approximating them with the particles' statistics from a texture.");
+
+							if (scope_cfg.portal_effects == portal_effects_type::PARTICLES) {
+								revertable_slider(SCOPE_CFG_NVP(portal_particle_amount), 0.f, 2.f);
+								tooltip_on_hover("Scales the pixel particles of every portal.\nAll the portals in view still share at most 20000.");
+							}
 						}
 
 						ImGui::Separator();

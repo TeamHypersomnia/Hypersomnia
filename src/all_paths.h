@@ -119,3 +119,4 @@ extern augs::path_type KEYS_DIR;
 #define CACHED_AVATAR (USER_DIR / "cached_avatar.png")
 #define ACCOUNT_AVATAR (KEYS_DIR / "account_avatar.png")
 #define BLANK_AVATAR ("content/gfx/necessary/blank_avatar.png")
+#define PORTAL_SWIRL_DATA ("content/gfx/portal_swirl_data.png")

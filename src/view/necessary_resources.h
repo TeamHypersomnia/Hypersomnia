@@ -62,6 +62,12 @@ struct all_necessary_fbos {
 	);
 };
 
+/*
+	The texture unit the portal swirl shader reads its data from (see portal_swirl.fsh).
+*/
+
+constexpr int portal_swirl_data_texture_unit = 9;
+
 struct all_necessary_shaders {
 	// GEN INTROSPECTOR struct all_necessary_shaders
 	optional_shader standard;
@@ -73,6 +79,7 @@ struct all_necessary_shaders {
 	optional_shader smoke;
 	optional_shader illuminating_smoke;
 	optional_shader exploding_rings;
+	optional_shader portal_swirl;
 	optional_shader light;
 	optional_shader textured_light;
 	optional_shader flash_afterimage;

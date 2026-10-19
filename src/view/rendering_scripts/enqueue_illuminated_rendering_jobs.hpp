@@ -1092,7 +1092,9 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto special_effects_job = [&cosm, &exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, actual_cone, get_line_drawer_for]() {
+	const bool portal_swirls = in.perf_settings.special_effects.portal_effects != portal_effects_type::PARTICLES;
+
+	auto special_effects_job = [&cosm, &exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, actual_cone, get_line_drawer_for, portal_swirls]() {
 		{
 			thunders.draw_thunders(
 				get_line_drawer_for(D::THUNDERS),
@@ -1114,6 +1116,16 @@ void enqueue_illuminated_rendering_jobs(
 				cosm,
 				get_drawer_for(D::EXPLODING_RINGS),
 				dedicated[D::EXPLODING_RINGS].specials,
+				queried_cone,
+				actual_cone
+			);
+		}
+
+		if (portal_swirls) {
+			exploding_rings.draw_portal_swirls(
+				cosm,
+				get_drawer_for(D::PORTAL_SWIRLS),
+				dedicated[D::PORTAL_SWIRLS].specials,
 				queried_cone,
 				actual_cone
 			);
