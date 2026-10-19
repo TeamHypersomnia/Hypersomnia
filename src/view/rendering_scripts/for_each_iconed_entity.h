@@ -138,7 +138,7 @@ void for_each_iconed_entity(
 				auto col = m.col;
 
 				if constexpr(E::template has<components::portal>()) {
-					col = typed_handle.template get<components::portal>().rings_effect.value.inner_color;
+					col = typed_handle.template get<components::portal>().rings_effect.value.outer_color;
 				}
 
 				callback(

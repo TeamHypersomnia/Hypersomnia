@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "augs/math/camera_cone.h"
 #include "augs/math/matrix.h"
 
@@ -1396,6 +1397,36 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);
 
+	/*
+		Under the nicknames, health numbers and indicators - the swirl's halo reaches twice the portal's radius.
+	*/
+
+	if (const auto portal_effects = in.perf_settings.special_effects.get_portal_effects();
+		shaders.portal_swirl && portal_effects != portal_effects_type::PARTICLES
+	) {
+		const bool with_data = portal_effects == portal_effects_type::SHADER_WITH_DATA && in.portal_swirl_data != nullptr;
+
+		if (with_data) {
+			renderer.set_active_texture(portal_swirl_data_texture_unit);
+			in.portal_swirl_data->set_as_current(renderer);
+			renderer.set_active_texture(0);
+		}
+
+		set_shader_with_matrix(shaders.portal_swirl);
+
+		/*
+			The common period of all the swirl's motions - see portal_swirl.fsh.
+		*/
+
+		const auto portal_swirl_period_secs = 7920.0;
+		const auto swirl_time = std::fmod(exploding_rings.global_time_seconds, portal_swirl_period_secs);
+
+		set_uniform(shaders.portal_swirl, U::global_time, static_cast<float>(swirl_time));
+		set_uniform(shaders.portal_swirl, U::zoom, cone.eye.zoom);
+		set_uniform(shaders.portal_swirl, U::portal_mode, with_data ? 1 : 0);
+		renderer.call_triangles(D::PORTAL_SWIRLS);
+	}
+
 	draw_sentience_HUDs();
 
 	set_shader_with_non_zoomed_matrix(shaders.standard);
@@ -1414,24 +1445,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::SENTIENCE_INDICATORS);
 	renderer.call_triangles(D::INDICATORS_AND_CALLOUTS);
-
-	if (const auto portal_effects = in.perf_settings.special_effects.get_portal_effects();
-		shaders.portal_swirl && portal_effects != portal_effects_type::PARTICLES
-	) {
-		const bool with_data = portal_effects == portal_effects_type::SHADER_WITH_DATA && in.portal_swirl_data != nullptr;
-
-		if (with_data) {
-			renderer.set_active_texture(portal_swirl_data_texture_unit);
-			in.portal_swirl_data->set_as_current(renderer);
-			renderer.set_active_texture(0);
-		}
-
-		set_shader_with_matrix(shaders.portal_swirl);
-		set_uniform(shaders.portal_swirl, U::global_time, static_cast<float>(exploding_rings.global_time_seconds));
-		set_uniform(shaders.portal_swirl, U::zoom, cone.eye.zoom);
-		set_uniform(shaders.portal_swirl, U::portal_mode, with_data ? 1 : 0);
-		renderer.call_triangles(D::PORTAL_SWIRLS);
-	}
 
 	set_shader_with_matrix(shaders.exploding_rings);
 

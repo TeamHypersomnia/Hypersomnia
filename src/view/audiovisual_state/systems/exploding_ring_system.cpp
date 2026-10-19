@@ -23,6 +23,22 @@
 #include "view/viewables/particle_types.hpp"
 
 /*
+	The ring shaders take the center in gl_FragCoord space - its y goes up.
+*/
+
+static vec2 to_frag_coord_space(const camera_cone& cone, const vec2 world_pos) {
+	auto result = cone.to_screen_space(world_pos);
+	result.y = cone.screen_size.y - result.y;
+	return result;
+}
+
+static void push_quad_specials(augs::special_buffer& specials, const augs::special& sp) {
+	for (int s = 0; s < 6; ++s) {
+		specials.push_back(sp);
+	}
+}
+
+/*
 	The radius of a force grenade's explosion.
 	An explosion this big spawns the whole max_particles_per_explosion budget.
 	Bigger explosions scale their particles up instead of spawning more of them,
@@ -560,6 +576,7 @@ void exploding_ring_system::advance(
 		return secs_remaining <= 0.f;
 	});
 
+#if !IS_PRODUCTION_BUILD
 	if (const auto* const effect = mapped_or_nullptr(manager, common.exploding_ring_explosion_particles)) {
 		if (!effect->emissions.empty()) {
 			portal_particles.advance(
@@ -574,6 +591,9 @@ void exploding_ring_system::advance(
 			);
 		}
 	}
+#else
+	(void)portal_particle_amount;
+#endif
 }
 
 /*
@@ -608,16 +628,25 @@ void exploding_ring_system::draw_portal_swirls(
 			}
 
 			augs::special sp;
-			sp.v1 = actual_cone.to_screen_space(center);
-			sp.v1.y = actual_cone.screen_size.y - sp.v1.y;
-			sp.v2.x = radius * eye.zoom;
-			sp.v2.y = static_cast<float>(std::hash<entity_id>()(typed_portal_handle.get_id()) % 65536);
+			sp.v1 = ::to_frag_coord_space(actual_cone, center);
 
-			output.aabb(ltrbi(quad), e.inner_color);
+			/*
+				Four floats per vertex: the seed (12 bits) goes into the fraction of the radius in whole screen pixels,
+				the grain's color (24 bits, exact in a float) into the last one.
 
-			for (int s = 0; s < 6; ++s) {
-				specials.push_back(sp);
-			}
+				The base in the outer ring color, the brightest grain leaning towards the inner one.
+			*/
+
+			const auto seed = std::hash<entity_id>()(typed_portal_handle.get_id()) % 4096;
+			const auto& grain = e.inner_color;
+			const auto grain_packed = (static_cast<uint32_t>(grain.r) << 16) | (static_cast<uint32_t>(grain.g) << 8) | grain.b;
+
+			sp.v2.x = std::floor(radius * eye.zoom) + static_cast<float>(seed) / 4096.f;
+			sp.v2.y = static_cast<float>(grain_packed);
+
+			output.aabb(ltrbi(quad), e.outer_color);
+
+			::push_quad_specials(specials, sp);
 		}
 	);
 }
@@ -681,8 +710,7 @@ void exploding_ring_system::draw_continuous_rings(
 
 				augs::special sp;
 
-				sp.v1 = actual_cone.to_screen_space(ring_center);
-				sp.v1.y = actual_cone.screen_size.y - sp.v1.y;
+				sp.v1 = ::to_frag_coord_space(actual_cone, ring_center);
 
 				sp.v2.x = inner_radius_now * eye.zoom * eye.zoom;
 				sp.v2.y = outer_radius_now * eye.zoom * eye.zoom;
@@ -692,13 +720,11 @@ void exploding_ring_system::draw_continuous_rings(
 					color
 				);
 
-				for (int s = 0; s < 6; ++s) {
-					specials.push_back(sp);
-				}
+				::push_quad_specials(specials, sp);
 			};
 
-			draw_rings_with(0.0f, radius/2.f, radius / 2, radius / 1.2f, e.inner_color, 1.0f, 0.05f );
-			draw_rings_with(0.0f, 0.0f, radius / 2, radius / 1.2f, e.inner_color, 0.4212f, 0.05f);
+			draw_rings_with(0.0f, radius/2.f, radius / 2, radius / 1.2f, e.outer_color, 1.0f, 0.05f );
+			draw_rings_with(0.0f, 0.0f, radius / 2, radius / 1.2f, e.outer_color, 0.4212f, 0.05f);
 
 			draw_rings_with(radius / 1.5f, radius / 2.0f, radius, radius / 1.2f, e.outer_color, 1.243f, 0.0f, 0.5f);
 			draw_rings_with(0.0f, radius/10.0f, radius, radius, e.outer_color, 1.0f, 0.3f, 0.6f);
@@ -761,8 +787,7 @@ void exploding_ring_system::draw_rings(
 		}
 
 		augs::special sp;
-		sp.v1 = actual_cone.to_screen_space(world_explosion_center);
-		sp.v1.y = actual_cone.screen_size.y - sp.v1.y;
+		sp.v1 = ::to_frag_coord_space(actual_cone, world_explosion_center);
 
 		sp.v2.x = inner_radius_now * eye.zoom * eye.zoom;
 		sp.v2.y = outer_radius_now * eye.zoom * eye.zoom;
@@ -816,9 +841,7 @@ void exploding_ring_system::draw_rings(
 				considered_color
 			);
 
-			for (int s = 0; s < 6; ++s) {
-				specials.push_back(sp);
-			}
+			::push_quad_specials(specials, sp);
 		}
 	}
 }

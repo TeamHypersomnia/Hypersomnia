@@ -598,6 +598,64 @@ bool edit_property(
 				return true;
 			}
 		}
+		else if constexpr(std::is_same_v<T, editor_color_preset>) {
+			/*
+				Each preset with its outer and inner ring colors in front of the name.
+			*/
+
+			const auto current = property;
+			const auto id = ImGui::GetCurrentWindow()->GetID(label.c_str());
+
+			if (auto combo = scoped_combo(label.c_str(), format_enum(property).c_str())) {
+				const auto side = ImGui::GetTextLineHeight();
+
+				auto color_square = [&](const rgba col) {
+					const auto pos = ImGui::GetCursorScreenPos();
+
+					ImGui::GetWindowDrawList()->AddRectFilled(
+						pos,
+						ImVec2(pos.x + side, pos.y + side),
+						ImGui::ColorConvertFloat4ToU32(col.with_alpha(255))
+					);
+
+					ImGui::Dummy(ImVec2(side, side));
+					ImGui::SameLine();
+				};
+
+				augs::for_each_enum_except_bounds([&](const editor_color_preset e) {
+					auto scope = scoped_id(static_cast<int>(e));
+
+					if (e == editor_color_preset::CUSTOM) {
+						ImGui::Dummy(ImVec2(side * 2 + ImGui::GetStyle().ItemSpacing.x, side));
+						ImGui::SameLine();
+					}
+					else {
+						const auto& cols = get_editor_color_preset(e).portal;
+
+						color_square(cols.outer_ring);
+						color_square(cols.inner_ring);
+					}
+
+					const bool is_selected = e == current;
+
+					if (ImGui::Selectable(format_enum(e).c_str(), is_selected)) {
+						property = e;
+					}
+
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
+				});
+
+				/* To detect that the same combo has been modified in editor */
+				ImGui::GetCurrentContext()->LastActiveId = id;
+			}
+
+			if (current != property) {
+				result = typesafe_sprintf("Switched %x to %x in %x", label, property);
+				return true;
+			}
+		}
 		else if constexpr(std::is_same_v<T, impulse_type>) {
 			if (enum_combo_constrained<
 				impulse_type, 
@@ -927,10 +985,10 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 
 rgba editor_portal_info::get_icon_color() const {
 	if (color_preset == editor_color_preset::CUSTOM) {
-		return rings_effect.value.inner_color;
+		return rings_effect.value.outer_color;
 	}
 
-	return get_editor_color_preset(color_preset).portal.inner_ring;
+	return get_editor_color_preset(color_preset).portal.outer_ring;
 }
 
 EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource, const id_widget_handler& special_handler) {
@@ -983,7 +1041,28 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		ImGui::ColorButton("##Cbutton", insp.as_portal.get_icon_color().operator ImVec4());
 
 		ImGui::SameLine();
+
+		const auto preset_before = insp.as_portal.color_preset;
+
 		MULTIPROPERTY("Color preset", as_portal.color_preset);
+
+		/*
+			CUSTOM starts from the colors of the preset chosen before.
+		*/
+
+		const bool switched_to_custom =
+			last_result
+			&& preset_before != editor_color_preset::CUSTOM
+			&& insp.as_portal.color_preset == editor_color_preset::CUSTOM
+		;
+
+		if (switched_to_custom) {
+			insp.as_portal.apply(preset_before);
+
+			for (auto& ee : es) {
+				ee.after.as_portal.apply(preset_before);
+			}
+		}
 
 		if (insp.as_portal.color_preset == editor_color_preset::CUSTOM) {
 			MULTIPROPERTY("Inner ring color", as_portal.rings_effect.value.inner_color);
@@ -1051,7 +1130,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Visual effects")) {
 
 				MULTIPROPERTY("Begin entering highlight time (ms)", as_portal.begin_entering_highlight_ms);
-				tooltip_on_hover("Highlights any entered object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+				tooltip_on_hover("Highlights any entered object in pure color.\nThe color is automatically set to Rings effect -> Outer color.");
 				MULTIPROPERTY("Decrease opacity to", as_portal.decrease_opacity_to);
 
 				tooltip_on_hover("As objects enter the portal, they will become \nless and less visible until they finally disappear.\n\nYou can control the target to which opacity is decreased.\nIf you want objects to become fully invisible before teleporting, set to 0.\nIf you want to disable this effect (to make the portal undetectible), set it to maximum: 255.");
@@ -1073,10 +1152,12 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 				if (insp.as_portal.rings_effect.is_enabled) {
 					auto scope = scoped_indent();
 
-					MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
-
 					MULTIPROPERTY("Pixel particles", as_portal.rings_effect.value.pixel_particles);
 					tooltip_on_hover("Replaces the flat rings with the pixel art swirl.");
+
+					if (!insp.as_portal.rings_effect.value.pixel_particles) {
+						MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
+					}
 
 #if !IS_PRODUCTION_BUILD
 					if (insp.as_portal.rings_effect.value.pixel_particles) {
@@ -1103,7 +1184,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 						MULTIPROPERTY_RANGED("Spin (deg/s)", as_portal.rings_effect.value.particles.spin, -90.0f, 90.0f);
 						tooltip_on_hover("How fast the particles rotate around the portal.\nNegative rotates the other way.");
 						MULTIPROPERTY_RANGED("End color from", as_portal.rings_effect.value.particles.end_color_from, 0.0f, 1.0f);
-						tooltip_on_hover("The part of the lifetime after which the particles turn into the inner ring color.\nThey start in the inner or outer ring color.");
+						tooltip_on_hover("The part of the lifetime after which the particles turn into the outer ring color.\nThey start in the inner or outer ring color.");
 
 						MULTIPROPERTY_RANGED("Edge radius mult", as_portal.rings_effect.value.particles.edge_radius_mult, 0.0f, 2.0f);
 						tooltip_on_hover("Where the particles stop and slide along, times the portal's radius -\nmarking its edge with a subtle circle. 0 = no edge.");
@@ -1266,7 +1347,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		if (!insp.as_portal.disable_all_exit_effects) {
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Exit effects")) {
 				MULTIPROPERTY("Exit highlight time (ms)", as_portal.exit_highlight_ms);
-				tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+				tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Outer color.");
 
 				SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
 				PARTICLE_EFFECT_MULTIPROPERTY_NOCOLOR("Exit particles", as_portal.exit_particles);

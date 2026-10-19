@@ -2,8 +2,9 @@ precision highp int;
 precision highp float;
 
 /*
-	A portal's swirl, analytically - fitted to the statistics of the pixel particle version,
-	sampled in polar coordinates (r in the portal's radii):
+	A portal's swirl. The game uses portal_mode 1 (the data below);
+	portal_mode 0 is the analytic version - the fallback without the data, and a base for making new effects -
+	fitted to the statistics of the pixel particle version, sampled in polar coordinates (r in the portal's radii):
 
 	- the mean opacity: a linear ramp inside, a saturated rim at 0.95-1.05, an exponential halo outside,
 	- times 1 + contrast * noise, the noise stretched along the circle, rotating, and changing over time,
@@ -12,9 +13,11 @@ precision highp float;
 	The noise is value noise on a polar lattice: each ring of cells has a whole number of cells around,
 	so there is no seam at the angle's wrap.
 
-	With portal_mode 1, the statistics come from data instead (portal_swirl_data.png, 1024 angles x 256 radii up to 2R):
-	three independent snapshots of the particles' grain, normalized by the local deviation, in RGB,
-	and in the last row the exact mean and deviation profiles. All three are always mixed,
+	With portal_mode 1, the statistics come from data instead (portal_swirl_data.png, angles along x, radii up to 2R along y):
+	three independent snapshots of the particles' grain, normalized by the local deviation, in RGB
+	(a byte b stands for b / 255 * data_value_scale - data_value_offset),
+	and in the last row the exact mean and deviation profiles in R and G, in bytes:
+	alpha = (mean + deviation * grain) / data_profile_scale. All three snapshots are always mixed,
 	with weights going around in turns (their squares always sum up to 1, keeping the deviation),
 	each snapshot coming back at a random angle whenever its weight is zero, all co-rotating.
 */
@@ -186,41 +189,62 @@ const float data_outflow = 0.13;
 const float data_pixel_size = 1.0;
 const float data_edge_grain_cut = 0.85;
 
+/*
+	global_time comes wrapped at data_period_cycles * data_cycle_secs = 7920 s (portal_swirl_period_secs),
+	a whole number of turns of both spins (209 and 154), so the swirl flows on with no jump,
+	and the time keeps its float precision however long the game runs.
+*/
+
+const int data_period_cycles = 7200;
+
+/*
+	The brightest grain leans towards its own color (see draw_portal_swirls).
+*/
+
+const float data_grain_color_max = 0.5;
+const float data_grain_color_from_grain = 0.5;
+const float data_grain_color_full_grain = 2.0;
+
+const float data_value_scale = 8.0;
+const float data_value_offset = 3.0;
+const float data_profile_scale = 248.0;
+
+/*
+	The weights' squares sum up to 1, so their sum is at most sqrt(3) - times the largest grain value.
+*/
+
+const float data_max_abs_grain = 1.7321 * (data_value_scale - data_value_offset);
+
+float data_row(float r, int radii) {
+	return clamp(r / data_max_r * float(radii) - 0.5, 0.0, float(radii - 1));
+}
+
 float data_channel(vec3 texel, int layer) {
 	return layer == 0 ? texel.r : (layer == 1 ? texel.g : texel.b);
 }
 
+/*
+	Bilinear in hardware: the texture repeats around the circle,
+	and the row stays at most at the last snapshot row's center, never blending in the profile's row.
+*/
+
 float data_layer(int layer, float r, float theta_turns, ivec2 size) {
-	int angles = size.x;
 	int radii = size.y - 1;
 
-	float u = fract(theta_turns) * float(angles) - 0.5;
-	float v = clamp(r / data_max_r * float(radii) - 0.5, 0.0, float(radii - 1));
+	vec2 uv = vec2(fract(theta_turns), (data_row(r, radii) + 0.5) / float(size.y));
 
-	int c0 = int(floor(u));
-	float fu = u - float(c0);
-	c0 = (c0 % angles + angles) % angles;
-	int c1 = (c0 + 1) % angles;
-
-	int r0 = int(floor(v));
-	float fv = v - float(r0);
-	int r1 = min(r0 + 1, radii - 1);
-
-	float a = mix(data_channel(texelFetch(basic_texture, ivec2(c0, r0), 0).rgb, layer), data_channel(texelFetch(basic_texture, ivec2(c1, r0), 0).rgb, layer), fu);
-	float b = mix(data_channel(texelFetch(basic_texture, ivec2(c0, r1), 0).rgb, layer), data_channel(texelFetch(basic_texture, ivec2(c1, r1), 0).rgb, layer), fu);
-
-	return mix(a, b, fv) * 8.0 - 3.0;
+	return data_channel(texture(basic_texture, uv).rgb, layer) * data_value_scale - data_value_offset;
 }
 
 float appearance_offset(int k, uint seed) {
 	return float(hash3(uvec3(uint(k), seed, 977u)) & 0xFFFFu) / 65536.0;
 }
 
-float data_alpha(float r, float theta, uint seed) {
+float data_alpha(float r, float theta, uint seed, out float grain) {
 	ivec2 size = textureSize(basic_texture, 0);
 	int radii = size.y - 1;
 
-	float row = clamp(r / data_max_r * float(radii) - 0.5, 0.0, float(radii - 1));
+	float row = data_row(r, radii);
 	int row0 = int(floor(row));
 	int row1 = min(row0 + 1, radii - 1);
 	vec2 profile = mix(
@@ -228,6 +252,13 @@ float data_alpha(float r, float theta, uint seed) {
 		texelFetch(basic_texture, ivec2(row1, radii), 0).rg,
 		row - float(row0)
 	) * 255.0;
+
+	/* Below a quarter of the 8-bit step whatever the grain - skips the snapshots' fetches where the profile fades out. */
+	if (profile.x + data_max_abs_grain * profile.y < data_profile_scale / 1020.0) {
+		return 0.0;
+	}
+
+	grain = 0.0;
 
 	float spin = radians(mix(data_spin_degrees, data_halo_spin_degrees, smoothstep(1.0, 1.15, r)));
 	float turns = (theta - spin * global_time) / (2.0 * PI);
@@ -239,7 +270,8 @@ float data_alpha(float r, float theta, uint seed) {
 	for (int layer = 0; layer < 3; ++layer) {
 		float phase = global_time / data_cycle_secs - float(layer) / 3.0;
 		float since_zero = phase + 0.5;
-		int appearance = int(floor(since_zero)) * 3 + layer;
+		/* floor(since_zero) is at least -1. */
+		int appearance = ((int(floor(since_zero)) + data_period_cycles) % data_period_cycles) * 3 + layer;
 		float age_secs = fract(since_zero) * data_cycle_secs;
 		float weight = sqrt((1.0 + cos(2.0 * PI * phase)) / 3.0);
 
@@ -256,14 +288,22 @@ float data_alpha(float r, float theta, uint seed) {
 
 	float edge_band = smoothstep(0.95, 1.0, r) * (1.0 - smoothstep(1.12, 1.2, r));
 	z *= 1.0 - data_edge_grain_cut * edge_band;
+	grain = z;
 
-	return (profile.x + profile.y * z) / 248.0;
+	return (profile.x + profile.y * z) / data_profile_scale;
 }
 
 void main() {
+	/*
+		See draw_portal_swirls: the radius is whole screen pixels with the seed (12 bits) in the fraction,
+		and the grain's color comes packed as 0xRRGGBB.
+	*/
+
 	vec2 center = portal.xy;
-	float radius_px = portal.z;
-	uint seed = uint(portal.w);
+	float radius_px = floor(portal.z);
+	uint seed = uint(round((portal.z - radius_px) * 4096.0)) & 4095u;
+	uint grain_packed = uint(portal.w);
+	vec3 grain_color = vec3(uvec3(grain_packed >> 16u, grain_packed >> 8u, grain_packed) & 255u) / 255.0;
 
 	/* Pixel art: the center of the world pixel this fragment is in. */
 	float pixel_px = max(zoom * (portal_mode == 1 ? data_pixel_size : pixel_size), 1.0);
@@ -280,13 +320,16 @@ void main() {
 	float theta = atan(q.y, q.x);
 
 	if (portal_mode == 1) {
-		float alpha = clamp(data_alpha(r, theta, seed), 0.0, 1.0);
+		float grain = 0.0;
+		float alpha = clamp(data_alpha(r, theta, seed, grain), 0.0, 1.0);
 
 		if (alpha <= 0.0) {
 			discard;
 		}
 
-		outputColor = vec4(theColor.rgb, theColor.a * alpha);
+		float grain_t = data_grain_color_max * smoothstep(data_grain_color_from_grain, data_grain_color_full_grain, grain);
+
+		outputColor = vec4(mix(theColor.rgb, grain_color, grain_t), theColor.a * alpha);
 		return;
 	}
 

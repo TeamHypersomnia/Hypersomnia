@@ -38,9 +38,14 @@ namespace augs {
 			void GL_texImage2D(const vec2u size, const unsigned char* const source);
 			void GL_texImage2D(const image& rgba_source);
 
-			void set_filtering(filtering_type);
-
 		public:
+			/*
+				These two apply right away - with the context current, e.g. right after loading.
+			*/
+
+			void set_filtering(filtering_type);
+			void set_repeat_horizontally();
+
 			texture(const vec2u size = vec2u::zero, const rgba* const source = nullptr);
 			texture(const image& rgba_source);
 

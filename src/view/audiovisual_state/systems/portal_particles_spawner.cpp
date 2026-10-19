@@ -244,7 +244,7 @@ void portal_particles_spawner::advance(
 
 			p.hot_color = start_color;
 			p.ring_color = start_color;
-			p.cool_color = opaque(e.inner_color);
+			p.cool_color = opaque(e.outer_color);
 			p.cool_from_ms = lifetime_ms * def.end_color_from;
 			p.cool_until_ms = p.cool_from_ms + lifetime_ms * 0.1f;
 

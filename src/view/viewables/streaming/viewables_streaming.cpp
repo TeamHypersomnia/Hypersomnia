@@ -739,6 +739,13 @@ void viewables_streaming::load_portal_swirl_data() {
 		auto source = augs::image();
 		source.from_file(PORTAL_SWIRL_DATA);
 		portal_swirl_data.emplace(source);
+
+		/*
+			The shader samples the snapshots bilinearly in hardware, around the circle across the angle's wrap.
+		*/
+
+		portal_swirl_data->set_repeat_horizontally();
+		portal_swirl_data->set_filtering(augs::filtering_type::LINEAR);
 	}
 	catch (const std::exception& err) {
 		LOG("Failed to load %x: %x. The portals fall back to the shader without data.", PORTAL_SWIRL_DATA, err.what());

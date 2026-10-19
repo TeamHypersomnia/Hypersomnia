@@ -14,6 +14,6 @@ void main() {
 	gl_Position = projection_matrix * vec4(position.xy, 0.0, 1.0);
 	theColor = color;
 
-	/* Center on the screen (GL coordinates), radius in screen pixels, a seed. */
+	/* Center on the screen (GL coordinates), radius in screen pixels with a seed, the grain's color - see portal_swirl.fsh. */
 	portal = special;
 }

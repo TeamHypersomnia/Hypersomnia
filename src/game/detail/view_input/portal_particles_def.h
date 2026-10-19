@@ -9,7 +9,7 @@
 	"count" of them are alive at once, each living lifetime_secs.
 	With scale_count_with_size, portals smaller than 768x768 get proportionally fewer (by area).
 	They spawn uniformly over the portal's disc, in its inner or outer ring color (randomly),
-	turning into the inner ring color from end_color_from of their lifetime - so any color preset applies.
+	turning into the outer ring color from end_color_from of their lifetime - so any color preset applies.
 
 	Each moves away from the center at a constant random speed between radial_speed_min and radial_speed_max
 	(in the portal's radii per second, negative - towards the center) and around it at spin degrees per second.

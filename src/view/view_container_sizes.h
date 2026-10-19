@@ -15,8 +15,13 @@ constexpr std::size_t MAX_EXPLOSION_PARTICLES = 20000;
 	All the portals in view share PORTAL_PARTICLES_BUDGET, each scaled down equally once they would exceed it.
 	The rest of the pool is headroom: a portal coming into view gets its particles at once,
 	while the others' excess dies out on its own.
+	Production builds draw the portals with the shader only, so the pool stays empty there.
 */
+#if IS_PRODUCTION_BUILD
+constexpr std::size_t MAX_PORTAL_PARTICLES = 1;
+#else
 constexpr std::size_t MAX_PORTAL_PARTICLES = 30000;
+#endif
 constexpr std::size_t PORTAL_PARTICLES_BUDGET = 20000;
 
 constexpr std::size_t MAX_THUNDERS = 100;

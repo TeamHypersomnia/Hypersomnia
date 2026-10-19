@@ -88,6 +88,13 @@ namespace augs {
 			}
 		}
 
+		void texture::set_repeat_horizontally() {
+			augs::window::get_current().check_current_context();
+
+			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+		}
+
 		void texture::set_filtering_impl(const filtering_type f) {
 #if BUILD_OPENGL
 			using T = filtering_type;

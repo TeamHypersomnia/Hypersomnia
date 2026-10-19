@@ -85,7 +85,7 @@ static void play_begin_entering_effects(const logic_step step, const H& typed_co
 		h.subject = typed_contacted_entity.get_id();
 		h.input.maximum_duration_seconds = portal.begin_entering_highlight_ms / 1000;
 		h.input.starting_alpha_ratio = 1.0f;
-		h.input.color = portal.rings_effect.value.inner_color;
+		h.input.color = portal.rings_effect.value.outer_color;
 		h.input.use_sqrt = false;
 		step.post_message(h);
 	}
@@ -145,7 +145,7 @@ static void play_exit_effects(const logic_step step, const H& typed_contacted_en
 		h.subject = typed_contacted_entity.get_id();
 		h.input.maximum_duration_seconds = portal.exit_highlight_ms / 1000;
 		h.input.starting_alpha_ratio = 1.0f;
-		h.input.color = portal.rings_effect.value.inner_color;
+		h.input.color = portal.rings_effect.value.outer_color;
 		h.input.use_sqrt = false;
 		step.post_message(h);
 	}

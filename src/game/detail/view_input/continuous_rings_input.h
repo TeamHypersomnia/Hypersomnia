@@ -8,6 +8,9 @@
 
 	pixel_particles replaces the flat rings with the explosions' pixel art particles (see continuous_rings_particles) -
 	or, as the client's portal_effects setting picks, with a shader approximating them (portal_swirl.fsh).
+
+	The outer color is the portal's main one - the flat rings, the swirl's base, the highlights and the icons;
+	the inner one tints the swirl's brightest grain.
 */
 
 struct continuous_rings_input {
@@ -15,7 +18,7 @@ struct continuous_rings_input {
 	float effect_speed = 1.0f;
 
 	rgba inner_color = cyan;
-	rgba outer_color = turquoise;
+	rgba outer_color = turquoise.with_alpha(200);
 
 	continuous_rings_particles particles;
 	bool pixel_particles = true;
