@@ -3760,13 +3760,20 @@ work_result work(
 							const auto full_content = typesafe_sprintf("Failed to load: %x", loaded_path);
 							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
 						}
+
+						/*
+							Forget the project that failed, so that the error shows only once,
+							not again on every next launch.
+						*/
+
+						augs::remove_file(get_editor_last_project_path());
 					}
 					catch (...) {
 						LOG("No %x detected. Launching the project selector.", get_editor_last_project_path());
 					}
 
 					/*
-						The last project failed to load or there is none - the project selector shows the error, if any.
+						The last project failed to load or there is none - the project selector shows the error once, if any.
 					*/
 
 					[[fallthrough]];
