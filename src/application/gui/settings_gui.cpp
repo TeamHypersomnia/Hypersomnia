@@ -2817,31 +2817,22 @@ void settings_gui_state::perform(
 							tooltip_on_hover("Shape of muzzle flashes - the same for every gun at 0.5.\nLower spreads them further out, higher concentrates them near the muzzle.");
 							revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
+#if !IS_PRODUCTION_BUILD
 							/*
-								Like revertable_enum_rev, but with the tooltip on the combo, not on the Revert button after it.
+								Developer builds only. Like revertable_enum_rev, but with the tooltip on the combo,
+								not on the Revert button after it.
 							*/
 
-							auto revertable_enum_with_tooltip = [&](const auto label, auto& field, const auto tooltip) {
-								text(label);
-								ImGui::SameLine();
+							text("Portal effects:");
+							ImGui::SameLine();
 
-								{
-									auto scope = scoped_item_width(150);
-									enum_combo(std::string("###") + label, field);
-								}
+							{
+								auto scope = scoped_item_width(150);
+								enum_combo("###Portal effects", scope_cfg.portal_effects);
+							}
 
-								tooltip_on_hover(tooltip);
-								revert(field);
-							};
-
-							revertable_enum_with_tooltip("Portal effect quality:", scope_cfg.portal_quality, "This only affects VRAM usage.");
-
-#if !IS_PRODUCTION_BUILD
-							revertable_enum_with_tooltip(
-								"Portal effects:",
-								scope_cfg.portal_effects,
-								"Developer builds only, for making new portal effects.\nPARTICLES: the real pixel particles - the most expensive.\nSHADER: a shader approximating them with formulas.\nSHADER_WITH_DATA: a shader approximating them with the particles' statistics from a texture - the game's."
-							);
+							tooltip_on_hover("Developer builds only, for making new portal effects.\nPARTICLES: the real pixel particles - the most expensive.\nSHADER: a shader approximating them with formulas.\nSHADER_WITH_DATA: a shader approximating them with the particles' statistics from a texture - the game's.");
+							revert(scope_cfg.portal_effects);
 
 							if (scope_cfg.portal_effects == portal_effects_type::PARTICLES) {
 								revertable_slider(SCOPE_CFG_NVP(portal_particle_amount), 0.f, 2.f);

@@ -129,15 +129,12 @@ public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
 
 	/*
-		The portal swirl shader's data (see portal_swirl.fsh), as made and as uploaded - downscaled by portal_swirl_data_downscale.
+		The portal swirl shader's data (see portal_swirl.fsh).
 	*/
 
-	std::optional<augs::image> portal_swirl_data_source;
 	std::optional<augs::graphics::texture> portal_swirl_data;
-	unsigned portal_swirl_data_downscale = 1;
 
-	void load_portal_swirl_data(const unsigned downscale);
-	void update_portal_swirl_data(augs::renderer& renderer, const unsigned downscale);
+	void load_portal_swirl_data();
 	std::optional<augs::path_type> requested_avatar_preview;
 
 	/*
