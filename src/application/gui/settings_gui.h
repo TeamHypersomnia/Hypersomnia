@@ -351,12 +351,6 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::optional<augs::ed25519_public_key_type> current_public_key() const;
 
 	/*
-		Linked to Steam: a saved Steam cert, or signed in to a Steam account right now.
-	*/
-
-	bool is_key_linked() const;
-
-	/*
 		Why the key or its link may not change now, if so: a ranked match on or one that can still be rejoined
 		(read from the disk only when asked, on a click), or the browser's storage not writable.
 	*/
@@ -364,6 +358,12 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	std::optional<std::string> account_change_blocked() const;
 
 public:
+	/*
+		Linked to Steam: a saved Steam cert, or signed in to a Steam account right now.
+	*/
+
+	bool is_key_linked() const;
+
 	/*
 		The nickname and avatar a restored key last played with, given to both configs (the caller saves them).
 		True when anything changed.

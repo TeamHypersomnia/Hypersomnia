@@ -508,6 +508,7 @@
     "remove_live_log_file_on_start": true,
     "prompted_for_sign_in_once": false,
     "last_seen_changelog_version": "",
+    "opened_steam_review": false,
 
     "sound": {
         "allow_sounds_without_character_listener": true,

@@ -1,6 +1,9 @@
 #include <cmath>
+#include <algorithm>
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_game_image.h"
+#include "augs/window_framework/shell.h"
 #include "augs/misc/date_time.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "hypersomnia_version.h"
@@ -482,10 +485,63 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 }
 
 /*
+	The thumb with a line beside it - a fifth of the row (a quarter of OK), wider only if the text needs it.
+	Asks for a review, not a positive one (Steamworks rules).
+*/
+
+static bool perform_steam_review_button(const necessary_images_in_atlas_map* const necessary_images, const float h) {
+	using namespace augs::imgui;
+
+	const auto& style = ImGui::GetStyle();
+
+	const auto label = "Steam reviews help us grow.";
+
+	const auto icon_side = std::round(h * 0.4f);
+	const auto icon_gap = std::round(icon_side * 0.4f);
+	const auto contents_w = icon_side + icon_gap + ImGui::CalcTextSize(label).x;
+
+	const auto row_w = ImGui::GetContentRegionAvail().x;
+	const auto w = std::max((row_w - style.ItemSpacing.x) / 5, contents_w + style.FramePadding.x * 4);
+
+	const auto pos = vec2(ImGui::GetCursorScreenPos());
+
+	const bool clicked = ImGui::Button("##steam_review", ImVec2(w, h));
+
+	if (clicked) {
+		augs::open_url("https://store.steampowered.com/recommended/recommendgame/2660970");
+	}
+
+	tooltip_on_hover("Want more people to play with?\nA review on Steam helps new players find the game.");
+
+	const auto contents_lt = pos + vec2(std::round((w - contents_w) / 2), 0.0f);
+
+	if (necessary_images != nullptr) {
+		const auto& entry = (*necessary_images)[assets::necessary_image_id::THUMB_UP_ICON];
+
+		auto cursor = scoped_preserve_cursor();
+		ImGui::SetCursorScreenPos(static_cast<ImVec2>(contents_lt + vec2(0.0f, std::round((h - icon_side) / 2))));
+		game_image(entry, vec2::square(icon_side), leaderboards_tint, vec2::zero, augs::imgui_atlas_type::GAME);
+	}
+
+	const auto text_pos = ImVec2(
+		contents_lt.x + icon_side + icon_gap,
+		pos.y + std::round((h - ImGui::GetTextLineHeight()) / 2)
+	);
+
+	ImGui::GetWindowDrawList()->AddText(text_pos, ImGui::GetColorU32(leaderboards_tint), label);
+
+	return clicked;
+}
+
+/*
 	Fills the remaining space of the current window. Returns true when OK was pressed.
 */
 
-static bool perform_changelog_view(const changelog_input in) {
+static bool perform_changelog_view(
+	const changelog_input in,
+	const necessary_images_in_atlas_map* const necessary_images,
+	bool& steam_review_opened
+) {
 	using namespace augs::imgui;
 
 	const auto& entries = in.entries;
@@ -578,6 +634,14 @@ static bool perform_changelog_view(const changelog_input in) {
 		rgba(255, 255, 255, 100) * leaderboards_tint
 	});
 
+	if (in.show_steam_review) {
+		if (::perform_steam_review_button(necessary_images, ok_h)) {
+			steam_review_opened = true;
+		}
+
+		ImGui::SameLine();
+	}
+
 	ImGui::PushFont(larger_font);
 	const bool ok_pressed = ImGui::Button("OK", ImVec2(-1, ok_h));
 	ImGui::PopFont();
@@ -644,7 +708,7 @@ bool changelog_window_state::perform(const changelog_input in) {
 		return !show;
 	}
 
-	const bool ok_pressed = ::perform_changelog_view(in);
+	const bool ok_pressed = ::perform_changelog_view(in, necessary_images, steam_review_opened);
 	const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
 
 	if (ok_pressed || escape_pressed || !show) {

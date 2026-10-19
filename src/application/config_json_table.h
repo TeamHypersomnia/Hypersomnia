@@ -98,6 +98,7 @@ struct config_json_table {
 
 	bool prompted_for_sign_in_once = false;
 	std::string last_seen_changelog_version;
+	bool opened_steam_review = false;
 
 	std::string log_timestamp_format = std::string("[%m-%d-%y %H:%M:%S] ");
 

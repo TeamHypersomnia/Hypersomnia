@@ -190,6 +190,7 @@ namespace assets {
 
 		DOWNLOAD_ICON,
 		UPLOAD_ICON,
+		THUMB_UP_ICON,
 
 		RANK_BACKGROUND,
 

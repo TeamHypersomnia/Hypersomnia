@@ -2041,7 +2041,8 @@ work_result work(
 		return changelog_input {
 			changelog,
 			changelog_view,
-			last_seen_changelog_at_start
+			last_seen_changelog_at_start,
+			!config.opened_steam_review && (is_steam_client || settings_gui.is_key_linked())
 		};
 	};
 
@@ -2122,6 +2123,20 @@ work_result work(
 
 		if (changelog_window.perform(get_changelog_input())) {
 			acknowledge_changelog();
+		}
+
+		/*
+			The review button stays until the changelog is closed - it is gone from the next one.
+		*/
+
+		if (changelog_window.steam_review_opened && !changelog_window.is_open()) {
+			changelog_window.steam_review_opened = false;
+
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.opened_steam_review = true;
+				}
+			);
 		}
 
 		if (!changelog_window.is_open() && reopen_settings_after_changelog) {
@@ -2933,6 +2948,7 @@ work_result work(
 
 		settings_gui.identity = identity.get();
 		settings_gui.necessary_images = std::addressof(streaming.necessary_images_in_atlas);
+		changelog_window.necessary_images = std::addressof(streaming.necessary_images_in_atlas);
 		settings_gui.identity_input = get_identity_input();
 		settings_gui.current_account_id = current_account_id();
 		settings_gui.identity_error = identity->last_error;

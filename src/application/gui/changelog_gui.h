@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_set>
 #include "augs/misc/imgui/standard_window_mixin.h"
+#include "view/necessary_resources.h"
 #include "application/gui/changelog_entry.h"
 
 /*
@@ -29,6 +30,13 @@ struct changelog_input {
 	*/
 
 	const std::string& last_seen_version;
+
+	/*
+		"Steam reviews help us grow." beside OK, opening the Steam review page - for a Steam account
+		(the Steam build, or a key linked to Steam) until a changelog in which it was clicked is closed.
+	*/
+
+	const bool show_steam_review;
 };
 
 /*
@@ -43,6 +51,18 @@ bool should_show_changelog(const changelog_entries&, const std::string& last_see
 struct changelog_window_state : public standard_window_mixin<changelog_window_state> {
 	using base = standard_window_mixin<changelog_window_state>;
 	using base::base;
+
+	/*
+		For the thumb on the Steam review button. Set by the game.
+	*/
+
+	const necessary_images_in_atlas_map* necessary_images = nullptr;
+
+	/*
+		Set when the review page was opened - the game saves it to the config once the changelog closes.
+	*/
+
+	bool steam_review_opened = false;
 
 	bool perform(changelog_input);
 };
