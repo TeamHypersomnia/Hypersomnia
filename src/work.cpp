@@ -3253,6 +3253,7 @@ work_result work(
 		set_rich_presence_now = true;
 		
 		get_audiovisuals().get<particles_simulation_system>().clear();
+		get_audiovisuals().get<exploding_ring_system>().clear();
 		get_audiovisuals().get<minimap_sighting_system>().clear();
 		
 		game_gui_mode_flag = false;
@@ -5722,6 +5723,7 @@ work_result work(
 
 				get_audiovisuals().get<sound_system>().clear();
 				get_audiovisuals().get<particles_simulation_system>().clear();
+				get_audiovisuals().get<exploding_ring_system>().clear();
 				get_audiovisuals().get<minimap_sighting_system>().clear();
 
 				last_sampled_cosmos = now_sampled_cosmos;

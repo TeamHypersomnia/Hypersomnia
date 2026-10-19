@@ -42,11 +42,44 @@ FORCE_INLINE void explosion_particle::update_sprite_transform() {
 	sprite.rotation = angle + 90.f + rotation_offset;
 }
 
+FORCE_INLINE float explosion_particle::calc_lifetime_alpha() const {
+	const auto age_ms = sprite.current_lifetime_ms;
+	auto result = max_alpha;
+
+	if (fade_in_ms > 0.f) {
+		result *= std::min(1.f, age_ms / fade_in_ms);
+	}
+
+	if (fade_out_ms > 0.f) {
+		result *= std::clamp((sprite.max_lifetime_ms - age_ms) / fade_out_ms, 0.f, 1.f);
+	}
+
+	return result;
+}
+
+FORCE_INLINE void explosion_particle::begin_edge_fade() {
+	edge_fade_from_alpha = calc_lifetime_alpha();
+	edge_fade_start_ms = sprite.current_lifetime_ms;
+	lifetime_before_edge_fade_ms = sprite.max_lifetime_ms;
+	sprite.max_lifetime_ms = sprite.current_lifetime_ms + edge_fade_ms;
+}
+
 FORCE_INLINE void explosion_particle::update_sprite_color() {
 	const auto age_ms = sprite.current_lifetime_ms;
 
+	const auto alpha = [&]() {
+		const auto result = 
+			is_edge_fading() ?
+			edge_fade_from_alpha * std::clamp(1.f - (age_ms - edge_fade_start_ms) / edge_fade_ms, 0.f, 1.f) :
+			calc_lifetime_alpha()
+		;
+
+		return static_cast<rgba_channel>(255.f * result);
+	}();
+
 	if (!palette.empty()) {
 		sprite.color = ::sample_explosion_particles_palette(palette, palette_offset + age_ms / palette_step_ms);
+		sprite.color.a = alpha;
 		return;
 	}
 
@@ -64,7 +97,7 @@ FORCE_INLINE void explosion_particle::update_sprite_color() {
 	}();
 
 	sprite.color = considered;
-	sprite.color.a = 255;
+	sprite.color.a = alpha;
 }
 
 FORCE_INLINE void explosion_particle::integrate(const float dt) {
@@ -78,13 +111,22 @@ FORCE_INLINE void explosion_particle::integrate(const float dt) {
 	}
 
 	radius += radial_vel * dt;
-	angle += RAD_TO_DEG<float> * tangential_vel * dt / std::max(radius, 1.f);
+	angle += RAD_TO_DEG<float> * tangential_vel * dt / std::max(radius, 1.f) + angular_vel * dt;
 
 	drift_vel += drift_acc * dt;
 	drift += drift_vel * dt;
 
+	if (radius > max_radius && stop_at_max_radius) {
+		radius = max_radius;
+		radial_vel = 0.f;
+	}
+
 	if (radius < 0.f || radius > max_radius) {
 		sprite.current_lifetime_ms = sprite.max_lifetime_ms;
+	}
+
+	if (edge_fade_ms > 0.f && !is_edge_fading() && radius >= edge_fade_radius && !is_dead()) {
+		begin_edge_fade();
 	}
 
 	update_sprite_transform();

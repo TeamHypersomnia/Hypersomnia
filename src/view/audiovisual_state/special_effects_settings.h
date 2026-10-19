@@ -93,6 +93,7 @@ struct special_effects_settings {
 	float muzzle_flash_falloff = 0.5f;
 	float particle_stream_amount = 1.f;
 	float particle_burst_amount = 1.f;
+	float portal_particle_amount = 1.f;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const special_effects_settings& b) const = default;

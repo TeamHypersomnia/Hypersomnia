@@ -10,6 +10,15 @@ constexpr std::size_t MAX_EXPLODING_RINGS = 300;
 */
 constexpr std::size_t MAX_EXPLOSION_PARTICLES = 20000;
 
+/*
+	The portals' pixel particles have their own pool too.
+	All the portals in view share PORTAL_PARTICLES_BUDGET, each scaled down equally once they would exceed it.
+	The rest of the pool is headroom: a portal coming into view gets its particles at once,
+	while the others' excess dies out on its own.
+*/
+constexpr std::size_t MAX_PORTAL_PARTICLES = 30000;
+constexpr std::size_t PORTAL_PARTICLES_BUDGET = 20000;
+
 constexpr std::size_t MAX_THUNDERS = 100;
 
 constexpr std::size_t MAX_THUNDER_BRANCHES = 255;

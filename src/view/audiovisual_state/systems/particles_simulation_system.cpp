@@ -195,6 +195,7 @@ std::size_t particles_simulation_system::count_particles_on_layer(const particle
 
 	if (p == explosion_particles_layer) {
 		total += explosion_particles.size();
+		total += portal_particles.size();
 	}
 
 	for (const auto& v : homing_animated_particles[p]) {
@@ -210,6 +211,7 @@ std::size_t particles_simulation_system::count_all_particles() const {
 	total += ::accumulate_sizes(general_particles);
 	total += ::accumulate_sizes(animated_particles);
 	total += explosion_particles.size();
+	total += portal_particles.size();
 
 	for (const auto& m : homing_animated_particles) {
 		for (const auto& v : m) {
@@ -230,6 +232,7 @@ void particles_simulation_system::clear() {
 	clearer(animated_particles);
 	clearer(homing_animated_particles);
 	explosion_particles.clear();
+	portal_particles.clear();
 
 	firearm_engine_caches.clear();
 	continuous_particles_caches.clear();
@@ -255,6 +258,11 @@ void particles_simulation_system::add_particle(const particle_layer l, const ent
 void particles_simulation_system::add_explosion_particle(const explosion_particle& p) {
 	auto p_copy = p;
 	::simple_push_or_recycle(explosion_particles, p_copy);
+}
+
+void particles_simulation_system::add_portal_particle(const portal_particle& p) {
+	auto p_copy = p;
+	::simple_push_or_recycle(portal_particles, p_copy);
 }
 
 void particles_simulation_system::update_effects_from_messages(
@@ -539,6 +547,7 @@ void particles_simulation_system::for_each_particle_in_range(
 	});
 
 	maybe_process(explosion_particles_layer, explosion_particles);
+	maybe_process(explosion_particles_layer, portal_particles);
 }
 
 void particles_simulation_system::remove_dead_particles(const cosmos& cosm) {
@@ -555,6 +564,7 @@ void particles_simulation_system::remove_dead_particles(const cosmos& cosm) {
 	}
 
 	dead_particles_remover(explosion_particles);
+	dead_particles_remover(portal_particles);
 
 	for (auto& particle_layer : homing_animated_particles) {
 		erase_if(particle_layer, [&](auto& cluster) {
@@ -617,7 +627,7 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 			else if constexpr(std::is_same_v<P, homing_animated_particle>) {
 				particle.integrate(delta * particle.time_mult, anims, std::forward<decltype(args)>(args)...);
 			}
-			else if constexpr(std::is_same_v<P, explosion_particle>) {
+			else if constexpr(std::is_same_v<P, explosion_particle> || std::is_same_v<P, portal_particle>) {
 				particle.integrate(delta);
 			}
 			else {

@@ -30,6 +30,8 @@ void setup_resource_defaults_after_creating_officials(
 		auto& to = portal->editable.node_defaults.as_portal;
 
 		to.ambience_particles.id = o[test_particles_decorations::PORTAL_CIRCLE];
+		to.ambience_particles.scale_amounts = 0.25f;
+		to.ambience_particles.scale_lifetimes = 4.0f;
 		to.ambience_sound.id = o[test_sound_decorations::PORTAL_AMBIENCE];
 
 		to.begin_entering_sound.id = o[test_sound_decorations::PORTAL_BEGIN_ENTERING_SOUND];

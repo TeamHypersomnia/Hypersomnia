@@ -1075,6 +1075,50 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 					MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
 
+					MULTIPROPERTY("Pixel particles", as_portal.rings_effect.value.pixel_particles);
+					tooltip_on_hover("Replaces the flat rings with the explosions' pixel art particles:\nevery pulse of each ring spawns a burst of them tracing the ring.");
+
+					if (insp.as_portal.rings_effect.value.pixel_particles) {
+						auto scope = scoped_indent();
+
+						MULTIPROPERTY("Count", as_portal.rings_effect.value.particles.count);
+						tooltip_on_hover("How many particles are alive at once.\nAll the portals in view share 20000 - once they would exceed it, each gets proportionally fewer.");
+						MULTIPROPERTY("Scale count with size", as_portal.rings_effect.value.particles.scale_count_with_size);
+						tooltip_on_hover("Portals smaller than 768x768 get proportionally fewer particles (by area).\nUncheck to always spawn Count.");
+						MULTIPROPERTY_RANGED("Lifetime (s)", as_portal.rings_effect.value.particles.lifetime_secs, 0.1f, 30.0f);
+						MULTIPROPERTY_RANGED("Size mult", as_portal.rings_effect.value.particles.size_mult, 0.1f, 5.0f);
+						MULTIPROPERTY_RANGED("Max opacity", as_portal.rings_effect.value.particles.max_opacity, 0.0f, 1.0f);
+						MULTIPROPERTY_RANGED("Fade in", as_portal.rings_effect.value.particles.fade_in, 0.0f, 1.0f);
+						tooltip_on_hover("The part of the lifetime over which the alpha goes from 0 to Max opacity.");
+						MULTIPROPERTY_RANGED("Fade out", as_portal.rings_effect.value.particles.fade_out, 0.0f, 1.0f);
+						tooltip_on_hover("The part of the lifetime over which the alpha goes back to 0.");
+						MULTIPROPERTY_RANGED("Grow in", as_portal.rings_effect.value.particles.grow_in, 0.0f, 1.0f);
+						tooltip_on_hover("The part of the lifetime over which the particles grow from nothing.");
+						MULTIPROPERTY_RANGED("Shrink out", as_portal.rings_effect.value.particles.shrink_out, 0.0f, 1.0f);
+						tooltip_on_hover("The part of the lifetime over which the particles shrink to nothing.");
+						MULTIPROPERTY_RANGED("Radial speed min", as_portal.rings_effect.value.particles.radial_speed_min, -1.0f, 1.0f);
+						tooltip_on_hover("In the portal's radii per second. Negative - towards the center.");
+						MULTIPROPERTY_RANGED("Radial speed max", as_portal.rings_effect.value.particles.radial_speed_max, -1.0f, 1.0f);
+						MULTIPROPERTY_RANGED("Spin (deg/s)", as_portal.rings_effect.value.particles.spin, -90.0f, 90.0f);
+						tooltip_on_hover("How fast the particles rotate around the portal.\nNegative rotates the other way.");
+						MULTIPROPERTY_RANGED("End color from", as_portal.rings_effect.value.particles.end_color_from, 0.0f, 1.0f);
+						tooltip_on_hover("The part of the lifetime after which the particles turn into the inner ring color.\nThey start in the inner or outer ring color.");
+
+						MULTIPROPERTY_RANGED("Edge radius mult", as_portal.rings_effect.value.particles.edge_radius_mult, 0.0f, 2.0f);
+						tooltip_on_hover("Where the particles stop and slide along, times the portal's radius -\nmarking its edge with a subtle circle. 0 = no edge.");
+
+						if (insp.as_portal.rings_effect.value.particles.edge_radius_mult > 0.0f) {
+							auto scope = scoped_indent();
+
+							MULTIPROPERTY_RANGED("Edge softness", as_portal.rings_effect.value.particles.edge_softness, 0.0f, 0.5f);
+							tooltip_on_hover("The particles stop anywhere up to that part of the edge's radius before it,\nso the circle is a soft band instead of a saturated line.");
+							MULTIPROPERTY_RANGED("Edge leak", as_portal.rings_effect.value.particles.edge_leak, 0.0f, 1.0f);
+							tooltip_on_hover("The fraction of the particles going past the edge, as decoration.");
+							MULTIPROPERTY_RANGED("Leak fade (s)", as_portal.rings_effect.value.particles.leak_fade_secs, 0.1f, 15.0f);
+							tooltip_on_hover("Once past the edge, the leaking particles fade out over that time,\nkeeping their size, however long they had left to live.");
+						}
+					}
+
 					//MULTIPROPERTY("Inner color", as_portal.rings_effect.value.inner_color);
 					//MULTIPROPERTY("Outer color", as_portal.rings_effect.value.outer_color);
 				}

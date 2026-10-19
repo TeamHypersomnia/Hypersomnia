@@ -212,6 +212,7 @@ public:
 	*/
 	static constexpr auto explosion_particles_layer = particle_layer::TRAILS;
 	augs::constant_size_vector<explosion_particle, MAX_EXPLOSION_PARTICLES> explosion_particles;
+	augs::constant_size_vector<portal_particle, MAX_PORTAL_PARTICLES> portal_particles;
 
 	/* Here we must have a vector as we would be forced to allocate memory every time we begin an emission */
 	per_particle_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
@@ -232,6 +233,7 @@ public:
 	void add_particle(const particle_layer, const animated_particle&);
 	void add_particle(const particle_layer, const entity_id, const homing_animated_particle&);
 	void add_explosion_particle(const explosion_particle&);
+	void add_portal_particle(const portal_particle&);
 
 	std::size_t count_all_particles() const;
 	std::size_t count_particles_on_layer(particle_layer) const;

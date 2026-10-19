@@ -2817,6 +2817,8 @@ void settings_gui_state::perform(
 							tooltip_on_hover("Shape of muzzle flashes - the same for every gun at 0.5.\nLower spreads them further out, higher concentrates them near the muzzle.");
 							revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
 							revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
+							revertable_slider(SCOPE_CFG_NVP(portal_particle_amount), 0.f, 2.f);
+							tooltip_on_hover("Scales the pixel particles of every portal.\nAll the portals in view still share at most 20000.");
 						}
 
 						ImGui::Separator();
