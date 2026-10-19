@@ -4,7 +4,7 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [4.0.0] - 2026-10-18
+## [4.0.0] - 2026-10-19
 
 ### Added
 
@@ -74,6 +74,7 @@
 - Shortened bullet traces a bit as they were a bit excessive.
 - Bots see only as far as a player standing in their spot would.
 - Bots using sniper rifles wait a moment before the first shot. 
+- Losing to a **weaker opponent** costs at most as much MMR as losing to an equal one.
 
 ### Fixed
 
