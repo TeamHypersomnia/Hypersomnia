@@ -83,6 +83,20 @@ void debug_details_summaries::acquire(
 	}
 }
 
+void show_fps(
+	const augs::drawer output,
+	const augs::baked_font& numbers_font,
+	const int fps
+) {
+	using namespace augs::gui::text;
+
+	print(
+		output,
+		vec2i(9, 0),
+		formatted_string(typesafe_sprintf("%x", fps), style(numbers_font, rgba(255, 255, 255, 200)))
+	);
+}
+
 void show_recent_logs(
 	const augs::drawer output,
 	const augs::baked_font& gui_font,

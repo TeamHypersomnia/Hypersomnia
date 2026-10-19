@@ -40,6 +40,12 @@ struct debug_details_summaries {
 	);
 };
 
+void show_fps(
+	const augs::drawer output,
+	const augs::baked_font& numbers_font,
+	const int fps
+);
+
 void show_performance_details(
 	const augs::drawer output,
 	const augs::baked_font& gui_font,

@@ -122,6 +122,10 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 #if WEB_CRAZYGAMES
 		auto& app_controls = result.app_controls;
 
+		if (const auto k = key_or_default(app_controls, app_intent_type::SHOW_FPS); k != key_type()) {
+			app_controls.erase(k);
+		}
+
 		if (const auto k = key_or_default(app_controls, app_intent_type::SHOW_PERFORMANCE); k != key_type()) {
 			app_controls.erase(k);
 		}

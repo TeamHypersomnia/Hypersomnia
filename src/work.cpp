@@ -5229,30 +5229,36 @@ work_result work(
 	WEBSTATIC auto handle_app_intent = [&](const app_intent_type intent) {
 		using T = decltype(intent);
 
+		/*
+			The FPS, the performance details and the logs exclude each other.
+		*/
+
+		auto toggle_debug_overlay = [&](auto member) {
+			change_with_save([&](config_json_table& cfg) {
+				auto& session = cfg.session;
+				const bool new_value = !(session.*member);
+
+				session.show_fps = false;
+				session.show_performance = false;
+				session.show_logs = false;
+
+				session.*member = new_value;
+			});
+		};
+
 		switch (intent) {
+			case T::SHOW_FPS: {
+				toggle_debug_overlay(&session_settings::show_fps);
+				break;
+			}
+
 			case T::SHOW_PERFORMANCE: {
-				change_with_save([&](config_json_table& cfg) {
-					bool& f = cfg.session.show_performance;
-					f = !f;
-
-					if (f) {
-						cfg.session.show_logs = false;
-					}
-				});
-
+				toggle_debug_overlay(&session_settings::show_performance);
 				break;
 			}
 
 			case T::SHOW_LOGS: {
-				change_with_save([&](config_json_table& cfg) {
-					bool& f = cfg.session.show_logs;
-					f = !f;
-
-					if (f) {
-						cfg.session.show_performance = false;
-					}
-				});
-
+				toggle_debug_overlay(&session_settings::show_logs);
 				break;
 			}
 
@@ -6184,6 +6190,14 @@ work_result work(
 	*/
 
 	WEBSTATIC augs::timer frame_timer;
+
+	struct fps_counter_state {
+		int frames = 0;
+		double secs = 0.0;
+		int shown = 0;
+	};
+
+	WEBSTATIC fps_counter_state fps_counter;
 	
 	WEBSTATIC release_flags releases;
 
@@ -6309,6 +6323,21 @@ work_result work(
 
 			const auto frame_delta = frame_timer.extract_delta();
 			const auto current_frame_num = current_frame.load();
+
+			/*
+				The FPS shown with show_fps - frames counted over half a second, so that it stays readable.
+			*/
+
+			{
+				fps_counter.frames += 1;
+				fps_counter.secs += frame_delta.in_seconds();
+
+				if (fps_counter.secs >= 0.5) {
+					fps_counter.shown = static_cast<int>(std::round(fps_counter.frames / fps_counter.secs));
+					fps_counter.frames = 0;
+					fps_counter.secs = 0.0;
+				}
+			}
 			auto game_gui_mode = game_gui_mode_flag;
 
 			auto& write_buffer = get_write_buffer();
@@ -7364,6 +7393,14 @@ work_result work(
 				);
 			};
 
+			auto show_fps = [&](augs::renderer& chosen_renderer) {
+				::show_fps(
+					get_drawer_for(chosen_renderer),
+					streaming.get_loaded_gui_fonts().large_numbers,
+					fps_counter.shown
+				);
+			};
+
 			auto show_recent_logs = [&](augs::renderer& chosen_renderer) {
 				::show_recent_logs(
 					get_drawer_for(chosen_renderer),
@@ -7604,7 +7641,15 @@ work_result work(
 				show_recent_logs(debug_details_renderer);
 			};
 
+			auto show_fps_job = [&]() {
+				show_fps(debug_details_renderer);
+			};
+
 			enqueue_visibility_jobs();
+
+			if (new_viewing_config.session.show_fps) {
+				thread_pool.enqueue(show_fps_job);
+			}
 
 			if (new_viewing_config.session.show_performance) {
 				thread_pool.enqueue(show_performance_details_job);

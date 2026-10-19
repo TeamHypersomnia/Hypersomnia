@@ -4714,6 +4714,7 @@ void settings_gui_state::perform(
 						break;
 					}
 					case advanced_settings_pane::DEBUG: {
+						revertable_checkbox("Show FPS", config.session.show_fps);
 						revertable_checkbox("Show performance", config.session.show_performance);
 						revertable_checkbox("Show logs", config.session.show_logs);
 						revertable_checkbox("Log keystrokes", config.window.log_keystrokes);

@@ -100,8 +100,9 @@
     },
 
     "app_controls": {
-        "F1": "SHOW_PERFORMANCE",
+        "F1": "SHOW_FPS",
         "F3": "SHOW_LOGS",
+        "F4": "SHOW_PERFORMANCE",
         // "F9": "TOGGLE_STREAMER_MODE",
         // "F10": "TOGGLE_CINEMATIC_MODE"
     },
@@ -773,6 +774,7 @@
     },
 
     "session": {
+        "show_fps": false,
         "show_performance": false,
         "show_logs": false,
         "hide_settings_ingame": true,

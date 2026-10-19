@@ -11,6 +11,7 @@
 
 struct session_settings {
 	// GEN INTROSPECTOR struct session_settings
+	bool show_fps = false;
 	bool show_performance = false;
 	bool show_logs = false;
 	bool hide_settings_ingame = false;

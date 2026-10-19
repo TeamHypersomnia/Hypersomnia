@@ -7,6 +7,7 @@ enum class app_intent_type {
 	// GEN INTROSPECTOR enum class app_intent_type
 	INVALID,
 
+	SHOW_FPS,
 	SHOW_PERFORMANCE,
 	SHOW_LOGS,
 
