@@ -6594,6 +6594,11 @@ work_result work(
 					settings_gui.ask_whether_link_is_theirs();
 				}
 
+#if !WEB_CRAZYGAMES
+				/*
+					No account keys on CrazyGames - nothing to unlink or import there.
+				*/
+
 				if (!in_a_game) {
 					if (const auto steam_name = identity->take_unlinked()) {
 						settings_gui.tell_unlinked(*steam_name);
@@ -6612,6 +6617,7 @@ work_result work(
 
 					identity->imported_profile_applied();
 				}
+#endif
 
 				const auto viewing_config = get_setup_customized_config();
 				out.viewing_config = viewing_config;
