@@ -10,6 +10,7 @@
 #include "game/components/light_component.h"
 #include "3rdparty/Box2D/Dynamics/b2Filter.h"
 #include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 #include "augs/pad_bytes.h"
 
 struct visibility_information_request_input {
@@ -49,6 +50,13 @@ namespace messages {
 		*/
 
 		bool muzzle_flash = false;
+
+		/*
+			When set, the polygon is computed only within this world rect, which must contain the eye,
+			instead of within queried_rect centered at the eye - e.g. only where it can be seen at all.
+		*/
+
+		std::optional<ltrb> only_within;
 
 		bool valid() const;
 	};

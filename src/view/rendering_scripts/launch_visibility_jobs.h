@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+#include "augs/math/rects.h"
 #include "augs/math/transform.h"
 #include "game/cosmos/entity_id.h"
 
@@ -28,6 +30,8 @@ void enqueue_visibility_jobs(
 	entity_id subject,
 	transformr viewed_character_transform,
 	const fog_of_war_settings& fog_of_war,
+	const std::optional<ltrb>& fow_needed_only_in,
+	vec2 fow_look_direction,
 	real32 point_light_shadow_smoothness_multiplier,
 	bool point_light_soft_shadows,
 	bool point_light_heights

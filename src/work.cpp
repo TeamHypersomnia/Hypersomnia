@@ -7500,6 +7500,22 @@ work_result work(
 
 				const auto fog_of_war = get_considered_fow(new_viewing_config);
 
+				/*
+					In the world, the fog of war hides enemies only on the screen - as the camera shows it,
+					with the edge zoomout, and a margin for snapping the camera to pixels.
+					The minimap overlay draws it beyond, so then the whole area is needed.
+				*/
+
+				const auto fow_needed_only_in = [&]() -> std::optional<ltrb> {
+					if (new_viewing_config.drawing.minimap.fog_of_war_color.a > 0) {
+						return std::nullopt;
+					}
+
+					auto screen = get_camera_cone(new_viewing_config).get_visible_world_rect_aabb();
+					screen.expand_from_center(vec2::square(16.0f));
+					return screen;
+				}();
+
 				const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
 #if BUILD_STENCIL_BUFFER
@@ -7522,6 +7538,8 @@ work_result work(
 					viewed_character,
 					viewed_character_transform ? *viewed_character_transform : transformr(),
 					fog_of_war,
+					fow_needed_only_in,
+					viewed_character ? ::calc_look_direction(viewed_character, calc_pre_step_crosshair_displacement(new_viewing_config)) : vec2::zero,
 					new_viewing_config.performance.point_light_shadows.smoothness_mult,
 					new_viewing_config.performance.point_light_shadows.soft,
 					new_viewing_config.performance.point_light_shadows.heights

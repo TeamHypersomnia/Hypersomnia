@@ -250,6 +250,21 @@ void visibility_system::calc_visibility(
 	aabb.lowerBound = b2Vec2(eye_meters - vision_meters / 2);
 	aabb.upperBound = b2Vec2(eye_meters + vision_meters / 2);
 
+	if (request.only_within.has_value()) {
+		const auto& within = *request.only_within;
+
+		aabb.lowerBound = b2Vec2(si.get_meters(within.lt()));
+		aabb.upperBound = b2Vec2(si.get_meters(within.rb()));
+	}
+
+	const auto aabb_size = vec2(aabb.upperBound) - vec2(aabb.lowerBound);
+
+	/*
+		Every ray reaches past the bounds, wherever the eye is within them.
+	*/
+
+	const auto ray_reach = aabb_size.length() * 1.5f;
+
 	auto push_vertex_if_within_range = [
 		eye_meters, 
 		boundary = ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y)
@@ -412,9 +427,9 @@ void visibility_system::calc_visibility(
 		/* extract the actual vertices from visibility AABB to cast rays to */
 		const b2Vec2 whole_vision[] = {
 			aabb.lowerBound,
-			aabb.lowerBound + b2Vec2(vision_meters.x, 0),
+			aabb.lowerBound + b2Vec2(aabb_size.x, 0),
 			aabb.upperBound,
-			aabb.upperBound - b2Vec2(vision_meters.x, 0)
+			aabb.upperBound - b2Vec2(aabb_size.x, 0)
 		};
 
 		/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit
@@ -616,7 +631,7 @@ void visibility_system::calc_visibility(
 			return result;
 		}();
 
-		vec2 destination = eye_meters + direction * vision_meters.bigger_side() / 2 * 1.5f;
+		vec2 destination = eye_meters + direction * ray_reach;
 
 		for (const auto& bound : visibility_bounds) {
 			const auto edge_ray_output = segment_segment_intersection(

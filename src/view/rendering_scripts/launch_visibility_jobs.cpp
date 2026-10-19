@@ -8,6 +8,7 @@
 #include "augs/templates/thread_pool.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/dedicated_buffers.h"
+#include "augs/math/sector_aabb.h"
 #include "game/enums/filters.h"
 #include "game/cosmos/cosmos.h"
 #include "game/stateless_systems/visibility_system.h"
@@ -97,6 +98,8 @@ void enqueue_visibility_jobs(
 	const entity_id subject,
 	const transformr viewed_character_transform,
 	const fog_of_war_settings& fog_of_war,
+	const std::optional<ltrb>& fow_needed_only_in,
+	const vec2 fow_look_direction,
 	const real32 point_light_shadow_smoothness_multiplier,
 	const bool point_light_soft_shadows,
 	const bool point_light_heights
@@ -287,12 +290,48 @@ void enqueue_visibility_jobs(
 	launch_light_jobs();
 
 	if (fow_effective) {
-		const auto fow_size = fog_of_war.get_real_size();
+		const auto eye = viewed_character_transform.pos;
+		const auto full_size = fog_of_war.get_real_size();
+
+		/*
+			Rays only where the fog of war can show at all: within the screen, if it's needed only there,
+			and within the field of view angle - both its consumers draw it through fog_of_war.fsh, which cuts the rest.
+			Every point of that part is seen along a segment from the eye that stays within its bounding box with the eye,
+			so the obstacles past the box can't hide it. A few degrees of margin cover rounding.
+		*/
+
+		const auto only_within = [&]() {
+			auto needed = ltrb::center_and_size(eye, full_size);
+
+			if (fow_needed_only_in.has_value()) {
+				needed.clip_by(*fow_needed_only_in);
+			}
+
+			const auto fov_margin_degrees = 3.0f;
+
+			auto result = augs::calc_sector_within_rect_aabb(
+				eye,
+				fow_look_direction,
+				fog_of_war.angle / 2 + fov_margin_degrees,
+				needed
+			);
+
+			/*
+				The eye must never lie on the bounds - looking straight up, the sides of the sector run almost level,
+				and the rays grazing the bottom bound right at the eye would break the polygon.
+			*/
+
+			const auto eye_margin = 64.0f;
+
+			result.contain(ltrb::center_and_size(eye, vec2::square(eye_margin * 2)));
+			return result;
+		}();
 
 		visibility_request request;
 		request.eye_transform = viewed_character_transform;
 		request.filter = predefined_queries::line_of_sight();
-		request.queried_rect = fow_size;
+		request.queried_rect = full_size;
+		request.only_within = only_within;
 		request.subject = subject;
 
 		auto& fow_response = cached_visibility.fow_response;
