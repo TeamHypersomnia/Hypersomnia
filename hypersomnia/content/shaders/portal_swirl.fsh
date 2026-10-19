@@ -168,20 +168,48 @@ float mean_opacity(float r) {
 
 /*
 	portal_mode 1: the data.
+
+	The texture's last row holds the profiles, the rest - the snapshots, angles along x, radii up to data_max_r along y.
+	Sampled bilinearly (the angle wrapping around), so that zoomed in it does not look blocky.
+
+	While a snapshot is mixed in (from one zero of its weight to the next), its grain flows outwards at data_outflow
+	(in the portal's radii per second), as the particles drifting out and leaking past the rim do -
+	inside and in the halo, never across the rim's edge, where it would pull the inside's grain into the steep edge.
+	The flow fades out and in over wide ranges of the radius, so that the sampled radius never folds back.
 */
 
-const int data_angles = 1024;
-const int data_radii = 256;
 const float data_max_r = 2.0;
 const float data_cycle_secs = 1.1;
 const float data_spin_degrees = 9.5;
 const float data_halo_spin_degrees = 7.0;
+const float data_outflow = 0.13;
+const float data_pixel_size = 1.0;
+const float data_edge_grain_cut = 0.85;
 
-float data_layer(int layer, int row, float theta_turns) {
-	int column = int(floor(fract(theta_turns) * float(data_angles))) % data_angles;
-	vec3 texel = texelFetch(basic_texture, ivec2(column, row), 0).rgb;
-	float value = layer == 0 ? texel.r : (layer == 1 ? texel.g : texel.b);
-	return value * 8.0 - 3.0;
+float data_channel(vec3 texel, int layer) {
+	return layer == 0 ? texel.r : (layer == 1 ? texel.g : texel.b);
+}
+
+float data_layer(int layer, float r, float theta_turns, ivec2 size) {
+	int angles = size.x;
+	int radii = size.y - 1;
+
+	float u = fract(theta_turns) * float(angles) - 0.5;
+	float v = clamp(r / data_max_r * float(radii) - 0.5, 0.0, float(radii - 1));
+
+	int c0 = int(floor(u));
+	float fu = u - float(c0);
+	c0 = (c0 % angles + angles) % angles;
+	int c1 = (c0 + 1) % angles;
+
+	int r0 = int(floor(v));
+	float fv = v - float(r0);
+	int r1 = min(r0 + 1, radii - 1);
+
+	float a = mix(data_channel(texelFetch(basic_texture, ivec2(c0, r0), 0).rgb, layer), data_channel(texelFetch(basic_texture, ivec2(c1, r0), 0).rgb, layer), fu);
+	float b = mix(data_channel(texelFetch(basic_texture, ivec2(c0, r1), 0).rgb, layer), data_channel(texelFetch(basic_texture, ivec2(c1, r1), 0).rgb, layer), fu);
+
+	return mix(a, b, fv) * 8.0 - 3.0;
 }
 
 float appearance_offset(int k, uint seed) {
@@ -189,21 +217,45 @@ float appearance_offset(int k, uint seed) {
 }
 
 float data_alpha(float r, float theta, uint seed) {
-	int row = min(int(r / data_max_r * float(data_radii)), data_radii - 1);
-	vec2 profile = texelFetch(basic_texture, ivec2(row, data_radii), 0).rg * 255.0;
+	ivec2 size = textureSize(basic_texture, 0);
+	int radii = size.y - 1;
+
+	float row = clamp(r / data_max_r * float(radii) - 0.5, 0.0, float(radii - 1));
+	int row0 = int(floor(row));
+	int row1 = min(row0 + 1, radii - 1);
+	vec2 profile = mix(
+		texelFetch(basic_texture, ivec2(row0, radii), 0).rg,
+		texelFetch(basic_texture, ivec2(row1, radii), 0).rg,
+		row - float(row0)
+	) * 255.0;
 
 	float spin = radians(mix(data_spin_degrees, data_halo_spin_degrees, smoothstep(1.0, 1.15, r)));
 	float turns = (theta - spin * global_time) / (2.0 * PI);
+
+	float outflow_weight = 1.0 - smoothstep(0.7, 0.9, r) + smoothstep(1.2, 1.4, r);
 
 	float z = 0.0;
 
 	for (int layer = 0; layer < 3; ++layer) {
 		float phase = global_time / data_cycle_secs - float(layer) / 3.0;
-		int appearance = int(floor(phase + 0.5)) * 3 + layer;
+		float since_zero = phase + 0.5;
+		int appearance = int(floor(since_zero)) * 3 + layer;
+		float age_secs = fract(since_zero) * data_cycle_secs;
 		float weight = sqrt((1.0 + cos(2.0 * PI * phase)) / 3.0);
 
-		z += weight * data_layer(layer, row, turns + appearance_offset(appearance, seed));
+		float flow = data_outflow * age_secs * outflow_weight;
+		float flowed_r = max(0.0, r - flow);
+
+		z += weight * data_layer(layer, flowed_r, turns + appearance_offset(appearance, seed), size);
 	}
+
+	/*
+		Across the rim's outer edge the brightness drops steeply, so the deviation there is huge, and the snapshots,
+		each with its edge somewhere else, would add up into sharp contours - there the mean profile alone, already soft.
+	*/
+
+	float edge_band = smoothstep(0.95, 1.0, r) * (1.0 - smoothstep(1.12, 1.2, r));
+	z *= 1.0 - data_edge_grain_cut * edge_band;
 
 	return (profile.x + profile.y * z) / 248.0;
 }
@@ -214,7 +266,7 @@ void main() {
 	uint seed = uint(portal.w);
 
 	/* Pixel art: the center of the world pixel this fragment is in. */
-	float pixel_px = max(zoom * pixel_size, 1.0);
+	float pixel_px = max(zoom * (portal_mode == 1 ? data_pixel_size : pixel_size), 1.0);
 	vec2 rel = (floor((gl_FragCoord.xy - center) / pixel_px) + 0.5) * pixel_px;
 
 	/* The world's y goes down. */

@@ -1,9 +1,6 @@
 #pragma once
 #include <cstddef>
 #include <limits>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 #include "augs/misc/bound.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/constant_size_vector.h"
@@ -16,13 +13,12 @@
 #include "game/components/transform_component.h"
 
 #include "view/view_container_sizes.h"
+#include "view/audiovisual_state/systems/portal_particles_spawner.h"
 
 class particles_simulation_system;
 struct randomization;
 struct common_assets;
 struct explosions_settings;
-struct continuous_rings_input;
-struct particles_emission;
 class cosmos;
 
 class exploding_ring_system {
@@ -57,33 +53,10 @@ public:
 	cached_visibility last_visibility;
 
 	/*
-		The portals with pixel particles in view this frame (see spawn_portal_particles) -
-		caches kept between the frames so as not to allocate.
+		Only in developer builds, with Settings > Portal effects: PARTICLES.
 	*/
 
-	struct visible_portal {
-		entity_id id;
-		vec2 center;
-		float radius = 0.f;
-		const continuous_rings_input* rings = nullptr;
-		float count = 0.f;
-		int alive = 0;
-	};
-
-	std::vector<visible_portal> visible_portals;
-	std::unordered_map<entity_id, std::size_t> visible_portal_indices;
-	std::unordered_set<entity_id> portals_visible_last_frame;
-
-	void spawn_portal_particles(
-		const cosmos& cosm,
-		randomization& rng,
-		const ltrb queried_camera_aabb,
-		const explosions_settings& settings,
-		const particles_emission& emission,
-		particles_simulation_system& particles,
-		const float amount_mult,
-		const float dt_secs
-	);
+	portal_particles_spawner portal_particles;
 
 	augs::constant_size_vector<ring, MAX_EXPLODING_RINGS> rings;
 
@@ -102,7 +75,6 @@ public:
 		const augs::delta dt,
 		const explosions_settings& settings,
 		const float portal_particle_amount,
-		const bool portal_particles_enabled,
 		particles_simulation_system& particles_output_for_effects
 	);
 

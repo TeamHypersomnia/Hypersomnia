@@ -1092,7 +1092,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	const bool portal_swirls = in.perf_settings.special_effects.portal_effects != portal_effects_type::PARTICLES;
+	const bool portal_swirls = in.perf_settings.special_effects.get_portal_effects() != portal_effects_type::PARTICLES;
 
 	auto special_effects_job = [&cosm, &exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, actual_cone, get_line_drawer_for, portal_swirls]() {
 		{

@@ -1415,7 +1415,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::SENTIENCE_INDICATORS);
 	renderer.call_triangles(D::INDICATORS_AND_CALLOUTS);
 
-	if (const auto portal_effects = in.perf_settings.special_effects.portal_effects;
+	if (const auto portal_effects = in.perf_settings.special_effects.get_portal_effects();
 		shaders.portal_swirl && portal_effects != portal_effects_type::PARTICLES
 	) {
 		const bool with_data = portal_effects == portal_effects_type::SHADER_WITH_DATA && in.portal_swirl_data != nullptr;

@@ -17,6 +17,7 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
 #include "view/viewables/particle_types.h"
+#include "view/viewables/portal_particle.h"
 #include "view/view_container_sizes.h"
 #include "view/audiovisual_state/special_effects_settings.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"

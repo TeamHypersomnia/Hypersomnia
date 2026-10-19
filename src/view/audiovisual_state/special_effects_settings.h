@@ -101,6 +101,29 @@ enum class portal_effects_type {
 	// END GEN INTROSPECTOR
 };
 
+/*
+	The resolution of the portal shader's data texture: HIGH as made, MEDIUM and LOW downscaled 2x and 4x.
+	It only affects VRAM usage - the cost of drawing barely changes.
+*/
+
+enum class portal_effect_quality {
+	// GEN INTROSPECTOR enum class portal_effect_quality
+	LOW,
+	MEDIUM,
+	HIGH,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+inline unsigned get_portal_data_downscale(const portal_effect_quality q) {
+	switch (q) {
+		case portal_effect_quality::LOW: return 4;
+		case portal_effect_quality::MEDIUM: return 2;
+		default: return 1;
+	}
+}
+
 struct special_effects_settings {
 	// GEN INTROSPECTOR struct special_effects_settings
 	explosions_settings explosions;
@@ -110,7 +133,20 @@ struct special_effects_settings {
 	float particle_burst_amount = 1.f;
 	float portal_particle_amount = 1.f;
 	portal_effects_type portal_effects = portal_effects_type::SHADER_WITH_DATA;
+	portal_effect_quality portal_quality = portal_effect_quality::HIGH;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const special_effects_settings& b) const = default;
+
+	/*
+		The particles and the shader without data are for making new portal effects - developer builds only.
+	*/
+
+	portal_effects_type get_portal_effects() const {
+#if IS_PRODUCTION_BUILD
+		return portal_effects_type::SHADER_WITH_DATA;
+#else
+		return portal_effects;
+#endif
+	}
 };

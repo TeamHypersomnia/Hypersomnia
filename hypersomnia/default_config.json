@@ -1147,7 +1147,8 @@
             "particle_stream_amount": 1.0,
             "particle_burst_amount": 1.0,
             "portal_particle_amount": 1.0,
-            "portal_effects": "SHADER_WITH_DATA"
+            "portal_effects": "SHADER_WITH_DATA",
+            "portal_quality": "HIGH"
         },
         "max_particles_in_single_job": 2500,
         "OFF_custom_num_pool_workers": 0,

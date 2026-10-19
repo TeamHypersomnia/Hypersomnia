@@ -1,4 +1,7 @@
 #include "augs/log.h"
+#include <cmath>
+#include <algorithm>
+#include "all_paths.h"
 #include <unordered_set>
 #include "augs/graphics/renderer.h"
 #include "augs/templates/thread_templates.h"
@@ -731,4 +734,116 @@ void viewables_streaming::display_loading_progress() const {
 			text_color("The game is compressing demo files. Please be patient.\n", yellow);
 		}
 	}
+}
+
+/*
+	The data texture downscaled by an integer factor (see portal_swirl.fsh for the layout):
+	the snapshots averaged in blocks, then normalized again row by row (averaging lowers their deviation),
+	the profiles in the last row averaged too.
+*/
+
+static augs::image make_portal_swirl_data(const augs::image& source, const unsigned downscale) {
+	if (downscale <= 1) {
+		return source;
+	}
+
+	const auto size = source.get_size();
+	const auto radii = size.y - 1;
+	const auto out_angles = size.x / downscale;
+	const auto out_radii = radii / downscale;
+
+	auto result = augs::image(vec2u(out_angles, out_radii + 1));
+
+	auto decode = [](const rgba_channel c) {
+		return static_cast<float>(c) / 255.f * 8.f - 3.f;
+	};
+
+	auto encode = [](const float z) {
+		return static_cast<rgba_channel>(std::clamp((z + 3.f) / 8.f * 255.f + 0.5f, 0.f, 255.f));
+	};
+
+	auto row_values = std::vector<float>(out_angles);
+
+	for (unsigned y = 0; y < out_radii; ++y) {
+		for (unsigned channel = 0; channel < 3; ++channel) {
+			for (unsigned x = 0; x < out_angles; ++x) {
+				auto sum = 0.f;
+
+				for (unsigned dy = 0; dy < downscale; ++dy) {
+					for (unsigned dx = 0; dx < downscale; ++dx) {
+						sum += decode(source.pixel(vec2u(x * downscale + dx, y * downscale + dy))[channel]);
+					}
+				}
+
+				row_values[x] = sum / static_cast<float>(downscale * downscale);
+			}
+
+			auto mean = 0.f;
+
+			for (const auto v : row_values) {
+				mean += v;
+			}
+
+			mean /= static_cast<float>(out_angles);
+
+			auto variance = 0.f;
+
+			for (const auto v : row_values) {
+				variance += (v - mean) * (v - mean);
+			}
+
+			const auto deviation = std::max(std::sqrt(variance / static_cast<float>(out_angles)), 0.001f);
+
+			for (unsigned x = 0; x < out_angles; ++x) {
+				result.pixel(vec2u(x, y))[channel] = encode((row_values[x] - mean) / deviation);
+			}
+		}
+
+		for (unsigned x = 0; x < out_angles; ++x) {
+			result.pixel(vec2u(x, y))[3] = 255;
+		}
+	}
+
+	for (unsigned i = 0; i < out_radii; ++i) {
+		auto mean = 0.f;
+		auto deviation = 0.f;
+
+		for (unsigned d = 0; d < downscale; ++d) {
+			const auto& p = source.pixel(vec2u(i * downscale + d, radii));
+			mean += p.r;
+			deviation += p.g;
+		}
+
+		result.pixel(vec2u(i, out_radii)) = rgba(
+			static_cast<rgba_channel>(mean / downscale + 0.5f),
+			static_cast<rgba_channel>(deviation / downscale + 0.5f),
+			0,
+			255
+		);
+	}
+
+	return result;
+}
+
+void viewables_streaming::load_portal_swirl_data(const unsigned downscale) {
+	try {
+		auto source = augs::image();
+		source.from_file(PORTAL_SWIRL_DATA);
+
+		portal_swirl_data.emplace(::make_portal_swirl_data(source, downscale));
+		portal_swirl_data_source.emplace(std::move(source));
+		portal_swirl_data_downscale = downscale;
+	}
+	catch (const std::exception& err) {
+		LOG("Failed to load %x: %x. The portals fall back to the shader without data.", PORTAL_SWIRL_DATA, err.what());
+	}
+}
+
+void viewables_streaming::update_portal_swirl_data(augs::renderer& renderer, const unsigned downscale) {
+	if (!portal_swirl_data.has_value() || !portal_swirl_data_source.has_value() || downscale == portal_swirl_data_downscale) {
+		return;
+	}
+
+	portal_swirl_data->texImage2D(renderer, ::make_portal_swirl_data(*portal_swirl_data_source, downscale));
+	portal_swirl_data_downscale = downscale;
 }

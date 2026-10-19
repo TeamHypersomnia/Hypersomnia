@@ -2456,14 +2456,7 @@ work_result work(
 		streaming.avatar_preview_tex = augs::graphics::texture(avatar); 
 	}
 
-	try {
-		augs::image portal_swirl_data;
-		portal_swirl_data.from_file(PORTAL_SWIRL_DATA);
-		streaming.portal_swirl_data.emplace(portal_swirl_data);
-	}
-	catch (const std::exception& err) {
-		LOG("Failed to load %x: %x. The portals fall back to the shader without data.", PORTAL_SWIRL_DATA, err.what());
-	}
+	streaming.load_portal_swirl_data(::get_portal_data_downscale(config.performance.special_effects.portal_quality));
 
 	WEBSTATIC auto get_my_avatar_bytes = [&]() {
 		std::vector<std::byte> avatar;
@@ -7553,6 +7546,11 @@ work_result work(
 					so its icons always sample the atlas 1:1.
 				*/
 				{
+			streaming.update_portal_swirl_data(
+				get_general_renderer(),
+				::get_portal_data_downscale(new_viewing_config.performance.special_effects.portal_quality)
+			);
+
 					const auto& minimap = new_viewing_config.drawing.minimap;
 					auto& chosen_renderer = get_general_renderer();
 

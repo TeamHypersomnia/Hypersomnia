@@ -629,6 +629,7 @@ if(HAS_HEAD)
 	"src/view/viewables/particle_effect.cpp"
 	"src/view/audiovisual_state/aabb_highlighter.cpp"
 	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
+	"src/view/audiovisual_state/systems/portal_particles_spawner.cpp"
 	"src/view/audiovisual_state/systems/finishing_trace_system.cpp"
 	"src/view/audiovisual_state/systems/throw_trajectory_system.cpp"
 	"src/view/audiovisual_state/systems/light_system.cpp"

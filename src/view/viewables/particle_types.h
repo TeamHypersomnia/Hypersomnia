@@ -169,8 +169,6 @@ struct explosion_particle {
 	float angle = 0.f;
 	float rotation_offset = 0.f;
 	float max_radius = std::numeric_limits<float>::max();
-	bool stop_at_max_radius = false;
-	float angular_vel = 0.f;
 
 	float velocity_damping = 0.f;
 
@@ -180,20 +178,6 @@ struct explosion_particle {
 	float hot_until_ms = 0.f;
 	float cool_from_ms = std::numeric_limits<float>::max();
 	float cool_until_ms = std::numeric_limits<float>::max();
-	float fade_in_ms = 0.f;
-	float fade_out_ms = 0.f;
-	float max_alpha = 1.f;
-
-	/*
-		Above 0, once past edge_fade_radius, the particle fades out over edge_fade_ms instead of living out its lifetime,
-		keeping the size and alpha it had then.
-	*/
-
-	float edge_fade_radius = std::numeric_limits<float>::max();
-	float edge_fade_ms = 0.f;
-	float edge_fade_start_ms = -1.f;
-	float edge_fade_from_alpha = 1.f;
-	float lifetime_before_edge_fade_ms = 0.f;
 
 	explosion_particles_palette palette;
 	float palette_offset = 0.f;
@@ -202,12 +186,6 @@ struct explosion_particle {
 	void integrate(const float dt);
 	void update_sprite_color();
 	void update_sprite_transform();
-	float calc_lifetime_alpha() const;
-	void begin_edge_fade();
-
-	bool is_edge_fading() const {
-		return edge_fade_start_ms >= 0.f;
-	}
 
 	template <bool use_neon_maps, class M>
 	void draw_as_sprite(
@@ -216,33 +194,12 @@ struct explosion_particle {
 		const M& manager,
 		const plain_animations_pool& anims
 	) const {
-		if (is_edge_fading()) {
-			/*
-				The size as of crossing the edge.
-			*/
-
-			auto frozen = sprite;
-			frozen.current_lifetime_ms = edge_fade_start_ms;
-			frozen.max_lifetime_ms = lifetime_before_edge_fade_ms;
-			frozen.template draw_as_sprite<use_neon_maps>(t1, t2, manager, anims);
-			return;
-		}
-
 		sprite.template draw_as_sprite<use_neon_maps>(t1, t2, manager, anims);
 	}
 
 	bool is_dead() const {
 		return sprite.is_dead();
 	}
-};
-
-/*
-	A portal's pixel particle (see continuous_rings_particles), knowing its portal -
-	so that the particles of a portal out of view are dropped, and each portal's are counted against its budget.
-*/
-
-struct portal_particle : explosion_particle {
-	entity_id owner;
 };
 
 struct animation_in_particle {
