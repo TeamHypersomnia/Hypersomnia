@@ -3344,7 +3344,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("2.1");
+			charge_deposit_def.space_available = to_space_units("1.1");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::BULLDUP2000_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -4476,7 +4476,7 @@ namespace test_flavours {
 			gun_def.bot_aim_radius_to_shoot = 8.0f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {16000.f, 16000.f};
+			gun_def.muzzle_velocity = {14000.f, 14000.f};
 			gun_def.shot_cooldown_ms = 600.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.gunshot_decal_scale = 4.f;

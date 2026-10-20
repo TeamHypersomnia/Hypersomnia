@@ -10,7 +10,7 @@
 	of the per-map default_zoom arena setting. Maps can still
 	override it, and camera_zoom areas take precedence locally.
 */
-constexpr float BALANCE_ZOOM_OUT = 0.75f;
+constexpr float BALANCE_ZOOM_OUT = 0.7f;
 
 /*
 	The extra camera zoom-out when the crosshair reaches the screen edge -
