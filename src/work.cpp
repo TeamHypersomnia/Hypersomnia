@@ -557,16 +557,29 @@ work_result work(
 	WEBSTATIC const auto steam_id = is_steam_client ? std::to_string(::steam_get_id()) : std::string("0");
 #endif
 
-#if PLATFORM_WEB
-	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
+	::USER_DIR = ::get_user_dir([&]() -> std::optional<std::string> {
+#if PLATFORM_WEB || !IS_PRODUCTION_BUILD || CREATE_STEAM_APPID
+		/*
+			On Web, ::USER_DIR will be CWD/user, just like during normal development on Linux.
+
+			Just use the "user" folder when developing.
+			CREATE_STEAM_APPID means we're still not really in "true" production.
+			Otherwise the numbered user folder will show up in our git as we can't easily ignore it.
+		*/
+
+		return std::nullopt;
 #else
-	if (is_steam_client) {
-		::USER_DIR = APPDATA_DIR / steam_id;
-	}
-	else {
-		::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
-	}
+		if (is_steam_client) {
+			return steam_id;
+		}
+
+		return std::nullopt;
 #endif
+	}());
+
+	::KEYS_DIR = ::get_keys_dir(params.appdata_dir.empty());
+
+	LOG("Keys directory: %x", ::KEYS_DIR);
 
 	/*
 		Who the player is in this run - see identity_session.h. Only a client needs it.
@@ -574,42 +587,6 @@ work_result work(
 
 	WEBSTATIC auto identity = std::make_shared<identity_session>();
 	identity->set_device_name(augs::get_device_name());
-
-	/*
-		On Web, ::USER_DIR will be CWD/user,
-		just like during normal development on Linux.
-	*/
-
-	/* 
-		Just use the "user" folder when developing.
-		CREATE_STEAM_APPID means we're still not really in "true" production.
-		Otherwise the numbered user folder will show up in our git as we can't easily ignore it.
-	*/
-
-#if !IS_PRODUCTION_BUILD || CREATE_STEAM_APPID
-	::USER_DIR = APPDATA_DIR / NONSTEAM_USER_FOLDER_NAME;
-#endif
-
-	::KEYS_DIR = [&]() {
-#if PLATFORM_WEB
-		/*
-			Its own IndexedDB database in the browser - see pre_run in common.js (not on CrazyGames: in memory only,
-			the account is the CrazyGames one).
-		*/
-
-		return ::APPDATA_DIR / "hypersomnia_keys";
-#endif
-
-		if (params.appdata_dir.empty()) {
-			if (const auto local = augs::get_default_local_appdata_dir(); !local.empty()) {
-				return local / ::USER_DIR.filename() / identity_key::keys_dir_name;
-			}
-		}
-
-		return ::USER_DIR / identity_key::keys_dir_name;
-	}();
-
-	LOG("Keys directory: %x", ::KEYS_DIR);
 
 #if PLATFORM_UNIX && !PLATFORM_WEB
 	WEBSTATIC auto signal_handler = [](const int signal_type) {
@@ -865,31 +842,6 @@ work_result work(
 	netcode_rng = randomization(random_seed);
 #endif
 #endif
-
-	if (params.print_server_key_only) {
-		/*
-			What an official server's operator sends to the developers: the public part of server.key, made if missing.
-		*/
-
-		if (const auto error = server_key::dedicated_start_error()) {
-			std::cerr << "ERROR: " << *error << std::endl;
-			return work_result::FAILURE;
-		}
-
-		const auto seed = server_key::load_or_create(server_key::path());
-
-		/*
-			The key on a line of its own on stdout (grep -E "^[0-9a-f]{64}$" in scripts); how to use it on stderr.
-		*/
-
-		const auto key_hex = server_key::public_key_hex(*seed);
-
-		std::cerr << "Server public key (" << augs::key_scheme_name << "):" << std::endl;
-		std::cout << key_hex << std::endl;
-		std::cerr << "\nPublish it with this server's address, e.g. 1.2.3.4:8412,0x" << key_hex << "\n";
-		std::cerr << "Players add it in Browse servers - Favorites - Add an unlisted server." << std::endl;
-		return work_result::SUCCESS;
-	}
 
 	if (config.unit_tests.run || params.unit_tests_only) {
 		/* Needed by some unit tests */

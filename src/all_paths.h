@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+#include <string>
 #include "augs/filesystem/path.h"
 
 /* 
@@ -100,6 +102,17 @@ extern augs::path_type USER_DIR;
 */
 
 extern augs::path_type KEYS_DIR;
+
+/*
+	USER_DIR and KEYS_DIR as resolved at the start (defined in main.cpp) - the same for every activity and for
+	--print-server-key, so that a server's key is always looked for where the server keeps it.
+
+	get_user_dir: APPDATA_DIR / the Steam ID of a Steam client, otherwise NONSTEAM_USER_FOLDER_NAME (servers, CLI tools).
+	get_keys_dir: from USER_DIR - default_appdata_dir is true without --appdata-dir.
+*/
+
+augs::path_type get_user_dir(const std::optional<std::string>& steam_id);
+augs::path_type get_keys_dir(bool default_appdata_dir);
 
 /*
 	Derived subdirectories.

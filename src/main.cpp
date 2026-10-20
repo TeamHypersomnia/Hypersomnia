@@ -8,6 +8,7 @@
 #include "augs/window_framework/shell.h"
 
 #include "application/main/verify_signature.h"
+#include "application/main/server_key.h"
 
 #include "cmd_line_params.h"
 #include "build_info.h"
@@ -23,6 +24,76 @@ augs::path_type USER_DIR;
 augs::path_type KEYS_DIR;
 
 extern augs::mutex log_mutex;
+
+augs::path_type get_user_dir(const std::optional<std::string>& steam_id) {
+	return ::APPDATA_DIR / (steam_id.has_value() ? *steam_id : std::string(NONSTEAM_USER_FOLDER_NAME));
+}
+
+augs::path_type get_keys_dir(const bool default_appdata_dir) {
+#if PLATFORM_WEB
+	/*
+		Its own IndexedDB database in the browser - see pre_run in common.js (not on CrazyGames: in memory only,
+		the account is the CrazyGames one).
+	*/
+
+	(void)default_appdata_dir;
+	return ::APPDATA_DIR / "hypersomnia_keys";
+#else
+	/*
+		With the default app data, in the local app data dir when there is one - a synced Documents folder never holds them.
+	*/
+
+	if (default_appdata_dir) {
+		if (const auto local = augs::get_default_local_appdata_dir(); !local.empty()) {
+			return local / ::USER_DIR.filename() / identity_key::keys_dir_name;
+		}
+	}
+
+	return ::USER_DIR / identity_key::keys_dir_name;
+#endif
+}
+
+/*
+	What an official server's operator sends to the developers: the public part of server.key, made if missing.
+	Like --version - right at the start, before any logs.
+*/
+
+static int print_server_key() {
+	/*
+		Whatever is logged while reading or making the key goes to stderr - stdout has only the key.
+	*/
+
+	auto* const previous_cout = std::cout.rdbuf(std::cerr.rdbuf());
+
+	const auto error = server_key::dedicated_start_error();
+	const auto seed = [&]() -> std::optional<augs::ed25519_seed_type> {
+		if (error.has_value()) {
+			return std::nullopt;
+		}
+
+		return server_key::load_or_create(server_key::path());
+	}();
+
+	std::cout.rdbuf(previous_cout);
+
+	if (error.has_value()) {
+		std::cerr << "ERROR: " << *error << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	/*
+		The key on a line of its own on stdout (grep -E "^[0-9a-f]{64}$" in scripts); how to use it on stderr.
+	*/
+
+	const auto key_hex = server_key::public_key_hex(*seed);
+
+	std::cerr << "Server public key (" << augs::key_scheme_name << ") of " << server_key::source_name(server_key::path()) << ":" << std::endl;
+	std::cout << key_hex << std::endl;
+	std::cerr << "\nPublish it with this server's address, e.g. 1.2.3.4:8412,0x" << key_hex << "\n";
+	std::cerr << "Players add it in Browse servers - Favorites - Add an unlisted server." << std::endl;
+
+	return EXIT_SUCCESS;
+}
 
 extern std::string live_log_path;
 extern bool log_to_live_file;
@@ -180,6 +251,16 @@ int main(const int argc, const char* const * const argv) {
 	}
 	else {
 		::APPDATA_DIR = augs::get_default_documents_dir();
+	}
+
+	if (params.print_server_key_only) {
+		/*
+			A server is never a Steam client, so its keys are always in the "user" folder.
+		*/
+
+		::USER_DIR = ::get_user_dir(std::nullopt);
+		::KEYS_DIR = ::get_keys_dir(params.appdata_dir.empty());
+		return ::print_server_key();
 	}
 
 	const bool log_directory_existed = augs::exists(LOGS_DIR);
