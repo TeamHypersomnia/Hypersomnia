@@ -320,7 +320,11 @@ void test_scene_setup::restart_arena() {
 
 	range_entry_portal = {};
 
-	if (const bool completed = tutorial.level == 20) {
+	/*
+		CrazyGames' happytime: at the end of the basic tutorial (its finish screen) and of the advanced one.
+	*/
+
+	if (const bool completed = is_tutorial_finish_level() || tutorial.level == 20) {
 		web_sdk_happy_time();
 	}
 
