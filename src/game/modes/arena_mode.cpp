@@ -3252,7 +3252,7 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in
 
 	const bool progressive = casual_progressive_enabled(in);
 
-	if (over.is_set() && !progressive) {
+	if (over.is_set() && (!progressive || over.disables_bots())) {
 		return calc_requested_bots_from_quotas(
 			in,
 			over.quota,

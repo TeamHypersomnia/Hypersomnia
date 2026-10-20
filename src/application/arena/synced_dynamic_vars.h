@@ -14,6 +14,24 @@ struct bots_request {
 		return !quota.empty();
 	}
 
+	/*
+		An all-zero quota - "Bots" unchecked or "/bots 0" - wins even over the progressive difficulty.
+	*/
+
+	bool disables_bots() const {
+		if (!is_set()) {
+			return false;
+		}
+
+		for (const auto q : quota) {
+			if (q != 0) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	bool operator==(const bots_request&) const = default;
 };
 
