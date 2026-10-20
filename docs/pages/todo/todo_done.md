@@ -7579,3 +7579,15 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 
 - przeniesc fixy z jedruli na master
 - is open in editor -> editor view
+- zoom na 0.7
+- defaulty
+	- spawn bots
+	- no ff
+	- 0.7 sun strength
+
+- arena -> miniaturka
+- ustaw domyslny strength w sun_shadow_settings na 0.7
+- naprawic bots tick bo boty sa nawet jak odznaczone
+- moze jakby te enemy corpse wybuchy ciagnely wzdluz a nie naprzeciw
+- ./Hypersomnia-Headless.AppImage --print-server-key powinien dzialac jak version ze tylko to pokazuje i nara
+

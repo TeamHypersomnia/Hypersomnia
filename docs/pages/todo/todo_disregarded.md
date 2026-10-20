@@ -5,6 +5,7 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- jakas komenda zeby pobrac ponownie mapy moze zamiast restarta? chociaz restart lepszy zeby ludzi wyjebalo
 - smoke jeszcze czy nie da sie ominac
 - nie powinien zerowac cooldownu chyba jesli jest begin contact i to poprawnie zadziala?
 

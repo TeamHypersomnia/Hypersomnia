@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- kiedys dashe takie obrotowe animacje zamiast dmuchniecia
+- kiedys te flagi poprawne ogarnac w browserze, serwer sam moze wysylac w jakim kraju jest
+
+- flatpaki
+- opierdolic te jakies ich wymagania na cg
+- early access
+
+- reverb areas takie jak na starych mapkach cs-a, na webie nie musi dzialac
+
 - rozlozyc generacje tych navpointow kiedys potem na kilka klatek
 - literki - domyslnie closest, mozna wybrac konkretna jak sie chce
 - poorganizowac te skile do audytow
