@@ -14,7 +14,7 @@ struct editor_arena_settings {
 	bool minimap_tab_shows_all_islands = false;
 	rgba ambient_light_color = rgba(53, 97, 102, 255);
 	bool physical_lights = true;
-	bool brighten_lights = true;
+	bool brighten_lights = false;
 	sun_shadow_settings sun_shadows;
 	point_light_shadow_settings point_light_shadows;
 	editor_theme warmup_theme;

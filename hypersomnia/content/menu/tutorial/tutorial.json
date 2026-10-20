@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-10-17 23:57:56.838489 UTC"
+        "version_timestamp": "2026-10-20 21:19:34.399865 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -307,7 +307,6 @@
     "layers": [
         {
             "id": "Level22",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level22 island",
                 "arrow_orange (1)",
@@ -349,7 +348,6 @@
         },
         {
             "id": "Level21",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level21 island",
                 "exit19",
@@ -689,7 +687,6 @@
         },
         {
             "id": "Level20",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level20 island",
                 "arrow (187)-right",
@@ -731,7 +728,6 @@
         },
         {
             "id": "Level19",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level19 island",
                 "exit19 (1)",
@@ -823,7 +819,6 @@
         },
         {
             "id": "Level18",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level18 island",
                 "exit18",
@@ -908,7 +903,6 @@
         },
         {
             "id": "Level17",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level17 island",
                 "obs23",
@@ -951,7 +945,6 @@
         },
         {
             "id": "Level16",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level16 island",
                 "dev_floor_256 (98)",
@@ -983,7 +976,6 @@
         },
         {
             "id": "Level15",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level15 island",
                 "electric_rapier (5)",
@@ -1054,7 +1046,6 @@
         },
         {
             "id": "Level14",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level14 island",
                 "floor_right (20)",
@@ -1416,7 +1407,6 @@
         },
         {
             "id": "Level10",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level10 island",
                 "team_spawn (17)",
@@ -1623,7 +1613,6 @@
         },
         {
             "id": "Level7",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level7 island",
                 "team_spawn (7)",
@@ -1678,7 +1667,6 @@
         },
         {
             "id": "Level6",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level6 island",
                 "hazard (7)",
@@ -1706,7 +1694,6 @@
         },
         {
             "id": "Level5",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level5 island",
                 "obs4 (2)",
@@ -1738,7 +1725,6 @@
         },
         {
             "id": "Level4",
-            "is_open_in_editor": false,
             "nodes": [
                 "Level4 island",
                 "tip4_1 (2)",

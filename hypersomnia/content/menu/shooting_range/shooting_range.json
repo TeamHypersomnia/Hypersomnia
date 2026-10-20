@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2026-10-19 18:29:17.414709 UTC"
+        "version_timestamp": "2026-10-20 21:45:49.337394 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -10,6 +10,7 @@
     "settings": {
         "default_server_mode": "quick_test",
         "ambient_light_color": [5, 35, 52, 255],
+        "brighten_lights": false,
         "sun_shadows": {
             "strength": 0.6019999980926514
         }
@@ -273,6 +274,7 @@
                 "zoom_0.8x",
                 "zoom_0.75x",
                 "zoom_0.7x",
+                "zoom_0.65x",
                 "zoom_0.6x",
                 "zoom_0.5x",
                 "zoom_4x_outline",
@@ -280,6 +282,7 @@
                 "zoom_0.8x_outline",
                 "zoom_0.75x_outline",
                 "zoom_0.7x_outline",
+                "zoom_0.65x_outline",
                 "zoom_0.6x_outline",
                 "zoom_0.5x_outline"
             ]
@@ -1443,7 +1446,7 @@
         {
             "id": "zoom_0.5x",
             "type": "@zoom",
-            "pos": [-640.0, 4736.0],
+            "pos": [-640.0, 4992.0],
             "size": [64, 64]
         },
         {
@@ -1455,7 +1458,7 @@
         {
             "id": "zoom_0.6x",
             "type": "@zoom",
-            "pos": [-640.0, 4480.0],
+            "pos": [-640.0, 4736.0],
             "size": [64, 64]
         },
         {
@@ -1491,13 +1494,13 @@
         {
             "id": "zoom_0.6x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 4480.0],
+            "pos": [-640.0, 4736.0],
             "color": [255, 0, 255, 20]
         },
         {
             "id": "zoom_0.5x_outline",
             "type": "@pad_outline",
-            "pos": [-640.0, 4736.0],
+            "pos": [-640.0, 4992.0],
             "color": [255, 0, 255, 20]
         },
         {
@@ -1636,6 +1639,18 @@
             "rotation": -180.0,
             "color": [0, 255, 0, 255],
             "flip_horizontally": true
+        },
+        {
+            "id": "zoom_0.65x_outline",
+            "type": "@pad_outline",
+            "pos": [-640.0, 4480.0],
+            "color": [255, 0, 255, 20]
+        },
+        {
+            "id": "zoom_0.65x",
+            "type": "@zoom",
+            "pos": [-640.0, 4480.0],
+            "size": [64, 64]
         },
         {
             "id": "aquarium_ambience_left",

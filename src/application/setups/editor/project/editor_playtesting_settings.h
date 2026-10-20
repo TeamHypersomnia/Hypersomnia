@@ -16,8 +16,8 @@ struct editor_playtesting_settings {
 	bool skip_warmup = true;
 	bool skip_freeze_time = true;
 	bool unlimited_money = true;
-	bool friendly_fire = true;
-	bool spawn_bots = false;
+	bool friendly_fire = false;
+	bool spawn_bots = true;
 	bool spawn_only_enemy_bots = false;
 	bool see_enemies_behind_walls = false;
 	bool draw_enemy_crosshairs = false;
