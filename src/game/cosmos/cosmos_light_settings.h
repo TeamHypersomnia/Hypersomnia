@@ -12,7 +12,7 @@
 struct sun_shadow_settings {
 	// GEN INTROSPECTOR struct sun_shadow_settings
 	vec2 step = vec2(1.87f, 2.34f);
-	real32 strength = 0.35f;
+	real32 strength = 0.7f;
 	real32 smoothness = 1.0f;
 	real32 hue_preservation = 1.0f;
 	// END GEN INTROSPECTOR

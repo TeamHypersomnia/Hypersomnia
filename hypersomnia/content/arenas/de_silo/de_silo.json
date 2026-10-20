@@ -9,6 +9,7 @@
         "welcome_message": "[color=vslightgray]Welcome to [/color][color=orange]THE ABANDONED ROCKET SILO.[/color]\n\nlia - [color=cyan]MAPPING[/color]\nMarcel Windys - [color=cyan]WARMUP THEME[/color]\n\nThis creepy and incredibly tactical\ncommunity map will test your [color=cyan]CQB[/color] \nto the utmost limit."
     },
     "settings": {
+        "brighten_lights": true,
         "default_server_mode": "bomb_defusal",
         "include_disabled_nodes": false,
         "ambient_light_color": [70, 111, 179, 255],

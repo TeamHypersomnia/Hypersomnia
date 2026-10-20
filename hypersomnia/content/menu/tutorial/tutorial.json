@@ -8,6 +8,7 @@
         "welcome_message": "  h"
     },
     "settings": {
+        "brighten_lights": true,
         "default_server_mode": "quick_test",
         "include_disabled_nodes": false,
         "ambient_light_color": [0, 66, 89, 255],
