@@ -19,6 +19,7 @@
 
 class images_in_atlas_map;
 class interpolation_system;
+class cosmos;
 
 namespace augs {
 	struct baked_font;
@@ -93,18 +94,61 @@ private:
 	double global_time_seconds = 0.0;
 
 	struct active_white_highlight {
-		// We keep the target to reset the white highlight when e.g. the shield is destroyed
-		messages::health_event::target_type target = messages::health_event::target_type::HEALTH;
+		/*
+			Health with what the shield can still absorb before the damage,
+			in the maximums of health alone - see health_with_shield.
+		*/
 
 		float original_ratio = 0.0f;
 		double time_of_occurence_seconds = 0.0;
 	};
 
+	/*
+		Small health bars of other characters, recorded from the referential cosmos only -
+		like the white highlights, so that the bar, the highlight and the damage numbers agree.
+
+		Health with what the shield can still absorb, in the maximums of health alone - see health_with_shield.
+		The bar's width follows the maximum with an exponential easing,
+		frozen for small_health_bar_resize_delay_secs after every damage -
+		so that a destroyed shield doesn't shrink the bar under the shooter's hands.
+	*/
+
+	struct small_health_bar_state {
+		float value = 0.0f;
+		float target_maximum = 0.0f;
+		float displayed_maximum = 0.0f;
+		double time_of_last_damage_seconds = -1.0;
+		bool recorded = false;
+	};
+
 	std::unordered_map<entity_id, damage_streak> streaks;
 	std::unordered_map<entity_id, active_white_highlight> active_white_highlights;
+	std::unordered_map<entity_id, small_health_bar_state> small_health_bars;
+
+	/*
+		The cosmos clock going back means a restored state, e.g. a new round -
+		the same entities start anew, so their bars snap instead of easing.
+	*/
+
+	std::optional<uint32_t> last_recorded_step;
 	std::vector<award> awards;
 
 public:
+
+	struct small_health_bar {
+		float value = 0.0f;
+		float displayed_maximum = 0.0f;
+	};
+
+	/*
+		Full health alone - with the usual armor, the bar is twice as wide.
+	*/
+
+	static constexpr float small_health_bar_pixels_per_health_maximum = 36.0f;
+
+	std::optional<small_health_bar> find_small_health_bar(entity_id) const;
+
+	void record_small_health_bars(const cosmos&);
 
 	struct white_highlight {
 		float original_ratio; 
@@ -131,7 +175,6 @@ public:
 
 	void add_white_highlight(
 		const entity_id subject,
-		const messages::health_event::target_type target,
 		float original_ratio
 	);
 

@@ -768,22 +768,43 @@ FORCE_INLINE void specific_draw_border(
 	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input& in,
 	const border_provider& borders,
-	F&& customize_input = default_customize_input()
+	F&& customize_input = default_customize_input(),
+	const int width = 1
 ) {
 	if (const auto border_info = borders(typed_handle)) {
-		auto border_maker = [border_info, customize_input](const auto& renderable, const auto& manager, auto& pre_input) {
+		auto border_maker = [border_info, customize_input, width](const auto& renderable, const auto& manager, auto& pre_input) {
 			auto input = customize_input(pre_input);
 
 			const auto source_pos = input.renderable_transform.pos;
 			input.colorize = *border_info;
 
-			const vec2i offsets[4] = {
-				vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
-			};
+			if (width <= 1) {
+				const vec2i offsets[4] = {
+					vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+				};
 
-			for (const auto& o : offsets) {
-				input.renderable_transform.pos = source_pos + o;
-				augs::draw(renderable, manager, input);
+				for (const auto& o : offsets) {
+					input.renderable_transform.pos = source_pos + o;
+					augs::draw(renderable, manager, input);
+				}
+
+				return;
+			}
+
+			/*
+				A thicker border: the sprite drawn at every offset within a circle of the width's radius.
+			*/
+
+			for (int y = -width; y <= width; ++y) {
+				for (int x = -width; x <= width; ++x) {
+					const auto o = vec2i(x, y);
+					const bool within_circle = o.length_sq() <= width * width;
+
+					if (o != vec2i::zero && within_circle) {
+						input.renderable_transform.pos = source_pos + o;
+						augs::draw(renderable, manager, input);
+					}
+				}
 			}
 		};
 

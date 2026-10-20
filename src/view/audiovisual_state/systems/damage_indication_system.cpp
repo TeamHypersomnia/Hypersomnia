@@ -3,6 +3,8 @@
 #include "augs/math/camera_cone.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/for_each_entity.h"
+#include "game/detail/sentience/sentience_getters.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 #include "augs/gui/text/printer.h"
@@ -28,26 +30,64 @@ constexpr float total_damage_size_bounce_mult = 1.9f;
 void damage_indication_system::clear() {
 	streaks.clear();
 	awards.clear();
+	small_health_bars.clear();
+	last_recorded_step = std::nullopt;
+}
+
+void damage_indication_system::record_small_health_bars(const cosmos& cosm) {
+	const auto now_step = cosm.get_timestamp().step;
+
+	if (last_recorded_step.has_value() && now_step < *last_recorded_step) {
+		small_health_bars.clear();
+	}
+
+	last_recorded_step = now_step;
+
+	for (auto& entry : small_health_bars) {
+		entry.second.recorded = false;
+	}
+
+	cosm.for_each_having<components::sentience>([&](const auto& typed_handle) {
+		const auto health_with_shield = ::get_health_with_shield(typed_handle);
+
+		const auto [it, is_new] = small_health_bars.try_emplace(typed_handle.get_id());
+		auto& bar = it->second;
+
+		bar.value = health_with_shield.calc_current();
+		bar.target_maximum = health_with_shield.calc_maximum();
+		bar.recorded = true;
+
+		if (is_new) {
+			bar.displayed_maximum = bar.target_maximum;
+		}
+	});
+
+	erase_if(small_health_bars, [](const auto& entry) { return !entry.second.recorded; });
+}
+
+std::optional<damage_indication_system::small_health_bar> damage_indication_system::find_small_health_bar(const entity_id id) const {
+	if (const auto found = mapped_or_nullptr(small_health_bars, id)) {
+		return small_health_bar { found->value, found->displayed_maximum };
+	}
+
+	return std::nullopt;
 }
 
 void damage_indication_system::add_white_highlight(
 	const entity_id subject,
-	const messages::health_event::target_type target,
 	const float original_ratio
 ) {
 	auto& highlight = active_white_highlights[subject];
 
-	const bool should_reset_ratio = 
-		original_ratio >= highlight.original_ratio
-		|| target != highlight.target
-	;
-
-	if (should_reset_ratio) {
+	if (original_ratio >= highlight.original_ratio) {
 		highlight.original_ratio = original_ratio;
-		highlight.target = target;
 	}
 
 	highlight.time_of_occurence_seconds = global_time_seconds;
+
+	if (const auto bar = mapped_or_nullptr(small_health_bars, subject)) {
+		bar->time_of_last_damage_seconds = global_time_seconds;
+	}
 }
 
 void damage_indication_system::add(const entity_id subject, const damage_event::input new_in, bool merge) {
@@ -109,6 +149,37 @@ void damage_indication_system::advance(
 	global_time_seconds += secs;
 
 	const auto& accum_speed = settings.numbers_accumulation_speed;
+
+	for (auto& entry : small_health_bars) {
+		auto& bar = entry.second;
+
+		const bool damaged_recently = 
+			bar.time_of_last_damage_seconds >= 0.0
+			&& global_time_seconds - bar.time_of_last_damage_seconds < settings.small_health_bar_resize_delay_secs
+		;
+
+		if (damaged_recently) {
+			continue;
+		}
+
+		const auto remaining_mult = static_cast<float>(std::pow(
+			settings.small_health_bar_resize_average_factor,
+			secs * settings.small_health_bar_resize_averages_per_sec
+		));
+
+		bar.displayed_maximum = bar.target_maximum + (bar.displayed_maximum - bar.target_maximum) * remaining_mult;
+
+		/*
+			Ends the endless exponential approach once within a pixel -
+			so that a full bar doesn't keep an empty pixel at its end for long.
+		*/
+
+		const auto one_pixel = 1.0f / small_health_bar_pixels_per_health_maximum;
+
+		if (std::abs(bar.displayed_maximum - bar.target_maximum) < one_pixel) {
+			bar.displayed_maximum = bar.target_maximum;
+		}
+	}
 
 	erase_if(
 		active_white_highlights,

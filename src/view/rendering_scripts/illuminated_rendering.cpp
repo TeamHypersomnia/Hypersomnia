@@ -261,6 +261,19 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.set_stencil(false);
 	};
 
+	auto draw_occluded_sentience_highlights = [&]() {
+		if (fog_of_war_effective) {
+			renderer.call_triangles(D::OCCLUDED_ENEMY_HIGHLIGHTS);
+		}
+
+		renderer.call_and_clear_triangles();
+	};
+
+	/*
+		Over the shadows of characters and the fog of war overlay,
+		so that nothing darkens their pure colors.
+	*/
+
 	auto draw_sentience_borders = [&]() {
 		if (fog_of_war_effective) {
 			renderer.set_stencil(true);
@@ -268,15 +281,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			renderer.call_triangles(D::BORDERS_ENEMY_SENTIENCES);
 			renderer.set_stencil(false);
-
-			renderer.call_triangles(D::OCCLUDED_ENEMY_HIGHLIGHTS);
-			renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
-		}
-		else {
-			renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
 		}
 
-		renderer.call_and_clear_triangles();
+		renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
 	};
 
 	auto draw_sentiences = [&](auto& shader) {
@@ -1273,7 +1280,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	{
 		set_shader_with_matrix(shaders.pure_color_highlight);
 
-		draw_sentience_borders();
+		draw_occluded_sentience_highlights();
 		draw_area_markers();
 		draw_interaction_sensor();
 
@@ -1340,7 +1347,39 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_shader_with_matrix(shaders.illuminated);
 	}
 
+	set_shader_with_matrix(shaders.pure_color_highlight);
+	draw_sentience_borders();
+
+	set_shader_with_matrix(shaders.illuminated);
 	draw_sentiences(shaders.illuminated);
+
+	if (shaders.shadow_sprite) {
+		/*
+			Darkening of enemies and teammates (game_drawing_settings::enemy_darkening and teammate_darkening)
+			as a flat black overlay over the already lit characters, each pixel darkened once -
+			so that neons, lights and the items over bodies don't make it uneven.
+		*/
+
+		set_shader_with_matrix(shaders.shadow_sprite);
+
+#if BUILD_STENCIL_BUFFER
+		renderer.set_stencil(true);
+		renderer.clear_single_coverage();
+
+		if (fog_of_war_effective) {
+			renderer.start_single_coverage_where_stencil();
+			renderer.call_triangles(D::ENEMY_SENTIENCE_DARKENINGS);
+		}
+
+		renderer.start_single_coverage();
+		renderer.call_triangles(D::FRIENDLY_SENTIENCE_DARKENINGS);
+		renderer.finish_single_coverage();
+		renderer.set_stencil(false);
+#else
+		renderer.call_triangles(D::FRIENDLY_SENTIENCE_DARKENINGS);
+#endif
+	}
+
 	set_shader_with_matrix(shaders.illuminated);
 	receive_shadows(shaders.illuminated, false);
 	renderer.call_triangles(D::FOREGROUND);

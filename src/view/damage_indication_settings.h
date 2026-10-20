@@ -24,6 +24,10 @@ struct damage_indication_settings {
 
 	float white_damage_highlight_secs = 0.11f;
 	float character_silhouette_damage_highlight_secs = 0.11f;
+
+	float small_health_bar_resize_delay_secs = 0.5f;
+	float small_health_bar_resize_average_factor = 0.5f;
+	float small_health_bar_resize_averages_per_sec = 5.0f;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const damage_indication_settings& b) const = default;

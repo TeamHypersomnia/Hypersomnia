@@ -3572,7 +3572,40 @@ void settings_gui_state::perform(
 							text_disabled("(hides the HUD regardless of the settings below)");
 						}
 
+						ImGui::Separator();
+
+						revertable_color_edit("Enemy color", config.drawing.enemy_color);
+						revertable_color_edit("Friendly color", config.drawing.friendly_color);
+
+						revertable_checkbox("Colorize enemies", config.drawing.colorize_enemies);
+						revertable_checkbox("Colorize teammates", config.drawing.colorize_teammates);
+						revertable_checkbox("Colorize yourself", config.drawing.colorize_yourself);
+
+						if (config.drawing.colorize_enemies) {
+							revertable_slider("Enemy border width", config.drawing.enemy_border_width, 1, 4);
+						}
+
+						if (config.drawing.colorize_teammates || config.drawing.colorize_yourself) {
+							revertable_slider("Teammate border width", config.drawing.teammate_border_width, 1, 4);
+						}
+
+						revertable_slider("Enemy darkening", config.drawing.enemy_darkening, 0.0f, 0.8f, "%.2f");
+						revertable_slider("Teammate darkening", config.drawing.teammate_darkening, 0.0f, 0.8f, "%.2f");
+
+						revertable_enum("Teammates behind walls", config.drawing.teammates_behind_walls);
 						revertable_checkbox("Draw enemy silhouettes in Spectator", config.drawing.draw_enemy_silhouettes_in_spectator);
+
+						revertable_enum("Teammate HUD mode", config.drawing.teammate_hud_mode);
+
+						if (config.drawing.teammate_hud_mode == teammate_hud_type::MINIMAL) {
+							revertable_enum("Teammate nickname position", config.drawing.teammate_nickname_position);
+							revertable_slider("Teammate nickname offset", config.drawing.teammate_nickname_offset, -30, 30);
+						}
+
+						revertable_slider("Small health bar offset", config.drawing.small_health_bar_offset, -30, 30);
+						text_disabled("(for both enemies and teammates)");
+
+						ImGui::Separator();
 
 						revertable_checkbox(SCOPE_CFG_NVP(draw_inventory));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_hotbar));

@@ -992,16 +992,31 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds]() {
-		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle) {
+	/*
+		Cinematic mode shows the characters as they are - no colorizing, darkening or teammate silhouettes.
+	*/
+
+	const bool cinematic = settings.cinematic_mode;
+
+	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, enemy_color = settings.enemy_color, friendly_color = settings.friendly_color, colorize_enemies = !cinematic && settings.colorize_enemies, enemy_darkening = cinematic ? 0.0f : settings.enemy_darkening, colorize_teammates = !cinematic && settings.colorize_teammates, colorize_yourself = !cinematic && settings.colorize_yourself, enemy_border_width = cinematic ? 1 : settings.enemy_border_width, teammate_border_width = cinematic ? 1 : settings.teammate_border_width, teammate_darkening = cinematic ? 0.0f : settings.teammate_darkening, teammates_behind_walls = cinematic ? teammates_behind_walls_mode::FULL : settings.teammates_behind_walls, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds]() {
+		/*
+			Enemies and teammates - with the items they hold - are darkened
+			by enemy_darkening and teammate_darkening with a black overlay, see illuminated_rendering.cpp.
+			With colorize_enemies, colorize_teammates and colorize_yourself,
+			they also have a constant border - and others' shields glow - in enemy_color or friendly_color.
+		*/
+
+		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle, const std::optional<rgba> shield_glow_color = std::nullopt) {
 			::specific_draw_neon_map(handle, drawing_in);
+
 			::draw_character_glow(
 				handle, 
 				{
 					drawing_in.drawer,
 					interp,
 					real_global_time_seconds,
-					cast_highlight_tex
+					cast_highlight_tex,
+					shield_glow_color
 				}
 			);
 		};
@@ -1010,6 +1025,36 @@ void enqueue_illuminated_rendering_jobs(
 
 		auto standard_border_provider = [timestamp_ms](const auto& typed_handle) {
 			return typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
+		};
+
+		auto enemy_border_provider = [enemy_color](const auto& typed_handle) -> std::optional<rgba> {
+			if (typed_handle.template get<components::sentience>().is_dead()) {
+				return std::nullopt;
+			}
+
+			return enemy_color;
+		};
+
+		/*
+			The friendly border still turns red with the low health pulse.
+		*/
+
+		auto teammate_border_provider = [timestamp_ms, friendly_color](const auto& typed_handle) -> std::optional<rgba> {
+			const auto& sentience = typed_handle.template get<components::sentience>();
+
+			if (sentience.is_dead()) {
+				return std::nullopt;
+			}
+
+			if (const auto low_health = sentience.find_low_health_border(timestamp_ms)) {
+				return augs::interp(friendly_color, rgba(255, 0, 0, 255), low_health->a / 255.f);
+			}
+
+			return friendly_color;
+		};
+
+		auto friendly_highlight_provider = [friendly_color](const auto&) -> std::optional<rgba> {
+			return friendly_color;
 		};
 
 		auto occluded_highlight_provider = [](const auto& typed_handle) -> std::optional<rgba> {
@@ -1045,6 +1090,9 @@ void enqueue_illuminated_rendering_jobs(
 		const auto shadows_friendly_drawing_in = make_drawing_input(D::FRIENDLY_SENTIENCE_SHADOWS);
 		const auto shadows_enemy_drawing_in = make_drawing_input(D::ENEMY_SENTIENCE_SHADOWS);
 
+		const auto darkenings_friendly_drawing_in = make_drawing_input(D::FRIENDLY_SENTIENCE_DARKENINGS);
+		const auto darkenings_enemy_drawing_in = make_drawing_input(D::ENEMY_SENTIENCE_DARKENINGS);
+
 		auto draw_shadow_for = [&](const auto& typed_handle, const auto& drawing_in) {
 			const bool standing_corpse = typed_handle.template get<components::sentience>().is_dead();
 			const auto offset = standing_corpse ? standing_corpse_shadow_offset : character_shadow_offset;
@@ -1058,23 +1106,101 @@ void enqueue_illuminated_rendering_jobs(
 			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 					const bool is_local = typed_handle == fog_of_war_character;
+					const bool is_teammate = !is_local && !ffa && typed_handle.get_official_faction() == fow_faction;
+					const bool is_enemy = !is_local && !is_teammate;
+					const auto& sentience = typed_handle.template get<components::sentience>();
 
-					if (const bool visible_in_fow = is_local || (!ffa && typed_handle.get_official_faction() == fow_faction) || see_enemies_behind_walls) {
-						draw_lights_for(neons_friendly_drawing_in, typed_handle);
+					/*
+						Only the living are darkened - not the standing corpses about to fall.
+						Lying corpses are separate entities, never darkened.
+					*/
+
+					const auto darkening = [&]() {
+						if (sentience.is_dead()) {
+							return 0.0f;
+						}
+
+						if (is_enemy) {
+							return enemy_darkening;
+						}
+
+						if (is_teammate) {
+							return teammate_darkening;
+						}
+
+						return 0.0f;
+					}();
+
+					auto draw_body = [&](const auto& drawing_in, const auto& darkenings_drawing_in) {
+						::specific_draw_entity(typed_handle, drawing_in);
+
+						if (darkening > 0.0f) {
+							const auto overlay = rgba(0, 0, 0, static_cast<rgba_channel>(255 * std::min(darkening, 1.0f)));
+							::specific_draw_color_highlight(typed_handle, overlay, darkenings_drawing_in);
+						}
+					};
+
+					/*
+						Yourself with the teammates' width.
+					*/
+
+					const auto border_width = is_enemy ? enemy_border_width : teammate_border_width;
+
+					/*
+						Shields of others glow in the colors of the borders - yours keeps the faction color.
+					*/
+
+					const auto shield_glow_color = [&]() -> std::optional<rgba> {
+						if (colorize_enemies && is_enemy) {
+							return enemy_color;
+						}
+
+						if (colorize_teammates && is_teammate) {
+							return friendly_color;
+						}
+
+						return std::nullopt;
+					}();
+
+					auto draw_border = [&](const auto& drawing_in) {
+						if (colorize_enemies && is_enemy) {
+							::specific_draw_border(typed_handle, drawing_in, enemy_border_provider, default_customize_input(), border_width);
+						}
+						else if ((colorize_teammates && is_teammate) || (colorize_yourself && is_local)) {
+							::specific_draw_border(typed_handle, drawing_in, teammate_border_provider, default_customize_input(), border_width);
+						}
+						else {
+							::specific_draw_border(typed_handle, drawing_in, standard_border_provider, default_customize_input(), border_width);
+						}
+					};
+
+					const bool teammate_as_silhouette =
+						is_teammate
+						&& teammates_behind_walls != teammates_behind_walls_mode::FULL
+						&& !see_enemies_behind_walls
+					;
+
+					if (const bool visible_in_fow = is_local || (is_teammate && !teammate_as_silhouette) || see_enemies_behind_walls) {
+						draw_lights_for(neons_friendly_drawing_in, typed_handle, shield_glow_color);
 
 						draw_shadow_for(typed_handle, shadows_friendly_drawing_in);
-						::specific_draw_entity(typed_handle, friendly_drawing_in);
-						::specific_draw_border(typed_handle, borders_friendly_drawing_in, standard_border_provider);
+						draw_body(friendly_drawing_in, darkenings_friendly_drawing_in);
+						draw_border(borders_friendly_drawing_in);
 					}
 					else {
-						draw_lights_for(neons_enemy_drawing_in, typed_handle);
+						draw_lights_for(neons_enemy_drawing_in, typed_handle, shield_glow_color);
 
 						draw_shadow_for(typed_handle, shadows_enemy_drawing_in);
-						::specific_draw_entity(typed_handle, enemy_drawing_in);
-						::specific_draw_border(typed_handle, borders_enemy_drawing_in, standard_border_provider);
+						draw_body(enemy_drawing_in, darkenings_enemy_drawing_in);
+						draw_border(borders_enemy_drawing_in);
 
-						if (draw_enemy_silhouettes && typed_handle.template get<components::sentience>().is_conscious()) {
-							::specific_draw_border(typed_handle, occluded_enemy_highlights_in, occluded_highlight_provider);
+						if (sentience.is_conscious()) {
+							if (teammate_as_silhouette) {
+								::specific_draw_border(typed_handle, occluded_enemy_highlights_in, friendly_highlight_provider);
+							}
+							else if (draw_enemy_silhouettes) {
+								::specific_draw_border(typed_handle, occluded_enemy_highlights_in, occluded_highlight_provider);
+							}
 						}
 					}
 				});

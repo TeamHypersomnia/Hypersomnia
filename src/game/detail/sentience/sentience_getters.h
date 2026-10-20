@@ -67,24 +67,56 @@ bool get_hand_flag(const E& self, const std::size_t index) {
 	return false;
 }
 
-template <class E>
-inline real32 get_shield_ratio(const E& character) {
-	if (!any_shield_active(character)) {
-		return 0.0f;
+/*
+	Health together with the health that the active shield (armor) can still absorb with Personal Electricity.
+	shield_mult converts Personal Electricity into health, 0 without an active shield.
+
+	Measured in the maximums of health alone, so e.g. a full health with a full shield
+	of the same absorbable health is 2.
+*/
+
+struct health_with_shield {
+	real32 value = 0.f;
+	real32 maximum = 0.f;
+	real32 health_maximum = 0.f;
+	real32 shield_mult = 0.f;
+
+	real32 in_health_maximums(const real32 health) const {
+		return health_maximum > 0.f ? health / health_maximum : 0.f;
 	}
+
+	real32 calc_current(const real32 added_value = 0.f) const {
+		return in_health_maximums(value + added_value);
+	}
+
+	real32 calc_maximum() const {
+		return in_health_maximums(maximum);
+	}
+};
+
+template <class E>
+inline health_with_shield get_health_with_shield(const E& character) {
+	auto result = health_with_shield();
 
 	if (const auto sentience = character.template find<components::sentience>()) {
-		return std::get<personal_electricity_meter_instance>(sentience->meters).get_ratio();
+		const auto& health = std::get<health_meter_instance>(sentience->meters);
+
+		result.value = std::max(0.f, health.value);
+		result.maximum = health.maximum;
+		result.health_maximum = health.maximum;
+
+		if (const auto absorption = ::find_active_pe_absorption(character)) {
+			const auto& pe = std::get<personal_electricity_meter_instance>(sentience->meters);
+
+			/*
+				The same minimum as in sentience_system's damage application.
+			*/
+
+			result.shield_mult = std::max(0.01f, absorption->first.hp);
+			result.value += std::max(0.f, pe.value) * result.shield_mult;
+			result.maximum += pe.maximum * result.shield_mult;
+		}
 	}
 
-	return 0.0f;
-}
-
-template <class E>
-inline real32 get_health_ratio(const E& character) {
-	if (const auto sentience = character.template find<components::sentience>()) {
-		return std::get<health_meter_instance>(sentience->meters).get_ratio();
-	}
-
-	return 0.0f;
+	return result;
 }

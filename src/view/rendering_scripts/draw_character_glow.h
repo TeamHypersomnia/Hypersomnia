@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 
 #include "rendering_scripts.h"
 #include "augs/drawing/drawing.hpp"
@@ -17,6 +18,12 @@ struct draw_character_glow_in {
 	const interpolation_system& interpolation;
 	const double real_global_time_seconds;
 	const augs::atlas_entry cast_highlight_tex;
+
+	/*
+		Replaces the color of the shield's glow, e.g. the red of enemies' borders.
+	*/
+
+	const std::optional<rgba> shield_glow_color = std::nullopt;
 };
 
 template <class E>
@@ -65,7 +72,7 @@ void draw_character_glow(const E& it, const draw_character_glow_in in) {
 				const auto radius = std::max(10.f, 190.f * highlight_amount);
 
 				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
-					auto color = tool->glow_color;
+					auto color = in.shield_glow_color.has_value() ? *in.shield_glow_color : tool->glow_color;
 
 					if (color == rgba::faction_color) {
 						if (it.get_official_faction() == faction_type::RESISTANCE) {

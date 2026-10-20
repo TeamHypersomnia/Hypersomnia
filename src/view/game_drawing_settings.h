@@ -64,6 +64,28 @@ inline auto format_enum(const bullet_trails_mode e) {
 	return std::string("UnknownEnumValue");
 }
 
+enum class teammates_behind_walls_mode {
+	// GEN INTROSPECTOR enum class teammates_behind_walls_mode
+	SILHOUETTES,
+	FULL,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+template <>
+inline auto format_enum(const teammates_behind_walls_mode e) {
+	constexpr std::array<const char*, 2> vals = {
+		"Silhouettes",
+		"Full"
+	};
+
+	if (static_cast<uint8_t>(e) < static_cast<uint8_t>(vals.size())) {
+		return std::string(vals[static_cast<uint8_t>(e)]);
+	}
+
+	return std::string("UnknownEnumValue");
+}
+
 struct crosshair_drawing_settings {
 	// GEN INTROSPECTOR struct crosshair_drawing_settings
 	crosshair_type type = crosshair_type::CLASSIC;
@@ -284,6 +306,20 @@ struct game_drawing_settings {
 	float custom_zoom = 1.0f;
 
 	bool draw_enemy_silhouettes_in_spectator = true;
+	rgba enemy_color = rgba(255, 0, 0, 255);
+	rgba friendly_color = rgba(0, 255, 0, 255);
+	bool colorize_enemies = true;
+	float enemy_darkening = 0.7f;
+	bool colorize_teammates = true;
+	bool colorize_yourself = false;
+	int enemy_border_width = 3;
+	int teammate_border_width = 2;
+	float teammate_darkening = 0.38f;
+	teammates_behind_walls_mode teammates_behind_walls = teammates_behind_walls_mode::SILHOUETTES;
+	teammate_hud_type teammate_hud_mode = teammate_hud_type::MINIMAL;
+	teammate_nickname_position_type teammate_nickname_position = teammate_nickname_position_type::OVER_CHARACTER;
+	int teammate_nickname_offset = 0;
+	int small_health_bar_offset = 0;
 
 	bool draw_bullet_shadows = true;
 	bullet_trails_mode bullet_trails = bullet_trails_mode::FULL;

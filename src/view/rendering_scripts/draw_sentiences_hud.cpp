@@ -85,6 +85,225 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		const bool is_enemy = !viewer_faction_matches(drawn_character);
 		const auto transform = drawn_character.get_viewing_transform(interp);
 
+		/*
+			A small health bar by the character - for enemies with enemy_hud_mode SMALL_HEALTH_BAR,
+			in friendly_color with the nickname for teammates with teammate_hud_mode MINIMAL - see teammate_nickname_position.
+		*/
+
+		auto draw_small_health_bar = [&](const bool is_teammate) {
+			if (!in.is_reasonably_in_view(drawn_character)) {
+				return;
+			}
+
+			if (!is_conscious) {
+				return;
+			}
+
+			/*
+				The bar shows health together with what an active shield (armor) can still absorb,
+				in a constant scale of pixels per health.
+				See damage_indication_system::small_health_bar_pixels_per_health_maximum.
+
+				Read from the referential cosmos through damage_indication_system, like the white highlights -
+				the bar doesn't show mispredicted damage.
+				Without a recorded state (e.g. a character that has just appeared), from the drawn cosmos.
+			*/
+
+			const auto bar_state = [&]() {
+				if (const auto recorded = in.damage_indication_sys.find_small_health_bar(drawn_character.get_id())) {
+					return *recorded;
+				}
+
+				const auto health_with_shield = ::get_health_with_shield(drawn_character);
+				return damage_indication_system::small_health_bar { health_with_shield.calc_current(), health_with_shield.calc_maximum() };
+			}();
+
+			const auto chosen_ratio = 
+				bar_state.displayed_maximum > 0.f ?
+				std::min(1.0f, bar_state.value / bar_state.displayed_maximum) :
+				0.f
+			;
+
+			auto bar_color = is_teammate ? in.settings.friendly_color : in.settings.enemy_color;
+			bar_color.mult_alpha(teleport_alpha);
+
+			const auto bright_bar_color = bar_color;
+
+			/*
+				The empty part is opaque - a very dark shade of the bar's color.
+			*/
+
+			auto dark_bar_color = rgba(bar_color).multiply_rgb(0.25f);
+			dark_bar_color.a = 255;
+			dark_bar_color.mult_alpha(teleport_alpha);
+
+			const auto internal_border_size = 0;
+			const auto external_border_size = 1;
+			const auto pixels_per_health_maximum = damage_indication_system::small_health_bar_pixels_per_health_maximum;
+			const auto internal_bar_size = vec2i(
+				std::max(1, static_cast<int>(pixels_per_health_maximum * bar_state.displayed_maximum)),
+				4
+			);
+
+			const auto nickname_text = [&]() {
+				if (!is_teammate) {
+					return formatted_string();
+				}
+
+				auto nickname = get_bbcoded_entity_name(drawn_character);
+
+				if (in.streamer_mode || augs::has_profanity(nickname, true)) {
+					nickname = "Player";
+				}
+
+				return formatted_string { nickname, { in.gui_font, bar_color } };
+			}();
+
+			const auto nickname_bbox = get_text_bbox(nickname_text);
+			const auto nickname_padding = 3;
+			const auto nickname_position = in.settings.teammate_nickname_position;
+			const bool nickname_over_bar = is_teammate && nickname_position == teammate_nickname_position_type::OVER_BAR;
+
+			/*
+				With the nickname over the bar, the nickname takes the line of the bar - a bit closer to the character -
+				and the bar moves under it, a bit further apart.
+			*/
+
+			const auto over_bar_nickname_raise = 4;
+			const auto over_bar_gap = 6;
+
+			/*
+				With the nickname under the character, the bar is over the character instead.
+			*/
+
+			const bool bar_over_character = is_teammate && nickname_position == teammate_nickname_position_type::UNDER_CHARACTER;
+			const auto bar_line_offset = vec2(0, bar_over_character ? -outermost_circle_radius : outermost_circle_radius);
+			const auto bar_line = vec2i(in.text_camera.to_screen_space(transform.pos + bar_line_offset));
+			const auto bar_line_top = bar_line.y - (internal_bar_size.y + 2 * (internal_border_size + external_border_size)) / 2;
+
+			/*
+				The settings' offsets are relative to these.
+			*/
+
+			const auto base_bar_offset = 5;
+			const auto base_nickname_offset = 4;
+
+			const auto bar_offset = vec2i(0, base_bar_offset + in.settings.small_health_bar_offset);
+
+			const auto bar_center = bar_offset + (
+				nickname_over_bar ?
+				bar_line + vec2i(0, nickname_bbox.y - over_bar_nickname_raise + over_bar_gap) :
+				bar_line
+			);
+
+			const auto internal_current_width = is_conscious ? std::max(1, static_cast<int>(static_cast<float>(internal_bar_size.x) * chosen_ratio)) : 0;
+			const auto internal_bar_current_size = vec2i(internal_current_width, internal_bar_size.y);
+
+			const int total_border_extent = internal_border_size + external_border_size;
+
+			const auto total_size = internal_bar_size + 2 * vec2i(total_border_extent, total_border_extent);
+
+			auto bars_output = augs::drawer { in.small_health_bars };
+
+			const auto bigger_origin = ltrb::center_and_size(bar_center, total_size);
+
+			const auto smaller_left = bigger_origin.l + total_border_extent;
+			const auto smaller_origin = ltrb(smaller_left, bigger_origin.t + total_border_extent, smaller_left + internal_bar_current_size.x, bigger_origin.b - total_border_extent);
+
+			const auto tex = in.small_health_bar_tex;
+
+			const bool draw_partial_borders = true;
+
+			if (is_conscious) {
+				bars_output.aabb(tex, bigger_origin, dark_bar_color);
+				bars_output.aabb(tex, smaller_origin, bright_bar_color);
+
+				if (draw_partial_borders && chosen_ratio < 1.0f) {
+					{
+						const auto dim_border_col = rgba(bar_color).mult_brightness(0.5f);
+						bars_output.border(in.small_health_bar_tex, bigger_origin, dim_border_col);
+					}
+
+					const auto top_border =     ltrb(bigger_origin.l-1, bigger_origin.t-1, smaller_origin.r, bigger_origin.t);
+					const auto left_border =    ltrb(bigger_origin.l-1, bigger_origin.t,   bigger_origin.l, bigger_origin.b);
+					const auto bottom_border =  ltrb(bigger_origin.l-1, bigger_origin.b,   smaller_origin.r, bigger_origin.b+1);
+					//const auto right_border =   ltrb(bigger_origin.r  , bigger_origin.t,   bigger_origin.r+1, bigger_origin.b);
+
+					bars_output.aabb(tex, left_border, bright_bar_color);
+					bars_output.aabb(tex, top_border, bright_bar_color);
+					bars_output.aabb(tex, bottom_border, bright_bar_color);
+					//bars_output.aabb(tex, right_border, bright_bar_color);
+				}
+				else {
+					bars_output.border(in.small_health_bar_tex, bigger_origin, bright_bar_color);
+				}
+			}
+
+			if (const auto highlight = in.damage_indication_sys.find_white_highlight(drawn_character, in.damage_indication_settings)) {
+				const auto white_bar_width_inclusive = std::min(
+					internal_bar_size.x,
+					static_cast<int>(pixels_per_health_maximum * highlight->original_ratio)
+				);
+
+				const auto white_bar_origin = ltrb(
+					smaller_origin.r,
+					smaller_origin.t,
+					smaller_left + white_bar_width_inclusive,
+					smaller_origin.b
+				);
+
+				auto white_bar_color = white;
+				white_bar_color.mult_alpha(1.0f - highlight->passed_mult);
+				white_bar_color.mult_alpha(teleport_alpha);
+
+				bars_output.aabb(tex, white_bar_origin, white_bar_color);
+
+				if (draw_partial_borders) {
+					const auto top_border =     ltrb(white_bar_origin.l, bigger_origin.t-1, white_bar_origin.r, bigger_origin.t);
+					const auto bottom_border =  ltrb(white_bar_origin.l, bigger_origin.b,   white_bar_origin.r, bigger_origin.b+1);
+
+					bars_output.aabb(tex, top_border, white_bar_color);
+					bars_output.aabb(tex, bottom_border, white_bar_color);
+				}
+			}
+
+			if (is_teammate) {
+				auto stroke_color = black;
+				stroke_color.mult_alpha(teleport_alpha);
+
+				const auto bbox = nickname_bbox;
+
+				const auto nickname_offset = vec2i(0, base_nickname_offset + in.settings.teammate_nickname_offset);
+
+				const auto text_pos = nickname_offset + [&]() {
+					const auto center_x = bar_line.x - bbox.x / 2;
+
+					switch (nickname_position) {
+						case teammate_nickname_position_type::OVER_BAR:
+							return vec2i(center_x, bar_line_top - over_bar_nickname_raise);
+						case teammate_nickname_position_type::UNDER_BAR:
+							return vec2i(center_x, bigger_origin.b + nickname_padding);
+						case teammate_nickname_position_type::UNDER_CHARACTER: {
+							const auto under_character = vec2i(in.text_camera.to_screen_space(transform.pos + vec2(0, outermost_circle_radius)));
+							return vec2i(center_x, under_character.y);
+						}
+						default: {
+							const auto over_character = vec2i(in.text_camera.to_screen_space(transform.pos - vec2(0, outermost_circle_radius)));
+							return vec2i(center_x, over_character.y - bbox.y);
+						}
+					}
+				}();
+
+				augs::gui::text::print_stroked(
+					augs::drawer { in.nicknames },
+					text_pos,
+					nickname_text,
+					{},
+					stroke_color
+				);
+			}
+		};
+
 		if (is_enemy) {
 			const auto& danger_indicators = in.settings.draw_danger_indicators;
 
@@ -149,126 +368,24 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 			}
 
 			switch (in.settings.enemy_hud_mode) {
-				case character_hud_type::SMALL_HEALTH_BAR: {
-					if (!in.is_reasonably_in_view(drawn_character)) {
-						return;
-					}
-
-					const auto shield = ::get_shield_ratio(drawn_character);
-					const auto health = ::get_health_ratio(drawn_character);
-
-					const bool draw_shield = shield > 0.0f;
-
-					if (shield > 0.0f) {
-						return;
-					}
-
-					if (!is_conscious) {
-						return;
-					}
-
-					const auto& meter_metas = cosm.get_common_significant().meters;
-					const auto chosen_ratio = draw_shield ? shield : health;
-
-					const auto& chosen_appearance = 
-						draw_shield ? 
-						std::get<personal_electricity_meter>(meter_metas).appearance : 
-						std::get<health_meter>(meter_metas).appearance
-					;
-
-					auto bar_color = chosen_appearance.bar_color;
-					bar_color.mult_alpha(teleport_alpha);
-
-					// brighten up the health bar a little
-					auto bright_bar_color = draw_shield ? rgba(bar_color).mult_brightness(1.25f) : bar_color;
-					bright_bar_color.mult_alpha(teleport_alpha);
-
-					auto dark_bar_color = rgba(bar_color) * 0.4f;
-					// now we have a bit less alpha too
-					dark_bar_color.a = 200;
-					dark_bar_color.mult_alpha(teleport_alpha);
-
-					const auto bar_center = in.text_camera.to_screen_space(transform.pos + vec2(0, outermost_circle_radius));
-
-					const auto internal_border_size = 0;
-					const auto external_border_size = 1;
-					const auto internal_bar_size = vec2i(72, 4);
-
-					const auto internal_current_width = is_conscious ? std::max(1, static_cast<int>(static_cast<float>(internal_bar_size.x) * chosen_ratio)) : 0;
-					const auto internal_bar_current_size = vec2i(internal_current_width, internal_bar_size.y);
-
-					const int total_border_extent = internal_border_size + external_border_size;
-
-					const auto total_size = internal_bar_size + 2 * vec2i(total_border_extent, total_border_extent);
-
-					auto bars_output = augs::drawer { in.small_health_bars };
-
-					const auto bigger_origin = ltrb::center_and_size(bar_center, total_size);
-
-					const auto smaller_left = bigger_origin.l + total_border_extent;
-					const auto smaller_origin = ltrb(smaller_left, bigger_origin.t + total_border_extent, smaller_left + internal_bar_current_size.x, bigger_origin.b - total_border_extent);
-
-					const auto tex = in.small_health_bar_tex;
-
-					const bool draw_partial_borders = true;
-
-					if (is_conscious) {
-						bars_output.aabb(tex, bigger_origin, dark_bar_color);
-						bars_output.aabb(tex, smaller_origin, bright_bar_color);
-
-						if (draw_partial_borders && chosen_ratio < 1.0f) {
-							{
-								const auto dim_border_col = rgba(bar_color).mult_brightness(0.5f);
-								bars_output.border(in.small_health_bar_tex, bigger_origin, dim_border_col);
-							}
-
-							const auto top_border =     ltrb(bigger_origin.l-1, bigger_origin.t-1, smaller_origin.r, bigger_origin.t);
-							const auto left_border =    ltrb(bigger_origin.l-1, bigger_origin.t,   bigger_origin.l, bigger_origin.b);
-							const auto bottom_border =  ltrb(bigger_origin.l-1, bigger_origin.b,   smaller_origin.r, bigger_origin.b+1);
-							//const auto right_border =   ltrb(bigger_origin.r  , bigger_origin.t,   bigger_origin.r+1, bigger_origin.b);
-
-							bars_output.aabb(tex, left_border, bright_bar_color);
-							bars_output.aabb(tex, top_border, bright_bar_color);
-							bars_output.aabb(tex, bottom_border, bright_bar_color);
-							//bars_output.aabb(tex, right_border, bright_bar_color);
-						}
-						else {
-							bars_output.border(in.small_health_bar_tex, bigger_origin, bright_bar_color);
-						}
-					}
-
-					if (const auto highlight = in.damage_indication_sys.find_white_highlight(drawn_character, in.damage_indication_settings)) {
-						const auto white_bar_width_inclusive = static_cast<int>(static_cast<float>(internal_bar_size.x) * highlight->original_ratio);
-
-						const auto white_bar_origin = ltrb(
-							smaller_origin.r,
-							smaller_origin.t,
-							smaller_left + white_bar_width_inclusive,
-							smaller_origin.b
-						);
-
-						auto white_bar_color = white;
-						white_bar_color.mult_alpha(1.0f - highlight->passed_mult);
-						white_bar_color.mult_alpha(teleport_alpha);
-
-						bars_output.aabb(tex, white_bar_origin, white_bar_color);
-
-						if (draw_partial_borders) {
-							const auto top_border =     ltrb(white_bar_origin.l, bigger_origin.t-1, white_bar_origin.r, bigger_origin.t);
-							const auto bottom_border =  ltrb(white_bar_origin.l, bigger_origin.b,   white_bar_origin.r, bigger_origin.b+1);
-
-							bars_output.aabb(tex, top_border, white_bar_color);
-							bars_output.aabb(tex, bottom_border, white_bar_color);
-						}
-					}
-
+				case character_hud_type::SMALL_HEALTH_BAR:
+					draw_small_health_bar(false);
 					return;
-				}
 				case character_hud_type::FULL:
 					break;
 				default:
 					return;
 			}
+		}
+
+		const bool minimal_teammate_hud =
+			!is_enemy
+			&& drawn_character != watched_character
+			&& in.settings.teammate_hud_mode == teammate_hud_type::MINIMAL
+		;
+
+		if (minimal_teammate_hud) {
+			draw_small_health_bar(true);
 		}
 
 		const auto starting_health_angle = [&]() {
@@ -289,6 +406,10 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		}();
 
 		for (const auto& meter : in.meters) {
+			if (minimal_teammate_hud) {
+				break;
+			}
+
 			const auto& this_tex = meter.tex;
 			const auto circle_radius = circular_bars_size_mult * static_cast<int>(this_tex.get_original_size().x / 2);
 			auto meter_output = augs::drawer { meter.output.triangles };
@@ -642,7 +763,13 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		const bool skull_covered_by_tactical = in.settings.draw_tactical_indicators.is_enabled;
 		const bool show_death_skull = koed_recently && !skull_covered_by_tactical;
 
-		if (indicators_enabled && (is_conscious || show_death_skull) && col.a > 0) {
+		/*
+			The minimal teammate HUD has no circling color indicator, only the death skull.
+		*/
+
+		const bool indicator_allowed = !minimal_teammate_hud || !is_conscious;
+
+		if (indicators_enabled && indicator_allowed && (is_conscious || show_death_skull) && col.a > 0) {
 			const auto cam = in.text_camera;
 			const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
 			const auto angle = starting_health_angle + in.color_indicator_angle;
