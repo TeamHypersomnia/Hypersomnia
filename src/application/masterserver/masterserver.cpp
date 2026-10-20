@@ -505,9 +505,16 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 
 	/*
 		At most a few "new server" notifications an hour, whatever comes - a flood of new servers must not spam the channels.
+		And at most a few a day from one address (an IPv6 /64 counts as one) - a server that keeps restarting
+		would otherwise be announced as new every time it comes back.
 	*/
 
 	auto new_server_notifications = std::vector<double>();
+
+	constexpr std::size_t max_new_server_notifications_per_address_per_day = 4;
+	constexpr double secs_per_day = 24.0 * 3600.0;
+
+	auto new_server_notifications_by_address = std::unordered_map<netcode_address_t, std::vector<double>>();
 
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data, const bool is_web) {
 		const auto ip_str = ::ToString(from);
@@ -525,7 +532,24 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				return;
 			}
 
+			auto& of_address = new_server_notifications_by_address[augs::network_of(from)];
+			erase_if(of_address, [now](const double t) { return now - t > secs_per_day; });
+
+			if (of_address.size() >= max_new_server_notifications_per_address_per_day) {
+				MSR_LOG("Too many new server notifications from %x today - skipping one.", ip_str);
+				return;
+			}
+
+			/*
+				Addresses with nothing left in the last day are forgotten - the map does not grow without end.
+			*/
+
+			erase_if(new_server_notifications_by_address, [now](const auto& entry) {
+				return entry.second.empty() || now - entry.second.back() > secs_per_day;
+			});
+
 			new_server_notifications.push_back(now);
+			new_server_notifications_by_address[augs::network_of(from)].push_back(now);
 		}
 
 		const auto passed = since_launch.get<std::chrono::seconds>();
