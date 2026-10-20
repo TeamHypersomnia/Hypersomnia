@@ -83,6 +83,7 @@
 #include "application/main/server_key.h"
 
 #include "application/gui/headless_map_catalogue.h"
+#include "application/platform_settings.h"
 #include "augs/window_framework/platform_utils.h"
 #include "application/gui/gui_state.h"
 
@@ -284,6 +285,37 @@ enum class ad_state_type {
 	REQUESTING,
 	PLAYING
 } ad_state = ad_state_type::NONE;
+
+/*
+	CrazyGames' muteAudio and disableChat (common.js keeps them in Module, also as they change) - see platform_settings.h.
+	Muted, the game is silent over its own volume settings - as CrazyGames requires.
+*/
+
+#if PLATFORM_WEB
+EM_JS(bool, web_cg_mute_audio, (), {
+	return !!Module.cg_mute_audio;
+});
+
+EM_JS(bool, web_cg_disable_chat, (), {
+	return !!Module.cg_disable_chat;
+});
+
+bool platform_muted_audio() {
+	return web_cg_mute_audio();
+}
+
+bool platform_disables_chat() {
+	return web_cg_disable_chat();
+}
+#else
+bool platform_muted_audio() {
+	return false;
+}
+
+bool platform_disables_chat() {
+	return false;
+}
+#endif
 
 #if PLATFORM_WEB
 EM_JS(char*, crazygames_get_invite_link, (), {
@@ -4614,7 +4646,7 @@ work_result work(
 				config_copy.drawing.draw_character_status = false;
 			}
 
-			if (ad_state == ad_state_type::PLAYING || params.mute) {
+			if (ad_state == ad_state_type::PLAYING || params.mute || ::platform_muted_audio()) {
 				config_copy.audio_volume.master = 0.0f;
 			}
 

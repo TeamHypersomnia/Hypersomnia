@@ -1,5 +1,6 @@
 #include "application/gui/client/client_gui_state.h"
 #include "augs/templates/container_templates.h"
+#include "application/platform_settings.h"
 
 bool client_gui_state::requires_cursor() const {
 	return rcon.show;
@@ -27,6 +28,14 @@ bool client_gui_state::control(const handle_input_before_game_input in) {
 			}
 
 			auto invoke_chat = [&](const chat_target_type t) {
+				/*
+					No chat where the platform disables it (CrazyGames' disableChat).
+				*/
+
+				if (::platform_disables_chat()) {
+					return;
+				}
+
 				chat.open_input_bar(t);
 			};
 

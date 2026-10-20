@@ -304,6 +304,21 @@ async function pre_run_cg() {
     try {
       await window.CrazyGames.SDK.init();
 
+      // muteAudio and disableChat: the game reads Module.cg_mute_audio and cg_disable_chat every frame
+      {
+        const applySettings = settings => {
+          Module.cg_mute_audio = !!(settings && settings.muteAudio);
+          Module.cg_disable_chat = !!(settings && settings.disableChat);
+          console.log("CrazyGames muteAudio:", Module.cg_mute_audio, "disableChat:", Module.cg_disable_chat);
+        };
+
+        applySettings(window.CrazyGames.SDK.game.settings);
+
+        if (window.CrazyGames.SDK.game.addSettingsChangeListener) {
+          window.CrazyGames.SDK.game.addSettingsChangeListener(applySettings);
+        }
+      }
+
       FS.mkdir('/user');
       init_config_cg();
 

@@ -56,6 +56,7 @@
 #include "augs/misc/compress.h"
 #include "augs/misc/to_hex_str.h"
 #include "application/detail_file_paths.h"
+#include "application/platform_settings.h"
 
 #include "augs/templates/main_thread_queue.h"
 
@@ -1676,6 +1677,15 @@ void client_setup::send_packets() {
 void client_setup::perform_chat_input_bar() {
 	auto& chat = client_gui.chat;
 
+	/*
+		Disabled by the platform (CrazyGames' disableChat) while the bar was open.
+	*/
+
+	if (::platform_disables_chat()) {
+		chat.show = false;
+		return;
+	}
+
 	if (chat.perform_input_bar(vars.client_chat) && is_connected()) {
 		::client_requested_chat message;
 
@@ -2421,15 +2431,21 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		return false;
 	}();
 
-	client_gui.chat.draw_recent_messages(
-		in.get_drawer(),
-		vars.client_chat,
-		in.config.faction_view,
-		in.gui_fonts.gui,
-		get_current_time(),
-		should_censor,
-		in.config.drawing.cinematic_mode
-	);
+	/*
+		No chat messages where the platform disables chat (CrazyGames' disableChat).
+	*/
+
+	if (!::platform_disables_chat()) {
+		client_gui.chat.draw_recent_messages(
+			in.get_drawer(),
+			vars.client_chat,
+			in.config.faction_view,
+			in.gui_fonts.gui,
+			get_current_time(),
+			should_censor,
+			in.config.drawing.cinematic_mode
+		);
+	}
 
 	arena_gui_base::draw_custom_gui(in);
 }
