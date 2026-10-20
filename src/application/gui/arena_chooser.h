@@ -11,6 +11,19 @@
 #include "augs/log.h"
 #include "augs/string/path_sanitization.h"
 #include "augs/misc/imgui/maybe_different.h"
+#include "augs/misc/imgui/imgui_miniature_combo.h"
+#include "application/gui/arena_miniatures.h"
+#include "application/gui/pretty_tabs.h"
+
+enum class arena_chooser_tab {
+	// GEN INTROSPECTOR enum class arena_chooser_tab
+	OFFICIAL,
+	DOWNLOADED,
+	USER_PROJECTS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
 
 class arena_chooser : keyboard_acquiring_popup {
 	using I = std::string;
@@ -47,6 +60,8 @@ class arena_chooser : keyboard_acquiring_popup {
 
 	path_tree_settings tree_settings;
 
+	arena_chooser_tab active_tab = arena_chooser_tab::OFFICIAL;
+
 public:
 	template <class F>
 	void perform(
@@ -61,8 +76,9 @@ public:
 		using namespace augs::imgui;
 
 		const auto displayed_str = current_source.empty() ? std::string("(Invalid)") : current_source;
+		const auto* const miniature = ::get_arena_miniatures().request(current_source);
 
-		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
+		if (auto combo = scoped_miniature_combo(label, displayed_str, miniature, augs::imgui_atlas_type::ARENA_MINIATURES)) {
 			if (base::check_opened_first_time()) {
 				if (info) {
 					other_paths.clear();
@@ -99,6 +115,24 @@ public:
 					add_paths(official_folder, official_paths);
 					add_paths(downloaded_folder, downloaded_paths);
 					add_paths(user_projects_folder, user_projects_paths);
+
+					/*
+						Open on the tab of the current arena - official first, as an arena is looked for.
+					*/
+
+					auto has_current = [&](const auto& entries) {
+						return std::any_of(entries.begin(), entries.end(), [&](const auto& e) { return e.get_filename().string() == current_source; });
+					};
+
+					if (has_current(official_paths)) {
+						active_tab = arena_chooser_tab::OFFICIAL;
+					}
+					else if (has_current(user_projects_paths)) {
+						active_tab = arena_chooser_tab::USER_PROJECTS;
+					}
+					else if (has_current(downloaded_paths)) {
+						active_tab = arena_chooser_tab::DOWNLOADED;
+					}
 				}
 			}
 
@@ -112,22 +146,80 @@ public:
 
 			filter.Draw();
 
-			auto files_view = scoped_child("Files view", ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing()));
+			/*
+				Typing in the filter searches all the tabs at once - picking a tab then clears it.
+			*/
 
-			const std::array<std::string, 2> custom_column_names = { "Arena", "Type" };
+			const bool filtering = filter.IsActive();
 
-			const auto avail = ImGui::GetContentRegionAvail();
+			if (info == nullptr) {
+				const auto tab_before = active_tab;
 
-			ImGui::Columns(2);
+				do_pretty_tabs(active_tab);
 
-			text_disabled(custom_column_names[0]);
-			ImGui::NextColumn();
-			text_disabled(custom_column_names[1]);
-			ImGui::NextColumn();
+				if (filtering && active_tab != tab_before) {
+					filter.Clear();
+				}
+			}
 
-			ImGui::SetColumnWidth(0, avail.x - ImGui::CalcTextSize("User project9999").x);
+			const bool show_type = info == nullptr && filtering;
 
-			auto do_selectable = [&](const auto& path_entry) {
+			auto files_view = scoped_child("Files view", ImVec2(0, 24 * ImGui::GetTextLineHeightWithSpacing()));
+
+			const auto line_height = ImGui::GetTextLineHeight();
+			const auto row_height = ImGui::GetFrameHeight() * 2.f;
+
+			/*
+				A column of miniatures on a darker background, the name and the type of each arena right of it.
+			*/
+
+			const auto table_flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_NoPadOuterX;
+
+			auto border_like_separator = scoped_style_color(ImGuiCol_TableBorderLight, ImGui::GetStyleColorVec4(ImGuiCol_Separator));
+
+			/*
+				No vertical cell padding - rows exactly row_height tall, the empty last row of no height.
+			*/
+
+			auto no_vertical_cell_padding = scoped_style_var(ImGuiStyleVar_CellPadding, ImVec2(ImGui::GetStyle().CellPadding.x, 0.f));
+
+			if (!ImGui::BeginTable(show_type ? "Arenas with types" : "Arenas", show_type ? 3 : 2, table_flags)) {
+				return;
+			}
+
+			auto end_table = augs::scope_guard([]() { ImGui::EndTable(); });
+
+			ImGui::TableSetupColumn("Miniature", ImGuiTableColumnFlags_WidthFixed, row_height);
+			ImGui::TableSetupColumn("Arena", ImGuiTableColumnFlags_WidthStretch);
+
+			if (show_type) {
+				ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, ImGui::CalcTextSize("User project9").x);
+			}
+
+			auto darken_miniature_column = [&]() {
+				ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, miniature_background_color(), 0);
+			};
+
+			auto indent_name = [&]() {
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x * 2);
+			};
+
+			auto centered_vertically = [&]() {
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (row_height - line_height) / 2);
+			};
+
+			ImGui::TableNextRow();
+			darken_miniature_column();
+			ImGui::TableSetColumnIndex(1);
+			indent_name();
+			text_disabled("Arena");
+
+			if (show_type) {
+				ImGui::TableSetColumnIndex(2);
+				text_disabled("Type");
+			}
+
+			auto do_row = [&](const auto& path_entry, const auto type_name) {
 				const auto button_path = path_entry.path;
 				const auto arena_name = button_path.filename().string();
 
@@ -139,6 +231,10 @@ public:
 
 				const bool is_current = arena_name == current_source;
 
+				ImGui::TableNextRow(ImGuiTableRowFlags_None, row_height);
+				darken_miniature_column();
+				ImGui::TableSetColumnIndex(0);
+
 				if (is_current && acquire_keyboard) {
 					ImGui::SetScrollHereY();
 				}
@@ -147,7 +243,40 @@ public:
 				auto disabled = maybe_disabled_cols({}, !enabled);
 				auto cond = cond_scoped_style_color(!enabled, ImGuiCol_Text, ImVec4(rgba(150, 40, 40, 255)));
 
-				if (ImGui::Selectable(arena_name.c_str(), is_current, ImGuiSelectableFlags_SpanAllColumns)) {
+				const auto cell_lt = vec2(ImGui::GetCursorScreenPos());
+				const auto cell_size = vec2(ImGui::GetContentRegionAvail().x, row_height);
+
+				const bool chosen = [&]() {
+					auto subtle_highlight = scoped_selectable_colors({
+						rgba(255, 255, 255, 20),
+						rgba(255, 255, 255, 30),
+						rgba(255, 255, 255, 60)
+					});
+
+					return ImGui::Selectable(("##" + arena_name).c_str(), is_current, ImGuiSelectableFlags_SpanAllColumns, ImVec2(0, row_height));
+				}();
+
+				miniature_image(
+					*ImGui::GetWindowDrawList(),
+					::get_arena_miniatures().request(arena_name),
+					cell_lt,
+					cell_size,
+					2.f,
+					augs::imgui_atlas_type::ARENA_MINIATURES
+				);
+
+				ImGui::TableSetColumnIndex(1);
+				centered_vertically();
+				indent_name();
+				text(arena_name);
+
+				if (show_type) {
+					ImGui::TableSetColumnIndex(2);
+					centered_vertically();
+					text_disabled(type_name);
+				}
+
+				if (chosen) {
 					if (enabled) {
 						ImGui::CloseCurrentPopup();
 
@@ -159,18 +288,8 @@ public:
 
 			auto idx = 0;
 
-			auto perform_paths = [&](const auto& label, const auto& entries, const auto type_name) {
-				if (entries.empty()) {
-					return;
-				}
-
+			auto perform_paths = [&](const auto& entries, const auto type_name) {
 				auto scope = scoped_id(idx++);
-
-				ImGui::Separator();
-				text_disabled(label);
-
-				ImGui::NextColumn();
-				ImGui::NextColumn();
 
 				for (const auto& entry : entries) {
 					const auto arena_name = entry.get_filename().string();
@@ -179,21 +298,40 @@ public:
 						continue;
 					}
 
-					do_selectable(entry);
-					ImGui::NextColumn();
-					text_disabled(type_name);
-					ImGui::NextColumn();
+					do_row(entry, type_name);
 				}
 			};
 
 			if (info) {
-				perform_paths("(Arenas on server)", other_paths, "Arena on server");
+				perform_paths(other_paths, "Arena on server");
+			}
+			else if (filtering) {
+				perform_paths(official_paths, "Official");
+				perform_paths(downloaded_paths, "Downloaded");
+				perform_paths(user_projects_paths, "User project");
 			}
 			else {
-				perform_paths("(User projects)", user_projects_paths, "User project");
-				perform_paths("(Downloaded arenas)", downloaded_paths, "Downloaded");
-				perform_paths("(Official arenas)", official_paths, "Official");
+				switch (active_tab) {
+					case arena_chooser_tab::OFFICIAL:
+						perform_paths(official_paths, "Official");
+						break;
+					case arena_chooser_tab::DOWNLOADED:
+						perform_paths(downloaded_paths, "Downloaded");
+						break;
+					case arena_chooser_tab::USER_PROJECTS:
+						perform_paths(user_projects_paths, "User project");
+						break;
+					default:
+						break;
+				}
 			}
+
+			/*
+				An empty row last, of no height - so that the last arena, too, has a separator under it
+				(an inner border is only between rows), with the column border ending right on it.
+			*/
+
+			ImGui::TableNextRow(ImGuiTableRowFlags_None, 0.f);
 		}
 		else {
 			base::mark_not_opened();

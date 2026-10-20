@@ -450,6 +450,15 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		requested_link_avatar = std::nullopt;
 	}
 
+	if (requested_arena_miniatures.has_value()) {
+		arena_miniatures_tex.texImage2D(in.renderer, std::move(*requested_arena_miniatures));
+		arena_miniatures_tex.set_filtering(in.renderer, augs::filtering_type::LINEAR);
+
+		augs::graphics::texture::set_current_to_previous(in.renderer);
+
+		requested_arena_miniatures = std::nullopt;
+	}
+
 	const auto current_frame = in.current_frame;
 	auto& now_all_defs = now_loaded_viewables_defs;
 

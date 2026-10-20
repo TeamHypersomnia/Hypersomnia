@@ -123,6 +123,7 @@
 #include "application/gui/changelog_gui.h"
 #include "application/gui/social_sign_in_gui.h"
 #include "application/gui/ingame_menu_gui.h"
+#include "application/gui/arena_miniatures.h"
 #include "application/setups/editor/editor_paths.h"
 
 #include "application/main/imgui_pass.h"
@@ -6929,6 +6930,10 @@ work_result work(
 			};
 
 			auto finalize_loading_viewables = [&](const bool measure_atlas_uploading) {
+				if (auto new_grid = ::get_arena_miniatures().take_new_grid()) {
+					streaming.requested_arena_miniatures = std::move(*new_grid);
+				}
+
 				streaming.finalize_load({
 					audio_buffers,
 					get_current_frame_num(),
@@ -7352,7 +7357,8 @@ work_result work(
 					std::addressof(streaming.avatars.texture), 
 					std::addressof(streaming.avatar_preview_tex),
 					std::addressof(streaming.ad_hoc.texture),
-					std::addressof(streaming.link_avatar_tex)
+					std::addressof(streaming.link_avatar_tex),
+					std::addressof(streaming.arena_miniatures_tex)
 				);
 			};
 

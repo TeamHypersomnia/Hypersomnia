@@ -7,6 +7,7 @@ namespace augs {
 		AVATARS,
 		AVATAR_PREVIEW,
 		LINK_AVATAR,
+		ARENA_MINIATURES,
 		AD_HOC
 	};
 }

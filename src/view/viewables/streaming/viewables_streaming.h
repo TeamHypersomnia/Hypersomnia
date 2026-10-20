@@ -144,6 +144,13 @@ public:
 	augs::graphics::texture link_avatar_tex = augs::image::white_pixel();
 	std::optional<augs::image> requested_link_avatar;
 
+	/*
+		The grid of small arena miniatures shown in the arena choosers - see arena_miniatures.h.
+	*/
+
+	augs::graphics::texture arena_miniatures_tex = augs::image::white_pixel();
+	std::optional<augs::image> requested_arena_miniatures;
+
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;
 

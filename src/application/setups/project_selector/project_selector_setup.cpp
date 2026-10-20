@@ -13,6 +13,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "application/gui/pretty_tabs.h"
 
+#include "augs/misc/imgui/imgui_miniature_combo.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/date_time.h"
@@ -254,18 +255,25 @@ bool projects_list_tab_state::perform_list(
 
 		++current_col;
 
-		if (num_columns > 1) {
-			ImGui::NextColumn();
-		}
+		ImGui::NextColumn();
 	};
 
 	const auto avail = ImGui::GetContentRegionAvail();
 
-	ImGui::Columns(num_columns);
+	/*
+		The first column - of miniatures on a darker background - has no header.
+	*/
+
+	const auto miniature_column_width = miniature_size_v + ImGui::GetStyle().ItemSpacing.x * 2;
+
+	ImGui::Columns(num_columns + 1);
+	ImGui::SetColumnWidth(0, miniature_column_width);
 
 	if (num_columns > 1) {
-		ImGui::SetColumnWidth(0, avail.x * 0.8f);
+		ImGui::SetColumnWidth(1, avail.x * 0.8f - miniature_column_width);
 	}
+
+	ImGui::NextColumn();
 
 	do_column("Name");
 
@@ -275,7 +283,6 @@ bool projects_list_tab_state::perform_list(
 
 	ImGui::Separator();
 
-	const auto line_h = ImGui::GetTextLineHeight();
 
 	bool anything_chosen = false;
 
@@ -287,12 +294,25 @@ bool projects_list_tab_state::perform_list(
 			return;
 		}
 
-		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
+		/*
+			No item spacing inside a row, so that the highlight reaches the separators - the row's own padding instead.
+			The row is as tall as its miniature or its text, whichever is taller.
+		*/
+
+		const auto spacing = vec2(ImGui::GetStyle().ItemSpacing);
+		const auto text_padding = spacing.y;
+		const auto description = sanitize_arena_short_description(entry.about.short_description);
+		const auto text_h = ImGui::CalcTextSize(arena_name.c_str()).y + ImGui::CalcTextSize(description.c_str()).y;
+
+		const auto row_h = std::max(1.f + miniature_size_v, 2 * text_padding + text_h);
+		const auto selectable_size = ImVec2(0, row_h);
+
+		auto no_gaps = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(spacing.x, 0.f));
 		auto id = scoped_id(entry.miniature_index);
 
 		const bool is_selected = path == selected_arena_path;
 
-		const auto local_pos = ImGui::GetCursorPos();
+		const auto row_lt = vec2(ImGui::GetCursorScreenPos());
 
 		{
 			auto darkened_selectables = scoped_selectable_colors({
@@ -316,6 +336,8 @@ bool projects_list_tab_state::perform_list(
 			}
 
 			if (ImGui::BeginPopupContextItem()) {
+				auto popup_spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, static_cast<ImVec2>(spacing));
+
 				if (ImGui::Selectable("Reveal in explorer")) {
 					window.reveal_in_explorer(path);
 				}
@@ -324,42 +346,37 @@ bool projects_list_tab_state::perform_list(
 			}
 		}
 
-		const auto after_pos = ImGui::GetCursorPos();
+		{
+			const auto column_l = ImGui::GetWindowPos().x + ImGui::GetColumnOffset(0);
+			const auto column_w = ImGui::GetColumnWidth(0);
 
-		ImGui::SetCursorPos(local_pos);
-
-		ImGui::SameLine();
-
-		const auto image_padding = vec2(0, 0);
-		const auto miniature_entry = mapped_or_nullptr(ad_hoc_atlas, entry.miniature_index);
-		const auto target_miniature_size = vec2::square(miniature_size_v);
-
-		if (miniature_entry != nullptr) {
-			const auto miniature_size = miniature_entry->get_original_size();
-			const auto resized_miniature_size = vec2i::scaled_to_max_size(miniature_size, miniature_size_v);
-
-			const auto offset = (target_miniature_size - resized_miniature_size) / 2;
-			game_image(*miniature_entry, resized_miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
+			miniature_image(
+				*ImGui::GetWindowDrawList(),
+				mapped_or_nullptr(ad_hoc_atlas, entry.miniature_index),
+				vec2(column_l, row_lt.y),
+				vec2(column_w, selectable_size.y),
+				4.f,
+				augs::imgui_atlas_type::AD_HOC
+			);
 		}
 
-		invisible_button("invisible_miniature", target_miniature_size + image_padding);
+		ImGui::NextColumn();
 
-		ImGui::SameLine();
+		{
+			const auto x = ImGui::GetCursorPosX() + spacing.x;
 
-		const auto x = ImGui::GetCursorPosX();
-		const auto prev_y = ImGui::GetCursorPosY() + line_h;
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + text_padding);
+			ImGui::SetCursorPosX(x);
+			text(arena_name);
 
-		text(arena_name);
+			ImGui::SetCursorPosX(x);
+			text_disabled(description);
+		}
 
-		ImGui::SetCursorPosY(prev_y);
-		ImGui::SetCursorPosX(x);
-
-		text_disabled(sanitize_arena_short_description(entry.about.short_description));
-
-		ImGui::SetCursorPos(after_pos);
+		ImGui::NextColumn();
 
 		if (num_columns > 1) {
-			ImGui::NextColumn();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + text_padding);
 
 			const auto date = augs::date_time::from_utc_timestamp(entry.meta.version_timestamp);
 
@@ -373,6 +390,13 @@ bool projects_list_tab_state::perform_list(
 
 			ImGui::NextColumn();
 		}
+
+		/*
+			A separator under every entry, the miniature column darkened down to it.
+		*/
+
+		ImGui::Separator();
+		darken_first_column(row_lt.y, ImGui::GetCursorScreenPos().y);
 	};
 
 	if (sort_by_column == 0) {

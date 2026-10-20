@@ -129,6 +129,12 @@ as well as to test your skills in a laggy environment.
 
 		// auto& scope_cfg = into;
 
+		if (perform_arena_chooser(into_vars.arena)) {
+			into_vars.game_mode = "";
+		}
+
+		perform_game_mode_chooser(into_vars.game_mode);
+
 		input_text_with_hint("Server name", "(default)", into_vars.server_name);
 
 		{
@@ -139,12 +145,6 @@ as well as to test your skills in a laggy environment.
 			ImGui::SameLine();
 			checkbox("Show##serverpw", show);
 		}
-
-		if (perform_arena_chooser(into_vars.arena)) {
-			into_vars.game_mode = "";
-		}
-
-		perform_game_mode_chooser(into_vars.game_mode);
 
 		slider("Slots", into.slots, 2, 64);
 

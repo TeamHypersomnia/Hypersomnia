@@ -661,6 +661,7 @@ if(HAS_HEAD)
 	"src/application/gui/settings_gui.cpp"
 	"src/application/gui/start_client_gui.cpp"
 	"src/application/gui/start_server_gui.cpp"
+	"src/application/gui/arena_miniatures.cpp"
 	"src/view/mode_gui/arena/arena_mode_gui.cpp"
 	"src/view/mode_gui/arena/arena_scoreboard_gui.cpp"
 	"src/view/mode_gui/arena/arena_choose_team_gui.cpp"

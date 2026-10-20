@@ -141,7 +141,8 @@ namespace augs {
 		graphics::texture* avatar_atlas,
 		graphics::texture* avatar_preview_atlas,
 		graphics::texture* ad_hoc_atlas,
-		graphics::texture* link_avatar_texture
+		graphics::texture* link_avatar_texture,
+		graphics::texture* arena_miniatures_texture
 	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
@@ -197,6 +198,7 @@ namespace augs {
 					bind_if(augs::imgui_atlas_type::AVATAR_PREVIEW, avatar_preview_atlas);
 					bind_if(augs::imgui_atlas_type::AD_HOC, ad_hoc_atlas);
 					bind_if(augs::imgui_atlas_type::LINK_AVATAR, link_avatar_texture);
+					bind_if(augs::imgui_atlas_type::ARENA_MINIATURES, arena_miniatures_texture);
 
 					push_no_arg(no_arg_command::IMGUI_CMD);
 

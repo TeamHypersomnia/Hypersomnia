@@ -9,6 +9,7 @@
 #include "augs/misc/httplib_utils.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/misc/imgui/imgui_miniature_combo.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/maybe_different.h"
 #include "augs/misc/imgui/imgui_utils.h"
@@ -126,15 +127,24 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 	const auto avail = ImGui::GetContentRegionAvail();
 
-	ImGui::Columns(num_columns);
+	/*
+		The first column - of miniatures on a darker background - has no header.
+	*/
+
+	const auto miniature_column_width = miniature_size_v + ImGui::GetStyle().ItemSpacing.x * 2;
+
+	ImGui::Columns(num_columns + 1);
+	ImGui::SetColumnWidth(0, miniature_column_width);
 
 	if (num_columns > 1) {
 		const auto max_w = ImGui::CalcTextSize("999 days ago 99").x;
 		const auto ago_col_w = std::max(max_w, avail.x * 0.2f);
-		const auto first_col_w = avail.x - ago_col_w;
+		const auto name_col_w = avail.x - ago_col_w - miniature_column_width;
 
-		ImGui::SetColumnWidth(0, first_col_w);
+		ImGui::SetColumnWidth(1, name_col_w);
 	}
+
+	ImGui::NextColumn();
 
 	do_column("Name");
 	do_column("Last modified");
@@ -180,7 +190,26 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			entry.passed_filter = true;
 		}
 
-		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
+		/*
+			No item spacing inside a row, so that the highlight reaches the separators - the row's own padding instead.
+			The row is as tall as its miniature or its text, whichever is taller - the description wraps at a known width.
+		*/
+
+		const auto spacing = vec2(ImGui::GetStyle().ItemSpacing);
+		const auto text_padding = spacing.y;
+		const auto name_indent = spacing.x;
+		const auto description_wrap_w = ImGui::GetColumnWidth(1) - 2 * spacing.x - name_indent;
+
+		const auto description_h = 
+			in.streamer_mode ? 
+			0.f : 
+			ImGui::CalcTextSize(entry.short_description.c_str(), nullptr, false, description_wrap_w).y
+		;
+
+		const auto row_h = std::max(1.f + miniature_size_v, 2 * text_padding + line_h + description_h);
+		const auto selectable_size = ImVec2(0, row_h);
+
+		auto no_gaps = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(spacing.x, 0.f));
 		auto id = scoped_id(arena_name.c_str());
 
 		auto entry_id = entry.name;
@@ -198,7 +227,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 		const bool downloading_this_map = maybe_progress != nullptr;
 
-		const auto local_pos = ImGui::GetCursorPos();
+		const auto row_lt = vec2(ImGui::GetCursorScreenPos());
 
 		{
 			auto selectable_cols = [&]() -> std::array<rgba, 3> {
@@ -310,6 +339,8 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			}
 
 			if (ImGui::BeginPopupContextItem()) {
+				auto popup_spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, static_cast<ImVec2>(spacing));
+
 				if (!is_selected) {
 					select_this();
 				}
@@ -346,27 +377,23 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			}
 		}
 
-		const auto after_pos = ImGui::GetCursorPos();
+		{
+			const auto miniature_entry = entry.miniature_id != 0 ? mapped_or_nullptr(in.ad_hoc_atlas, entry.miniature_id) : nullptr;
+			const auto column_l = ImGui::GetWindowPos().x + ImGui::GetColumnOffset(0);
 
-		ImGui::SetCursorPos(local_pos);
-
-		ImGui::SameLine();
-
-		const auto image_padding = vec2(0, 0);
-		const auto miniature_entry = mapped_or_nullptr(in.ad_hoc_atlas, entry.miniature_id);
-		const auto target_miniature_size = vec2::square(miniature_size_v);
-
-		if (entry.miniature_id != 0 && miniature_entry != nullptr) {
-			const auto miniature_size = miniature_entry->get_original_size();
-			const auto resized_miniature_size = vec2i::scaled_to_max_size(miniature_size, miniature_size_v);
-
-			const auto offset = (target_miniature_size - resized_miniature_size) / 2;
-			game_image(*miniature_entry, resized_miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
+			miniature_image(
+				*ImGui::GetWindowDrawList(),
+				miniature_entry,
+				vec2(column_l, row_lt.y),
+				vec2(ImGui::GetColumnWidth(0), selectable_size.y),
+				4.f,
+				augs::imgui_atlas_type::AD_HOC
+			);
 		}
 
-		invisible_button("invisible_miniature", target_miniature_size + image_padding);
-
-		ImGui::SameLine();
+		ImGui::NextColumn();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + name_indent);
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + text_padding);
 
 		const auto x = ImGui::GetCursorPosX();
 		const auto prev_y = ImGui::GetCursorPosY() + line_h;
@@ -384,15 +411,14 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		ImGui::SetCursorPosX(x);
 
 		if (!in.streamer_mode) {
-			ImGui::PushTextWrapPos();
+			ImGui::PushTextWrapPos(x + description_wrap_w);
 			text_disabled(entry.short_description);
 			ImGui::PopTextWrapPos();
 		}
 
-		ImGui::SetCursorPos(after_pos);
-
 		if (num_columns > 1) {
 			ImGui::NextColumn();
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + text_padding);
 
 			if (maybe_progress) {
 				if ((*maybe_progress) == 0.0f) {
@@ -421,6 +447,13 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 			ImGui::NextColumn();
 		}
+
+		/*
+			A separator under every entry, the miniature column darkened down to it.
+		*/
+
+		ImGui::Separator();
+		darken_first_column(row_lt.y, ImGui::GetCursorScreenPos().y);
 	};
 
 	if (sort_by_column == 0) {
