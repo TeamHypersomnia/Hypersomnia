@@ -378,6 +378,7 @@ namespace test_flavours {
 				in.explosion_particles.playback_speed = 1.1f;
 				dmg.impact_impulse = 2.f;
 				dmg.impulse_multiplier_against_sentience = 1000.f;
+				dmg.impulse_along_sentience_velocity = true;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 				//in.sound.modifier.pitch = 0.8f;
 				in.sound.modifier.max_distance = 6000.f;

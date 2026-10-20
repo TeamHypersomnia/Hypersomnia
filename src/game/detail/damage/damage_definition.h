@@ -32,7 +32,8 @@ struct damage_definition {
 	sound_effect_input pass_through_held_item_sound;
 
 	bool always_friendly_fire = false;
-	pad_bytes<3> pad;
+	bool impulse_along_sentience_velocity = false;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 
 	template <class T>

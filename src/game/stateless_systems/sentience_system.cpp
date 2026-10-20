@@ -756,6 +756,22 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 			const auto subject_of_impact = subject.get_owner_of_colliders().template get<components::rigid_body>();
 			const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
 
+			if (def.impulse_along_sentience_velocity && subject.template has<components::sentience>()) {
+				/*
+					E.g. a corpse explosion restoring stamina: it doesn't push the character away from the corpse,
+					it pulls them on where they are running - through the center, so without spinning them.
+					A character standing still isn't pushed at all.
+				*/
+
+				const auto velocity = subject_of_impact.get_velocity();
+
+				if (velocity.is_nonzero()) {
+					subject_of_impact.apply_impulse(vec2(velocity).set_length(considered_impulse));
+				}
+
+				return;
+			}
+
 			const auto impact = vec2(d.impact_velocity).set_length(considered_impulse);
 
 			subject_of_impact.apply_impulse(impact, d.point_of_impact - subject_of_impact_mass_pos);
