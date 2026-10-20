@@ -1501,7 +1501,11 @@ void client_setup::send_pending_commands() {
 		send_settings();
 	}
 
-	const auto& avatar_path = vars.avatar_image_path;
+	/*
+		The account's avatar (Steam, CrazyGames) when it is in effect - not only the player's own file.
+	*/
+
+	const auto avatar_path = vars.get_avatar_image_path();
 
 	if (state == C::IN_GAME) {
 		if (!has_sent_avatar) {
