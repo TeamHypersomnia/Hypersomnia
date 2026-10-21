@@ -355,20 +355,26 @@ ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(
 	const auto source_entity = in_entity.to_const();
 	auto& cosm = in_entity.get_cosmos();
 
-	return cosmic::specific_create_entity(access, cosm, new_flavour, [&](const auto new_entity, auto&&...) {
-		const auto& source_components = source_entity.get({}).component_state;
-		auto& new_solvable = new_entity.get({});
-		auto& new_components = new_solvable.component_state;
+	/*
+		Everything read from the source before allocating the clone:
+		it is in the same pool, which the allocation may move - source_entity would then point to freed memory.
+	*/
 
-		/* Initial copy-assignment */
-		new_components = source_components;
+	const auto source_components = source_entity.get({}).component_state;
 
+	const auto source_transform = [&]() -> std::optional<transformr> {
+		if (source_entity.get_current_slot()) {
+			return source_entity.find_logic_transform();
+		}
+
+		return std::nullopt;
+	}();
+
+	return cosmic::specific_create_entity_detail(access, cosm, new_flavour, source_components, [&](const auto new_entity, auto& new_solvable) {
 		cosmic::make_suitable_for_cloning(new_solvable);
 
-		if (const auto slot = source_entity.get_current_slot()) {
-			if (const auto source_transform = source_entity.find_logic_transform()) {
-				new_entity.set_logic_transform(*source_transform);
-			}
+		if (source_transform.has_value()) {
+			new_entity.set_logic_transform(*source_transform);
 		}
 
 		return new_entity;

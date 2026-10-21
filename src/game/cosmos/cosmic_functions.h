@@ -128,4 +128,7 @@ public:
 
 	template <class... Types>
 	static void might_allocate_entities_having(cosmos&, const std::size_t new_count);
+
+	template <class E>
+	static void might_allocate_entities_of_type(cosmos&, const std::size_t new_count);
 };

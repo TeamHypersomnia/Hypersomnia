@@ -591,7 +591,7 @@ struct game_state_checks {
 	static_assert(!can_type_contain_v<all_logical_assets, entity_id_base>);
 	static_assert(!can_type_contain_v<all_viewables_defs, entity_id_base>);
 
-	static_assert(can_type_contain_constructible_from_v<invariants::cartridge, typed_entity_flavour_id<shootable_charge>>);
+	static_assert(can_type_contain_constructible_from_v<invariants::cartridge, typed_entity_flavour_id<remnant_body>>);
 	static_assert(!can_type_contain_constructible_from_v<invariants::cartridge, typed_entity_flavour_id<static_light>>);
 
 	static_assert(!can_type_contain_constructible_from_v<invariants::fixtures, typed_entity_flavour_id<plain_missile>>);

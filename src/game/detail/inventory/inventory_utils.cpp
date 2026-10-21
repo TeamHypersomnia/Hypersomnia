@@ -100,7 +100,15 @@ item_transfer_result query_transfer_result(
 
 			const auto item = transferred_item.template get<components::item>();
 
-			ensure(r.params.get_specified_quantity() != 0);
+			/*
+				-1 for the whole item, otherwise at least one charge - the quantity also comes from the network,
+				and 0 or less would clone empty or negative stacks.
+			*/
+
+			if (const auto q = r.params.get_specified_quantity(); q != -1 && q < 1) {
+				output.result = item_transfer_result_type::INVALID_PARAMETERS;
+				return;
+			}
 
 			const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
 			const auto relation = capabilities_compared.relation_type;

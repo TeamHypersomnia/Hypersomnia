@@ -334,5 +334,8 @@ public:
 	void might_allocate_entities_having(const std::size_t count);
 
 	template <class E>
+	void might_allocate_entities_of_type(const std::size_t count);
+
+	template <class E>
 	bool next_allocation_preserves_pointers() const;
 };

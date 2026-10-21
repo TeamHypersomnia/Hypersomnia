@@ -272,7 +272,7 @@ entity_id requested_equipment::generate_for_impl(
 		}
 		else if (chamber_slot) {
 			const auto final_charge_flavour = [&]() {
-				if (eq.non_standard_mag.is_set()) {
+				if (eq.non_standard_charge.is_set()) {
 					return eq.non_standard_charge;
 				}
 

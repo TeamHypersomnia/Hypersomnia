@@ -19,6 +19,16 @@ void cosmos::might_allocate_entities_having(const std::size_t new_count) {
 	cosmic::might_allocate_entities_having<Types...>(*this, new_count);
 }
 
+template <class E>
+void cosmic::might_allocate_entities_of_type(cosmos& cosm, const std::size_t new_count) {
+	cosm.get_solvable({}).significant.template get_pool<E>().might_allocate_objects(new_count);
+}
+
+template <class E>
+void cosmos::might_allocate_entities_of_type(const std::size_t new_count) {
+	cosmic::might_allocate_entities_of_type<E>(*this, new_count);
+}
+
 inline void cosmos::might_allocate_stackable_entities(const std::size_t count) {
 	might_allocate_entities_having<invariants::cartridge>(count);
 }

@@ -85,13 +85,16 @@ void creation_system::flush_just_create_entity_requests(const logic_step step) {
 		const auto new_entity = just_create_entity(access, cosm, q.flavour);
 
 		if (new_entity.alive() && q.post_create) {
+			const auto new_id = new_entity.get_id();
+
 			q.post_create(new_entity, step);
 
 			/*
 				Re-snap interpolation after post_create moves the entity,
 				so it doesn't appear at (0,0) and interpolate towards the real position.
+				Fetched again - post_create might have created entities of the same type, moving the pool.
 			*/
-			new_entity.dispatch([](const auto& typed_handle) {
+			cosm[new_id].dispatch([](const auto& typed_handle) {
 				if constexpr(remove_cref<decltype(typed_handle)>::template has<invariants::interpolation>()) {
 					auto& interp = get_corresponding<components::interpolation>(typed_handle);
 					if (const auto t = typed_handle.find_logic_transform()) {

@@ -278,6 +278,23 @@ perform_transfer_result perform_transfer_impl::operator()(
 		return output;
 	}
 
+	/*
+		A partial transfer clones the stack into its own pool - room for the clone is made before any handle
+		or reference into that pool is taken here, as the clone could otherwise move the pool under them.
+		Not for a whole item: no clone then, and the callers' handles into that pool must stay valid.
+	*/
+
+	if (const auto item_to_split = cosm[r.item];
+		item_to_split.get<components::item>().get_charges() != static_cast<int>(result.transferred_charges)
+	) {
+		item_to_split.dispatch(
+			[&]<typename H>(const H&) {
+				using E = typename H::used_entity_type;
+				cosm.might_allocate_entities_of_type<E>(1);
+			}
+		);
+	}
+
 	const auto transferred_item = cosm[r.item];
 
 	auto& item = get_item_of(transferred_item);
@@ -523,13 +540,6 @@ perform_transfer_result perform_transfer_impl::operator()(
 			return transferred_item;
 		}
 		else {
-			transferred_item.dispatch(
-				[&]<typename H>(const H&) {
-					using E = typename H::used_entity_type;
-					ensure(cosm.next_allocation_preserves_pointers<E>());
-				}
-			);
-
 			const auto cloned_stack = just_clone_entity(allocate_new_entity_access(), transferred_item);
 			get_item_of(cloned_stack).charges = result.transferred_charges;
 			get_item_of(cloned_stack).previous_slot = source_slot;

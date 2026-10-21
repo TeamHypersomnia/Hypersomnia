@@ -10,8 +10,12 @@ namespace invariants {
 			components::sender
 		>;
 
+		/*
+			Only remnants - spawned while iterating guns (gun_system), so creating them never moves the gun pool.
+		*/
+
 		using shell_flavour_type = constrained_entity_flavour_id<
-			invariants::rigid_body
+			invariants::remnant
 		>;
 
 		// GEN INTROSPECTOR struct invariants::cartridge

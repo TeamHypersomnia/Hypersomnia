@@ -5,7 +5,6 @@
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/sentience_system.h"
-#include "game/stateless_systems/destruction_system.h"
 
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_id.h"
@@ -34,9 +33,6 @@ namespace test_scenes {
 class game_gui_system;
 struct cosmos_global_solvable;
 struct perform_transfer_impl;
-
-struct duplicate_entities_command;
-struct instantiate_flavour_command;
 
 class allocate_new_entity_access {
 	/*
@@ -169,8 +165,6 @@ class allocate_new_entity_access {
 
 	friend void missile_system::detonate_colliding_missiles(const logic_step);
 
-	friend void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const;
-
 	/* 
 		For allocating characters. No character handles are manipulated anywhere in proximity. 
 	*/
@@ -207,13 +201,6 @@ class allocate_new_entity_access {
 
 	template <bool is_const>
 	friend class basic_game_gui_context;
-
-	/*
-		Debugger setup.
-	*/
-
-	friend instantiate_flavour_command;
-	friend duplicate_entities_command;
 
 	allocate_new_entity_access() {}
 };
