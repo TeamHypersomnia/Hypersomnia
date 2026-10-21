@@ -4,12 +4,6 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [4.0.1] - 2026-10-20
-
-### Fixed
-
-- Your **Steam or CrazyGames avatar** now shows on servers on a fresh install too.
-
 ## [4.0.0] - 2026-10-19
 
 ### Added
