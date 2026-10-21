@@ -70,7 +70,10 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/cosmos.h"
 
+#include "test_scenes/test_scene_settings.h"
+#include "test_scenes/scenes/testbed.h"
 #include "application/session_profiler.h"
+#include "application/intercosm.h"
 #include "application/config_json_table.h"
 #include "application/main/identity_key.h"
 #include "application/main/identity_session.h"
@@ -861,6 +864,27 @@ work_result work(
 	else {
 		LOG("Unit tests were disabled.");
 	}
+
+#if BUILD_TEST_SCENES
+	if (!params.export_weapon_stats.empty()) {
+		/*
+			The testbed reports the stats of every weapon it spawns - for the weapons page of the website.
+		*/
+
+		const auto target_dir = CALLING_CWD / params.export_weapon_stats;
+		LOG("Exporting weapon stats to %x.", target_dir);
+
+		{
+			auto scene = std::make_unique<intercosm>();
+			scene->make_test_scene(test_scene_settings());
+		}
+
+		test_scenes::save_reported_weapons(target_dir);
+		LOG("Weapon stats exported.");
+
+		return work_result::SUCCESS;
+	}
+#endif
 
 	LOG("Initializing ImGui.");
 

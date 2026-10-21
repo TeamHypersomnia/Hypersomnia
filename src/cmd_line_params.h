@@ -55,6 +55,7 @@ struct cmd_line_params {
 
 	augs::path_type apply_config;
 	augs::path_type tournament;
+	augs::path_type export_weapon_stats;
 
 	int test_fp_consistency = -1;
 	std::string connect_address;
@@ -254,6 +255,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--tournament") {
 				tournament = get_next();
+			}
+			else if (a == "--export-weapon-stats") {
+				export_weapon_stats = get_next();
 			}
 			else if (a == "--edit") {
 				editor_target = get_next();

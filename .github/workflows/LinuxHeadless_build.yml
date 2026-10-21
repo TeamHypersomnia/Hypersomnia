@@ -54,6 +54,11 @@ jobs:
     - name: Build AppImage
       run: cmake/appimage_builder.sh --headless
 
+    # After the AppImage, as running the game writes its user files into hypersomnia/ which the AppImage packs.
+    - name: Export weapon stats
+      continue-on-error: true
+      run: pushd hypersomnia && ../build/current/Hypersomnia --export-weapon-stats ../weapon_stats --no-update-on-launch && popd
+
     - name: Create release_notes.txt
       run: cmake/generate_archives.sh Linux
 
@@ -63,6 +68,7 @@ jobs:
         path: |
           Hypersomnia-Headless.AppImage
           hypersomnia/release_notes.txt
+          weapon_stats/*.json
 
     - uses: actions/upload-artifact@v4
       with:

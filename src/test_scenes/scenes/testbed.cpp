@@ -42,6 +42,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "augs/string/string_templates.h"
 #include "test_scenes/ingredients/all_weapons_report.h"
+#include "test_scenes/ingredients/sprint_speed.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
 
 #include "augs/readwrite/json_readwrite.h"
@@ -49,6 +50,7 @@
 #include "game/inferred_caches/organism_cache.hpp"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "all_paths.h"
+#include "augs/filesystem/directory.h"
 
 static bool reported = false;
 
@@ -151,7 +153,7 @@ static void report_melee(const auto enum_id, H handle) {
 }
 
 template <class H>
-static void report_weapon(const auto enum_id, H handle) {
+static void report_weapon(const auto enum_id, H handle, const loaded_image_caches_map& caches) {
 	if (handle.dead()) return;
 
 	if (handle.template has<components::melee>()) {
@@ -172,32 +174,18 @@ static void report_weapon(const auto enum_id, H handle) {
 
 	json_firearm_entry entry;
 	entry.id = to_lowercase(augs::enum_to_string(enum_id));
-	entry.pic_filename = entry.id;
+	/*
+		The image the weapon is drawn with - not its id, which some images are named differently from.
+	*/
 
-	/* TODO EDITOR: remove this when we deprecate maps */
-	if (entry.pic_filename == "awka") {
-		entry.pic_filename = "hpsr";
-	}
-	if (entry.pic_filename == "lews") {
-		entry.pic_filename = "lewsii";
-	}
-	if (entry.pic_filename == "elon") {
-		entry.pic_filename = "elon_hrl";
-	}
-	if (entry.pic_filename == "warx") {
-		entry.pic_filename = "warx_fq12";
-	}
-	if (entry.pic_filename == "datum") {
-		entry.pic_filename = "datum_gun";
-	}
+	{
+		const auto image_id = handle.template get<invariants::sprite>().image_id;
+		entry.pic_filename = to_lowercase(augs::enum_to_string(static_cast<test_scene_image_id>(image_id.indirection_index))) + ".png";
 
-	if (handle.template has<invariants::animation>()) {
-		if (handle.template get<invariants::animation>().id.is_set()) {
-			entry.pic_filename += "_1";
-		}
+		const auto pic_size = caches.at(image_id).get_original_size();
+		entry.pic_width = pic_size.x;
+		entry.pic_height = pic_size.y;
 	}
-
-	entry.pic_filename += ".png";
 
 	entry.display_name = handle.get_name();
 
@@ -233,7 +221,12 @@ static void report_weapon(const auto enum_id, H handle) {
 	entry.price = item.standard_price;
 	entry.kill_award = gun.adversarial.knockout_award;
 
-	entry.weight = 100 * handle.template get<components::rigid_body>().get_mass();
+	if constexpr(std::is_same_v<remove_cref<decltype(enum_id)>, test_shootable_weapons>) {
+		const auto& flavours = cosm.get_common_significant().flavours;
+		const auto in = test_flavours::sprint_speed_input { flavours, caches };
+
+		entry.sprint_speed = test_flavours::calc_sprint_speed_with(get_test_flavour(flavours, enum_id), in);
+	}
 
 	entry.reload_time /= 1000;
 	entry.chambering_time /= 1000;
@@ -256,6 +249,21 @@ static void report_weapon(const auto enum_id, H handle) {
 
 	entry.action_type = gun.action_mode;
 
+	/*
+		Time to kill when every pellet hits: the first shot is free, the rest wait for the practical cooldown.
+		The electric armor adds its 100 Personal Electricity, absorbed 1:1 before health.
+	*/
+
+	auto calc_ttk = [&](const real32 effective_health) {
+		const auto damage_per_shot = entry.damage * std::max(1, entry.pellets_per_shot);
+		const auto shots_to_kill = std::ceil(effective_health / damage_per_shot);
+
+		return (shots_to_kill - 1) * practical_shot_cooldown / 1000;
+	};
+
+	entry.ttk = calc_ttk(100.f);
+	entry.ttk_armor = calc_ttk(200.f);
+
 	handle.dispatch(
 		[&](const auto typed_handle) {
 			if constexpr(typed_handle.template has<invariants::item>()) {
@@ -268,6 +276,10 @@ static void report_weapon(const auto enum_id, H handle) {
 						entry.magazine_x = transform.pos.x;
 						entry.magazine_y = transform.pos.y;
 						entry.magazine_rotation = transform.rotation;
+
+						const auto magazine_size = caches.at(img).get_original_size();
+						entry.magazine_width = magazine_size.x;
+						entry.magazine_height = magazine_size.y;
 
 					},
 					cosm,
@@ -319,6 +331,17 @@ auto toarr(const std::unordered_map<std::string, T>& m) {
 	return out;
 }
 
+namespace test_scenes {
+	void save_reported_weapons(const augs::path_type& dir) {
+		augs::create_directories(dir);
+
+		augs::save_as_json(toarr(reported_firearms), dir / "firearms.json");
+		augs::save_as_json(toarr(reported_melees), dir / "melees.json");
+		augs::save_as_json(toarr(reported_explosives), dir / "explosives.json");
+		augs::save_as_json(toarr(reported_spells), dir / "spells.json");
+	}
+}
+
 static void save_all_reported_weapons() {
 	if (reported) {
 		return;
@@ -326,10 +349,7 @@ static void save_all_reported_weapons() {
 
 	reported = true;
 
-	augs::save_as_json(toarr(reported_firearms), LOGS_DIR / "firearms.json");
-	augs::save_as_json(toarr(reported_melees), LOGS_DIR / "melees.json");
-	augs::save_as_json(toarr(reported_explosives), LOGS_DIR / "explosives.json");
-	augs::save_as_json(toarr(reported_spells), LOGS_DIR / "spells.json");
+	test_scenes::save_reported_weapons(LOGS_DIR);
 }
 
 test_mode_ruleset::test_mode_ruleset() {
@@ -641,7 +661,7 @@ namespace test_scenes {
 			}
 
 			auto result = r.generate_for(access, character, step);
-			report_weapon(w, world[result]);
+			report_weapon(w, world[result], caches);
 		};
 
 		auto give_charge = [&](const auto& where, const auto w, const int pieces) {

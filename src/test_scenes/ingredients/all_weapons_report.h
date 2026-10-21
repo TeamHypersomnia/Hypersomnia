@@ -75,7 +75,9 @@ struct json_firearm_entry {
 	float max_bullet_speed = 0;
 	float price = 0;
 	float kill_award = 0;
-	float weight = 0;
+	float sprint_speed = 0;
+	float ttk = 0;
+	float ttk_armor = 0;
 
 	float reload_time = 0;
 	float slow_reload_time = 0;
@@ -90,5 +92,10 @@ struct json_firearm_entry {
 	float magazine_x = 0;
 	float magazine_y = 0;
 	float magazine_rotation = 0;
+	float magazine_width = 0;
+	float magazine_height = 0;
+
+	float pic_width = 0;
+	float pic_height = 0;
 	// END GEN INTROSPECTOR
 };
