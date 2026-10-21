@@ -77,7 +77,7 @@ J
 
 cd $REPO/hypersomnia
 
-KEY=$($BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$')
+KEY=$($BIN --dedicated-server --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$')
 echo "$KEY" > $S/broker_site/private/official_servers.d/corners
 
 # The broker as alice sees it: a proxy that can be stopped

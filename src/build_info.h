@@ -93,7 +93,8 @@ Options:
                                 --verify-updater Hypersomnia-for-Windows.exe --signature Hypersomnia-for-Windows.exe.sig
 
     --unit-tests-only           Perform unit tests only and quit.
-    --print-server-key          Print this server's public key (.keys/server.key, made if missing) and quit.
+    --print-server-key          Print the dedicated server's public key (.keys/server.key, made if missing) and quit.
+                                Headless build only, or together with --dedicated-server.
     --connect [TARGET]          Connect to an arena server. TARGET is an address (not verified), "<address>,0x<key>"
                                 (verified to be the server with that key) or "0x<key>" alone (found on the server list).
     --server                    Host an arena server in accordance with server_start inside the config file.

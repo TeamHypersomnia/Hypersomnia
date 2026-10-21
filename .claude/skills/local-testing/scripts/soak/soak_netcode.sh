@@ -26,7 +26,7 @@ J
 done
 
 cd $REPO/hypersomnia
-KEY=$($BIN --print-server-key --appdata-dir $T/keyed 2>/dev/null | grep -E '^[0-9a-f]{64}$')
+KEY=$($BIN --dedicated-server --print-server-key --appdata-dir $T/keyed 2>/dev/null | grep -E '^[0-9a-f]{64}$')
 [ -n "$KEY" ] || { echo "no server key printed"; exit 1; }
 timeout 6000 $BIN --dedicated-server --appdata-dir $T/byaddress $GAME_TEST_FLAGS > $T/byaddress.out 2>&1 & C=$!
 timeout 6000 $BIN --dedicated-server --appdata-dir $T/keyed $GAME_TEST_FLAGS > $T/keyed.out 2>&1 & O=$!

@@ -72,7 +72,7 @@ J
 cd $REPO/hypersomnia
 
 # Official on the site by its key
-KEY=$($BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$')
+KEY=$($BIN --dedicated-server --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$')
 echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
 
 timeout 180 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &

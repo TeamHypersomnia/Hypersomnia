@@ -42,7 +42,7 @@ J
 python3 "$HERE/crazygames_sdk_stub.py" "$CG_KEY" "$CG_GAME_ID" cgUser_e2e $T/cg_sdk_stub.js
 
 cd $REPO/hypersomnia
-$BIN --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
+$BIN --dedicated-server --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
 timeout $((WAIT + 60)) $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
 timeout $((WAIT + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &

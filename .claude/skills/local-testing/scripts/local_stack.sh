@@ -66,7 +66,7 @@ server_conf casual 10004 "[DE] Local casual" NEVER 19100 de
 SECS=$((HOURS * 3600))
 cd $REPO/hypersomnia
 for s in ranked:pl casual:de; do
-	$BIN --print-server-key --appdata-dir $T/${s%%:*} 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/${s##*:}
+	$BIN --dedicated-server --print-server-key --appdata-dir $T/${s%%:*} 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/${s##*:}
 done
 
 timeout $SECS $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &

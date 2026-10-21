@@ -29,13 +29,14 @@ augs::path_type get_user_dir(const std::optional<std::string>& steam_id) {
 	return ::APPDATA_DIR / (steam_id.has_value() ? *steam_id : std::string(NONSTEAM_USER_FOLDER_NAME));
 }
 
-augs::path_type get_keys_dir(const bool default_appdata_dir) {
+augs::path_type get_keys_dir(const augs::path_type& user_dir, const bool default_appdata_dir) {
 #if PLATFORM_WEB
 	/*
 		Its own IndexedDB database in the browser - see pre_run in common.js (not on CrazyGames: in memory only,
 		the account is the CrazyGames one).
 	*/
 
+	(void)user_dir;
 	(void)default_appdata_dir;
 	return ::APPDATA_DIR / "hypersomnia_keys";
 #else
@@ -45,11 +46,11 @@ augs::path_type get_keys_dir(const bool default_appdata_dir) {
 
 	if (default_appdata_dir) {
 		if (const auto local = augs::get_default_local_appdata_dir(); !local.empty()) {
-			return local / ::USER_DIR.filename() / identity_key::keys_dir_name;
+			return local / user_dir.filename() / identity_key::keys_dir_name;
 		}
 	}
 
-	return ::USER_DIR / identity_key::keys_dir_name;
+	return user_dir / identity_key::keys_dir_name;
 #endif
 }
 
@@ -81,11 +82,21 @@ static int print_server_key() {
 		return EXIT_FAILURE;
 	}
 
+	if (!seed.has_value()) {
+		std::cerr << "ERROR: Could not read or make " << server_key::path().string() << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	/*
 		The key on a line of its own on stdout (grep -E "^[0-9a-f]{64}$" in scripts); how to use it on stderr.
 	*/
 
 	const auto key_hex = server_key::public_key_hex(*seed);
+
+	if (key_hex.empty()) {
+		std::cerr << "ERROR: Could not compute the public key of " << server_key::path().string() << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	std::cerr << "Server public key (" << augs::key_scheme_name << ") of " << server_key::source_name(server_key::path()) << ":" << std::endl;
 	std::cout << key_hex << std::endl;
@@ -211,9 +222,9 @@ int main(const int argc, const char* const * const argv) {
 	{
 		const auto new_cwd = augs::path_type(SET_CWD_TO);
 
-		std::cout << "CHANGING CWD TO: " << new_cwd.string() << std::endl;
+		std::cerr << "CHANGING CWD TO: " << new_cwd.string() << std::endl;
 		std::filesystem::current_path(new_cwd);
-		std::cout << "CHANGED CWD TO: " << new_cwd.string() << std::endl;
+		std::cerr << "CHANGED CWD TO: " << new_cwd.string() << std::endl;
 	}
 #else
 	bool set_cwd_to_exe_path = false;
@@ -233,9 +244,9 @@ int main(const int argc, const char* const * const argv) {
 	if (set_cwd_to_exe_path) {
 		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
 			exe_path.replace_filename("");
-			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+			std::cerr << "CHANGING CWD TO: " << exe_path.string() << std::endl;
 			std::filesystem::current_path(exe_path);
-			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
+			std::cerr << "CHANGED CWD TO: " << exe_path.string() << std::endl;
 		}
 	}
 #endif
@@ -255,11 +266,22 @@ int main(const int argc, const char* const * const argv) {
 
 	if (params.print_server_key_only) {
 		/*
+			Only for a dedicated server: the Headless build, or with --dedicated-server.
+			A server hosted from the game on Steam signs with the key of its Steam ID's folder instead -
+			and the same binary is a Steam or a non-Steam one, so it can't be told apart without starting Steam.
+		*/
+
+		if (!HEADLESS && params.type != app_type::DEDICATED_SERVER) {
+			std::cerr << "ERROR: --print-server-key prints the dedicated server's key - run it with the Headless build or add --dedicated-server." << std::endl;
+			return EXIT_FAILURE;
+		}
+
+		/*
 			A server is never a Steam client, so its keys are always in the "user" folder.
 		*/
 
 		::USER_DIR = ::get_user_dir(std::nullopt);
-		::KEYS_DIR = ::get_keys_dir(params.appdata_dir.empty());
+		::KEYS_DIR = ::get_keys_dir(::USER_DIR, params.appdata_dir.empty());
 		return ::print_server_key();
 	}
 

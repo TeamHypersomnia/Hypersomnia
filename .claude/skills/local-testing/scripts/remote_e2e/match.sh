@@ -76,7 +76,7 @@ EOF
 key)
 	mkdir -p $E/server/user
 	cd $E/hypersomnia
-	$E/Hypersomnia --print-server-key --appdata-dir $E/server 2>/dev/null | grep -E '^[0-9a-f]{64}$'
+	$E/Hypersomnia --dedicated-server --print-server-key --appdata-dir $E/server 2>/dev/null | grep -E '^[0-9a-f]{64}$'
 	;;
 stop)
 	stop

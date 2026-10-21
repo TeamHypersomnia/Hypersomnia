@@ -53,7 +53,7 @@ EOF
 
 cd $GAME
 # Official by its public key
-$BIN --print-server-key --appdata-dir $T/ranked 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
+$BIN --dedicated-server --print-server-key --appdata-dir $T/ranked 2>/dev/null | grep -E '^[0-9a-f]{64}$' > $T/official_servers.d/pl
 
 timeout 120 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3

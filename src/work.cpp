@@ -578,7 +578,7 @@ work_result work(
 #endif
 	}());
 
-	::KEYS_DIR = ::get_keys_dir(params.appdata_dir.empty());
+	::KEYS_DIR = ::get_keys_dir(::USER_DIR, params.appdata_dir.empty());
 
 	LOG("Keys directory: %x", ::KEYS_DIR);
 

@@ -53,7 +53,7 @@ cd $GAME
 
 # The official servers are known by their public keys
 for s in casual_de ranked_pl; do
-	key=$($BIN --print-server-key --appdata-dir $T/$s 2>/dev/null | grep -E '^[0-9a-f]{64}$')
+	key=$($BIN --dedicated-server --print-server-key --appdata-dir $T/$s 2>/dev/null | grep -E '^[0-9a-f]{64}$')
 	echo "$key" > $T/official_servers.d/$s
 	echo "official $s: $key"
 done
