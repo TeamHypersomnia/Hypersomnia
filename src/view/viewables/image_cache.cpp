@@ -13,4 +13,6 @@ image_cache::image_cache(
 		LOG(what.what());
 		original_image_size = { 32, 32 };
 	}
+
+	non_standard_shape = definition.get_meta().offsets.non_standard_shape;
 }

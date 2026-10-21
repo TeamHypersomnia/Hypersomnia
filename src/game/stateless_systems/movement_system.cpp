@@ -33,6 +33,7 @@
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/movement/movement_getters.h"
 #include "game/detail/movement/movement_inertia.h"
+#include "game/detail/movement/top_movement_speed.h"
 #include "game/detail/sentience/tool_getters.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/get_hovered_world_entity.h"
@@ -411,7 +412,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						}
 					}
 					else {
-						movement_force_mult /= 2.f;
+						movement_force_mult *= sprint_movement_force_mult;
 
 						{
 							const auto& wielded_guns = it.get_wielded_guns();

@@ -88,4 +88,8 @@ struct image_definition_view : asset_definition_view<const image_definition> {
 
 	augs::path_type get_source_image_path() const;
 	vec2u read_source_image_size() const;
+
+	const image_meta& get_meta() const {
+		return get_def().meta;
+	}
 };

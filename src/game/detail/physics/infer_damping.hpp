@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/movement/movement_snappiness.h"
 #include "game/detail/movement/movement_inertia.h"
+#include "game/detail/movement/top_movement_speed.h"
 
 template <class E>
 bool calc_angled_damping_enabled(const E& handle) {
@@ -48,7 +49,7 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		if (requested_by_input.is_nonzero()) {
 			if (movement.was_sprint_effective) {
 				if (!is_inert) {
-					damping.linear /= 4;
+					damping.linear *= sprint_linear_damping_mult;
 				}
 			}
 		}

@@ -3,6 +3,7 @@
 #include "game/assets/ids/asset_ids.h"
 #include "augs/math/vec2.h"
 #include "game/components/shape_polygon_component.h"
+#include "game/assets/image_offsets.h"
 #include "augs/templates/container_templates.h"
 
 struct image_definition_view;
@@ -15,6 +16,13 @@ struct image_cache {
 	);
 
 	vec2u original_image_size;
+
+	/*
+		The custom collider from the image's meta, empty if the body is a box of the image's size.
+		Lets the flavours compute the mass of a body before any cosmos exists.
+	*/
+
+	image_shape_type non_standard_shape;
 
 	vec2u get_original_size() const {
 		return original_image_size;
