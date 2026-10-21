@@ -81,6 +81,44 @@ namespace augs {
 		}
 
 		/*
+			A list with a column of miniatures first (old ImGui::Columns), as in the map catalogue and the project selector:
+			the miniature column has no header, every row ends with a separator and the column darkened down to it.
+		*/
+
+		constexpr auto list_miniature_size_v = 80;
+
+		/*
+			Returns the miniature column's width; the caller sets the other widths, then goes to the next column.
+		*/
+
+		inline float begin_miniature_columns(const int num_text_columns) {
+			const auto miniature_column_width = list_miniature_size_v + ImGui::GetStyle().ItemSpacing.x * 2;
+
+			ImGui::Columns(num_text_columns + 1);
+			ImGui::SetColumnWidth(0, miniature_column_width);
+
+			return miniature_column_width;
+		}
+
+		inline void miniature_column_cell(const augs::atlas_entry* const miniature, const float row_top_y, const float row_h) {
+			const auto column_l = ImGui::GetWindowPos().x + ImGui::GetColumnOffset(0);
+
+			miniature_image(
+				*ImGui::GetWindowDrawList(),
+				miniature,
+				vec2(column_l, row_top_y),
+				vec2(ImGui::GetColumnWidth(0), row_h),
+				4.f,
+				imgui_atlas_type::AD_HOC
+			);
+		}
+
+		inline void end_miniature_row(const float row_top_y) {
+			ImGui::Separator();
+			darken_first_column(row_top_y, ImGui::GetCursorScreenPos().y);
+		}
+
+		/*
 			The highlight of a hovered or pressed miniature frame - subtle, like in the project selector.
 		*/
 

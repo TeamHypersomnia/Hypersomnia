@@ -80,6 +80,8 @@ public:
 
 		if (auto combo = scoped_miniature_combo(label, displayed_str, miniature, augs::imgui_atlas_type::ARENA_MINIATURES)) {
 			if (base::check_opened_first_time()) {
+				::get_arena_miniatures().request_again_changed_on_disk();
+
 				if (info) {
 					other_paths.clear();
 
@@ -219,9 +221,8 @@ public:
 				text_disabled("Type");
 			}
 
-			auto do_row = [&](const auto& path_entry, const auto type_name) {
-				const auto button_path = path_entry.path;
-				const auto arena_name = button_path.filename().string();
+			auto do_row = [&](const auto& path_entry, const std::string& arena_name, const auto type_name) {
+				const auto& button_path = path_entry.path;
 
 				/* 
 					TODO: this will behave wrongly when there is more than one area with the same name. 
@@ -246,6 +247,8 @@ public:
 				const auto cell_lt = vec2(ImGui::GetCursorScreenPos());
 				const auto cell_size = vec2(ImGui::GetContentRegionAvail().x, row_height);
 
+				auto row_id = scoped_id(arena_name.c_str());
+
 				const bool chosen = [&]() {
 					auto subtle_highlight = scoped_selectable_colors({
 						rgba(255, 255, 255, 20),
@@ -253,7 +256,7 @@ public:
 						rgba(255, 255, 255, 60)
 					});
 
-					return ImGui::Selectable(("##" + arena_name).c_str(), is_current, ImGuiSelectableFlags_SpanAllColumns, ImVec2(0, row_height));
+					return ImGui::Selectable("##row", is_current, ImGuiSelectableFlags_SpanAllColumns, ImVec2(0, row_height));
 				}();
 
 				miniature_image(
@@ -287,6 +290,7 @@ public:
 			};
 
 			auto idx = 0;
+			auto num_shown = 0;
 
 			auto perform_paths = [&](const auto& entries, const auto type_name) {
 				auto scope = scoped_id(idx++);
@@ -298,7 +302,8 @@ public:
 						continue;
 					}
 
-					do_row(entry, type_name);
+					do_row(entry, arena_name, type_name);
+					++num_shown;
 				}
 			};
 
@@ -324,6 +329,15 @@ public:
 					default:
 						break;
 				}
+			}
+
+			if (num_shown == 0) {
+				ImGui::TableNextRow(ImGuiTableRowFlags_None, row_height);
+				darken_miniature_column();
+				ImGui::TableSetColumnIndex(1);
+				centered_vertically();
+				indent_name();
+				text_disabled(filtering ? "(No matching arenas)" : "(No arenas)");
 			}
 
 			/*

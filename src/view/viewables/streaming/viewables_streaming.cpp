@@ -50,6 +50,7 @@ void viewables_streaming::finalize_pending_tasks() {
 
 	avatars.finalize_tasks_if_any();
 	ad_hoc.finalize_tasks_if_any();
+	arena_miniatures.finalize_tasks_if_any();
 }
 
 viewables_streaming::~viewables_streaming() {
@@ -423,6 +424,41 @@ void texture_in_progress<output_type>::finalize_load(augs::renderer& renderer) {
 	}
 }
 
+void viewables_streaming::load_arena_miniatures(
+	std::optional<ad_hoc_atlas_subjects> new_subjects,
+	const augs::frame_num_type current_frame,
+	const unsigned max_atlas_size
+) {
+	if (new_subjects.has_value()) {
+		last_requested_arena_miniatures = std::move(new_subjects);
+	}
+
+	if (arena_miniatures.work_slot_free(current_frame)) {
+		if (last_requested_arena_miniatures.has_value()) {
+			/*
+				Shown at most at about 66 px - no need to keep the full miniatures.
+			*/
+
+			const auto max_arena_miniature_side = 96u;
+
+			auto arena_miniatures_in = ad_hoc_atlas_input {
+				std::move(*last_requested_arena_miniatures),
+				max_atlas_size,
+
+				nullptr,
+				arena_miniatures.pbo_fallback,
+				max_arena_miniature_side
+			};
+
+			last_requested_arena_miniatures = std::nullopt;
+
+			arena_miniatures.submit_work([arena_miniatures_in]() { 
+				return create_ad_hoc_atlas(arena_miniatures_in);
+			});
+		}
+	}
+}
+
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	if (valid_and_is_ready(future_compressed_demos)) {
 		auto discard = future_compressed_demos.get();
@@ -450,20 +486,12 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		requested_link_avatar = std::nullopt;
 	}
 
-	if (requested_arena_miniatures.has_value()) {
-		arena_miniatures_tex.texImage2D(in.renderer, std::move(*requested_arena_miniatures));
-		arena_miniatures_tex.set_filtering(in.renderer, augs::filtering_type::LINEAR);
-
-		augs::graphics::texture::set_current_to_previous(in.renderer);
-
-		requested_arena_miniatures = std::nullopt;
-	}
-
 	const auto current_frame = in.current_frame;
 	auto& now_all_defs = now_loaded_viewables_defs;
 
 	avatars.finalize_load(in.renderer);
 	ad_hoc.finalize_load(in.renderer);
+	arena_miniatures.finalize_load(in.renderer);
 
 	/* Unpack results of asynchronous asset loading */
 

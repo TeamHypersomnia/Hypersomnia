@@ -47,7 +47,6 @@ constexpr bool edit_any_arena_directly = false;
 constexpr bool edit_any_arena_directly = true;
 #endif
 
-constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
 std::string sanitize_arena_short_description(std::string in);
@@ -264,10 +263,7 @@ bool projects_list_tab_state::perform_list(
 		The first column - of miniatures on a darker background - has no header.
 	*/
 
-	const auto miniature_column_width = miniature_size_v + ImGui::GetStyle().ItemSpacing.x * 2;
-
-	ImGui::Columns(num_columns + 1);
-	ImGui::SetColumnWidth(0, miniature_column_width);
+	const auto miniature_column_width = begin_miniature_columns(num_columns);
 
 	if (num_columns > 1) {
 		ImGui::SetColumnWidth(1, avail.x * 0.8f - miniature_column_width);
@@ -304,7 +300,7 @@ bool projects_list_tab_state::perform_list(
 		const auto description = sanitize_arena_short_description(entry.about.short_description);
 		const auto text_h = ImGui::CalcTextSize(arena_name.c_str()).y + ImGui::CalcTextSize(description.c_str()).y;
 
-		const auto row_h = std::max(1.f + miniature_size_v, 2 * text_padding + text_h);
+		const auto row_h = std::max(1.f + list_miniature_size_v, 2 * text_padding + text_h);
 		const auto selectable_size = ImVec2(0, row_h);
 
 		auto no_gaps = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(spacing.x, 0.f));
@@ -346,19 +342,7 @@ bool projects_list_tab_state::perform_list(
 			}
 		}
 
-		{
-			const auto column_l = ImGui::GetWindowPos().x + ImGui::GetColumnOffset(0);
-			const auto column_w = ImGui::GetColumnWidth(0);
-
-			miniature_image(
-				*ImGui::GetWindowDrawList(),
-				mapped_or_nullptr(ad_hoc_atlas, entry.miniature_index),
-				vec2(column_l, row_lt.y),
-				vec2(column_w, selectable_size.y),
-				4.f,
-				augs::imgui_atlas_type::AD_HOC
-			);
-		}
+		miniature_column_cell(mapped_or_nullptr(ad_hoc_atlas, entry.miniature_index), row_lt.y, selectable_size.y);
 
 		ImGui::NextColumn();
 
@@ -391,12 +375,7 @@ bool projects_list_tab_state::perform_list(
 			ImGui::NextColumn();
 		}
 
-		/*
-			A separator under every entry, the miniature column darkened down to it.
-		*/
-
-		ImGui::Separator();
-		darken_first_column(row_lt.y, ImGui::GetCursorScreenPos().y);
+		end_miniature_row(row_lt.y);
 	};
 
 	if (sort_by_column == 0) {

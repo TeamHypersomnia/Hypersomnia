@@ -304,6 +304,7 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 	std::unordered_map<augs::path_type, augs::image::gif_data> gif_datas;
 	std::unordered_map<augs::path_type, augs::image::gif_data> png_seq_datas;
 	std::unordered_map<augs::path_type, std::size_t> starting_loading_image;
+	std::unordered_map<augs::path_type, std::size_t> scaled_loading_image;
 
 	for (const auto& entry : in.subjects) {
 		if (entry.image_path.extension() == ".gif" || ends_with(entry.image_path.string(), "_*.png")) {
@@ -311,7 +312,24 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 		}
 
 		try {
-			atlas_subjects.images.push_back(entry.image_path);
+			if (in.max_image_side > 0) {
+				auto image = augs::image();
+				image.from_file(entry.image_path);
+
+				const auto size = image.get_size();
+
+				if (size.x > in.max_image_side || size.y > in.max_image_side) {
+					const auto fitted = vec2u::scaled_to_max_size(size, in.max_image_side);
+					image.scale(vec2u(std::max(fitted.x, 1u), std::max(fitted.y, 1u)));
+				}
+
+				scaled_loading_image[entry.image_path] = atlas_subjects.loaded_images.size();
+				atlas_subjects.loaded_images.emplace_back(image.to_image_bytes());
+			}
+			else {
+				atlas_subjects.images.push_back(entry.image_path);
+			}
+
 			input_path_to_id[entry.image_path] = entry.id;
 		}
 		catch (...) {
@@ -431,6 +449,11 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 				out.atlas_entries.add_frame(entry_id, baked_image, ms);
 			}
 
+			continue;
+		}
+
+		if (const auto scaled_index = mapped_or_nullptr(scaled_loading_image, baked_path)) {
+			out.atlas_entries.add_frame(entry_id, baked.loaded_images[*scaled_index], 0.0f);
 			continue;
 		}
 

@@ -86,6 +86,12 @@ struct ad_hoc_atlas_input {
 
 	rgba* const atlas_image_output;
 	std::vector<rgba>& fallback_output;
+
+	/*
+		Still images larger than this are scaled down to it first - 0 keeps them as they are.
+	*/
+
+	const unsigned max_image_side = 0;
 };
 
 ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in);

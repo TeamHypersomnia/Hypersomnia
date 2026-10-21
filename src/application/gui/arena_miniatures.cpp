@@ -1,7 +1,4 @@
-#include <algorithm>
-#include "augs/math/rects.h"
 #include "augs/filesystem/file.h"
-#include "augs/log.h"
 #include "application/gui/arena_miniatures.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 
@@ -10,130 +7,88 @@ arena_miniatures& get_arena_miniatures() {
 	return miniatures;
 }
 
+static augs::path_type find_miniature_path(const std::string& arena_name) {
+	const auto project_json = ::server_choose_arena_file_by(arena_name);
+
+	if (project_json.empty()) {
+		return {};
+	}
+
+	return augs::path_type(project_json).replace_filename(editor_project_paths::get_miniature_filename());
+}
+
+static std::optional<augs::file_time_type> find_write_time(const augs::path_type& path) {
+	if (path.empty() || !augs::exists(path)) {
+		return std::nullopt;
+	}
+
+	try {
+		return augs::last_write_time(path);
+	}
+	catch (...) {
+		return std::nullopt;
+	}
+}
+
 const augs::atlas_entry* arena_miniatures::request(const std::string& arena_name) {
 	if (arena_name.empty()) {
 		return nullptr;
 	}
 
-	if (const auto found = known.find(arena_name); found != known.end()) {
-		if (found->second.has_value()) {
-			return std::addressof(*found->second);
+	auto found = known.find(arena_name);
+
+	if (found == known.end()) {
+		auto arena = known_arena();
+		arena.id = next_id++;
+		arena.path = ::find_miniature_path(arena_name);
+		arena.write_time = ::find_write_time(arena.path);
+
+		if (arena.write_time.has_value()) {
+			subjects_changed = true;
 		}
 
+		found = known.emplace(arena_name, std::move(arena)).first;
+	}
+
+	if (in_atlas == nullptr) {
 		return nullptr;
 	}
 
-	if (std::find(pending.begin(), pending.end(), arena_name) == pending.end()) {
-		pending.push_back(arena_name);
-	}
-
-	return nullptr;
+	return in_atlas->find(found->second.id);
 }
 
-void arena_miniatures::place(const std::string& arena_name) {
-	const auto miniature_path = [&]() -> augs::path_type {
-		const auto project_json = ::server_choose_arena_file_by(arena_name);
+void arena_miniatures::request_again_changed_on_disk() {
+	for (auto& [arena_name, arena] : known) {
+		auto path = ::find_miniature_path(arena_name);
+		const auto write_time = ::find_write_time(path);
 
-		if (project_json.empty()) {
-			return {};
-		}
+		if (const bool changed = path != arena.path || write_time != arena.write_time) {
+			arena.path = std::move(path);
+			arena.write_time = write_time;
 
-		return augs::path_type(project_json).replace_filename(editor_project_paths::get_miniature_filename());
-	}();
-
-	auto& entry = known[arena_name];
-	entry = std::nullopt;
-
-	if (miniature_path.empty() || !augs::exists(miniature_path)) {
-		return;
-	}
-
-	augs::image miniature;
-
-	try {
-		miniature.from_file(miniature_path);
-	}
-	catch (...) {
-		LOG("Could not load the arena miniature: %x", miniature_path);
-		return;
-	}
-
-	const auto original_size = miniature.get_size();
-
-	if (original_size.x == 0 || original_size.y == 0) {
-		return;
-	}
-
-	/*
-		Fit into the cell keeping the aspect ratio.
-	*/
-
-	const auto fit_mult = std::min(
-		static_cast<float>(cell_size_v) / original_size.x,
-		static_cast<float>(cell_size_v) / original_size.y
-	);
-
-	const auto fitted_size = vec2u(
-		std::clamp(static_cast<unsigned>(original_size.x * fit_mult), 1u, cell_size_v),
-		std::clamp(static_cast<unsigned>(original_size.y * fit_mult), 1u, cell_size_v)
-	);
-
-	miniature.scale(fitted_size);
-
-	const auto cell_index = used_cells++;
-	const auto cell_lt = vec2u(cell_index % cells_per_row_v, cell_index / cells_per_row_v) * cell_size_v;
-
-	for (unsigned y = 0; y < fitted_size.y; ++y) {
-		for (unsigned x = 0; x < fitted_size.x; ++x) {
-			grid.pixel(cell_lt + vec2u(x, y)) = miniature.pixel(vec2u(x, y));
+			subjects_changed = true;
 		}
 	}
-
-	const auto grid_side = static_cast<float>(cell_size_v * cells_per_row_v);
-
-	augs::atlas_entry placed;
-	placed.atlas_space = xywh(vec2(cell_lt) / grid_side, vec2(fitted_size) / grid_side);
-	placed.was_successfully_packed = true;
-	placed.cached_original_size_pixels = fitted_size;
-
-	entry = placed;
 }
 
-std::optional<augs::image> arena_miniatures::take_new_grid() {
-	if (pending.empty()) {
+void arena_miniatures::set_in_atlas(const ad_hoc_in_atlas_map& new_in_atlas) {
+	in_atlas = std::addressof(new_in_atlas);
+}
+
+std::optional<ad_hoc_atlas_subjects> arena_miniatures::take_new_subjects() {
+	if (!subjects_changed) {
 		return std::nullopt;
 	}
 
-	/*
-		At most one cell per newly asked arena - one without a miniature takes none.
-	*/
+	subjects_changed = false;
 
-	const auto max_new_cells = static_cast<unsigned>(pending.size());
-	const auto now = std::chrono::steady_clock::now();
+	auto subjects = ad_hoc_atlas_subjects();
 
-	const bool can_start_anew = 
-		!when_started_anew.has_value() 
-		|| now - *when_started_anew > std::chrono::seconds(3)
-	;
-
-	if (grid.get_size().area() == 0 || (used_cells + max_new_cells > max_cells_v && can_start_anew)) {
-		grid.recreate_filled(vec2u::square(cell_size_v * cells_per_row_v));
-		known.clear();
-		used_cells = 0;
-		when_started_anew = now;
-	}
-
-	auto newly_asked = std::move(pending);
-	pending.clear();
-
-	for (const auto& arena_name : newly_asked) {
-		if (used_cells < max_cells_v) {
-			place(arena_name);
-		}
-		else {
-			known[arena_name] = std::nullopt;
+	for (const auto& [arena_name, arena] : known) {
+		if (arena.write_time.has_value()) {
+			subjects.push_back({ arena.id, arena.path });
 		}
 	}
 
-	return grid;
+	return subjects;
 }

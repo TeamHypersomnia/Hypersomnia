@@ -6930,9 +6930,11 @@ work_result work(
 			};
 
 			auto finalize_loading_viewables = [&](const bool measure_atlas_uploading) {
-				if (auto new_grid = ::get_arena_miniatures().take_new_grid()) {
-					streaming.requested_arena_miniatures = std::move(*new_grid);
-				}
+				streaming.load_arena_miniatures(
+					::get_arena_miniatures().take_new_subjects(),
+					get_current_frame_num(),
+					renderer_backend.get_max_texture_size()
+				);
 
 				streaming.finalize_load({
 					audio_buffers,
@@ -6941,6 +6943,8 @@ work_result work(
 					get_general_renderer(),
 					get_audiovisuals().get<sound_system>()
 				});
+
+				::get_arena_miniatures().set_in_atlas(streaming.arena_miniatures.in_atlas);
 			};
 
 			auto create_viewing_game_gui_context = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
@@ -7358,7 +7362,7 @@ work_result work(
 					std::addressof(streaming.avatar_preview_tex),
 					std::addressof(streaming.ad_hoc.texture),
 					std::addressof(streaming.link_avatar_tex),
-					std::addressof(streaming.arena_miniatures_tex)
+					std::addressof(streaming.arena_miniatures.texture)
 				);
 			};
 

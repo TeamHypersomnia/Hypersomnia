@@ -144,17 +144,18 @@ public:
 	augs::graphics::texture link_avatar_tex = augs::image::white_pixel();
 	std::optional<augs::image> requested_link_avatar;
 
-	/*
-		The grid of small arena miniatures shown in the arena choosers - see arena_miniatures.h.
-	*/
-
-	augs::graphics::texture arena_miniatures_tex = augs::image::white_pixel();
-	std::optional<augs::image> requested_arena_miniatures;
-
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;
 
+	/*
+		The small arena miniatures of the arena choosers - an ad hoc atlas of their own (see arena_miniatures.h),
+		as the ad hoc one belongs to the current setup or the map catalogue.
+	*/
+
+	texture_in_progress<ad_hoc_atlas_output> arena_miniatures;
+
 	std::optional<ad_hoc_atlas_subjects> last_requested_ad_hoc_atlas;
+	std::optional<ad_hoc_atlas_subjects> last_requested_arena_miniatures;
 	std::optional<arena_player_metas> last_requested_player_metas;
 
 	viewables_streaming_profiler performance;
@@ -171,6 +172,12 @@ public:
 
 	void load_all(viewables_load_input);
 	void finalize_load(viewables_finalize_input);
+
+	void load_arena_miniatures(
+		std::optional<ad_hoc_atlas_subjects> new_subjects,
+		augs::frame_num_type current_frame,
+		unsigned max_atlas_size
+	);
 
 	auto& get_loaded_gui_fonts() {
 		return loaded_gui_fonts;

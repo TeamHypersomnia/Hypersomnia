@@ -5119,13 +5119,19 @@ void do_server_vars_section(
 					auto arena = arena_identifier(::get_first_word(entry));
 					auto mode = game_mode_name_type(::get_second_word(entry));
 
+					/*
+						The game mode under the tall arena frame, aligned with it.
+					*/
+
+					const auto chooser_x = ImGui::GetCursorPosX();
+
 					if (perform_arena_chooser(arena, runtime_info)) {
 						mode = "";
 
 						modified = true;
 					}
 
-					ImGui::SameLine();
+					ImGui::SetCursorPosX(chooser_x);
 
 					if (perform_game_mode_chooser(mode)) {
 						modified = true;
