@@ -47,6 +47,7 @@ rgba get_new_feature_color();
 
 std::string get_newest_changelog_version(const changelog_entries&);
 bool should_show_changelog(const changelog_entries&, const std::string& last_seen_version);
+std::size_t oldest_unseen_changelog_index(const changelog_entries&, const std::string& last_seen_version);
 
 struct changelog_window_state : public standard_window_mixin<changelog_window_state> {
 	using base = standard_window_mixin<changelog_window_state>;

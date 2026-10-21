@@ -2098,10 +2098,10 @@ work_result work(
 		}
 
 		/*
-			Always opens on the newest version.
+			Opens on the oldest version not acknowledged before this run - see oldest_unseen_changelog_index.
 		*/
 
-		changelog_view.selected = 0;
+		changelog_view.selected = ::oldest_unseen_changelog_index(changelog, last_seen_changelog_at_start);
 		changelog_window.open();
 	};
 

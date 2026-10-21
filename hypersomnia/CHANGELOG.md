@@ -4,6 +4,27 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [4.1.0] - 2026-10-21
+
+### Added
+
+- **Enemy and teammate colors** for borders, health bars and nicknames - in `Settings > Interface > HUD`.
+- **Map miniatures** when choosing an arena.
+
+### Changed
+
+- **Balance:** Default zoom 0.75x -> 0.7x.
+- **Balance:** Awka bullets are slower.
+- **Balance:** BullDup 2000 magazine holds about half as many bullets.
+- Stronger sun shadows on maps without their own setting.
+- Corpse explosions push only running characters.
+
+### Fixed
+
+- Your **Steam or CrazyGames avatar** now shows on servers on a fresh install.
+- Unchecking Bots when hosting a server still spawned bots.
+- Map downloads can no longer hang.
+
 ## [4.0.0] - 2026-10-19
 
 ### Added

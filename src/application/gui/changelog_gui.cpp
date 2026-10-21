@@ -46,6 +46,27 @@ bool should_show_changelog(const changelog_entries& entries, const std::string& 
 #endif
 }
 
+/*
+	The changelog opens on the oldest release not acknowledged yet - a big one is read first, the newer ones above it
+	are (NEW!) too. Nothing acknowledged at all ("") or everything: the newest.
+*/
+
+std::size_t oldest_unseen_changelog_index(const changelog_entries& entries, const std::string& last_seen_version) {
+	if (last_seen_version.empty()) {
+		return 0;
+	}
+
+	auto result = std::size_t(0);
+
+	for (std::size_t i = 0; i < entries.size(); ++i) {
+		if (::is_more_recent(entries[i].version, last_seen_version)) {
+			result = i;
+		}
+	}
+
+	return result;
+}
+
 static bool is_new_version(
 	const changelog_input& in,
 	const changelog_entry& entry,
