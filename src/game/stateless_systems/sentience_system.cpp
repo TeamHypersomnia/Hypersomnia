@@ -763,9 +763,16 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 					A character standing still isn't pushed at all.
 				*/
 
-				const auto velocity = subject_of_impact.get_velocity();
+				const auto velocity = vec2(subject_of_impact.get_velocity());
 
-				if (velocity.is_nonzero()) {
+				/*
+					Damping leaves a stopped character a tiny drift for a while,
+					a full push along it would throw them in an effectively random direction.
+				*/
+
+				const auto min_running_speed = 10.0f;
+
+				if (velocity.length_sq() > min_running_speed * min_running_speed) {
 					subject_of_impact.apply_impulse(vec2(velocity).set_length(considered_impulse));
 				}
 

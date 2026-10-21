@@ -13,6 +13,20 @@ bool arena_mode::casual_progressive_enabled(const_input_type in) const {
 		return false;
 	}
 
+	/*
+		Levels only drive the bots - with bots disabled nothing counts.
+	*/
+
+	const auto& over = in.dynamic_vars.bots_override;
+
+	if (over.disables_bots()) {
+		return false;
+	}
+
+	if (!over.is_set() && in.rules.default_bot_quota == 0) {
+		return false;
+	}
+
 	return true;
 }
 

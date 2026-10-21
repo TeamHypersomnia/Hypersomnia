@@ -6613,7 +6613,7 @@ void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 
 	const auto new_vars = make_synced_dynamic_vars();
 
-	if (new_vars.bot_override_difficulty == difficulty_type::PROGRESSIVE) {
+	if (new_vars.bot_override_difficulty == difficulty_type::PROGRESSIVE && !new_vars.bots_override.disables_bots()) {
 		/*
 			Progressive keeps recalculating both the counts and the difficulty on its own,
 			so any concrete numbers here would only look like they're set in stone.

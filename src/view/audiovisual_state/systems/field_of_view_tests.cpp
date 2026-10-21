@@ -10,7 +10,7 @@
 #include "view/audiovisual_state/systems/minimap_sighting_system.h"
 
 /*
-	The defaults: a 1920x1080 fog of war with a 165 degree angle, and the balance zoom of 0.75.
+	The defaults: a 1920x1080 fog of war with a 165 degree angle, and a zoom of 0.75.
 	A player then sees 2560x1440 on screen, the fog of war spans 5120x2880 around them,
 	and the minimap pins within 165 * 0.75 = 123.75 degrees.
 */

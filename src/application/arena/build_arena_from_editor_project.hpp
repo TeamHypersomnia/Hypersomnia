@@ -681,6 +681,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 			- Always need if showing_navmesh is true (user wants to see an up-to-date navmesh)
 			- If playtesting in editor (for_playtesting == true):
 			  - Only need if spawn_bots is true in playtesting settings
+			    and the tested mode isn't the quick test, which never has bots
 			- Otherwise, no need to load or generate the navmesh.
 
 			Additionally, *always* regenerate if we need the navmesh in editor,
@@ -688,7 +689,21 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		*/
 
 		const bool not_playtesting = !in.for_playtesting;
-		const bool spawn_bots_enabled = project.playtesting.spawn_bots;
+		const bool testing_quick_test = [&]() {
+			const auto& pool = project.resources.get_pool_for<editor_game_mode_resource>();
+
+			if (const auto tested_mode = pool.find(project.playtesting.mode.raw)) {
+				return tested_mode->type.template is<editor_quick_test_mode>();
+			}
+
+			/*
+				No mode chosen - the test mode is played then (see rebuild_game_mode).
+			*/
+
+			return true;
+		}();
+
+		const bool spawn_bots_enabled = project.playtesting.spawn_bots && !testing_quick_test;
 
 		const bool playtesting_with_bots = in.for_playtesting && spawn_bots_enabled;
 		const bool want_to_see_up_to_date = in.for_playtesting && in.showing_navmesh;
