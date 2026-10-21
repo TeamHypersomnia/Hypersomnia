@@ -192,7 +192,11 @@ static void draw_token(const std::string& token, const augs::markdown_span_style
 	Wrapped lines start at the x the line started at, giving bullets a hanging indent.
 */
 
-static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba base_col) {
+/*
+	Table cells don't wrap - their columns fit the widest cell instead.
+*/
+
+static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba base_col, const bool wrap = true) {
 	const auto start_x = ImGui::GetCursorPosX();
 	/*
 		Wrapped a bit before the edge so the text keeps away from the scrollbar.
@@ -231,7 +235,7 @@ static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba
 
 				const auto word_w = ImGui::CalcTextSize(word.c_str()).x + (bold ? 1.0f : 0.0f);
 
-				if (ImGui::GetCursorPosX() + word_w > wrap_right) {
+				if (wrap && ImGui::GetCursorPosX() + word_w > wrap_right) {
 					ImGui::NewLine();
 					ImGui::SetCursorPosX(start_x);
 
@@ -415,6 +419,64 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 		);
 	};
 
+	/*
+		Consecutive table rows from begin as one table, indented to start where the text of a bullet at their level would.
+		Returns the end of the rows.
+	*/
+
+	auto draw_table = [&](const std::size_t begin, const std::string& key) {
+		const auto level = lines[begin].level;
+		auto end = begin;
+		auto num_columns = std::size_t(0);
+
+		while (end < lines.size() && lines[end].type == L::TABLE_ROW && lines[end].level == level) {
+			num_columns = std::max(num_columns, lines[end].cells.size());
+			++end;
+		}
+
+		if (num_columns == 0) {
+			return end;
+		}
+
+		const auto total_indent = indent_w * level + ImGui::GetFontSize() * 1.1f;
+
+		ImGui::Indent(total_indent);
+
+		const auto flags =
+			ImGuiTableFlags_SizingFixedFit
+			| ImGuiTableFlags_NoHostExtendX
+			| ImGuiTableFlags_RowBg
+			| ImGuiTableFlags_BordersInnerH
+		;
+
+		auto cell_padding = scoped_style_var(ImGuiStyleVar_CellPadding, ImVec2(ImGui::GetFontSize() * 0.6f, ImGui::GetFontSize() * 0.15f));
+
+		if (ImGui::BeginTable(("##" + key).c_str(), static_cast<int>(num_columns), flags)) {
+			for (auto r = begin; r < end; ++r) {
+				const auto& row = lines[r];
+				const auto col = row.is_header ? rgba(style.Colors[ImGuiCol_TextDisabled]) : text_col;
+
+				ImGui::TableNextRow();
+
+				for (std::size_t c = 0; c < row.cells.size(); ++c) {
+					ImGui::TableSetColumnIndex(static_cast<int>(c));
+					::draw_spans(row.cells[c], col, false);
+				}
+			}
+
+			ImGui::EndTable();
+		}
+
+		ImGui::Unindent(total_indent);
+
+		return end;
+	};
+
+	auto is_child_of = [&](const std::size_t candidate, const augs::markdown_line& parent) {
+		const auto& child = lines[candidate];
+		return (child.type == L::BULLET || child.type == L::TABLE_ROW) && child.level > parent.level;
+	};
+
 	bool first_heading = true;
 	bool first_in_section = true;
 
@@ -454,10 +516,7 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 			case L::BULLET: {
 				auto children_end = i + 1;
 
-				while (children_end < lines.size()
-					&& lines[children_end].type == L::BULLET
-					&& lines[children_end].level > line.level
-				) {
+				while (children_end < lines.size() && is_child_of(children_end, line)) {
 					++children_end;
 				}
 
@@ -473,8 +532,16 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 					const auto key = entry.version + "#" + std::to_string(i);
 
 					if (draw_expandable(line, key)) {
-						for (auto c = i + 1; c < children_end; ++c) {
-							draw_bullet(lines[c]);
+						auto c = i + 1;
+
+						while (c < children_end) {
+							if (lines[c].type == L::TABLE_ROW) {
+								c = draw_table(c, key + "#table" + std::to_string(c));
+							}
+							else {
+								draw_bullet(lines[c]);
+								++c;
+							}
 						}
 					}
 
@@ -491,6 +558,13 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 					++i;
 				}
 
+				break;
+			}
+
+			case L::TABLE_ROW: {
+				ImGui::Spacing();
+				i = draw_table(i, entry.version + "#table" + std::to_string(i));
+				ImGui::Spacing();
 				break;
 			}
 

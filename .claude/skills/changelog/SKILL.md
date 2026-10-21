@@ -50,10 +50,13 @@ Rules:
    Short items stay on one line without nesting (`- **Changelog.** You're reading it.`).
 5. Inline: `**bold**`, `*italic*` / `_italic_`, `` `code` ``. Bold is the main emphasis - use it for headline features and `**Balance:**`-style prefixes.
    Links `[text](url)` show only the text. Images `![..](..)` on their own line are dropped.
-6. No tables, no HTML, no numbered lists (they render as plain paragraphs).
-7. Latin characters only - no arrows (→), emoji or other symbols: the game's fonts have no glyphs for them and show `?`.
+6. Tables: `| a | b |` rows, `|---|---|` under the header row (drawn dimmer). Indent the rows with a tab under a bullet
+   so they expand with it, like its nested points. Cells don't wrap - keep them short. Bold marks the new value.
+   Balance changes go as a `- **Balance:** <what>.` headline with a table under it, e.g. `| Weapon | Before | After |`, the old value first.
+7. No HTML, no numbered lists (they render as plain paragraphs).
+8. Latin characters only - no arrows (→), emoji or other symbols: the game's fonts have no glyphs for them and show `?`.
    Write `Controls > Inventory`, not `Controls → Inventory`.
-8. Plain paragraphs are fine for a short intro under a heading, e.g. `Most bugs were introduced by bots in 1.3.0:`.
+9. Plain paragraphs are fine for a short intro under a heading, e.g. `Most bugs were introduced by bots in 1.3.0:`.
 
 ## Style
 

@@ -186,6 +186,44 @@ std::vector<augs::markdown_line> augs::parse_markdown(const std::string& source)
 		L type;
 		int level;
 		std::string text;
+		std::vector<std::string> cells = {};
+		bool is_header = false;
+	};
+
+	/*
+		"| a | b |" -> "a", "b". The outer pipes are optional.
+	*/
+
+	auto split_table_row = [](std::string row) {
+		if (!row.empty() && row.front() == '|') {
+			row.erase(0, 1);
+		}
+
+		if (!row.empty() && row.back() == '|') {
+			row.pop_back();
+		}
+
+		auto cells = std::vector<std::string>();
+		auto cell_stream = std::istringstream(row);
+
+		for (std::string cell; std::getline(cell_stream, cell, '|'); ) {
+			const auto first = cell.find_first_not_of(" \t");
+			const auto last = cell.find_last_not_of(" \t");
+
+			cells.push_back(first == std::string::npos ? std::string() : cell.substr(first, last - first + 1));
+		}
+
+		return cells;
+	};
+
+	auto is_header_separator = [](const std::vector<std::string>& cells) {
+		for (const auto& cell : cells) {
+			if (cell.empty() || cell.find_first_not_of(":-") != std::string::npos || cell.find('-') == std::string::npos) {
+				return false;
+			}
+		}
+
+		return !cells.empty();
 	};
 
 	auto raw_lines = std::vector<raw_line>();
@@ -212,6 +250,22 @@ std::vector<augs::markdown_line> augs::parse_markdown(const std::string& source)
 		;
 
 		if (is_image) {
+			continue;
+		}
+
+		if (trimmed.front() == '|') {
+			const auto cells = split_table_row(trimmed);
+
+			if (is_header_separator(cells)) {
+				if (!raw_lines.empty() && raw_lines.back().type == L::TABLE_ROW) {
+					raw_lines.back().is_header = true;
+				}
+			}
+			else {
+				raw_lines.push_back({ L::TABLE_ROW, ::indent_level(line.substr(0, ws_end)), "", cells });
+			}
+
+			continuable = false;
 			continue;
 		}
 
@@ -250,7 +304,16 @@ std::vector<augs::markdown_line> augs::parse_markdown(const std::string& source)
 	result.reserve(raw_lines.size());
 
 	for (const auto& raw : raw_lines) {
-		result.push_back({ raw.type, raw.level, parse_markdown_inline(raw.text) });
+		auto& added = result.emplace_back();
+
+		added.type = raw.type;
+		added.level = raw.level;
+		added.spans = parse_markdown_inline(raw.text);
+		added.is_header = raw.is_header;
+
+		for (const auto& cell : raw.cells) {
+			added.cells.push_back(parse_markdown_inline(cell));
+		}
 	}
 
 	return result;
@@ -362,5 +425,43 @@ TEST_CASE("SimpleMarkdownLines", "[markdown]") {
 
 	REQUIRE(lines[6].type == L::PARAGRAPH);
 	REQUIRE(lines[6].get_plain_text() == "#nospace");
+}
+
+TEST_CASE("SimpleMarkdownTables", "[markdown]") {
+	using namespace augs;
+	using L = markdown_line_type;
+
+	const auto lines = parse_markdown(
+		"- **Balance:** SMG sprint speed.\n"
+		"\t| Weapon | Before | After |\n"
+		"\t|---|:--:|---|\n"
+		"\t| **Pro90** | 913 | 917 |\n"
+		"\t|Zamiec|885|910|\n"
+		"\n"
+		"| x | - |\n"
+	);
+
+	REQUIRE(lines.size() == 5);
+
+	REQUIRE(lines[1].type == L::TABLE_ROW);
+	REQUIRE(lines[1].level == 1);
+	REQUIRE(lines[1].is_header);
+	REQUIRE(lines[1].cells.size() == 3);
+
+	REQUIRE(lines[2].type == L::TABLE_ROW);
+	REQUIRE(!lines[2].is_header);
+	REQUIRE(lines[2].cells[0].size() == 1);
+	REQUIRE(lines[2].cells[0][0].style == markdown_span_style::BOLD);
+	REQUIRE(lines[2].cells[2][0].text == "917");
+
+	REQUIRE(lines[3].cells[0][0].text == "Zamiec");
+
+	/*
+		A lone dash is a cell, not a separator.
+	*/
+
+	REQUIRE(lines[4].type == L::TABLE_ROW);
+	REQUIRE(lines[4].level == 0);
+	REQUIRE(lines[4].cells[1][0].text == "-");
 }
 #endif

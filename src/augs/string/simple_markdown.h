@@ -10,8 +10,10 @@
 		- item / * item / + item      bullet, level = tabs or pairs of spaces
 		plain text                    paragraph
 		![alt](path)                  skipped
+		| a | b |                     table row, level = indentation like a bullet's
+		|---|---|                     marks the row above as the table's header
 	A non-empty line right under a bullet or paragraph continues it.
-	An empty line ends it.
+	An empty line ends it. Consecutive table rows make one table.
 
 	Inline:
 		**bold** __bold__ *italic* _italic_ `code` [text](url)
@@ -36,13 +38,21 @@ namespace augs {
 	enum class markdown_line_type {
 		HEADING,
 		BULLET,
-		PARAGRAPH
+		PARAGRAPH,
+		TABLE_ROW
 	};
 
 	struct markdown_line {
 		markdown_line_type type = markdown_line_type::PARAGRAPH;
 		int level = 0;
 		std::vector<markdown_span> spans;
+
+		/*
+			Only for TABLE_ROW.
+		*/
+
+		std::vector<std::vector<markdown_span>> cells;
+		bool is_header = false;
 
 		std::string get_plain_text() const;
 	};
