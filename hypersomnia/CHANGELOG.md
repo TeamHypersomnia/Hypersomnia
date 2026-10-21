@@ -10,7 +10,7 @@
 
 - **Map miniatures** when choosing an arena.
 - **Enemies and teammates** are colored red and green respectively.
-	- This is to improve readability.
+	- This is to improve game readability.
 	- You can disable this in `Settings -> Interface -> HUD`.
 
 ### Changed
@@ -22,8 +22,8 @@
 
 ### Fixed
 
+- Catalogue: map downloads no longer hang.
 - Unchecking Bots when hosting a server still spawned bots.
-- Map downloads can no longer hang.
 
 ## [4.0.0] - 2026-10-19
 
