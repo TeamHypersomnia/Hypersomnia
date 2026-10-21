@@ -108,6 +108,12 @@ const save_done = () => { try { localStorage.setItem(DONE_KEY, JSON.stringify(do
 let active = "top";
 let sev_on = Object.fromEntries(SEV.map(s => [s, true]));
 
+/*
+	One number per finding across the whole report, also in Top - so "punkt 7" names exactly one finding.
+*/
+const NUM_BASE = {};
+SYSTEMS.reduce((acc, s) => { NUM_BASE[s.id] = acc; return acc + s.items.length; }, 0);
+
 const tabs = [{ id: "top", name: "Top", n: TOP.length }].concat(SYSTEMS.map(s => ({ id: s.id, name: s.name, n: s.items.length })));
 
 function render_tabs() {
@@ -148,7 +154,7 @@ function card(sys, idx, show_sys) {
 	const d = document.createElement("div");
 	d.className = `item ${color}` + (done[key] ? " done" : "");
 	d.innerHTML = `
-		<h3><span class="num">${idx + 1}.</span><span class="badge b-${sev}">${SEV_LABEL[sev]}</span>${title}
+		<h3><span class="num">${NUM_BASE[sys.id] + idx + 1}.</span><span class="badge b-${sev}">${SEV_LABEL[sev]}</span>${title}
 			<span class="state ${state}">${state === "fixed" ? "poprawione" : "do decyzji"}</span>
 			${show_sys ? `<span class="sysname">· ${sys.name}</span>` : ""}
 			<input type="checkbox" title="zrobione" ${done[key] ? "checked" : ""}></h3>

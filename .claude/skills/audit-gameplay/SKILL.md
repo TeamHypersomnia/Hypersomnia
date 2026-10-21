@@ -79,6 +79,10 @@ a real report from 2026-09-30, kept as the example. Copy it, keep its CSS and sc
   severity is one of `crash`, `desync`, `lag`, `bug`, `perf`, `quality`, `nit`, `decision`
   (`decision` for what the user has to settle, e.g. intended behavior vs a bug).
 - `TOP` - `[system id, item index]` pairs of the worst findings across all systems, most severe first, shown in the first tab.
+- Numbers are unique across the whole report: findings are numbered continuously through all systems (`NUM_BASE`
+  in the template's script), and the Top tab shows each finding's own number, never a fresh 1, 2, 3. The user refers
+  to findings by number ("popraw 7"), so one number must name exactly one finding. Keep that script part when copying,
+  and in the chat summary use the same numbers.
 - The page title, the header line (date, checklist path) and the `DONE_KEY` of localStorage - a new key per audit.
 
 Write it in the user's language. Save it to `~/Downloads/audit-<topic>.html` and open it in Firefox
