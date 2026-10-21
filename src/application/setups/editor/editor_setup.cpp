@@ -3987,7 +3987,35 @@ void editor_setup::request_arena_screenshot(const augs::path_type& output_path, 
 		);
 	};
 
-	if (const auto world_captured_region = ::find_aabb_of(cosm, for_each_target)) {
+	/*
+		Framed like the minimap: by all the NAV_ISLAND markers together, when there are any -
+		decorations far outside the playable area don't shrink the arena then.
+	*/
+
+	const auto nav_islands_region = [&]() {
+		auto total = std::optional<ltrb>();
+
+		cosm.for_each_having<invariants::area_marker>([&](const auto& typed_handle) {
+			if (typed_handle.template get<invariants::area_marker>().type != area_marker_type::NAV_ISLAND) {
+				return;
+			}
+
+			if (const auto aabb = typed_handle.find_aabb()) {
+				if (total.has_value()) {
+					total->contain(*aabb);
+				}
+				else {
+					total = *aabb;
+				}
+			}
+		});
+
+		return total;
+	}();
+
+	const auto world_captured_region = nav_islands_region.has_value() ? nav_islands_region : ::find_aabb_of(cosm, for_each_target);
+
+	if (world_captured_region.has_value()) {
 		miniature_generator_state request;
 		auto cam = find_current_camera_eye();
 
