@@ -290,6 +290,8 @@ enum class ad_state_type {
 /*
 	CrazyGames' muteAudio and disableChat (common.js keeps them in Module, also as they change) - see platform_settings.h.
 	Muted, the game is silent over its own volume settings - as CrazyGames requires.
+	Read straight from Module: fine while every web build is single-threaded (WEB_SINGLETHREAD);
+	from a game thread worker it would need main_thread_queue::execute like the web_sdk_ calls.
 */
 
 #if PLATFORM_WEB

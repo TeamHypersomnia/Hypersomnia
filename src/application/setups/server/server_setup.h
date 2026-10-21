@@ -108,6 +108,12 @@ class server_setup :
 
 	client_vars integrated_client_vars;
 
+	/*
+		The host's avatar as last loaded - loaded again when it changes, e.g. the Steam or CrazyGames sign-in finishing later.
+	*/
+
+	std::optional<augs::path_type> integrated_avatar_path;
+
 	server_vars canon_with_confd_vars;
 	server_vars vars;
 	server_private_vars private_vars;
@@ -369,6 +375,7 @@ private:
 	void finalize_webhook_jobs();
 
 	void push_connected_webhook(mode_player_id);
+	void update_integrated_avatar();
 	void push_duel_of_honor_webhook(const std::string& first, const std::string& second);
 	void push_match_summary_webhook(const messages::match_summary_message& summary);
 	void push_duel_interrupted_webhook(const messages::duel_interrupted_message& summary);

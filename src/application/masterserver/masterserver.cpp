@@ -523,6 +523,18 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			return;
 		}
 
+		/*
+			Muted ones don't count - every listed server comes back as new right after a masterserver restart.
+		*/
+
+		const auto passed = since_launch.get<std::chrono::seconds>();
+		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
+
+		if (passed < mute_for_secs) {
+			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", ip_str, passed, mute_for_secs);
+			return;
+		}
+
 		{
 			const auto now = augs::steady_secs();
 			erase_if(new_server_notifications, [now](const double t) { return now - t > 3600.0; });
@@ -532,32 +544,28 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				return;
 			}
 
-			auto& of_address = new_server_notifications_by_address[augs::network_of(from)];
-			erase_if(of_address, [now](const double t) { return now - t > secs_per_day; });
-
-			if (of_address.size() >= max_new_server_notifications_per_address_per_day) {
-				MSR_LOG("Too many new server notifications from %x today - skipping one.", ip_str);
-				return;
-			}
-
 			/*
 				Addresses with nothing left in the last day are forgotten - the map does not grow without end.
+				An unknown address (a web server's peer) never equals another one, so only the hourly limit holds for it.
 			*/
 
 			erase_if(new_server_notifications_by_address, [now](const auto& entry) {
 				return entry.second.empty() || now - entry.second.back() > secs_per_day;
 			});
 
+			if (from.type != NETCODE_ADDRESS_NONE) {
+				auto& of_address = new_server_notifications_by_address[augs::network_of(from)];
+				erase_if(of_address, [now](const double t) { return now - t > secs_per_day; });
+
+				if (of_address.size() >= max_new_server_notifications_per_address_per_day) {
+					MSR_LOG("Too many new server notifications from %x today - skipping one.", ip_str);
+					return;
+				}
+
+				of_address.push_back(now);
+			}
+
 			new_server_notifications.push_back(now);
-			new_server_notifications_by_address[augs::network_of(from)].push_back(now);
-		}
-
-		const auto passed = since_launch.get<std::chrono::seconds>();
-		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
-
-		if (passed < mute_for_secs) {
-			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", ip_str, passed, mute_for_secs);
-			return;
 		}
 
 		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {

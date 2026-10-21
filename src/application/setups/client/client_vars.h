@@ -104,7 +104,7 @@ struct client_vars {
 		return nickname;
 	}
 
-	augs::path_type get_avatar_image_path() const {
+	const augs::path_type& get_avatar_image_path() const {
 		if (!signed_in.avatar_image_path.empty()) {
 			return signed_in.avatar_image_path;
 		}

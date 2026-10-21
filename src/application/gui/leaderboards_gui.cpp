@@ -450,14 +450,16 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 
 	/*
 		Under the avatar: the account - opens its profile on hypersomnia.io - and its id to copy.
-		Not on CrazyGames: no links out of the game there.
+		On CrazyGames only its label: no links out of the game there.
 	*/
 
-#if !WEB_CRAZYGAMES
 	if (!in.account_label.empty()) {
 		text_disabled("Account:");
 		ImGui::SameLine();
 
+#if WEB_CRAZYGAMES
+		text_disabled(in.account_label);
+#else
 		{
 			auto disabled_text = scoped_style_color(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 
@@ -473,13 +475,13 @@ void leaderboards_gui_state::perform(const leaderboards_input in) {
 		}
 
 		tooltip_on_hover("View profile on hypersomnia.io");
+#endif
 
 		if (!in.copyable_public_key.empty()) {
 			ImGui::SameLine();
 			copy_icon_button("LeaderboardsAccountKey", in.copyable_public_key);
 		}
 	}
-#endif
 
 	if (in.sign_in_failed) {
 		text_color(typesafe_sprintf("Not signed in to %x.", in.provider_label), orange);

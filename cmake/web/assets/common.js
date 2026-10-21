@@ -305,7 +305,8 @@ async function pre_run_cg() {
       await window.CrazyGames.SDK.init();
 
       // muteAudio and disableChat: the game reads Module.cg_mute_audio and cg_disable_chat every frame
-      {
+      // (its own try - a throw here must not skip /user and the config below)
+      try {
         const applySettings = settings => {
           Module.cg_mute_audio = !!(settings && settings.muteAudio);
           Module.cg_disable_chat = !!(settings && settings.disableChat);
@@ -317,6 +318,9 @@ async function pre_run_cg() {
         if (window.CrazyGames.SDK.game.addSettingsChangeListener) {
           window.CrazyGames.SDK.game.addSettingsChangeListener(applySettings);
         }
+      }
+      catch (e) {
+        console.log("CrazyGames settings unavailable:", e);
       }
 
       FS.mkdir('/user');

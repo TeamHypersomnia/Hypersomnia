@@ -177,7 +177,11 @@ class client_setup :
 	std::optional<std::string> pending_password_save;
 
 	bool rebuild_player_meta_viewables = false;
-	bool has_sent_avatar = false;
+	/*
+		Sent again when it changes - e.g. the Steam or CrazyGames sign-in finishing after joining.
+	*/
+
+	std::optional<augs::path_type> sent_avatar_path;
 	client_gui_state client_gui;
 
 	arena_download_input last_download_request;

@@ -364,6 +364,7 @@ public:
 
 	bool is_key_linked() const;
 
+#if !WEB_CRAZYGAMES
 	/*
 		The nickname and avatar a restored key last played with, given to both configs (the caller saves them).
 		True when anything changed.
@@ -380,6 +381,7 @@ public:
 	*/
 
 	void tell_unlinked(const std::string& steam_name);
+#endif
 
 	/*
 		Any modal of the Account settings - another modal waits while one is open (two would close each other every frame).

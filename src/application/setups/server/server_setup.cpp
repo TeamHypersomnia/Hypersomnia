@@ -98,6 +98,7 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 
 #include "application/setups/server/server_nickname_auth.h"
 #include "application/setups/server/server_handle_payload.hpp"
+#include "application/platform_settings.h"
 
 #if BUILD_WEBRTC
 
@@ -1091,22 +1092,7 @@ server_setup::server_setup(
 		integrated_client.settings.platform_type = static_cast<uint8_t>(get_client_platform_type());
 		integrated_client.rebroadcast_synced_meta = true;
 
-		if (!integrated_client_vars.avatar_image_path.empty()) {
-			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
-
-			try {
-				image_bytes = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
-
-				const auto size = augs::image::get_size(image_bytes);
-
-				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-					image_bytes.clear();
-				}
-			}
-			catch (...) {
-				image_bytes.clear();
-			}
-		}
+		update_integrated_avatar();
 
 		push_connected_webhook(to_mode_player_id(get_integrated_client_id()));
 
@@ -2319,6 +2305,51 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 			}
 		);
 	}
+}
+
+void server_setup::update_integrated_avatar() {
+	/*
+		The account's avatar (Steam, CrazyGames) when signed in, like a client sends it.
+	*/
+
+	const auto& avatar_path = integrated_client_vars.get_avatar_image_path();
+
+	if (integrated_avatar_path == avatar_path) {
+		return;
+	}
+
+	integrated_avatar_path = avatar_path;
+
+	auto& image_bytes = integrated_client.meta.avatar.image_bytes;
+	image_bytes.clear();
+
+	if (!avatar_path.empty()) {
+		try {
+			image_bytes = augs::file_to_bytes(avatar_path);
+
+			const auto size = augs::image::get_size(image_bytes);
+
+			if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+				image_bytes.clear();
+			}
+		}
+		catch (...) {
+			image_bytes.clear();
+		}
+	}
+
+	auto send_avatar = [this](const auto recipient_client_id, auto&) {
+		server->send_payload(
+			recipient_client_id,
+			game_channel_type::RELIABLE_MESSAGES,
+
+			to_mode_player_id(get_integrated_client_id()),
+			integrated_client.meta.avatar
+		);
+	};
+
+	for_each_id_and_client(send_avatar, only_connected_v);
+	rebuild_player_meta_viewables = true;
 }
 
 void server_setup::push_connected_webhook(const mode_player_id id) {
@@ -3778,6 +3809,10 @@ void server_setup::apply(const config_json_table& cfg) {
 	/* apply(cfg.server); */
 
 	integrated_client_vars = cfg.client;
+
+	if (dedicated == std::nullopt) {
+		update_integrated_avatar();
+	}
 
 	auto requested_settings = integrated_client.settings.public_settings;
 	requested_settings.character_input = cfg.input.character;
@@ -6187,15 +6222,21 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		return false;
 	}();
 
-	integrated_client_gui.chat.draw_recent_messages(
-		in.get_drawer(),
-		integrated_client_vars.client_chat,
-		in.config.faction_view,
-		in.gui_fonts.gui,
-		get_current_time(),
-		should_censor,
-		in.config.drawing.cinematic_mode
-	);
+	/*
+		No chat messages where the platform disables chat (CrazyGames' disableChat).
+	*/
+
+	if (!::platform_disables_chat()) {
+		integrated_client_gui.chat.draw_recent_messages(
+			in.get_drawer(),
+			integrated_client_vars.client_chat,
+			in.config.faction_view,
+			in.gui_fonts.gui,
+			get_current_time(),
+			should_censor,
+			in.config.drawing.cinematic_mode
+		);
+	}
 
 	arena_gui_base::draw_custom_gui(in);
 }
@@ -6269,7 +6310,14 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 		if (is_integrated()) {
 			auto& chat = integrated_client_gui.chat;
 
-			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
+			/*
+				Disabled by the platform (CrazyGames' disableChat) while the bar was open.
+			*/
+
+			if (::platform_disables_chat()) {
+				chat.show = false;
+			}
+			else if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
 				server_broadcasted_chat message;
 
 				message.author = to_mode_player_id(get_integrated_client_id());

@@ -112,6 +112,12 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	uint32_t max_tutorial_level = 0;
 
 	/*
+		So that a restart of the same level doesn't count as reaching it again (CrazyGames' happytime).
+	*/
+
+	std::optional<uint32_t> last_set_up_level;
+
+	/*
 		Tutorial progress HUD state.
 
 		The bottom bar counts the green context-tip portals

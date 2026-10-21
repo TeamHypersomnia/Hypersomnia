@@ -1501,14 +1501,20 @@ void client_setup::send_pending_commands() {
 		send_settings();
 	}
 
-	/*
-		The account's avatar (Steam, CrazyGames) when it is in effect - not only the player's own file.
-	*/
-
-	const auto avatar_path = vars.get_avatar_image_path();
-
 	if (state == C::IN_GAME) {
-		if (!has_sent_avatar) {
+		/*
+			The account's avatar (Steam, CrazyGames) when it is in effect - not only the player's own file.
+		*/
+
+		const auto& avatar_path = vars.get_avatar_image_path();
+
+		const bool should_send =
+			!sent_avatar_path.has_value()
+			|| (!avatar_path.empty() && *sent_avatar_path != avatar_path)
+		;
+
+		if (should_send) {
+
 			if (avatar_path.empty()) {
 				/* Send an empty payload to signal that there won't be any avatar. */
 				arena_player_avatar_payload payload;
@@ -1554,7 +1560,7 @@ void client_setup::send_pending_commands() {
 				}
 			}
 
-			has_sent_avatar = true;
+			sent_avatar_path = avatar_path;
 		}
 	}
 
