@@ -1,6 +1,4 @@
 #include <cstddef>
-#include <future>
-#include <mutex>
 #include "application/setups/client/arena_downloading_session.h"
 #include "application/setups/client/https_file_downloader.h"
 
@@ -43,13 +41,20 @@ editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);
 map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) : base(title) {}
 map_catalogue_gui_state::~map_catalogue_gui_state() = default;
 
-std::mutex miniature_mutex;
-
 void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 	using namespace httplib_utils;
 
 	last_miniatures.clear();
 	miniature_downloader.reset();
+
+	/*
+		Nothing to download for a failed or empty list - a downloader with nothing queued would never finish
+		and keep Refresh disabled.
+	*/
+
+	if (headless.get_map_list().empty()) {
+		return;
+	}
 
 	if (const auto parsed = parsed_url(in.external_arena_files_provider); parsed.valid()) {
 		augs::create_directories(get_miniatures_directory());
@@ -506,7 +511,82 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	using namespace httplib_utils;
 	using namespace augs::imgui;
 
+	/*
+		Downloads go on with the window closed or collapsed - every launch waits for them meanwhile.
+	*/
+
+	auto advance_downloads = [&]() {
+		{
+			const auto advance_result = headless.advance(in.make_headless());
+
+			if (advance_result == headless_catalogue_result::LIST_REFRESH_COMPLETE) {
+				focus_on_filter_once = true;
+
+				request_miniatures(in);
+			}
+		}
+
+		if (miniature_downloader && !miniature_downloader->is_running()) {
+			miniature_downloader.reset();
+			rebuild_miniatures();
+		}
+
+		if (miniature_downloader) {
+			if (auto next_miniature = miniature_downloader->get_downloaded_file()) {
+				const auto& map_list = headless.get_map_list();
+
+				/*
+					Paired with its map by the requested path, "<name>/miniature.png", not by the order.
+				*/
+
+				const auto arena_name = augs::path_type(next_miniature->first).parent_path().string();
+				const auto current_miniature_index = last_miniatures.size();
+
+				if (const auto entry = find_entry_by(arena_name); entry != nullptr && current_miniature_index < map_list.size()) {
+					LOG("Finished downloading miniature %x.", current_miniature_index);
+
+					const auto this_id = static_cast<ad_hoc_entry_id>(1 + current_miniature_index);
+
+					const auto miniature_filename = typesafe_sprintf("%x.png", this_id);
+					const auto next_path = get_miniatures_directory() / miniature_filename;
+
+					const auto new_subject = ad_hoc_atlas_subject { this_id, next_path };
+					last_miniatures.push_back(new_subject);
+
+					try {
+						augs::save_string_as_bytes(next_miniature->second, next_path);
+						entry->miniature_id = this_id;
+					}
+					catch (const std::exception& err) {
+						LOG("Could not save the miniature of %x: %x", arena_name, err.what());
+					}
+
+#if WEB_LOWEND
+					if (current_miniature_index == 7) {
+						/* Only rebuild the first few visible and then wait until completion */
+						rebuild_miniatures();
+					}
+#else
+					rebuild_miniatures();
+#endif
+				}
+
+				if (last_miniatures.size() == map_list.size()) {
+					LOG("Finished downloading all miniatures.");
+					miniature_downloader.reset();
+					rebuild_miniatures();
+				}
+			}
+		}
+
+		headless.finalize_download();
+	};
+
 	if (!show) {
+		if (is_downloading()) {
+			advance_downloads();
+		}
+
 		return false;
 	}
 
@@ -522,62 +602,11 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
 	if (!imgui_window) {
+		advance_downloads();
 		return false;
 	}
 
-	{
-		const auto advance_result = headless.advance(in.make_headless());
-
-		if (advance_result == headless_catalogue_result::LIST_REFRESH_COMPLETE) {
-			focus_on_filter_once = true;
-
-			request_miniatures(in);
-		}
-	}
-
-	if (miniature_downloader && !miniature_downloader->is_running()) {
-		miniature_downloader.reset();
-		rebuild_miniatures();
-	}
-
-	if (miniature_downloader) {
-		if (auto next_miniature = miniature_downloader->get_downloaded_file()) {
-			const auto& map_list = headless.get_map_list();
-
-			const auto current_miniature_index = last_miniatures.size();
-
-			if (current_miniature_index < map_list.size()) {
-				LOG("Finished downloading miniature %x.", current_miniature_index);
-
-				const auto this_id = static_cast<ad_hoc_entry_id>(1 + current_miniature_index);
-
-				const auto miniature_filename = typesafe_sprintf("%x.png", this_id);
-				const auto next_path = get_miniatures_directory() / miniature_filename;
-
-				const auto new_subject = ad_hoc_atlas_subject { this_id, next_path };
-				last_miniatures.push_back(new_subject);
-
-				augs::save_string_as_bytes(next_miniature->second, next_path);
-
-				map_list[current_miniature_index].miniature_id = this_id;
-
-#if WEB_LOWEND
-				if (current_miniature_index == 7) {
-					/* Only rebuild the first few visible and then wait until completion */
-					rebuild_miniatures();
-				}
-#else
-				rebuild_miniatures();
-#endif
-			}
-
-			if (last_miniatures.size() == map_list.size()) {
-				LOG("Finished downloading all miniatures.");
-				miniature_downloader.reset();
-				rebuild_miniatures();
-			}
-		}
-	}
+	advance_downloads();
 
 	bool address_modified = false;
 
@@ -884,13 +913,17 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		}
 	}
 
-	headless.finalize_download();
-
 	if (headless.download_failed_popup.has_value()) {
 		if (headless.download_failed_popup->perform()) {
 			headless.download_failed_popup = std::nullopt;
 		}
 	}
+
+	/*
+		Asked for by a double click or the context menu - only for this frame, not when some later download ends.
+	*/
+
+	launch_download_on_last_selected = false;
 
 	return address_modified;
 }

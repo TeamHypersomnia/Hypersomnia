@@ -53,7 +53,13 @@ void arena_downloading_session::start() {
 
 	build_content_database_from_candidate_folders();
 
-	augs::create_directories(part_dir_path);
+	try {
+		augs::create_directories(part_dir_path);
+	}
+	catch (const std::exception& err) {
+		last_error = typesafe_sprintf("Could not create %x:\n%x", part_dir_path, err.what());
+		return;
+	}
 
 	if (try_load_json_from_part_folder()) {
 		if (const auto first_resource_to_download = next_to_download()) {
@@ -125,7 +131,17 @@ void arena_downloading_session::advance_with(
 		const bool requested_hash_matches = requested == augs::secure_hash(next_received_file);
 
 		if (requested_hash_matches) {
-			create_files_matching_hash(requested, next_received_file);
+			/*
+				E.g. a full disk or a file locked by another program.
+			*/
+
+			try {
+				create_files_matching_hash(requested, next_received_file);
+			}
+			catch (const std::exception& err) {
+				last_error = typesafe_sprintf("Could not write a downloaded file:\n%x", err.what());
+				return;
+			}
 
 			/* 
 				Nullopt last_requested_file_hash will mark the end of download,
@@ -140,6 +156,13 @@ void arena_downloading_session::advance_with(
 				last_requested_file_hash,
 				augs::secure_hash(next_received_file)
 			);
+
+			/*
+				Requesting anything more would feed the next arena with this one's file,
+				and finalizing would install it incomplete.
+			*/
+
+			return;
 		}
 	}
 
@@ -408,6 +431,12 @@ std::optional<std::string> arena_downloading_session::final_rearrange_directorie
 	/* To save space */
 	try_remove(old_dir_path);
 #endif
+
+	/*
+		The renames aren't file writes that would sync the browser's storage on their own.
+	*/
+
+	augs::sync_if_persistent(target_dir_path);
 
 	return result;
 }

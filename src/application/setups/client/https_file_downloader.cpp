@@ -80,7 +80,12 @@ void https_file_downloader::worker_func() {
             const auto final_location = to_forward_slashes(parsed.location + "/" + path);
             LOG("HTTP downloader: requesting file at location: %x", final_location);
 
+            /*
+                Reset only here, in the worker - from the GUI thread it would race with the progress callback.
+            */
+
             downloadedBytes = 0;
+            totalBytes = 0;
 
             auto res = client->Get(
                 final_location.c_str(), 
@@ -128,9 +133,6 @@ void https_file_downloader::download_file(const std::string& path) {
 	{
 		auto lock = std::scoped_lock(queueMutex);
 		downloadQueue.push(path);
-
-		totalBytes = 0;
-		downloadedBytes = 0;
 	}
 
     queueCondition.notify_one(); // notify the worker thread
@@ -165,9 +167,13 @@ std::optional<std::pair<std::string, std::string>> https_file_downloader::get_do
 #else
     auto lock = std::scoped_lock(downloadedFilesMutex);
 
+    /*
+        In the order they were requested - callers pair the files with their requests.
+    */
+
     if (!downloadedFiles.empty()) {
-        auto fileData = downloadedFiles.back();
-        downloadedFiles.pop_back();
+        auto fileData = std::move(downloadedFiles.front());
+        downloadedFiles.erase(downloadedFiles.begin());
         return fileData;
     }
 #endif
@@ -175,10 +181,26 @@ std::optional<std::pair<std::string, std::string>> https_file_downloader::get_do
 }
 
 https_file_downloader::~https_file_downloader() {
+#if PLATFORM_WEB
 	keepRunning = false;
 
-#if PLATFORM_WEB
+	/*
+		The fetch in flight outlives this object - its progress callback must not touch it anymore.
+	*/
+
+	if (current_download) {
+		current_download->set_on_progress(nullptr);
+	}
 #else
+	{
+		/*
+			Under the lock, or the worker could miss the wakeup between checking the predicate and blocking.
+		*/
+
+		auto lock = std::scoped_lock(queueMutex);
+		keepRunning = false;
+	}
+
     queueCondition.notify_all(); // notify the worker thread
     if (downloadThread.joinable()) {
         downloadThread.join();

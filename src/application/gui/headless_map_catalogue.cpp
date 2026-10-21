@@ -320,6 +320,17 @@ void multi_arena_synchronizer::advance() {
 	if (const auto new_file = data->external.get_downloaded_file()) {
 		session().advance_with(augs::make_ptr_read_stream(new_file->second));
 	}
+	else if (const bool external_download_failed = !data->external.is_running()) {
+		/*
+			The downloader stops on a failed request and nothing more will arrive - for any of the maps left.
+		*/
+
+		last_error = typesafe_sprintf("Failed to download %x: the HTTP request failed.", session().get_arena_name());
+		LOG_NOFORMAT(*last_error);
+
+		current_map = input.size();
+		return;
+	}
 
 	if (session().finished()) {
 		if (session().has_error()) {

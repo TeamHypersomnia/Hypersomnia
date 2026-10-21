@@ -106,10 +106,15 @@ public:
 
 class headless_map_catalogue {
 	std::vector<map_catalogue_entry> map_list;
-	augs::async_response_ptr future_get;
-	augs::future<std::vector<map_catalogue_entry>> future_response;
+
+	/*
+		Before future_response: its worker writes here, so this must be destroyed after the future waits for it.
+	*/
 
 	std::string list_catalogue_error;
+
+	augs::async_response_ptr future_get;
+	augs::future<std::vector<map_catalogue_entry>> future_response;
 
 	bool refreshed_once = false;
 	std::optional<multi_arena_synchronizer> downloading;
