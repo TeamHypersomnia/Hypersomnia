@@ -8,20 +8,20 @@
 
 ### Added
 
-- **Enemy and teammate colors** for borders, health bars and nicknames - in `Settings > Interface > HUD`.
 - **Map miniatures** when choosing an arena.
+- **Enemies and teammates** are colored red and green respectively.
+	- This is to improve readability.
+	- You can disable this in `Settings -> Interface -> HUD`.
 
 ### Changed
 
-- **Balance:** Default zoom 0.75x -> 0.7x.
-- **Balance:** Awka bullets are slower.
-- **Balance:** BullDup 2000 magazine holds about half as many bullets.
-- Stronger sun shadows on maps without their own setting.
-- Corpse explosions push only running characters.
+- **Balance:** Default zoom: 0.75x -> 0.7x.
+- **Balance:** Awka bullets speed: 16000 -> 14000.
+- **Balance:** BullDup 2000 magazine: 22 -> 12 bullets.
+- Stronger sun shadows by default on new maps.
 
 ### Fixed
 
-- Your **Steam or CrazyGames avatar** now shows on servers on a fresh install.
 - Unchecking Bots when hosting a server still spawned bots.
 - Map downloads can no longer hang.
 
