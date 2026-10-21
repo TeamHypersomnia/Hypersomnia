@@ -56,7 +56,13 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 	}
 
 	if (const auto parsed = parsed_url(in.external_arena_files_provider); parsed.valid()) {
-		augs::create_directories(get_miniatures_directory());
+		try {
+			augs::create_directories(get_miniatures_directory());
+		}
+		catch (const std::exception& err) {
+			LOG("Couldn't create the miniatures directory: %x", err.what());
+			return;
+		}
 
 		miniature_downloader.emplace(parsed);
 

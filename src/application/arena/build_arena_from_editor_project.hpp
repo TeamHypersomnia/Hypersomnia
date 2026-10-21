@@ -703,7 +703,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 			return true;
 		}();
 
-		const bool spawn_bots_enabled = project.playtesting.spawn_bots && !testing_quick_test;
+		const bool spawn_bots_enabled =
+			(project.playtesting.spawn_bots || project.playtesting.spawn_only_enemy_bots)
+			&& !testing_quick_test
+		;
 
 		const bool playtesting_with_bots = in.for_playtesting && spawn_bots_enabled;
 		const bool want_to_see_up_to_date = in.for_playtesting && in.showing_navmesh;

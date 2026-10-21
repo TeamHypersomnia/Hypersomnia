@@ -2307,51 +2307,6 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 	}
 }
 
-void server_setup::update_integrated_avatar() {
-	/*
-		The account's avatar (Steam, CrazyGames) when signed in, like a client sends it.
-	*/
-
-	const auto& avatar_path = integrated_client_vars.get_avatar_image_path();
-
-	if (integrated_avatar_path == avatar_path) {
-		return;
-	}
-
-	integrated_avatar_path = avatar_path;
-
-	auto& image_bytes = integrated_client.meta.avatar.image_bytes;
-	image_bytes.clear();
-
-	if (!avatar_path.empty()) {
-		try {
-			image_bytes = augs::file_to_bytes(avatar_path);
-
-			const auto size = augs::image::get_size(image_bytes);
-
-			if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-				image_bytes.clear();
-			}
-		}
-		catch (...) {
-			image_bytes.clear();
-		}
-	}
-
-	auto send_avatar = [this](const auto recipient_client_id, auto&) {
-		server->send_payload(
-			recipient_client_id,
-			game_channel_type::RELIABLE_MESSAGES,
-
-			to_mode_player_id(get_integrated_client_id()),
-			integrated_client.meta.avatar
-		);
-	};
-
-	for_each_id_and_client(send_avatar, only_connected_v);
-	rebuild_player_meta_viewables = true;
-}
-
 void server_setup::push_connected_webhook(const mode_player_id id) {
 	auto client_state = find_client_state(id);
 
@@ -2867,6 +2822,51 @@ bool server_setup::server_list_enabled() const {
 	return server->is_running() && vars.notified_server_list.size() > 0;
 }
 #endif
+
+void server_setup::update_integrated_avatar() {
+	/*
+		The account's avatar (Steam, CrazyGames) when signed in, like a client sends it.
+	*/
+
+	const auto& avatar_path = integrated_client_vars.get_avatar_image_path();
+
+	if (integrated_avatar_path == avatar_path) {
+		return;
+	}
+
+	integrated_avatar_path = avatar_path;
+
+	auto& image_bytes = integrated_client.meta.avatar.image_bytes;
+	image_bytes.clear();
+
+	if (!avatar_path.empty()) {
+		try {
+			image_bytes = augs::file_to_bytes(avatar_path);
+
+			const auto size = augs::image::get_size(image_bytes);
+
+			if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+				image_bytes.clear();
+			}
+		}
+		catch (...) {
+			image_bytes.clear();
+		}
+	}
+
+	auto send_avatar = [this](const auto recipient_client_id, auto&) {
+		server->send_payload(
+			recipient_client_id,
+			game_channel_type::RELIABLE_MESSAGES,
+
+			to_mode_player_id(get_integrated_client_id()),
+			integrated_client.meta.avatar
+		);
+	};
+
+	for_each_id_and_client(send_avatar, only_connected_v);
+	rebuild_player_meta_viewables = true;
+}
 
 
 uint32_t server_setup::get_num_slots() const {
@@ -6661,16 +6661,6 @@ void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 
 	const auto new_vars = make_synced_dynamic_vars();
 
-	if (new_vars.bot_override_difficulty == difficulty_type::PROGRESSIVE && !new_vars.bots_override.disables_bots()) {
-		/*
-			Progressive keeps recalculating both the counts and the difficulty on its own,
-			so any concrete numbers here would only look like they're set in stone.
-		*/
-
-		broadcast_info("Bots adjusted: PROGRESSIVE.", chat_target_type::INFO);
-		return;
-	}
-
 	const auto message = get_arena_handle().on_mode_with_input(
 		[&](const auto& mode, const auto& in) -> std::string {
 			using M = remove_cref<decltype(mode)>;
@@ -6682,6 +6672,15 @@ void server_setup::broadcast_bots_adjusted(const mode_player_id& requester) {
 					in.clean_round_state,
 					in.cosm
 				};
+
+				if (mode.casual_progressive_enabled(new_in)) {
+					/*
+						Progressive keeps recalculating both the counts and the difficulty on its own,
+						so any concrete numbers here would only look like they're set in stone.
+					*/
+
+					return "Bots adjusted: PROGRESSIVE.";
+				}
 
 				const auto factions = mode.calc_participating_factions(new_in);
 
