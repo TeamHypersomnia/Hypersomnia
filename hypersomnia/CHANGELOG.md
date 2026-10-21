@@ -4,6 +4,41 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [4.2.0] - 2026-10-22
+
+### Added
+
+- **Weapon stats** at hypersomnia.io/weapons are up to date again.
+	- New columns: TTK and sprint speed.
+
+### Changed
+
+- **Balance (nerf):** sniper bullets are slower.
+	- At 0.75x speed, you can dodge every gun but the snipers.
+	- This made the snipers instantly overpowered.
+	| Weapon | Before | After |
+	|---|---|---|
+	| Awka | 14000 | **10500** |
+	| Hunter | 12000 | **9500** |
+	| BullDup 2000 | 9000 | **8500** |
+- **Balance (buff):** sprint faster with SMGs.
+	- Otherwise there was no point buying them versus rifles.
+	| Weapon | Before | After |
+	|---|---|---|
+	| Pro90 | 913 | **917** |
+	| Cyberspray | 913 | **917** |
+	| Zamiec | 885 | **910** |
+	| Szczur | 867 | **902** |
+- **Balance:** other weapons.
+	| Weapon | Stat | Before | After | Type |
+	|---|---|---|---|---|
+	| BullDup 2000 | Time between shots | 230 ms | **290 ms** | Nerf |
+	| Datum | Bullet speed | 6800 | **5700** | Nerf |
+	| Datum | Price | $4600 | **$4000** | Buff |
+	| Bulwark | Penetration | 60 | **70** | Buff |
+	| Hunter | Sprint speed | 952 | **900** | Nerf |
+	| Ao44 | Sprint speed | 880 | **830** | Nerf |
+
 ## [4.1.0] - 2026-10-21
 
 ### Added
