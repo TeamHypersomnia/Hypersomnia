@@ -941,7 +941,7 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 			auto after_shield_damage = amount;
 
 			if (is_shield_enabled()) {
-				const auto mult = std::max(0.01f, absorption->first.hp);
+				const auto mult = absorption->first.get_hp_mult();
 				after_shield_damage = apply_ped(amount / mult).excessive * mult;
 				event.is_remainder_after_shield_destruction = true;
 			}
@@ -966,7 +966,7 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 			if (false) {
 				/* Interferences ignore shield */
 				if (amount > 0 && is_shield_enabled()) {
-					const auto mult = std::max(0.01f, absorption->first.cp);
+					const auto mult = absorption->first.get_cp_mult();
 					after_shield_damage = apply_ped(amount / mult).excessive * mult;
 				}
 			}

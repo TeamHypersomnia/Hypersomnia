@@ -173,10 +173,7 @@ public:
 		rgba
 	);
 
-	void add_white_highlight(
-		const entity_id subject,
-		float original_ratio
-	);
+	void add_white_highlight(const entity_id subject);
 
 	void advance(const damage_indication_settings& settings, const augs::delta dt);
 

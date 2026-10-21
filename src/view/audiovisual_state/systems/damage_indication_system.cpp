@@ -73,19 +73,17 @@ std::optional<damage_indication_system::small_health_bar> damage_indication_syst
 	return std::nullopt;
 }
 
-void damage_indication_system::add_white_highlight(
-	const entity_id subject,
-	const float original_ratio
-) {
+void damage_indication_system::add_white_highlight(const entity_id subject) {
 	auto& highlight = active_white_highlights[subject];
-
-	if (original_ratio >= highlight.original_ratio) {
-		highlight.original_ratio = original_ratio;
-	}
-
 	highlight.time_of_occurence_seconds = global_time_seconds;
 
 	if (const auto bar = mapped_or_nullptr(small_health_bars, subject)) {
+		/*
+			The bar is recorded after this step's damage events - it still holds the value before all of them,
+			e.g. before every pellet of a shotgun volley.
+		*/
+
+		highlight.original_ratio = std::max(highlight.original_ratio, bar->value);
 		bar->time_of_last_damage_seconds = global_time_seconds;
 	}
 }

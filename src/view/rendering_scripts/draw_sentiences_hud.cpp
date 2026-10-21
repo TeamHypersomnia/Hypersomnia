@@ -85,6 +85,16 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		const bool is_enemy = !viewer_faction_matches(drawn_character);
 		const auto transform = drawn_character.get_viewing_transform(interp);
 
+		auto displayed_nickname = [&]() {
+			auto nickname = get_bbcoded_entity_name(drawn_character);
+
+			if (in.streamer_mode || augs::has_profanity(nickname, true)) {
+				nickname = "Player";
+			}
+
+			return nickname;
+		};
+
 		/*
 			A small health bar by the character - for enemies with enemy_hud_mode SMALL_HEALTH_BAR,
 			in friendly_color with the nickname for teammates with teammate_hud_mode MINIMAL - see teammate_nickname_position.
@@ -150,13 +160,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					return formatted_string();
 				}
 
-				auto nickname = get_bbcoded_entity_name(drawn_character);
-
-				if (in.streamer_mode || augs::has_profanity(nickname, true)) {
-					nickname = "Player";
-				}
-
-				return formatted_string { nickname, { in.gui_font, bar_color } };
+				return formatted_string { displayed_nickname(), { in.gui_font, bar_color } };
 			}();
 
 			const auto nickname_bbox = get_text_bbox(nickname_text);
@@ -196,7 +200,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				bar_line
 			);
 
-			const auto internal_current_width = is_conscious ? std::max(1, static_cast<int>(static_cast<float>(internal_bar_size.x) * chosen_ratio)) : 0;
+			const auto internal_current_width = std::max(1, static_cast<int>(static_cast<float>(internal_bar_size.x) * chosen_ratio));
 			const auto internal_bar_current_size = vec2i(internal_current_width, internal_bar_size.y);
 
 			const int total_border_extent = internal_border_size + external_border_size;
@@ -212,37 +216,32 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 			const auto tex = in.small_health_bar_tex;
 
-			const bool draw_partial_borders = true;
+			bars_output.aabb(tex, bigger_origin, dark_bar_color);
+			bars_output.aabb(tex, smaller_origin, bright_bar_color);
 
-			if (is_conscious) {
-				bars_output.aabb(tex, bigger_origin, dark_bar_color);
-				bars_output.aabb(tex, smaller_origin, bright_bar_color);
-
-				if (draw_partial_borders && chosen_ratio < 1.0f) {
-					{
-						const auto dim_border_col = rgba(bar_color).mult_brightness(0.5f);
-						bars_output.border(in.small_health_bar_tex, bigger_origin, dim_border_col);
-					}
-
-					const auto top_border =     ltrb(bigger_origin.l-1, bigger_origin.t-1, smaller_origin.r, bigger_origin.t);
-					const auto left_border =    ltrb(bigger_origin.l-1, bigger_origin.t,   bigger_origin.l, bigger_origin.b);
-					const auto bottom_border =  ltrb(bigger_origin.l-1, bigger_origin.b,   smaller_origin.r, bigger_origin.b+1);
-					//const auto right_border =   ltrb(bigger_origin.r  , bigger_origin.t,   bigger_origin.r+1, bigger_origin.b);
-
-					bars_output.aabb(tex, left_border, bright_bar_color);
-					bars_output.aabb(tex, top_border, bright_bar_color);
-					bars_output.aabb(tex, bottom_border, bright_bar_color);
-					//bars_output.aabb(tex, right_border, bright_bar_color);
+			if (chosen_ratio < 1.0f) {
+				{
+					const auto dim_border_col = rgba(bar_color).mult_brightness(0.5f);
+					bars_output.border(in.small_health_bar_tex, bigger_origin, dim_border_col);
 				}
-				else {
-					bars_output.border(in.small_health_bar_tex, bigger_origin, bright_bar_color);
-				}
+
+				const auto top_border =     ltrb(bigger_origin.l-1, bigger_origin.t-1, smaller_origin.r, bigger_origin.t);
+				const auto left_border =    ltrb(bigger_origin.l-1, bigger_origin.t,   bigger_origin.l, bigger_origin.b);
+				const auto bottom_border =  ltrb(bigger_origin.l-1, bigger_origin.b,   smaller_origin.r, bigger_origin.b+1);
+
+				bars_output.aabb(tex, left_border, bright_bar_color);
+				bars_output.aabb(tex, top_border, bright_bar_color);
+				bars_output.aabb(tex, bottom_border, bright_bar_color);
+			}
+			else {
+				bars_output.border(in.small_health_bar_tex, bigger_origin, bright_bar_color);
 			}
 
 			if (const auto highlight = in.damage_indication_sys.find_white_highlight(drawn_character, in.damage_indication_settings)) {
-				const auto white_bar_width_inclusive = std::min(
-					internal_bar_size.x,
-					static_cast<int>(pixels_per_health_maximum * highlight->original_ratio)
+				const auto white_bar_width_inclusive = std::clamp(
+					static_cast<int>(pixels_per_health_maximum * highlight->original_ratio),
+					internal_current_width,
+					internal_bar_size.x
 				);
 
 				const auto white_bar_origin = ltrb(
@@ -258,13 +257,11 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				bars_output.aabb(tex, white_bar_origin, white_bar_color);
 
-				if (draw_partial_borders) {
-					const auto top_border =     ltrb(white_bar_origin.l, bigger_origin.t-1, white_bar_origin.r, bigger_origin.t);
-					const auto bottom_border =  ltrb(white_bar_origin.l, bigger_origin.b,   white_bar_origin.r, bigger_origin.b+1);
+				const auto top_border =     ltrb(white_bar_origin.l, bigger_origin.t-1, white_bar_origin.r, bigger_origin.t);
+				const auto bottom_border =  ltrb(white_bar_origin.l, bigger_origin.b,   white_bar_origin.r, bigger_origin.b+1);
 
-					bars_output.aabb(tex, top_border, white_bar_color);
-					bars_output.aabb(tex, bottom_border, white_bar_color);
-				}
+				bars_output.aabb(tex, top_border, white_bar_color);
+				bars_output.aabb(tex, bottom_border, white_bar_color);
 			}
 
 			if (is_teammate) {
@@ -689,18 +686,12 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					false
 				});
 
-				auto nickname = get_bbcoded_entity_name(drawn_character);
-
 				const bool watching_our_character = 
 					watched_character == drawn_character
 					&& !in.viewer_is_spectator 
 				;
 
-				if (!watching_our_character) {
-					if (in.streamer_mode || augs::has_profanity(nickname, true)) {
-						nickname = "Player";
-					}
-				}
+				const auto nickname = watching_our_character ? get_bbcoded_entity_name(drawn_character) : displayed_nickname();
 
 				push_textual_info({
 					starting_health_angle,

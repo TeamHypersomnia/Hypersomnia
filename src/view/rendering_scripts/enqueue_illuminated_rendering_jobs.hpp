@@ -149,6 +149,13 @@ void enqueue_illuminated_rendering_jobs(
 #endif
 
 	const auto fog_of_war_character_id = fog_of_war_effective ? viewed_character : std::optional<entity_id>();
+
+	/*
+		Enemies and teammates told apart by the viewed character - also without fog of war,
+		only then nobody is behind walls.
+	*/
+
+	const auto classifying_character_id = std::optional<entity_id>(viewed_character);
 	const auto cast_highlight_tex = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
 	auto& dedicated = in.renderer.dedicated;
@@ -992,19 +999,30 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	/*
-		Cinematic mode shows the characters as they are - no colorizing, darkening or teammate silhouettes.
-	*/
-
-	const bool cinematic = settings.cinematic_mode;
-
-	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, ffa = settings.teammates_are_enemies, enemy_color = settings.enemy_color, friendly_color = settings.friendly_color, colorize_enemies = !cinematic && settings.colorize_enemies, enemy_darkening = cinematic ? 0.0f : settings.enemy_darkening, colorize_teammates = !cinematic && settings.colorize_teammates, colorize_yourself = !cinematic && settings.colorize_yourself, enemy_border_width = cinematic ? 1 : settings.enemy_border_width, teammate_border_width = cinematic ? 1 : settings.teammate_border_width, teammate_darkening = cinematic ? 0.0f : settings.teammate_darkening, teammates_behind_walls = cinematic ? teammates_behind_walls_mode::FULL : settings.teammates_behind_walls, cast_highlight_tex, &cosm, fog_of_war_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds]() {
+	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, settings, cast_highlight_tex, &cosm, fog_of_war_character_id, classifying_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds]() {
 		/*
 			Enemies and teammates - with the items they hold - are darkened
 			by enemy_darkening and teammate_darkening with a black overlay, see illuminated_rendering.cpp.
 			With colorize_enemies, colorize_teammates and colorize_yourself,
 			they also have a constant border - and others' shields glow - in enemy_color or friendly_color.
+			Cinematic mode turns all of it off in the customized config (work.cpp).
 		*/
+
+		const auto ffa = settings.teammates_are_enemies;
+		const auto enemy_color = settings.enemy_color;
+		const auto friendly_color = settings.friendly_color;
+		const auto colorize_enemies = settings.colorize_enemies;
+		const auto colorize_teammates = settings.colorize_teammates;
+		const auto colorize_yourself = settings.colorize_yourself;
+		const auto clamp_border_width = [](const int w) {
+			return std::clamp(w, min_character_border_width_v, max_character_border_width_v);
+		};
+
+		const auto enemy_border_width = clamp_border_width(settings.enemy_border_width);
+		const auto teammate_border_width = clamp_border_width(settings.teammate_border_width);
+		const auto enemy_darkening = settings.enemy_darkening;
+		const auto teammate_darkening = settings.teammate_darkening;
+		const auto teammates_behind_walls = settings.teammates_behind_walls;
 
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle, const std::optional<rgba> shield_glow_color = std::nullopt) {
 			::specific_draw_neon_map(handle, drawing_in);
@@ -1036,10 +1054,18 @@ void enqueue_illuminated_rendering_jobs(
 		};
 
 		/*
-			The friendly border still turns red with the low health pulse.
+			Colorized teammates have no low health pulse - only your own colorized border still turns red with it.
 		*/
 
-		auto teammate_border_provider = [timestamp_ms, friendly_color](const auto& typed_handle) -> std::optional<rgba> {
+		auto teammate_border_provider = [friendly_color](const auto& typed_handle) -> std::optional<rgba> {
+			if (typed_handle.template get<components::sentience>().is_dead()) {
+				return std::nullopt;
+			}
+
+			return friendly_color;
+		};
+
+		auto own_border_provider = [timestamp_ms, friendly_color](const auto& typed_handle) -> std::optional<rgba> {
 			const auto& sentience = typed_handle.template get<components::sentience>();
 
 			if (sentience.is_dead()) {
@@ -1100,13 +1126,15 @@ void enqueue_illuminated_rendering_jobs(
 			::specific_draw_color_highlight(typed_handle, CHARACTER_SHADOW_COLOR, drawing_in, ::make_shadow_offset_customizer(offset));
 		};
 
-		if (const auto fog_of_war_character = cosm[fog_of_war_character_id ? *fog_of_war_character_id : entity_id()]) {
-			const auto fow_faction = fog_of_war_character.get_official_faction();
+		const bool fog_of_war = fog_of_war_character_id.has_value();
+
+		if (const auto classifying_character = cosm[classifying_character_id ? *classifying_character_id : entity_id()]) {
+			const auto own_faction = classifying_character.get_official_faction();
 
 			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 				handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-					const bool is_local = typed_handle == fog_of_war_character;
-					const bool is_teammate = !is_local && !ffa && typed_handle.get_official_faction() == fow_faction;
+					const bool is_local = typed_handle == classifying_character;
+					const bool is_teammate = !is_local && !ffa && typed_handle.get_official_faction() == own_faction;
 					const bool is_enemy = !is_local && !is_teammate;
 					const auto& sentience = typed_handle.template get<components::sentience>();
 
@@ -1166,11 +1194,18 @@ void enqueue_illuminated_rendering_jobs(
 						if (colorize_enemies && is_enemy) {
 							::specific_draw_border(typed_handle, drawing_in, enemy_border_provider, default_customize_input(), border_width);
 						}
-						else if ((colorize_teammates && is_teammate) || (colorize_yourself && is_local)) {
+						else if (colorize_teammates && is_teammate) {
 							::specific_draw_border(typed_handle, drawing_in, teammate_border_provider, default_customize_input(), border_width);
 						}
+						else if (colorize_yourself && is_local) {
+							::specific_draw_border(typed_handle, drawing_in, own_border_provider, default_customize_input(), border_width);
+						}
 						else {
-							::specific_draw_border(typed_handle, drawing_in, standard_border_provider, default_customize_input(), border_width);
+							/*
+								Just the low health pulse - always 1 px, as without colorizing.
+							*/
+
+							::specific_draw_border(typed_handle, drawing_in, standard_border_provider);
 						}
 					};
 
@@ -1180,7 +1215,7 @@ void enqueue_illuminated_rendering_jobs(
 						&& !see_enemies_behind_walls
 					;
 
-					if (const bool visible_in_fow = is_local || (is_teammate && !teammate_as_silhouette) || see_enemies_behind_walls) {
+					if (const bool visible_in_fow = !fog_of_war || is_local || (is_teammate && !teammate_as_silhouette) || see_enemies_behind_walls) {
 						draw_lights_for(neons_friendly_drawing_in, typed_handle, shield_glow_color);
 
 						draw_shadow_for(typed_handle, shadows_friendly_drawing_in);

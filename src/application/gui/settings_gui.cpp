@@ -3581,12 +3581,22 @@ void settings_gui_state::perform(
 						revertable_checkbox("Colorize teammates", config.drawing.colorize_teammates);
 						revertable_checkbox("Colorize yourself", config.drawing.colorize_yourself);
 
+						/*
+							Clamped also after the slider - Ctrl+click would let any number be typed in.
+						*/
+
+						auto border_width_slider = [&](const auto label, int& width) {
+							auto indent = scoped_indent();
+							revertable_slider(label, width, min_character_border_width_v, max_character_border_width_v);
+							width = std::clamp(width, min_character_border_width_v, max_character_border_width_v);
+						};
+
 						if (config.drawing.colorize_enemies) {
-							revertable_slider("Enemy border width", config.drawing.enemy_border_width, 1, 4);
+							border_width_slider("Enemy border width", config.drawing.enemy_border_width);
 						}
 
 						if (config.drawing.colorize_teammates || config.drawing.colorize_yourself) {
-							revertable_slider("Teammate border width", config.drawing.teammate_border_width, 1, 4);
+							border_width_slider("Teammate border width", config.drawing.teammate_border_width);
 						}
 
 						revertable_slider("Enemy darkening", config.drawing.enemy_darkening, 0.0f, 0.8f, "%.2f");
@@ -3598,6 +3608,7 @@ void settings_gui_state::perform(
 						revertable_enum("Teammate HUD mode", config.drawing.teammate_hud_mode);
 
 						if (config.drawing.teammate_hud_mode == teammate_hud_type::MINIMAL) {
+							auto indent = scoped_indent();
 							revertable_enum("Teammate nickname position", config.drawing.teammate_nickname_position);
 							revertable_slider("Teammate nickname offset", config.drawing.teammate_nickname_offset, -30, 30);
 						}

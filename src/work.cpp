@@ -4583,6 +4583,13 @@ work_result work(
 				d.draw_grenade_trajectories = false;
 				d.draw_melee_trajectories = false;
 
+				d.colorize_enemies = false;
+				d.colorize_teammates = false;
+				d.colorize_yourself = false;
+				d.enemy_darkening = 0.0f;
+				d.teammate_darkening = 0.0f;
+				d.teammates_behind_walls = teammates_behind_walls_mode::FULL;
+
 				config_copy.hud_messages.is_enabled = false;
 				config_copy.arena_mode_gui.context_tip_settings.is_enabled = false;
 				config_copy.arena_mode_gui.show_spectator_overlay = false;

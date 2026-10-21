@@ -22,6 +22,8 @@ uniform int color_encodes_footprints;
 	the height in blue for footprints of the latter.
 
 	Also draws translucent shadows of characters over the ground, whose color is simply the shadow's.
+	Likewise the flat black darkening overlays of enemies and teammates over the lit characters -
+	the 0.5 alpha threshold below also decides which edge pixels of a character get darkened.
 */
 
 void main() 

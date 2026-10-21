@@ -1317,33 +1317,57 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	draw_fog_of_war_overlay();
 
-	if (shaders.shadow_sprite) {
-		/*
-			Shadows of characters before all characters, each pixel darkened once -
-			so that heads, backpacks and other attachments don't darken the shadows of bodies,
-			and shadows of neighbouring characters merge.
-			The alpha threshold of the shader keeps faint edges from blocking the solid parts of other sprites.
-		*/
+	/*
+		Each pixel darkened once: the first buffer drawn claims its pixels, the second only darkens the rest.
+		Enemies only where visible in the fog of war.
+	*/
 
+	auto draw_single_coverage = [&](const D enemy_buffer, const D friendly_buffer, const bool friendlies_first) {
 		set_shader_with_matrix(shaders.shadow_sprite);
 
 #if BUILD_STENCIL_BUFFER
 		renderer.set_stencil(true);
 		renderer.clear_single_coverage();
 
-		if (fog_of_war_effective) {
-			renderer.start_single_coverage_where_stencil();
-			renderer.call_triangles(D::ENEMY_SENTIENCE_SHADOWS);
+		auto draw_enemies = [&]() {
+			if (fog_of_war_effective) {
+				renderer.start_single_coverage_where_stencil();
+				renderer.call_triangles(enemy_buffer);
+			}
+		};
+
+		auto draw_friendlies = [&]() {
+			renderer.start_single_coverage();
+			renderer.call_triangles(friendly_buffer);
+		};
+
+		if (friendlies_first) {
+			draw_friendlies();
+			draw_enemies();
+		}
+		else {
+			draw_enemies();
+			draw_friendlies();
 		}
 
-		renderer.start_single_coverage();
-		renderer.call_triangles(D::FRIENDLY_SENTIENCE_SHADOWS);
 		renderer.finish_single_coverage();
 		renderer.set_stencil(false);
 #else
-		renderer.call_triangles(D::FRIENDLY_SENTIENCE_SHADOWS);
+		(void)enemy_buffer;
+		(void)friendlies_first;
+		renderer.call_triangles(friendly_buffer);
 #endif
+	};
 
+	if (shaders.shadow_sprite) {
+		/*
+			Shadows of characters before all characters -
+			so that heads, backpacks and other attachments don't darken the shadows of bodies,
+			and shadows of neighbouring characters merge.
+			The alpha threshold of the shader keeps faint edges from blocking the solid parts of other sprites.
+		*/
+
+		draw_single_coverage(D::ENEMY_SENTIENCE_SHADOWS, D::FRIENDLY_SENTIENCE_SHADOWS, false);
 		set_shader_with_matrix(shaders.illuminated);
 	}
 
@@ -1356,28 +1380,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (shaders.shadow_sprite) {
 		/*
 			Darkening of enemies and teammates (game_drawing_settings::enemy_darkening and teammate_darkening)
-			as a flat black overlay over the already lit characters, each pixel darkened once -
+			as a flat black overlay over the already lit characters -
 			so that neons, lights and the items over bodies don't make it uneven.
+			Friendly bodies are drawn over enemies, so their darkenings claim the overlapping pixels first.
 		*/
 
-		set_shader_with_matrix(shaders.shadow_sprite);
-
-#if BUILD_STENCIL_BUFFER
-		renderer.set_stencil(true);
-		renderer.clear_single_coverage();
-
-		if (fog_of_war_effective) {
-			renderer.start_single_coverage_where_stencil();
-			renderer.call_triangles(D::ENEMY_SENTIENCE_DARKENINGS);
-		}
-
-		renderer.start_single_coverage();
-		renderer.call_triangles(D::FRIENDLY_SENTIENCE_DARKENINGS);
-		renderer.finish_single_coverage();
-		renderer.set_stencil(false);
-#else
-		renderer.call_triangles(D::FRIENDLY_SENTIENCE_DARKENINGS);
-#endif
+		draw_single_coverage(D::ENEMY_SENTIENCE_DARKENINGS, D::FRIENDLY_SENTIENCE_DARKENINGS, true);
 	}
 
 	set_shader_with_matrix(shaders.illuminated);

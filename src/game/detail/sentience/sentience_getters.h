@@ -108,11 +108,7 @@ inline health_with_shield get_health_with_shield(const E& character) {
 		if (const auto absorption = ::find_active_pe_absorption(character)) {
 			const auto& pe = std::get<personal_electricity_meter_instance>(sentience->meters);
 
-			/*
-				The same minimum as in sentience_system's damage application.
-			*/
-
-			result.shield_mult = std::max(0.01f, absorption->first.hp);
+			result.shield_mult = absorption->first.get_hp_mult();
 			result.value += std::max(0.f, pe.value) * result.shield_mult;
 			result.maximum += pe.maximum * result.shield_mult;
 		}

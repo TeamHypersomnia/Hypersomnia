@@ -778,27 +778,17 @@ FORCE_INLINE void specific_draw_border(
 			const auto source_pos = input.renderable_transform.pos;
 			input.colorize = *border_info;
 
-			if (width <= 1) {
-				const vec2i offsets[4] = {
-					vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
-				};
-
-				for (const auto& o : offsets) {
-					input.renderable_transform.pos = source_pos + o;
-					augs::draw(renderable, manager, input);
-				}
-
-				return;
-			}
-
 			/*
-				A thicker border: the sprite drawn at every offset within a circle of the width's radius.
+				The sprite drawn at every offset within a circle of the width's radius -
+				for width 1, the 4 neighbours. Callers clamp a width from the config (max_character_border_width_v).
 			*/
 
-			for (int y = -width; y <= width; ++y) {
-				for (int x = -width; x <= width; ++x) {
+			const auto w = std::max(width, 1);
+
+			for (int y = -w; y <= w; ++y) {
+				for (int x = -w; x <= w; ++x) {
 					const auto o = vec2i(x, y);
-					const bool within_circle = o.length_sq() <= width * width;
+					const bool within_circle = o.length_sq() <= w * w;
 
 					if (o != vec2i::zero && within_circle) {
 						input.renderable_transform.pos = source_pos + o;

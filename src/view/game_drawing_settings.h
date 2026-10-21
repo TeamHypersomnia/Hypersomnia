@@ -72,20 +72,6 @@ enum class teammates_behind_walls_mode {
 	// END GEN INTROSPECTOR
 };
 
-template <>
-inline auto format_enum(const teammates_behind_walls_mode e) {
-	constexpr std::array<const char*, 2> vals = {
-		"Silhouettes",
-		"Full"
-	};
-
-	if (static_cast<uint8_t>(e) < static_cast<uint8_t>(vals.size())) {
-		return std::string(vals[static_cast<uint8_t>(e)]);
-	}
-
-	return std::string("UnknownEnumValue");
-}
-
 struct crosshair_drawing_settings {
 	// GEN INTROSPECTOR struct crosshair_drawing_settings
 	crosshair_type type = crosshair_type::CLASSIC;
@@ -298,6 +284,13 @@ struct minimap_settings {
 		return is_visible(minimap_state_type::NORMAL) && position == corner;
 	}
 };
+
+/*
+	The range of the enemy/teammate border width sliders - also what the renderer clamps a config value to.
+*/
+
+constexpr int min_character_border_width_v = 1;
+constexpr int max_character_border_width_v = 4;
 
 struct game_drawing_settings {
 	// GEN INTROSPECTOR struct game_drawing_settings
