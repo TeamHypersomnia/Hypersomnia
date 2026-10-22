@@ -4504,12 +4504,28 @@ work_result work(
 
 	/*
 		Whole world pixels keep the nearest-neighbor texels stable and the tiles seamless.
-		With linear filtering (forced when zoomed out) there is nothing to keep stable -
-		a world pixel is not a screen pixel anymore - so the camera and the viewed character
-		move smoothly instead of in uneven pixel steps.
+		With linear filtering (forced when zoomed out) a world pixel is not a screen pixel anymore,
+		so snap_camera_to_screen_pixels snaps to the pixels of the screen instead:
+		the static world then moves by whole screen pixels and fine patterns don't crawl.
+		Without it the camera and the viewed character move smoothly instead.
 	*/
 	WEBSTATIC auto is_camera_pixel_snapped = [&](const config_json_table& viewing_config) {
-		return viewing_config.renderer.default_filtering == augs::filtering_type::NEAREST_NEIGHBOR;
+		return
+			viewing_config.drawing.snap_camera_to_screen_pixels
+			|| viewing_config.renderer.default_filtering == augs::filtering_type::NEAREST_NEIGHBOR
+		;
+	};
+
+	/*
+		The zoom that scales world pixels to the pixels the camera snaps to:
+		those of the screen, or legacy world pixels.
+	*/
+	WEBSTATIC auto get_pixel_snap_zoom = [&](const config_json_table& viewing_config) {
+		if (viewing_config.drawing.snap_camera_to_screen_pixels) {
+			return get_camera_eye(viewing_config).zoom;
+		}
+
+		return 1.0f;
 	};
 
 	WEBSTATIC auto get_camera_cone = [&](const config_json_table& viewing_config) {		
@@ -5856,6 +5872,7 @@ work_result work(
 			viewing_config.gore,
 			viewing_config.drawing.bullet_trails == bullet_trails_mode::FULL,
 			is_camera_pixel_snapped(viewing_config),
+			get_pixel_snap_zoom(viewing_config),
 			throw_trajectory_flags::from(viewing_config.drawing),
 			viewing_config.drawing.throw_trajectory_gap,
 
@@ -7285,14 +7302,15 @@ work_result work(
 				auto cone = get_camera_cone(viewing_config);
 
 				if (is_camera_pixel_snapped(viewing_config)) {
-					cone.eye.transform.pos = gameplay_camera.snap_to_pixels(cone.eye.transform.pos);
+					const auto snap_zoom = get_pixel_snap_zoom(viewing_config);
+					cone.eye.transform.pos = gameplay_camera.snap_to_pixels(cone.eye.transform.pos, snap_zoom);
 
 					if (screen_size.x % 2 == 1) {
-						cone.eye.transform.pos.x -= 0.5f;
+						cone.eye.transform.pos.x -= 0.5f / snap_zoom;
 					}
 
 					if (screen_size.y % 2 == 1) {
-						cone.eye.transform.pos.y -= 0.5f;
+						cone.eye.transform.pos.y -= 0.5f / snap_zoom;
 					}
 				}
 				else {

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- balance snipers somehow with slower bullets now
+
 - kiedys dashe takie obrotowe animacje zamiast dmuchniecia
 - kiedys te flagi poprawne ogarnac w browserze, serwer sam moze wysylac w jakim kraju jest
 

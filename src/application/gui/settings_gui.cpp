@@ -2691,6 +2691,9 @@ void settings_gui_state::perform(
 							);
 						}
 
+						revertable_checkbox("Snap camera to screen pixels", config.drawing.snap_camera_to_screen_pixels);
+						tooltip_on_hover("If ticked, the camera and your character move by whole pixels of the screen, even when zoomed out,\nso fine patterns like tiled floors don't crawl or shimmer while you move.\nIf not ticked, the camera moves smoothly with linear filtering.\nCosts nothing.");
+
 				
 						text_color("Interpolation", yellow);
 

@@ -297,6 +297,7 @@ struct game_drawing_settings {
 	bool snap_zoom_to_fov_size = true;
 	int snap_zoom_to_multiple_if_different_by_pixels = 10;
 	float custom_zoom = 1.0f;
+	bool snap_camera_to_screen_pixels = true;
 
 	bool draw_enemy_silhouettes_in_spectator = true;
 	rgba enemy_color = rgba(255, 0, 0, 255);

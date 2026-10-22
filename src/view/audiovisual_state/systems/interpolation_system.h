@@ -23,6 +23,7 @@ class interpolation_system {
 
 public:
 	entity_id id_to_integerize;
+	float integerize_zoom = 1.0f;
 
 	void integrate_interpolated_transforms(
 		const interpolation_settings&,
@@ -56,7 +57,13 @@ public:
 		const auto id = handle.get_id();
 
 		if (entity_id(id) == id_to_integerize) {
+			/*
+				To whole pixels of the screen, like the camera - see world_camera::snap_to_pixels.
+			*/
+
+			result.pos *= integerize_zoom;
 			result.pos.discard_fract();
+			result.pos /= integerize_zoom;
 		}
 
 		return result;

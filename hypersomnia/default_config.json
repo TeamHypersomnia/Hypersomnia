@@ -190,6 +190,7 @@
         "snap_zoom_to_multiple_if_different_by_pixels": 100,
         // "custom_zoom": 4,
         "custom_zoom": 1.0,
+        "snap_camera_to_screen_pixels": true,
         "draw_enemy_silhouettes_in_spectator": true,
         "enemy_color": [255, 0, 0, 255],
         "friendly_color": [0, 255, 0, 255],

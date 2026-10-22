@@ -28,7 +28,7 @@
 #include "view/audiovisual_state/flashbang_math.h"
 #include "application/input/input_settings.h"
 
-vec2 world_camera::snap_to_pixels(const vec2 pos) {
+vec2 world_camera::snap_to_pixels(const vec2 world_pos, const float zoom) {
 	/*
 		The camera has to stand on whole pixels so that tiled sprites have no seams.
 
@@ -39,7 +39,20 @@ vec2 world_camera::snap_to_pixels(const vec2 pos) {
 
 		So on each axis, a one-pixel step against the motion is skipped
 		as long as the previous pixel is still less than a pixel away from the true position.
+
+		The pixels are those of the screen - world pixels scaled by the zoom.
+		Then the whole static world moves by whole screen pixels between frames,
+		so under linear filtering of a zoomed out camera every frame samples the textures the same way
+		and fine patterns like tiled floors don't crawl as the camera moves.
+		At zoom 1 these are just world pixels.
 	*/
+
+	if (zoom != last_pixel_snapped_zoom) {
+		last_pixel_snapped_pos.reset();
+		last_pixel_snapped_zoom = zoom;
+	}
+
+	const auto pos = world_pos * zoom;
 
 	auto snapped = pos;
 	snapped.discard_fract();
@@ -62,7 +75,7 @@ vec2 world_camera::snap_to_pixels(const vec2 pos) {
 	}
 
 	last_pixel_snapped_pos = snapped;
-	return snapped;
+	return snapped / zoom;
 }
 
 camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const

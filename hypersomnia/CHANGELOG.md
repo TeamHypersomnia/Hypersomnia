@@ -44,6 +44,13 @@
 	- Previously the bot on B would stay.
 	- Now it will rotate.
 
+### Fixed
+
+- **No more aliasing** on tiled floors when zoomed out.
+	- HUD was also jittery around the character.
+	- The now camera moves by whole pixels of the screen.
+	- You can revert this in `Settings -> Graphics -> Rendering`.
+
 ## [4.1.0] - 2026-10-21
 
 ### Added

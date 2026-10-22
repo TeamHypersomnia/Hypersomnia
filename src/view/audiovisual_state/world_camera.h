@@ -42,6 +42,7 @@ struct world_camera {
 	vec2 player_position_at_previous_step;
 
 	std::optional<vec2> last_pixel_snapped_pos;
+	float last_pixel_snapped_zoom = 1.0f;
 
 	augs::smooth_value_field additional_position_smoothing;
 	float target_zoom = 1.0f;
@@ -59,7 +60,7 @@ struct world_camera {
 
 	camera_eye get_current_eye(bool with_edge_zoomout) const;
 
-	vec2 snap_to_pixels(vec2 pos);
+	vec2 snap_to_pixels(vec2 pos, float zoom);
 
 	void tick(
 		const vec2i screen_size,
