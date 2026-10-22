@@ -319,6 +319,13 @@ struct basic_vec2 {
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
+	basic_vec2& floor_fract() {
+		x = std::floor(x);
+		y = std::floor(y);
+		return *this;
+	}
+
+	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	basic_vec2& round_fract() {
 		x = repro::round(x);
 		y = repro::round(y);

@@ -310,6 +310,11 @@ namespace test_flavours {
 		static const auto density_mult = 0.4f;
 		static const auto kickback_mult = 1.5f;
 
+		/*
+			Guns are carried in the back slots, never inside containers,
+			so the space a gun occupies has no gameplay effect - it may follow the density freely.
+		*/
+
 		auto calc_gun_space_occupied_per_charge = [&](const auto& meta) {
 			return
 				(meta.template get<invariants::fixtures>().density / density_mult)
@@ -320,14 +325,14 @@ namespace test_flavours {
 		/*
 			Sets the gun's density so that a character holding it (loaded, nothing else)
 			tops out at this sprint speed - in logic pixels per second, see calc_top_movement_speed.
-			With the electric armor by default, as most players buy it.
+			With the electric armor on, as most players buy it.
 
 			Call after make_default_gun_container and only_allow_mag (or the last change to the slots),
 			as what is loaded adds its mass and the space the gun occupies follows its density.
 		*/
 
-		auto set_density_from_sprint_speed = [&](auto& meta, const real32 sprint_speed, const bool with_armor = true) {
-			const auto in = sprint_speed_input { flavours, caches, with_armor };
+		auto set_density_from_sprint_speed = [&](auto& meta, const real32 sprint_speed) {
+			const auto in = sprint_speed_input { flavours, caches };
 
 			meta.template get<invariants::fixtures>().density = calc_density_for_sprint_speed(meta, sprint_speed, in);
 			meta.template get<invariants::item>().space_occupied_per_charge = calc_gun_space_occupied_per_charge(meta);

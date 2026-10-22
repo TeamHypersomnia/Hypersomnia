@@ -93,8 +93,11 @@ struct audiovisual_advance_input {
 
 	const bool gore_enabled;
 	const bool bullet_trails_enabled;
-	const bool integerize_viewed_character;
-	const float integerize_zoom;
+	/*
+		Set when the viewed character snaps to whole pixels - of the world scaled by this zoom.
+	*/
+
+	const std::optional<float> integerize_viewed_character_zoom;
 	const throw_trajectory_flags throw_trajectories;
 	const float throw_trajectory_gap;
 

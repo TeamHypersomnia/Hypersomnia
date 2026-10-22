@@ -38,3 +38,8 @@ constexpr float BALANCE_BOT_FOV_MULT_VERY_EASY = 0.8f;
 constexpr float BALANCE_BOT_FOV_MULT_EASY = 0.85f;
 constexpr float BALANCE_BOT_FOV_MULT_MEDIUM = 0.9f;
 constexpr float BALANCE_BOT_FOV_MULT_HARD = 0.95f;
+
+/*
+	The electric armor slows the movement down - the sprint speeds of the weapons are set with it on.
+*/
+constexpr float BALANCE_ELECTRIC_ARMOR_MOVEMENT_SPEED_MULT = 0.92f;

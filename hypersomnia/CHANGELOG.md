@@ -16,6 +16,7 @@
 - **Balance (nerf):** sniper bullets are slower.
 	- At 0.75x speed, you can dodge every gun but the snipers.
 	- This made the snipers instantly overpowered.
+
 	| Weapon | Before | After |
 	|---|---|---|
 	| Awka | 14000 | **10500** |
@@ -23,6 +24,7 @@
 	| BullDup 2000 | 9000 | **8500** |
 - **Balance (buff):** sprint faster with SMGs.
 	- Otherwise there was no point buying them versus rifles.
+
 	| Weapon | Before | After |
 	|---|---|---|
 	| Pro90 | 913 | **917** |
@@ -30,6 +32,7 @@
 	| Zamiec | 885 | **910** |
 	| Szczur | 867 | **902** |
 - **Balance:** other weapons.
+
 	| Weapon | Stat | Before | After | Type |
 	|---|---|---|---|---|
 	| BullDup 2000 | Time between shots | 230 ms | **290 ms** | Nerf |
@@ -38,11 +41,12 @@
 	| Bulwark | Penetration | 60 | **70** | Buff |
 	| Hunter | Sprint speed | 952 | **900** | Nerf |
 	| Ao44 | Sprint speed | 880 | **830** | Nerf |
-- **Bots defend smarter:** a Metropolis bot goes to help where a teammate died.
+- **Bots defend smarter:** a Metropolis bot goes to help where a teammate died or is fighting.
 	- Example: one bot per bombsite.
 	- Bot on A dies.
 	- Previously the bot on B would stay.
-	- Now it will rotate.
+	- Now it will rotate - and hold A.
+	- After a fight that ended, one bot goes back to the empty site in 10 seconds.
 
 ### Fixed
 

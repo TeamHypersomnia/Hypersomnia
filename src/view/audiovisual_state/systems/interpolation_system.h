@@ -62,7 +62,7 @@ public:
 			*/
 
 			result.pos *= integerize_zoom;
-			result.pos.discard_fract();
+			result.pos.floor_fract();
 			result.pos /= integerize_zoom;
 		}
 

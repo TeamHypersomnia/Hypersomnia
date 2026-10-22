@@ -201,9 +201,10 @@ struct arena_mode_ai_arena_meta {
 	Held in arena_mode per faction.
 
 	hot_bombsite: Metropolis only - the patrol_letter of the bot that most recently
-	died or entered combat; stays until the next such event or the round end.
+	died or entered combat on its site (not in transit to it).
 	Rebalancing sends one more bot there even when the sites differ by only 1,
 	and never takes bots away from it - a short fight would otherwise send the help right back.
+	It cools down hot_bombsite_cooldown_secs after the last death or fight there, or at the round end.
 */
 
 struct arena_mode_ai_team_state {
@@ -216,7 +217,15 @@ struct arena_mode_ai_team_state {
 	entity_id bot_with_bomb_retrieval_mission;
 	bool bomb_plant_handled = false;
 	marker_letter_type hot_bombsite = marker_letter_type::COUNT;
+	real32 hot_bombsite_active_secs = 0.0f;
 	// END GEN INTROSPECTOR
+
+	static constexpr real32 hot_bombsite_cooldown_secs = 10.0f;
+
+	void mark_hot_bombsite(const marker_letter_type letter, const real32 now_secs) {
+		hot_bombsite = letter;
+		hot_bombsite_active_secs = now_secs;
+	}
 
 	void round_reset() {
 		/*
@@ -229,6 +238,7 @@ struct arena_mode_ai_team_state {
 		bot_with_bomb_retrieval_mission = entity_id::dead();
 		bomb_plant_handled = false;
 		hot_bombsite = marker_letter_type::COUNT;
+		hot_bombsite_active_secs = 0.0f;
 	}
 
 	void clear_waypoint_assignments() {
@@ -448,6 +458,7 @@ struct arena_mode_ai_state {
 	entity_id perceived_enemy;
 
 	marker_letter_type patrol_letter = marker_letter_type::COUNT;
+	marker_letter_type reached_patrol_letter = marker_letter_type::COUNT;
 	bool loss_reported = false;
 	push_phase_type push_phase = push_phase_type::NOT_DECIDED;
 	bool recoil_cooldown = false;
@@ -515,12 +526,20 @@ struct arena_mode_ai_state {
 		return ::is_behavior<ai_behavior_combat>(last_behavior);
 	}
 
+	/*
+		Reached the site of its patrol_letter - not in transit to it.
+	*/
+	bool is_on_patrol_site() const {
+		return patrol_letter != marker_letter_type::COUNT && reached_patrol_letter == patrol_letter;
+	}
+
 	void round_reset() {
 		last_behavior = ai_behavior_idle();
 		combat_target.clear();
 		alertness.clear();
 		perceived_enemy = {};
 		patrol_letter = marker_letter_type::COUNT;
+		reached_patrol_letter = marker_letter_type::COUNT;
 		loss_reported = false;
 		push_phase = push_phase_type::NOT_DECIDED;
 		recoil_cooldown = false;

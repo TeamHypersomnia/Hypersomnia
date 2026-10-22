@@ -190,10 +190,7 @@ static void draw_token(const std::string& token, const augs::markdown_span_style
 /*
 	Word-wraps a line of mixed styles.
 	Wrapped lines start at the x the line started at, giving bullets a hanging indent.
-*/
-
-/*
-	Table cells don't wrap - their columns fit the widest cell instead.
+	Table cells don't wrap (wrap = false) - their columns fit the widest cell instead.
 */
 
 static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba base_col, const bool wrap = true) {
@@ -233,14 +230,16 @@ static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba
 			if (!line_empty) {
 				ImGui::SameLine(0.0f, 0.0f);
 
-				const auto word_w = ImGui::CalcTextSize(word.c_str()).x + (bold ? 1.0f : 0.0f);
+				if (wrap) {
+					const auto word_w = ImGui::CalcTextSize(word.c_str()).x + (bold ? 1.0f : 0.0f);
 
-				if (wrap && ImGui::GetCursorPosX() + word_w > wrap_right) {
-					ImGui::NewLine();
-					ImGui::SetCursorPosX(start_x);
+					if (ImGui::GetCursorPosX() + word_w > wrap_right) {
+						ImGui::NewLine();
+						ImGui::SetCursorPosX(start_x);
 
-					if (word.empty()) {
-						continue;
+						if (word.empty()) {
+							continue;
+						}
 					}
 				}
 			}
@@ -254,6 +253,8 @@ static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba
 		ImGui::NewLine();
 	}
 }
+
+static constexpr std::size_t max_table_columns = 64;
 
 static void draw_entry(const changelog_entry& entry, changelog_view_state& state) {
 	using namespace augs::imgui;
@@ -276,6 +277,12 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 	ImGui::Separator();
 
 	const auto indent_w = ImGui::GetFontSize() * 1.2f;
+
+	/*
+		The column of the bullet markers - a table under a bullet starts where its text does.
+	*/
+
+	const auto marker_w = ImGui::GetFontSize() * 1.1f;
 	const auto& lines = entry.lines;
 
 	/*
@@ -335,7 +342,7 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 			}
 		}
 
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + font_h * 1.1f);
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + marker_w);
 		::draw_spans(line.spans, col);
 	};
 
@@ -434,11 +441,17 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 			++end;
 		}
 
+		/*
+			ImGui asserts on too many columns - possible only with a typo in the local CHANGELOG.md.
+		*/
+
+		num_columns = std::min(num_columns, max_table_columns);
+
 		if (num_columns == 0) {
 			return end;
 		}
 
-		const auto total_indent = indent_w * level + ImGui::GetFontSize() * 1.1f;
+		const auto total_indent = indent_w * level + marker_w;
 
 		ImGui::Indent(total_indent);
 
@@ -458,7 +471,7 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 
 				ImGui::TableNextRow();
 
-				for (std::size_t c = 0; c < row.cells.size(); ++c) {
+				for (std::size_t c = 0; c < std::min(row.cells.size(), num_columns); ++c) {
 					ImGui::TableSetColumnIndex(static_cast<int>(c));
 					::draw_spans(row.cells[c], col, false);
 				}

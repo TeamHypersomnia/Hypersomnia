@@ -182,7 +182,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 			const bool bar_over_character = is_teammate && nickname_position == teammate_nickname_position_type::UNDER_CHARACTER;
 			const auto bar_line_offset = vec2(0, bar_over_character ? -outermost_circle_radius : outermost_circle_radius);
-			const auto bar_line = vec2i(vec2(in.text_camera.to_screen_space(transform.pos + bar_line_offset)).round_fract());
+			const auto bar_line = in.text_camera.to_screen_pixel(transform.pos + bar_line_offset);
 			const auto bar_line_top = bar_line.y - (internal_bar_size.y + 2 * (internal_border_size + external_border_size)) / 2;
 
 			/*
@@ -281,11 +281,11 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						case teammate_nickname_position_type::UNDER_BAR:
 							return vec2i(center_x, bigger_origin.b + nickname_padding);
 						case teammate_nickname_position_type::UNDER_CHARACTER: {
-							const auto under_character = vec2i(vec2(in.text_camera.to_screen_space(transform.pos + vec2(0, outermost_circle_radius))).round_fract());
+							const auto under_character = in.text_camera.to_screen_pixel(transform.pos + vec2(0, outermost_circle_radius));
 							return vec2i(center_x, under_character.y);
 						}
 						default: {
-							const auto over_character = vec2i(vec2(in.text_camera.to_screen_space(transform.pos - vec2(0, outermost_circle_radius))).round_fract());
+							const auto over_character = in.text_camera.to_screen_pixel(transform.pos - vec2(0, outermost_circle_radius));
 							return vec2i(center_x, over_character.y - bbox.y);
 						}
 					}
@@ -493,7 +493,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				auto health_col = info.color;
 				health_col.mult_alpha(teleport_alpha);
 
-				meter_output.aabb_centered(this_tex, vec2(in.text_camera.to_screen_space(transform.pos)).round_fract(), vec2(this_tex.get_original_size()) * circular_bars_size_mult, health_col);
+				meter_output.aabb_centered(this_tex, vec2(in.text_camera.to_screen_pixel(transform.pos)), vec2(this_tex.get_original_size()) * circular_bars_size_mult, health_col);
 
 				const auto push_angles = [&](
 					const float lower_outside, 
@@ -636,7 +636,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 								ammo_color.a = 200;
 								ammo_color.mult_alpha(teleport_alpha);
 
-								meter_output.aabb_centered(this_tex, vec2(in.text_camera.to_screen_space(transform.pos)).round_fract(), ammo_color);
+								meter_output.aabb_centered(this_tex, vec2(in.text_camera.to_screen_pixel(transform.pos)), ammo_color);
 
 								circle_info new_info;
 
@@ -709,7 +709,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					const auto bbox = get_text_bbox(text);
 					
 					const auto cam = in.text_camera;
-					const vec2i screen_space_circle_center = vec2(cam.to_screen_space(transform.pos)).round_fract();
+					const auto screen_space_circle_center = cam.to_screen_pixel(transform.pos);
 					const auto radius = circle_radius * info.circle_radius_mult_for_text;
 					const auto text_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(circle_positioning_zoom * (radius + 6.f), bbox, info.angle) - bbox / 2;
 					//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
@@ -762,7 +762,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 		if (indicators_enabled && indicator_allowed && (is_conscious || show_death_skull) && col.a > 0) {
 			const auto cam = in.text_camera;
-			const vec2i screen_space_circle_center = vec2(cam.to_screen_space(transform.pos)).round_fract();
+			const auto screen_space_circle_center = cam.to_screen_pixel(transform.pos);
 			const auto angle = starting_health_angle + in.color_indicator_angle;
 			const auto bbox = indicator_tex.get_original_size();
 

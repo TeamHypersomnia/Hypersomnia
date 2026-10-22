@@ -1,9 +1,11 @@
 #pragma once
 #include <array>
 #include <algorithm>
+#include "augs/ensure_rel.h"
 #include "augs/math/si_scaling.h"
 #include "augs/misc/convex_partitioned_shape.hpp"
 #include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
+#include "game/balance_params.h"
 #include "game/detail/movement/top_movement_speed.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "view/viewables/image_cache.h"
@@ -12,8 +14,6 @@
 	Weapon densities are set from the sprint speed with the armor on,
 	and the weapon stats report the same speed - so both compute it here.
 */
-
-constexpr real32 electric_armor_movement_speed_mult = 0.92f;
 
 namespace test_flavours {
 	/*
@@ -105,7 +105,6 @@ namespace test_flavours {
 	struct sprint_speed_input {
 		const all_entity_flavours& flavours;
 		const loaded_image_caches_map& caches;
-		const bool with_armor = true;
 	};
 
 	inline real32 calc_character_mass(const sprint_speed_input in) {
@@ -121,9 +120,7 @@ namespace test_flavours {
 	decltype(auto) with_sprint_movement(const sprint_speed_input in, F&& callback) {
 		const auto& character = get_test_flavour(in.flavours, test_controlled_characters::METROPOLIS_SOLDIER);
 		const auto& movement_def = character.template get<invariants::movement>();
-		const auto speed_mult = in.with_armor ? electric_armor_movement_speed_mult : 1.f;
-
-		return callback(movement_def.acceleration_length, speed_mult, movement_def.standard_linear_damping);
+		return callback(movement_def.acceleration_length, BALANCE_ELECTRIC_ARMOR_MOVEMENT_SPEED_MULT, movement_def.standard_linear_damping);
 	}
 
 	/*
@@ -156,6 +153,12 @@ namespace test_flavours {
 		});
 
 		const auto gun_mass = total_mass - calc_character_mass(in) - calc_loaded_mass(gun_meta, in.flavours, in.caches);
+
+		/*
+			Not positive when the speed is at least that of an empty-handed sprint.
+		*/
+
+		ensure_greater(gun_mass, 0.f);
 
 		return gun_mass / calc_attached_mass(gun_meta, 1.f, in.caches);
 	}

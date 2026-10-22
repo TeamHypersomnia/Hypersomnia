@@ -51,7 +51,10 @@ Rules:
 5. Inline: `**bold**`, `*italic*` / `_italic_`, `` `code` ``. Bold is the main emphasis - use it for headline features and `**Balance:**`-style prefixes.
    Links `[text](url)` show only the text. Images `![..](..)` on their own line are dropped.
 6. Tables: `| a | b |` rows, `|---|---|` under the header row (drawn dimmer). Indent the rows with a tab under a bullet
-   so they expand with it, like its nested points. Cells don't wrap - keep them short. Bold marks the new value.
+   so they expand with it, like its nested points. Put an empty line before the header row - without it GitHub
+   glues a table that follows a nested point into that point's text (the game skips empty lines, so both render).
+   Cells don't wrap - keep them short. Bold marks the new value. Two tables at one indent need a line of text
+   between them - an empty line alone glues them into one.
    Balance changes go as a `- **Balance:** <what>.` headline with a table under it, e.g. `| Weapon | Before | After |`, the old value first.
 7. No HTML, no numbered lists (they render as plain paragraphs).
 8. Latin characters only - no arrows (→), emoji or other symbols: the game's fonts have no glyphs for them and show `?`.

@@ -55,6 +55,14 @@ struct camera_cone {
 		return eye.zoom * (world_pos - eye.transform.pos) + screen_size / 2;
 	}
 
+	/*
+		Rounded, not truncated - with a pixel-snapped camera a snapped position lands on e.g. 957.99998.
+	*/
+
+	vec2i to_screen_pixel(const vec2_type world_pos) const {
+		return vec2i(vec2(to_screen_space(world_pos)).round_fract());
+	}
+
 	transform_type to_screen_space(transform_type world) const {
 		world.pos = to_screen_space(world.pos);
 		return world;

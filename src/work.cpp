@@ -5871,8 +5871,7 @@ work_result work(
 
 			viewing_config.gore,
 			viewing_config.drawing.bullet_trails == bullet_trails_mode::FULL,
-			is_camera_pixel_snapped(viewing_config),
-			get_pixel_snap_zoom(viewing_config),
+			is_camera_pixel_snapped(viewing_config) ? std::optional<float>(get_pixel_snap_zoom(viewing_config)) : std::nullopt,
 			throw_trajectory_flags::from(viewing_config.drawing),
 			viewing_config.drawing.throw_trajectory_gap,
 

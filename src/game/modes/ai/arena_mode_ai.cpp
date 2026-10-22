@@ -87,10 +87,13 @@ void update_arena_mode_ai_team(
 	}
 
 	/*
-		Metropolis: a bot that died or got knocked out marks its site as hot, once per loss.
-		Entering combat marks it too - see update_arena_mode_ai.
+		Metropolis: a bot that died or got knocked out on its site marks the site as hot, once per loss.
+		Entering combat there marks it too - see update_arena_mode_ai.
+		A fight still going on the hot site keeps it hot; without one it cools down.
 	*/
 	if (faction == faction_type::METROPOLIS) {
+		const auto now_secs = static_cast<real32>(cosm.get_total_seconds_passed());
+
 		for (auto& bot : only_bot(players)) {
 			if (bot.second.get_faction() != faction_type::METROPOLIS) {
 				continue;
@@ -100,14 +103,27 @@ void update_arena_mode_ai_team(
 
 			if (sentient_and_conscious(cosm[bot.second.controlled_character_id])) {
 				bot_ai.loss_reported = false;
+
+				if (bot_ai.is_on_patrol_site() && bot_ai.patrol_letter == team_state.hot_bombsite && bot_ai.is_in_combat()) {
+					team_state.hot_bombsite_active_secs = now_secs;
+				}
 			}
 			else if (!bot_ai.loss_reported) {
 				bot_ai.loss_reported = true;
 
-				if (bot_ai.patrol_letter != marker_letter_type::COUNT) {
-					team_state.hot_bombsite = bot_ai.patrol_letter;
+				if (bot_ai.is_on_patrol_site()) {
+					team_state.mark_hot_bombsite(bot_ai.patrol_letter, now_secs);
 				}
 			}
+		}
+
+		const bool hot_cooled_down =
+			team_state.hot_bombsite != marker_letter_type::COUNT
+			&& now_secs - team_state.hot_bombsite_active_secs >= arena_mode_ai_team_state::hot_bombsite_cooldown_secs
+		;
+
+		if (hot_cooled_down) {
+			team_state.hot_bombsite = marker_letter_type::COUNT;
 		}
 	}
 
@@ -121,15 +137,24 @@ void update_arena_mode_ai_team(
 	*/
 	if (faction == faction_type::METROPOLIS && !bomb_planted) {
 		auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
-		const auto most = ::find_most_assigned_bombsite(cosm, team_state, arena_meta);
+		auto most = ::find_most_assigned_bombsite(cosm, team_state, arena_meta);
 		const auto hot = team_state.hot_bombsite;
 
 		/*
-			Among equally least-covered sites prefer the hot one.
+			Among equally covered sites, the hot one is preferred as the least covered
+			and avoided as the most covered - so it neither blocks a move from another site nor loses bots.
 		*/
-		if (hot != marker_letter_type::COUNT && hot != least.letter) {
-			if (::count_assigned_waypoints_for_letter(cosm, team_state, hot).first == least.count) {
-				least.letter = hot;
+		if (hot != marker_letter_type::COUNT) {
+			for (const auto letter : arena_meta.get_available_bombsite_letters()) {
+				const auto [count, example] = ::count_assigned_waypoints_for_letter(cosm, team_state, letter);
+
+				if (letter == hot && least.letter != hot && count == least.count) {
+					least = { letter, count, example };
+				}
+
+				if (letter != hot && most.letter == hot && count == most.count) {
+					most = { letter, count, example };
+				}
 			}
 		}
 
@@ -146,6 +171,7 @@ void update_arena_mode_ai_team(
 			for (auto& bot : only_bot(players)) {
 				if (bot.second.controlled_character_id == most.example_bot) {
 					bot.second.ai_state.patrol_letter = least.letter;
+					bot.second.ai_state.reached_patrol_letter = marker_letter_type::COUNT;
 
 					if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(bot.second.ai_state.last_behavior)) {
 						*patrol = ai_behavior_patrol();
@@ -805,6 +831,19 @@ arena_ai_result update_arena_mode_ai(
 	);
 
 	/*
+		The bot reaches its site with the first patrol waypoint of its letter - until then it is in transit.
+	*/
+	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(ai_state.last_behavior)) {
+		if (!patrol->going_to_first_waypoint) {
+			if (const auto waypoint = cosm[patrol->patrol_waypoint]) {
+				if (waypoint.template get<components::marker>().letter == ai_state.patrol_letter) {
+					ai_state.reached_patrol_letter = ai_state.patrol_letter;
+				}
+			}
+		}
+	}
+
+	/*
 		Check if behavior changed - if so, handle transition.
 	*/
 	if (desired_behavior.index() != ai_state.last_behavior.index()) {
@@ -821,14 +860,14 @@ arena_ai_result update_arena_mode_ai(
 		);
 
 		/*
-			A Metropolis bot starting a fight marks its site as hot,
-			so the team rebalancing sends it help.
+			A Metropolis bot starting a fight on its site marks the site as hot,
+			so the team rebalancing sends it help. A fight in transit doesn't - it's not at the site.
 		*/
 		if (bot_faction == faction_type::METROPOLIS
 			&& ::is_behavior<ai_behavior_combat>(desired_behavior)
-			&& ai_state.patrol_letter != marker_letter_type::COUNT
+			&& ai_state.is_on_patrol_site()
 		) {
-			team_state.hot_bombsite = ai_state.patrol_letter;
+			team_state.mark_hot_bombsite(ai_state.patrol_letter, global_time_secs);
 		}
 
 		ai_state.last_behavior = desired_behavior;

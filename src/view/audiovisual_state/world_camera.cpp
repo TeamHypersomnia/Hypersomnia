@@ -34,7 +34,7 @@ vec2 world_camera::snap_to_pixels(const vec2 world_pos, const float zoom) {
 
 		The chased character is integerized too (see interpolation_system::get_interpolated),
 		so the camera is the integer character position plus the smoothed look offset.
-		While that offset grows against the motion, plain truncation sometimes steps
+		While that offset grows against the motion, plain flooring sometimes steps
 		the camera one pixel back, against the direction the character walks - a visible judder.
 
 		So on each axis, a one-pixel step against the motion is skipped
@@ -45,20 +45,19 @@ vec2 world_camera::snap_to_pixels(const vec2 world_pos, const float zoom) {
 		so under linear filtering of a zoomed out camera every frame samples the textures the same way
 		and fine patterns like tiled floors don't crawl as the camera moves.
 		At zoom 1 these are just world pixels.
-	*/
 
-	if (zoom != last_pixel_snapped_zoom) {
-		last_pixel_snapped_pos.reset();
-		last_pixel_snapped_zoom = zoom;
-	}
+		Floored, not truncated - truncation maps [-1, 1) to 0, a double-width pixel at the axes.
+		The previous pixel is kept in world units, so a zoom changing every frame (edge zoomout)
+		still skips the steps against the motion - at the new zoom it is the nearest pixel.
+	*/
 
 	const auto pos = world_pos * zoom;
 
 	auto snapped = pos;
-	snapped.discard_fract();
+	snapped.floor_fract();
 
 	if (last_pixel_snapped_pos.has_value()) {
-		const auto previous = *last_pixel_snapped_pos;
+		const auto previous = (*last_pixel_snapped_pos * zoom).round_fract();
 		const auto motion = player_position_at_previous_step - player_position_previously_seen;
 
 		auto keep_previous_if_against_motion = [](float& snapped_axis, const float previous_axis, const float pos_axis, const float motion_axis) {
@@ -74,8 +73,9 @@ vec2 world_camera::snap_to_pixels(const vec2 world_pos, const float zoom) {
 		keep_previous_if_against_motion(snapped.y, previous.y, pos.y, motion.y);
 	}
 
-	last_pixel_snapped_pos = snapped;
-	return snapped / zoom;
+	const auto snapped_world_pos = snapped / zoom;
+	last_pixel_snapped_pos = snapped_world_pos;
+	return snapped_world_pos;
 }
 
 camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const

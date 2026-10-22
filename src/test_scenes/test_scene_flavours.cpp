@@ -3,9 +3,9 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/remove_cref.h"
 #include "game/common_state/entity_flavours.h"
+#include "game/balance_params.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "test_scenes/ingredients/ingredients.h"
-#include "test_scenes/ingredients/sprint_speed.h"
 #include "test_scenes/test_scene_animations.h"
 #include "test_scenes/test_scene_images.h"
 
@@ -441,7 +441,7 @@ namespace test_flavours {
 			tool.pe_absorption.hp = 1.0f;
 			tool.pe_absorption.cp = 20.f;
 			tool.glow_color = rgba::faction_color;
-			tool.movement_speed_mult = electric_armor_movement_speed_mult;
+			tool.movement_speed_mult = BALANCE_ELECTRIC_ARMOR_MOVEMENT_SPEED_MULT;
 			meta.set(tool);
 		}
 

@@ -42,7 +42,6 @@ struct world_camera {
 	vec2 player_position_at_previous_step;
 
 	std::optional<vec2> last_pixel_snapped_pos;
-	float last_pixel_snapped_zoom = 1.0f;
 
 	augs::smooth_value_field additional_position_smoothing;
 	float target_zoom = 1.0f;

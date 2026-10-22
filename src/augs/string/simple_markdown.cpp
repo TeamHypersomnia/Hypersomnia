@@ -255,14 +255,29 @@ std::vector<augs::markdown_line> augs::parse_markdown(const std::string& source)
 
 		if (trimmed.front() == '|') {
 			const auto cells = split_table_row(trimmed);
+			const auto level = ::indent_level(line.substr(0, ws_end));
+			const auto num_lines = raw_lines.size();
 
-			if (is_header_separator(cells)) {
-				if (!raw_lines.empty() && raw_lines.back().type == L::TABLE_ROW) {
-					raw_lines.back().is_header = true;
-				}
+			auto is_row_at_level = [&](const std::size_t i) {
+				return raw_lines[i].type == L::TABLE_ROW && raw_lines[i].level == level;
+			};
+
+			/*
+				The separator marks the header only right under the first row of a table -
+				anywhere else a row of dashes is just a row.
+			*/
+
+			const bool under_first_row =
+				num_lines >= 1
+				&& is_row_at_level(num_lines - 1)
+				&& !(num_lines >= 2 && is_row_at_level(num_lines - 2))
+			;
+
+			if (under_first_row && is_header_separator(cells)) {
+				raw_lines.back().is_header = true;
 			}
 			else {
-				raw_lines.push_back({ L::TABLE_ROW, ::indent_level(line.substr(0, ws_end)), "", cells });
+				raw_lines.push_back({ L::TABLE_ROW, level, "", cells });
 			}
 
 			continuable = false;
@@ -463,5 +478,26 @@ TEST_CASE("SimpleMarkdownTables", "[markdown]") {
 	REQUIRE(lines[4].type == L::TABLE_ROW);
 	REQUIRE(lines[4].level == 0);
 	REQUIRE(lines[4].cells[1][0].text == "-");
+}
+
+TEST_CASE("SimpleMarkdownTableDashRows", "[markdown]") {
+	using namespace augs;
+
+	/*
+		Only the row under the first one is a separator - a row of dashes further down is data.
+	*/
+
+	const auto lines = parse_markdown(
+		"| a | b |\n"
+		"|---|---|\n"
+		"| 1 | 2 |\n"
+		"| - | - |\n"
+	);
+
+	REQUIRE(lines.size() == 3);
+	REQUIRE(lines[0].is_header);
+	REQUIRE(!lines[1].is_header);
+	REQUIRE(!lines[2].is_header);
+	REQUIRE(lines[2].cells[0][0].text == "-");
 }
 #endif
