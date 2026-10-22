@@ -4071,7 +4071,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false);
 			only_allow_mag(meta, test_container_items::ZAMIEC_MAGAZINE);
-			set_density_from_sprint_speed(meta, 900.f);
+			set_density_from_sprint_speed(meta, 905.f);
 			meta.get<invariants::item>().standard_price = 2400;
 			set_chambering_duration_ms(meta, 600.f);
 

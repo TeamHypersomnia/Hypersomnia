@@ -29,7 +29,7 @@
 	|---|---|---|
 	| Pro90 | 913 | **917** |
 	| Cyberspray | 913 | **917** |
-	| Zamiec | 885 | **900** |
+	| Zamiec | 885 | **905** |
 	| Szczur | 867 | **902** |
 - **Balance:** other weapons.
 
