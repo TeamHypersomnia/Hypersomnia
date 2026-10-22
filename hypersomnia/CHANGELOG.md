@@ -29,7 +29,7 @@
 	|---|---|---|
 	| Pro90 | 913 | **917** |
 	| Cyberspray | 913 | **917** |
-	| Zamiec | 885 | **910** |
+	| Zamiec | 885 | **900** |
 	| Szczur | 867 | **902** |
 - **Balance:** other weapons.
 
@@ -39,6 +39,8 @@
 	| Datum | Bullet speed | 6800 | **5700** | Nerf |
 	| Datum | Price | $4600 | **$4000** | Buff |
 	| Bulwark | Penetration | 60 | **70** | Buff |
+	| Zamiec | Price | $2200 | **$2400** | Nerf |
+	| Cyberspray | Price | $2400 | **$2200** | Buff |
 	| Hunter | Sprint speed | 952 | **900** | Nerf |
 	| Ao44 | Sprint speed | 880 | **830** | Nerf |
 - **Bots defend smarter:** a Metropolis bot goes to help where a teammate died or is fighting.
