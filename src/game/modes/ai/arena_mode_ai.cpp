@@ -87,15 +87,62 @@ void update_arena_mode_ai_team(
 	}
 
 	/*
+		Metropolis: a bot that died or got knocked out marks its site as hot, once per loss.
+		Entering combat marks it too - see update_arena_mode_ai.
+	*/
+	if (faction == faction_type::METROPOLIS) {
+		for (auto& bot : only_bot(players)) {
+			if (bot.second.get_faction() != faction_type::METROPOLIS) {
+				continue;
+			}
+
+			auto& bot_ai = bot.second.ai_state;
+
+			if (sentient_and_conscious(cosm[bot.second.controlled_character_id])) {
+				bot_ai.loss_reported = false;
+			}
+			else if (!bot_ai.loss_reported) {
+				bot_ai.loss_reported = true;
+
+				if (bot_ai.patrol_letter != marker_letter_type::COUNT) {
+					team_state.hot_bombsite = bot_ai.patrol_letter;
+				}
+			}
+		}
+	}
+
+	/*
 		Metropolis: rebalance patrol_letter distribution once per step.
 		If any bot's letter is over-covered by 2+ compared to the least-covered,
 		switch that bot to the least-covered letter.
+		If they differ by only 1, do it only when the least-covered site is hot -
+		so with one bot per site, the survivor goes where its teammate fell or fights.
+		Bots in combat hold no patrol waypoint, so they count as missing from their site.
 	*/
 	if (faction == faction_type::METROPOLIS && !bomb_planted) {
-		const auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
+		auto least = ::find_least_assigned_bombsite(cosm, team_state, arena_meta);
 		const auto most = ::find_most_assigned_bombsite(cosm, team_state, arena_meta);
+		const auto hot = team_state.hot_bombsite;
 
-		if (most.count >= least.count + 2 && sentient_and_conscious(cosm[most.example_bot])) {
+		/*
+			Among equally least-covered sites prefer the hot one.
+		*/
+		if (hot != marker_letter_type::COUNT && hot != least.letter) {
+			if (::count_assigned_waypoints_for_letter(cosm, team_state, hot).first == least.count) {
+				least.letter = hot;
+			}
+		}
+
+		const bool least_is_hot = hot != marker_letter_type::COUNT && least.letter == hot;
+
+		const bool should_move =
+			most.letter != hot && (
+				most.count >= least.count + 2 ||
+				(most.count == least.count + 1 && least_is_hot)
+			)
+		;
+
+		if (should_move && sentient_and_conscious(cosm[most.example_bot])) {
 			for (auto& bot : only_bot(players)) {
 				if (bot.second.controlled_character_id == most.example_bot) {
 					bot.second.ai_state.patrol_letter = least.letter;
@@ -772,6 +819,17 @@ arena_ai_result update_arena_mode_ai(
 			desired_behavior,
 			ai_state
 		);
+
+		/*
+			A Metropolis bot starting a fight marks its site as hot,
+			so the team rebalancing sends it help.
+		*/
+		if (bot_faction == faction_type::METROPOLIS
+			&& ::is_behavior<ai_behavior_combat>(desired_behavior)
+			&& ai_state.patrol_letter != marker_letter_type::COUNT
+		) {
+			team_state.hot_bombsite = ai_state.patrol_letter;
+		}
 
 		ai_state.last_behavior = desired_behavior;
 	}

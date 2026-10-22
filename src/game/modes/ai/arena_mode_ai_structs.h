@@ -199,6 +199,11 @@ struct arena_mode_ai_arena_meta {
 /*
 	Per-team common AI state.
 	Held in arena_mode per faction.
+
+	hot_bombsite: Metropolis only - the patrol_letter of the bot that most recently
+	died or entered combat; stays until the next such event or the round end.
+	Rebalancing sends one more bot there even when the sites differ by only 1,
+	and never takes bots away from it - a short fight would otherwise send the help right back.
 */
 
 struct arena_mode_ai_team_state {
@@ -210,6 +215,7 @@ struct arena_mode_ai_team_state {
 	entity_id bot_with_defuse_mission;
 	entity_id bot_with_bomb_retrieval_mission;
 	bool bomb_plant_handled = false;
+	marker_letter_type hot_bombsite = marker_letter_type::COUNT;
 	// END GEN INTROSPECTOR
 
 	void round_reset() {
@@ -222,6 +228,7 @@ struct arena_mode_ai_team_state {
 		bot_with_defuse_mission = entity_id::dead();
 		bot_with_bomb_retrieval_mission = entity_id::dead();
 		bomb_plant_handled = false;
+		hot_bombsite = marker_letter_type::COUNT;
 	}
 
 	void clear_waypoint_assignments() {
@@ -441,6 +448,7 @@ struct arena_mode_ai_state {
 	entity_id perceived_enemy;
 
 	marker_letter_type patrol_letter = marker_letter_type::COUNT;
+	bool loss_reported = false;
 	push_phase_type push_phase = push_phase_type::NOT_DECIDED;
 	bool recoil_cooldown = false;
 	bool sprint_cooldown = false;
@@ -513,6 +521,7 @@ struct arena_mode_ai_state {
 		alertness.clear();
 		perceived_enemy = {};
 		patrol_letter = marker_letter_type::COUNT;
+		loss_reported = false;
 		push_phase = push_phase_type::NOT_DECIDED;
 		recoil_cooldown = false;
 		sprint_cooldown = false;

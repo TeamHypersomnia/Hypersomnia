@@ -38,6 +38,11 @@
 	| Bulwark | Penetration | 60 | **70** | Buff |
 	| Hunter | Sprint speed | 952 | **900** | Nerf |
 	| Ao44 | Sprint speed | 880 | **830** | Nerf |
+- **Bots defend smarter:** a Metropolis bot goes to help where a teammate died.
+	- Example: one bot per bombsite.
+	- Bot on A dies.
+	- Previously the bot on B would stay.
+	- Now it will rotate.
 
 ## [4.1.0] - 2026-10-21
 
