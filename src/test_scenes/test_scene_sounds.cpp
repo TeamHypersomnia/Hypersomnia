@@ -18,6 +18,18 @@
 #include "augs/filesystem/find_path.h"
 #include "augs/log.h"
 
+/*
+	Sounds with their own id that still play another sound's file,
+	so they can get a file of their own without touching the code that uses them.
+*/
+
+static auto get_file_sound_id(const test_scene_sound_id id) {
+	switch (id) {
+		case test_scene_sound_id::PED_SHIELD_IMPACT: return test_scene_sound_id::EXPLOSION;
+		default: return id;
+	}
+}
+
 void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 	using test_id_type = test_scene_sound_id;
 
@@ -30,7 +42,7 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 			return;
 		}
 
-		const auto stem = augs::path_type("sfx") / to_lowercase(augs::enum_to_string(enum_id));
+		const auto stem = augs::path_type("sfx") / to_lowercase(augs::enum_to_string(::get_file_sound_id(enum_id)));
 		using path = augs::path_type;
 
 		sound_definition definition;
