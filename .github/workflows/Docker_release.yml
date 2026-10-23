@@ -1,0 +1,141 @@
+name: Docker release
+
+# The server image for every release: pushing a version tag (e.g. 4.2.0) publishes
+# ghcr.io/teamhypersomnia/hypersomnia-server:<tag> and :latest.
+#
+# The image takes the AppImage from hypersomnia.io/builds/latest (see Dockerfile), which only changes
+# when a build is signed and deployed. So this waits until the deployed AppImage is exactly the one
+# built from the tagged commit - the image is then never a release behind, and never ahead of the
+# players' clients either. Deploying after pushing the tag is fine; it can also be run by hand.
+
+on:
+  push:
+    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag to publish, e.g. 4.2.0'
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  container-publish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+      id-token: write
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE: ghcr.io/teamhypersomnia/hypersomnia-server
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+      DEPLOYED_URL: https://hypersomnia.io/builds/latest/Hypersomnia-Headless.AppImage
+
+    steps:
+      - name: Checkout the tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Wait for the headless build of the tagged commit
+        run: |
+          sha=$(git rev-parse HEAD)
+          echo "Tag $TAG is $sha"
+
+          # Pushed together with its commit, the tag may be ahead of the build - wait for it (up to 2 hours).
+          for i in $(seq 1 120); do
+            run_id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow LinuxHeadless_build.yml --commit "$sha" \
+              --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+
+            if [ -n "$run_id" ]; then
+              echo "Headless build: run $run_id"
+              echo "RUN_ID=$run_id" >> "$GITHUB_ENV"
+              exit 0
+            fi
+
+            echo "No successful headless build of $sha yet, waiting..."
+            sleep 60
+          done
+
+          echo "::error::No successful Linux Headless build of $sha - rerun it, then this workflow (Run workflow, tag $TAG)."
+          exit 1
+
+      - name: Download the AppImage built from the tag
+        run: |
+          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n LinuxHeadless-binaries -D built
+          sha256sum built/Hypersomnia-Headless.AppImage
+
+      - name: Wait until this build is the deployed one
+        run: |
+          expected=$(sha256sum built/Hypersomnia-Headless.AppImage | cut -d' ' -f1)
+
+          # Up to 3 hours for the build to be signed and deployed.
+          for i in $(seq 1 180); do
+            deployed=$(curl -sfL "$DEPLOYED_URL" | sha256sum | cut -d' ' -f1)
+
+            if [ "$deployed" = "$expected" ]; then
+              echo "hypersomnia.io serves the $TAG build ($expected)."
+              exit 0
+            fi
+
+            echo "hypersomnia.io serves $deployed, not the $TAG build $expected yet - waiting for the deploy..."
+            sleep 60
+          done
+
+          echo "::error::$TAG was not deployed to hypersomnia.io within 3 hours - deploy it, then run this workflow by hand (Run workflow, tag $TAG)."
+          exit 1
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.10.1
+        with:
+          cosign-release: "v2.6.3"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          no-cache: true
+          tags: |
+            ${{ env.IMAGE }}:${{ env.TAG }}
+            ${{ env.IMAGE }}:latest
+
+      # Before anything is published: a wrong version never reaches :latest.
+      - name: Check the version inside the image
+        run: |
+          version=$(docker run --rm --entrypoint ./Hypersomnia-Headless.AppImage "$IMAGE:$TAG" --appimage-extract-and-run --version | grep -m1 'Hypersomnia version' || true)
+          echo "$version"
+
+          if [ "$version" != "Hypersomnia version $TAG" ]; then
+            echo "::error::The image reports '$version', expected 'Hypersomnia version $TAG'."
+            exit 1
+          fi
+
+      - name: Push
+        run: |
+          docker push "$IMAGE:$TAG"
+          docker push "$IMAGE:latest"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE:$TAG" | cut -d@ -f2)
+          echo "Pushed $IMAGE@$digest"
+          echo "DIGEST=$digest" >> "$GITHUB_ENV"
+
+      - name: Sign the image
+        run: |
+          cosign sign --yes "$IMAGE@$DIGEST"
