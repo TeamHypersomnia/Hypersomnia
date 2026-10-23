@@ -13,10 +13,36 @@
 	implementation serializes concurrent invocations and persists the state
 	atomically before returning, so a crash after this call sees the result on
 	resume - no replay of finished matches.
+
+	An open match of the first round has its team_a/b_player_ids filled by the runner first - the coordinator
+	makes its teams of them. Closed by Close round 1: a walkover of team a (whoever waited), or with both
+	rosters empty, an empty server that's gone.
 */
-using tournament_commit_match_result_fn = std::function<
-	void(tournament_match&, uint32_t winner_team_index, float duration_secs, uint32_t team_a_score, uint32_t team_b_score)
->;
+
+struct tournament_match_outcome {
+	bool team_a_won = true;
+	float duration_secs = 0.f;
+	uint32_t team_a_score = 0;
+	uint32_t team_b_score = 0;
+	bool walkover = false;
+
+	/*
+		An open match's teams - set into the match under the coordinator's lock, as other matches' threads
+		may be saving the state meanwhile.
+	*/
+
+	std::vector<account_id_string> open_team_a;
+	std::vector<account_id_string> open_team_b;
+
+	/*
+		Their nicknames, in the same order - the later rounds' servers are named by them, not by the account ids.
+	*/
+
+	std::vector<std::string> open_names_a;
+	std::vector<std::string> open_names_b;
+};
+
+using tournament_commit_match_result_fn = std::function<void(tournament_match&, const tournament_match_outcome&)>;
 
 struct tournament_coordinator_dependencies {
 	/*
@@ -71,12 +97,15 @@ class tournament_coordinator {
 public:
 	tournament_coordinator(
 		tournament_config config,
-		augs::path_type config_file_path,
 		augs::path_type state_file_path,
 		tournament_coordinator_dependencies deps
 	);
 
-	void run();
+	/*
+		False if the same tournament (the same flags) was already played to the end here - it doesn't start again.
+	*/
+
+	bool run();
 
 private:
 	bool finished() const;
@@ -91,13 +120,16 @@ private:
 	void cleanup() const;
 
 	std::string make_server_name_for(const tournament_match&) const;
+	void pair_open_first_round();
+	std::optional<augs::path_type> find_completed_archive() const;
 
-	void commit_match_result(tournament_match& m, uint32_t winner_team_index, float duration_secs, uint32_t team_a_score, uint32_t team_b_score);
+	void commit_match_result(tournament_match& m, const tournament_match_outcome&);
+	uint32_t add_team_of(const std::vector<account_id_string>&, const std::vector<std::string>& nicknames);
 
 	tournament_config cfg;
 	tournament_state state;
-	augs::path_type config_path;
 	augs::path_type state_path;
+	bool resumed = false;
 	tournament_coordinator_dependencies deps;
 
 	mutable std::mutex state_lk;

@@ -15,6 +15,7 @@ using account_id_string = std::string;
 struct tournament_team_state {
 	// GEN INTROSPECTOR struct tournament_team_state
 	std::vector<account_id_string> player_ids;
+	std::vector<std::string> nicknames;
 	float skill = 0.f;
 	bool eliminated = false;
 	// END GEN INTROSPECTOR
@@ -23,16 +24,25 @@ struct tournament_team_state {
 struct tournament_match_result {
 	// GEN INTROSPECTOR struct tournament_match_result
 	uint32_t winner_team_index = 0;
+	bool walkover = false;
 	float duration_secs = 0.f;
 	uint32_t team_a_score = 0;
 	uint32_t team_b_score = 0;
 	// END GEN INTROSPECTOR
 };
 
+/*
+	A team not known yet: an open match of the first round, or nobody on a side of it.
+*/
+
+inline constexpr uint32_t no_tournament_team_v = static_cast<uint32_t>(-1);
+
 struct tournament_match {
 	// GEN INTROSPECTOR struct tournament_match
 	uint32_t team_a_index = 0;
 	uint32_t team_b_index = 0;
+	uint32_t open_team_size = 0;
+	bool closed_empty = false;
 	std::vector<account_id_string> team_a_player_ids;
 	std::vector<account_id_string> team_b_player_ids;
 	std::vector<account_id_string> spectator_player_ids;

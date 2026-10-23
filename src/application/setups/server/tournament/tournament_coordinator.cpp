@@ -10,6 +10,7 @@
 #include "augs/templates/algorithm_templates.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/filesystem/file.h"
+#include "augs/readwrite/json_readwrite.h"
 
 namespace {
 	uint32_t next_pow2(const uint32_t n) {
@@ -29,12 +30,10 @@ namespace {
 
 tournament_coordinator::tournament_coordinator(
 	tournament_config in_cfg,
-	augs::path_type in_config_path,
 	augs::path_type in_state_path,
 	tournament_coordinator_dependencies in_deps
 ) :
 	cfg(std::move(in_cfg)),
-	config_path(std::move(in_config_path)),
 	state_path(std::move(in_state_path)),
 	deps(std::move(in_deps))
 {
@@ -76,6 +75,7 @@ tournament_coordinator::tournament_coordinator(
 		}
 		else {
 			state = *loaded;
+			resumed = true;
 			LOG("Tournament: resumed from %x at stage %x.", state_path.string(), state.stage_index);
 		}
 	}
@@ -84,11 +84,64 @@ tournament_coordinator::tournament_coordinator(
 }
 
 bool tournament_coordinator::finished() const {
+	/*
+		The open first round has no teams yet - they come from its matches.
+	*/
+
+	if (cfg.is_open() && state.stage_index == 0) {
+		return false;
+	}
+
 	return state.tournament_finished();
+}
+
+/*
+	The archived state of this very tournament (the same hash of its flags), if it was played to the end here.
+*/
+
+std::optional<augs::path_type> tournament_coordinator::find_completed_archive() const {
+	const auto dir = state_path.parent_path();
+	const auto current_hash = cfg.compute_hash();
+
+	try {
+		for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+			const auto name = entry.path().filename().string();
+
+			if (name.rfind("tournament.completed.", 0) != 0 || name.find(".state.json") == std::string::npos) {
+				continue;
+			}
+
+			if (const auto archived = tournament_state::load(entry.path()); archived && archived->config_hash == current_hash) {
+				return entry.path();
+			}
+		}
+	}
+	catch (const std::exception& err) {
+		LOG("Tournament: could not look for the finished tournaments in %x: %x", dir.string(), err.what());
+	}
+
+	return std::nullopt;
+}
+
+uint32_t tournament_coordinator::add_team_of(const std::vector<account_id_string>& player_ids, const std::vector<std::string>& nicknames) {
+	tournament_team_state t;
+	t.player_ids = player_ids;
+	t.nicknames = nicknames;
+	state.teams.push_back(std::move(t));
+
+	return static_cast<uint32_t>(state.teams.size() - 1);
 }
 
 void tournament_coordinator::initialize_state_if_fresh() {
 	if (state.initialized) {
+		return;
+	}
+
+	if (cfg.is_open()) {
+		state.stage_index = 0;
+		state.initialized = true;
+
+		LOG("Tournament: an open first round for %x players, %x per team.", cfg.open_players, cfg.open_team_size);
 		return;
 	}
 
@@ -138,8 +191,40 @@ void tournament_coordinator::initialize_state_if_fresh() {
 	LOG("Tournament: initialized with %x teams.", N);
 }
 
+/*
+	A server per pair of the bracket: 16 players 1v1 - 8 servers, 5 players - 4 (the bracket of 8).
+	Whoever waits alone on one when round 1 is closed advances without playing.
+*/
+
+void tournament_coordinator::pair_open_first_round() {
+	const auto bracket = next_pow2(std::max(2u, cfg.num_teams()));
+	const auto num_servers = bracket / 2;
+
+	uint16_t port_cursor = deps.base_port;
+
+	for (uint32_t i = 0; i < num_servers; ++i) {
+		tournament_match m;
+		m.team_a_index = no_tournament_team_v;
+		m.team_b_index = no_tournament_team_v;
+		m.open_team_size = cfg.open_team_size;
+		m.port = port_cursor++;
+		m.arena_and_mode = cfg.arenas.front();
+		m.heartbeat_ranked_type = static_cast<uint8_t>(bracket == 2 ? ranked_server_type::TOURNAMENT_FINALS : ranked_server_type::TOURNAMENT_MID);
+		m.server_name = typesafe_sprintf("Match #%x (any pair)", i + 1);
+
+		state.current_stage_matches.push_back(std::move(m));
+	}
+
+	LOG("Tournament: round 1 open - %x servers, the first ones there make each match.", num_servers);
+}
+
 void tournament_coordinator::pair_teams() {
 	state.current_stage_matches.clear();
+
+	if (cfg.is_open() && state.stage_index == 0) {
+		pair_open_first_round();
+		return;
+	}
 
 	auto alive = state.surviving_team_indices();
 
@@ -150,8 +235,12 @@ void tournament_coordinator::pair_teams() {
 	std::vector<uint32_t> playing = alive;
 	std::vector<uint32_t> getting_bye;
 
-	if (state.stage_index == 0) {
-		const auto N = static_cast<uint32_t>(alive.size());
+	/*
+		Byes whenever the teams left aren't 2, 4, 8...: in the first round of listed teams,
+		or after an open first round that fewer came to.
+	*/
+
+	if (const auto N = static_cast<uint32_t>(alive.size()); next_pow2(N) != N) {
 		const auto target = next_pow2(N);
 		const auto byes = target > N ? target - N : 0u;
 
@@ -287,6 +376,10 @@ void tournament_coordinator::pair_teams() {
 }
 
 std::string tournament_coordinator::make_server_name_for(const tournament_match& m) const {
+	/*
+		By the nicknames, if known - a team from an open first round is account ids otherwise.
+	*/
+
 	auto stringify = [](const tournament_team_state& t) {
 		std::string s = "[";
 
@@ -295,7 +388,8 @@ std::string tournament_coordinator::make_server_name_for(const tournament_match&
 				s += ", ";
 			}
 
-			s += t.player_ids[i];
+			const bool has_nickname = i < t.nicknames.size() && !t.nicknames[i].empty();
+			s += has_nickname ? t.nicknames[i] : t.player_ids[i];
 		}
 
 		s += "]";
@@ -305,24 +399,42 @@ std::string tournament_coordinator::make_server_name_for(const tournament_match&
 	return stringify(state.teams[m.team_a_index]) + " vs " + stringify(state.teams[m.team_b_index]);
 }
 
-void tournament_coordinator::commit_match_result(
-	tournament_match& m,
-	const uint32_t winner_team_index,
-	const float duration_secs,
-	const uint32_t team_a_score,
-	const uint32_t team_b_score
-) {
+void tournament_coordinator::commit_match_result(tournament_match& m, const tournament_match_outcome& outcome) {
 	std::scoped_lock lk(state_lk);
 
-	if (m.result.has_value()) {
+	if (m.result.has_value() || m.closed_empty) {
 		return;
 	}
 
+	if (m.open_team_size > 0 && m.team_a_index == no_tournament_team_v) {
+		/*
+			An open match: its teams are whoever played it - or whoever waited on it when round 1 was closed.
+		*/
+
+		m.team_a_player_ids = outcome.open_team_a;
+		m.team_b_player_ids = outcome.open_team_b;
+
+		if (m.team_a_player_ids.empty() && m.team_b_player_ids.empty()) {
+			m.closed_empty = true;
+			LOG("Tournament: open match on port %x closed with nobody on it.", m.port);
+
+			state.save(state_path);
+			return;
+		}
+
+		m.team_a_index = add_team_of(m.team_a_player_ids, outcome.open_names_a);
+
+		if (!m.team_b_player_ids.empty()) {
+			m.team_b_index = add_team_of(m.team_b_player_ids, outcome.open_names_b);
+		}
+	}
+
 	tournament_match_result r;
-	r.winner_team_index = winner_team_index;
-	r.duration_secs = duration_secs;
-	r.team_a_score = team_a_score;
-	r.team_b_score = team_b_score;
+	r.winner_team_index = outcome.team_a_won ? m.team_a_index : m.team_b_index;
+	r.duration_secs = outcome.duration_secs;
+	r.team_a_score = outcome.team_a_score;
+	r.team_b_score = outcome.team_b_score;
+	r.walkover = outcome.walkover;
 
 	m.result = r;
 
@@ -336,14 +448,8 @@ void tournament_coordinator::run_current_stage() {
 
 	LOG("Tournament stage %x: running %x matches.", state.stage_index, state.current_stage_matches.size());
 
-	auto commit = [this](
-		tournament_match& m,
-		const uint32_t winner,
-		const float duration,
-		const uint32_t team_a_score,
-		const uint32_t team_b_score
-	) {
-		commit_match_result(m, winner, duration, team_a_score, team_b_score);
+	auto commit = [this](tournament_match& m, const tournament_match_outcome& outcome) {
+		commit_match_result(m, outcome);
 	};
 
 	deps.run_stage(state.current_stage_matches, commit);
@@ -359,12 +465,20 @@ void tournament_coordinator::update_skills() {
 			continue;
 		}
 
+		/*
+			A walkover takes no time - the strongest, as the byes of listed teams.
+		*/
+
 		state.teams[m.result->winner_team_index].skill = ::skill_from_match_time(m.result->duration_secs);
 	}
 }
 
 void tournament_coordinator::eliminate_losers() {
 	for (const auto& m : state.current_stage_matches) {
+		if (m.closed_empty) {
+			continue;
+		}
+
 		if (!m.result.has_value()) {
 			LOG("Tournament: match port=%x unresolved; nothing to eliminate.", m.port);
 			continue;
@@ -377,6 +491,14 @@ void tournament_coordinator::eliminate_losers() {
 			m.team_b_index :
 			m.team_a_index
 		;
+
+		if (loser == no_tournament_team_v) {
+			/*
+				A walkover: whoever waited alone goes on, nobody's eliminated.
+			*/
+
+			continue;
+		}
 
 		state.teams[loser].eliminated = true;
 
@@ -445,15 +567,20 @@ void tournament_coordinator::cleanup() const {
 	};
 
 	/*
-		Snapshot both the live state and the config the tournament ran with under
-		the same timestamp. The config is intentionally not deleted on failure -
-		operators may have hand-edited it and a stale copy is more useful than
-		nothing for forensics; the state file is the consumable runtime artifact
-		and gets removed on rename failure to keep load() from picking it up.
+		The state, and the tournament as the flags described it, under the same timestamp.
+		The state is what tells that this tournament was played to the end (find_completed_archive);
+		removed if it can't be renamed, so load() doesn't pick it up again.
 	*/
 
 	archive(state_path, "state");
-	archive(config_path, "config");
+
+	try {
+		const auto config_archive = state_path.parent_path() / (std::string("tournament.completed.") + stamp + ".config.json");
+		augs::save_as_json(cfg, config_archive);
+	}
+	catch (const std::exception& err) {
+		LOG("Tournament: failed to save the tournament's definition: %x", err.what());
+	}
 
 	if (augs::exists(state_path)) {
 		try {
@@ -465,7 +592,19 @@ void tournament_coordinator::cleanup() const {
 	}
 }
 
-void tournament_coordinator::run() {
+bool tournament_coordinator::run() {
+	if (!resumed) {
+		if (const auto archive = find_completed_archive()) {
+			LOG(
+				"Tournament: this tournament was played to the end already - the results are in %x. "
+				"It doesn't start again with the same settings; remove that file to play it once more.",
+				archive->string()
+			);
+
+			return false;
+		}
+	}
+
 	initialize_state_if_fresh();
 	persist();
 
@@ -478,7 +617,7 @@ void tournament_coordinator::run() {
 	while (!finished()) {
 		if (deps.should_interrupt && deps.should_interrupt()) {
 			LOG("Tournament: interrupted; state persisted, exiting.");
-			return;
+			return true;
 		}
 
 		/*
@@ -519,7 +658,7 @@ void tournament_coordinator::run() {
 
 		if (deps.should_interrupt && deps.should_interrupt()) {
 			persist();
-			return;
+			return true;
 		}
 
 		/*
@@ -532,7 +671,7 @@ void tournament_coordinator::run() {
 		*/
 
 		for (const auto& m : state.current_stage_matches) {
-			if (!m.result.has_value()) {
+			if (!m.result.has_value() && !m.closed_empty) {
 				LOG(
 					"Tournament: stage %x match on port %x (%x) exited without resolving. "
 					"Aborting tournament; edit %x to force a resolution before resuming.",
@@ -540,7 +679,7 @@ void tournament_coordinator::run() {
 				);
 
 				persist();
-				return;
+				return true;
 			}
 		}
 
@@ -564,6 +703,8 @@ void tournament_coordinator::run() {
 
 	declare_winner();
 	cleanup();
+
+	return true;
 }
 
 #endif

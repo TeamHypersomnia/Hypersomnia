@@ -15,6 +15,13 @@ struct server_assigned_teams {
 		faction_type
 	> id_to_faction;
 
+	/*
+		An open match of a tournament's first round: nobody is assigned beforehand - the first 2 * open_team_size
+		players to join make the match, assigned to the two teams by turns.
+	*/
+
+	uint32_t open_team_size = 0;
+
 	server_assigned_teams() = default;
 	server_assigned_teams(const augs::path_type&);
 };

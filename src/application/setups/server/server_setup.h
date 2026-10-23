@@ -1,7 +1,9 @@
 #pragma once
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <future>
+#include <memory>
 #include <functional>
 #include <optional>
 #include "application/masterserver/netcode_address_hash.h"
@@ -419,6 +421,17 @@ private:
 	void handle_client_messages();
 	void advance_clients_state();
 
+	bool is_open_match() const;
+	void take_into_open_match(const client_id_type, const server_client_state&);
+	void leave_open_match(const std::string& authenticated_id);
+	void name_open_match();
+	void close_open_match_if_requested();
+
+	server_name_type open_match_name;
+	bool open_match_closed = false;
+	bool open_match_named = false;
+	int open_match_close_waits = 0;
+
 	void rebroadcast_player_synced_metas();
 	void rebroadcast_synced_dynamic_vars();
 	void send_server_step_entropies(const compact_server_step_entropy& total);
@@ -511,6 +524,34 @@ public:
 		SEMIFINALS / FINALS in the server browser.
 	*/
 	std::optional<ranked_server_type> heartbeat_reported_tournament_stage;
+
+	/*
+		A tournament's open first round: Close round 1 from the administration panel of any of its servers
+		sets this flag shared by all of them. Each one that hasn't started its match yet then calls
+		on_open_match_closed with whoever waits on it (nobody: an empty server) and shuts down.
+	*/
+
+	std::shared_ptr<std::atomic<bool>> close_open_round;
+	std::function<void(const server_assigned_teams&)> on_open_match_closed;
+
+	/*
+		The players that took a place in any open match of round 1, shared by them too. Once all the players
+		the tournament is for came (open_round_expected_players), the round closes by itself - nobody else
+		is coming to pair with whoever waits alone.
+	*/
+
+	std::shared_ptr<std::atomic<uint32_t>> open_round_players;
+	uint32_t open_round_expected_players = 0;
+
+	/*
+		Who plays this match - an open match's roster grows as players join.
+	*/
+
+	const server_assigned_teams& get_assigned_teams() const {
+		return assigned_teams;
+	}
+
+	std::string find_nickname_of_account(const std::string& authenticated_id) const;
 
 	server_setup(
 		const packaged_official_content& official,
@@ -634,6 +675,8 @@ public:
 				auto scope = measure_scope(profiler.advance_clients_state);
 				advance_clients_state();
 			}
+
+			close_open_match_if_requested();
 
 			{
 				/* 

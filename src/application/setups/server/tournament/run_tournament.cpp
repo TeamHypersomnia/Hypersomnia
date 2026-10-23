@@ -32,18 +32,121 @@
 #include "game/enums/faction_type.h"
 #include "game/messages/hud_message.h"
 
-tournament_config tournament_config::from_file(const augs::path_type& path) {
-	constexpr auto rapidjson_flags =
-		rapidjson::kParseDefaultFlags |
-		rapidjson::kParseCommentsFlag |
-		rapidjson::kParseTrailingCommasFlag
-	;
+namespace {
+	std::string trimmed(const std::string& s) {
+		const auto first = s.find_first_not_of(" \t\r\n");
 
-	auto doc = augs::json_document_from<rapidjson_flags>(augs::file_to_string(path));
+		if (first == std::string::npos) {
+			return std::string();
+		}
 
-	tournament_config result;
-	augs::read_json(doc, result);
-	return result;
+		return s.substr(first, s.find_last_not_of(" \t\r\n") - first + 1);
+	}
+
+	std::vector<std::string> split_list(const std::string& value, const std::string& separators) {
+		std::vector<std::string> out;
+		std::string current;
+
+		auto flush = [&]() {
+			if (const auto item = ::trimmed(current); !item.empty()) {
+				out.push_back(item);
+			}
+
+			current.clear();
+		};
+
+		for (const auto c : value) {
+			if (separators.find(c) != std::string::npos) {
+				flush();
+			}
+			else {
+				current += c;
+			}
+		}
+
+		flush();
+		return out;
+	}
+
+	std::optional<uint32_t> as_count(const std::string& value, const uint32_t min, const uint32_t max) {
+		if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos) {
+			return std::nullopt;
+		}
+
+		const auto n = static_cast<uint32_t>(std::atoi(value.c_str()));
+
+		if (n < min || n > max) {
+			return std::nullopt;
+		}
+
+		return n;
+	}
+}
+
+/*
+	--tournament <players> | --tournament-teams "alice, bob; carol, dave" (or one team per line),
+	--tournament-team-size <n>, --tournament-arenas "de_cyberaqua,de_silo" - one per bracket round, the final last.
+*/
+
+tournament_config tournament_config::from_params(const cmd_line_params& params, std::string& error) {
+	tournament_config out;
+
+	if (!params.tournament_team_size.empty()) {
+		if (const auto size = ::as_count(params.tournament_team_size, 1, 8)) {
+			out.open_team_size = *size;
+		}
+		else {
+			error = typesafe_sprintf("--tournament-team-size: expected a number from 1 to 8, got \"%x\"", params.tournament_team_size);
+			return out;
+		}
+	}
+
+	if (!params.tournament_teams.empty()) {
+		for (const auto& line : ::split_list(params.tournament_teams, ";\n")) {
+			out.teams.push_back(::split_list(line, ","));
+		}
+
+		if (out.teams.size() < 2) {
+			error = "--tournament-teams: expected at least 2 teams, one per line or separated by ;";
+			return out;
+		}
+
+		if (!params.tournament_team_size.empty()) {
+			for (const auto& team : out.teams) {
+				if (team.size() != out.open_team_size) {
+					error = typesafe_sprintf("--tournament-teams: a team of %x players, expected %x (--tournament-team-size)", team.size(), out.open_team_size);
+					return out;
+				}
+			}
+		}
+	}
+	else if (const auto players = ::as_count(params.tournament_players, 2, 128)) {
+		out.open_players = *players;
+	}
+	else {
+		error = typesafe_sprintf("--tournament: expected a number of players from 2 to 128, got \"%x\"", params.tournament_players);
+		return out;
+	}
+
+	out.arenas = ::split_list(params.tournament_arenas, ",");
+
+	if (out.arenas.empty()) {
+		/*
+			As the config generator's default: de_cyberaqua and de_silo by turns.
+		*/
+
+		uint32_t bracket = 1;
+
+		while (bracket < out.num_teams()) {
+			bracket *= 2;
+		}
+
+		for (uint32_t round = 0; (1u << round) < bracket; ++round) {
+			out.arenas.push_back(round % 2 == 0 ? "de_cyberaqua" : "de_silo");
+		}
+	}
+
+	return out;
 }
 
 std::string tournament_config::compute_hash() const {
@@ -52,27 +155,13 @@ std::string tournament_config::compute_hash() const {
 }
 
 work_result run_tournament(const run_tournament_input& in) {
-	LOG("Tournament: loading config from %x", in.tournament_file_path.string());
+	auto cfg = in.config;
 
-	tournament_config cfg;
-
-	try {
-		cfg = tournament_config::from_file(in.tournament_file_path);
-	}
-	catch (const std::exception& err) {
-		LOG("Tournament: failed to load config: %x", err.what());
-		return work_result::FAILURE;
-	}
-
-	if (cfg.teams.size() < 2) {
-		LOG("Tournament: need at least 2 teams (got %x). Aborting.", cfg.teams.size());
-		return work_result::FAILURE;
-	}
-
-	if (cfg.arenas.empty()) {
-		LOG("Tournament: 'arenas' must list at least one 'arena mode' entry. Aborting.");
-		return work_result::FAILURE;
-	}
+	LOG(
+		"Tournament: %x, arenas: %x.",
+		cfg.is_open() ? typesafe_sprintf("open first round for %x players, %x per team", cfg.open_players, cfg.open_team_size) : typesafe_sprintf("%x teams set up beforehand", cfg.teams.size()),
+		cfg.arenas.size()
+	);
 
 	const auto base_port = in.config_pattern.server_start.port;
 
@@ -145,6 +234,13 @@ work_result run_tournament(const run_tournament_input& in) {
 
 		uint16_t webrtc_port_counter = in.config_pattern.server.webrtc_port_range_begin;
 
+		/*
+			Close round 1 from the administration panel of any open match sets it for all of them.
+		*/
+
+		const auto close_open_round = std::make_shared<std::atomic<bool>>(false);
+		const auto open_round_players = std::make_shared<std::atomic<uint32_t>>(0);
+
 		std::vector<std::thread> threads;
 		threads.reserve(matches.size());
 
@@ -180,6 +276,14 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.webrtc_udp_mux = true;
 			this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
 			this_config.server.daily_autoupdate = false;
+
+			if (match.open_team_size > 0) {
+				/*
+					Full once the pair is there - with a few places for the admins watching.
+				*/
+
+				this_config.server_start.slots = static_cast<int>(2 * match.open_team_size + 4);
+			}
 
 			/*
 				Force overtime on tournament matches: the bracket has no machinery
@@ -274,6 +378,8 @@ work_result run_tournament(const run_tournament_input& in) {
 			fill_faction(match.team_b_player_ids, team_b_faction);
 			fill_faction(match.spectator_player_ids, faction_type::SPECTATOR);
 
+			roster.open_team_size = match.open_team_size;
+
 			auto* match_ptr = &match;
 
 			/*
@@ -294,6 +400,9 @@ work_result run_tournament(const run_tournament_input& in) {
 				stage_should_interrupt,
 				on_instance_exit,
 				commit,
+				close_open_round,
+				open_round_players,
+				expected_players = in.config.open_players,
 				&in
 			]() {
 				LOG_THREAD_PREFFIX() = typesafe_sprintf("[T%x] ", match_ptr->port);
@@ -367,7 +476,72 @@ work_result run_tournament(const run_tournament_input& in) {
 
 				server_ptr->heartbeat_reported_tournament_stage = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
 
-				server_ptr->on_match_summary = [match_ptr, commit, nickname_auth](const messages::match_summary_message& s) {
+				/*
+					An open match's teams are whoever took the places - read from its roster once it's decided.
+				*/
+
+				const auto* const server_raw = server_ptr.get();
+
+				auto take_open_teams = [server_raw](const server_assigned_teams& roster, tournament_match_outcome& out) {
+					for (const auto& [id, faction] : roster.id_to_faction) {
+						if (faction == team_a_faction) {
+							out.open_team_a.push_back(id);
+						}
+						else if (faction == team_b_faction) {
+							out.open_team_b.push_back(id);
+						}
+					}
+
+					std::sort(out.open_team_a.begin(), out.open_team_a.end());
+					std::sort(out.open_team_b.begin(), out.open_team_b.end());
+
+					for (const auto& id : out.open_team_a) {
+						out.open_names_a.push_back(server_raw->find_nickname_of_account(id));
+					}
+
+					for (const auto& id : out.open_team_b) {
+						out.open_names_b.push_back(server_raw->find_nickname_of_account(id));
+					}
+				};
+
+				if (match_ptr->open_team_size > 0) {
+					server_ptr->close_open_round = close_open_round;
+					server_ptr->open_round_players = open_round_players;
+					server_ptr->open_round_expected_players = expected_players;
+
+					/*
+						Closed before its pair was there: whoever waited advances without playing - all of them as one
+						team, whichever side they took. Nobody: an empty server, gone.
+					*/
+
+					server_ptr->on_open_match_closed = [match_ptr, commit, take_open_teams](const server_assigned_teams& roster) {
+						auto outcome = tournament_match_outcome();
+						outcome.walkover = true;
+
+						take_open_teams(roster, outcome);
+
+						auto& waiting = outcome.open_team_a;
+						waiting.insert(waiting.end(), outcome.open_team_b.begin(), outcome.open_team_b.end());
+						outcome.open_team_b.clear();
+
+						auto& waiting_names = outcome.open_names_a;
+						waiting_names.insert(waiting_names.end(), outcome.open_names_b.begin(), outcome.open_names_b.end());
+						outcome.open_names_b.clear();
+
+						commit(*match_ptr, outcome);
+					};
+				}
+
+				server_ptr->on_match_summary = [match_ptr, commit, nickname_auth, server_raw, take_open_teams](const messages::match_summary_message& s) {
+					auto outcome = tournament_match_outcome();
+
+					if (match_ptr->open_team_size > 0 && match_ptr->team_a_index == no_tournament_team_v) {
+						take_open_teams(server_raw->get_assigned_teams(), outcome);
+					}
+
+					const auto& team_a_ids = match_ptr->open_team_size > 0 ? outcome.open_team_a : match_ptr->team_a_player_ids;
+					const auto& team_b_ids = match_ptr->open_team_size > 0 ? outcome.open_team_b : match_ptr->team_b_player_ids;
+
 					/*
 						Faction of `first_faction` shifts after a halftime swap (a player who
 						started on RESISTANCE can be on METROPOLIS by match end), so the
@@ -395,7 +569,7 @@ work_result run_tournament(const run_tournament_input& in) {
 
 					const bool team_a_in_first = [&]() {
 						for (const auto& winner_entry : s.first_faction) {
-							if (roster_contains(match_ptr->team_a_player_ids, winner_entry.account_id)) {
+							if (roster_contains(team_a_ids, winner_entry.account_id)) {
 								return true;
 							}
 						}
@@ -405,7 +579,7 @@ work_result run_tournament(const run_tournament_input& in) {
 
 					const bool team_b_in_first = [&]() {
 						for (const auto& winner_entry : s.first_faction) {
-							if (roster_contains(match_ptr->team_b_player_ids, winner_entry.account_id)) {
+							if (roster_contains(team_b_ids, winner_entry.account_id)) {
 								return true;
 							}
 						}
@@ -440,12 +614,12 @@ work_result run_tournament(const run_tournament_input& in) {
 						the recorded result can legitimately have winner_score < loser_score.
 					*/
 
-					const uint32_t winner_team_index = team_a_in_first ? match_ptr->team_a_index : match_ptr->team_b_index;
+					outcome.team_a_won = team_a_in_first;
+					outcome.duration_secs = s.effective_playtime_secs;
+					outcome.team_a_score = static_cast<uint32_t>(std::max(0, team_a_in_first ? s.first_team_score : s.second_team_score));
+					outcome.team_b_score = static_cast<uint32_t>(std::max(0, team_a_in_first ? s.second_team_score : s.first_team_score));
 
-					const uint32_t team_a_score = static_cast<uint32_t>(std::max(0, team_a_in_first ? s.first_team_score : s.second_team_score));
-					const uint32_t team_b_score = static_cast<uint32_t>(std::max(0, team_a_in_first ? s.second_team_score : s.first_team_score));
-
-					commit(*match_ptr, winner_team_index, s.effective_playtime_secs, team_a_score, team_b_score);
+					commit(*match_ptr, outcome);
 				};
 
 				auto worker_in = dedicated_server_worker_input {
@@ -472,12 +646,20 @@ work_result run_tournament(const run_tournament_input& in) {
 
 	auto coordinator = tournament_coordinator(
 		std::move(cfg),
-		in.tournament_file_path,
 		in.state_file_path,
 		std::move(deps)
 	);
 
-	coordinator.run();
+	if (!coordinator.run()) {
+		/*
+			Played to the end already. Stay up doing nothing rather than quit - a container would
+			only be started again and again (restart: unless-stopped).
+		*/
+
+		while (!(in.handle_sigint && in.handle_sigint())) {
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+	}
 
 	return work_result::SUCCESS;
 }

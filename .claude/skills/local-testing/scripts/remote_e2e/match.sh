@@ -31,19 +31,9 @@ start)
 	stop
 	sleep 1
 
-	cat > $E/tournament.json <<EOF
-{
-  "skill_level_source": "ORDER",
-  "teams": [ [ "$2" ], [ "$3" ] ],
-  "additional_spectators": [],
-  "arenas": [ "de_cyberaqua bomb_defusal" ]
-}
-EOF
-
 	mkdir -p $E/server/user/conf.d
 	cat > $E/server/user/conf.d/test.json <<EOF
 {
-  "tournament_file": "$E/tournament.json",
   "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": 9005, "slots": 16 },
   "webrtc_signalling_server_url": "ws://${ARENAUS_IP:-154.12.226.211}:18000",
   "server": {
@@ -68,7 +58,9 @@ EOF
 EOF
 
 	cd $E/hypersomnia
-	setsid nohup timeout 600 $E/Hypersomnia --dedicated-server --appdata-dir $E/server --no-update-on-launch --no-open-logs > $E/server.out 2>&1 < /dev/null &
+	# Tournament mode puts the two accounts on the teams: --tournament-teams
+	setsid nohup timeout 600 $E/Hypersomnia --dedicated-server --appdata-dir $E/server --no-update-on-launch --no-open-logs \
+		--tournament-teams "$2; $3" --tournament-arenas "de_cyberaqua bomb_defusal" > $E/server.out 2>&1 < /dev/null &
 	echo $! > $E/server.pid
 	sleep 6
 	grep -hE "Tournament|listening|heartbeat through UDP" $E/server.out | head -4

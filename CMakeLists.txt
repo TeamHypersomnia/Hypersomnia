@@ -759,6 +759,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/secure_hash.cpp"
 	"src/augs/misc/ed25519.cpp"
 	"src/application/main/identity_key.cpp"
+	"src/application/main/environment_variables.cpp"
 	"src/application/network/identity_cert.cpp"
 	"src/application/main/identity_session.cpp"
 	"src/augs/string/path_sanitization.cpp"

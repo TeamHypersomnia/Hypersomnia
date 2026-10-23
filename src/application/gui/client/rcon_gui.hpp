@@ -269,6 +269,19 @@ void perform_rcon_gui(
 
 			case rcon_pane::MAINTENANCE:
 				{
+					/*
+						A tournament's open first round: whoever waits alone advances, the empty servers close.
+					*/
+
+					if (runtime_info && runtime_info->can_close_round_1) {
+						if (do_command_button("Close round 1", RS::CLOSE_ROUND_1)) {
+							LOG("Requesting the tournament to close round 1");
+						}
+
+						text_disabled("Fewer players came? Whoever waits alone advances without playing,\nthe empty servers close. The matches being played go on.");
+						ImGui::Separator();
+					}
+
 					if (has_maintenance_tab) {
 						if (do_command_button("Refresh map list", RS::REQUEST_RUNTIME_INFO)) {
 							LOG("Requesting the server refresh the map list.");

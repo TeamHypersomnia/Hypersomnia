@@ -7,6 +7,7 @@
 #include "augs/network/network_types.h"
 #include "application/activity_type.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "application/main/environment_variables.h"
 
 struct cmd_line_params {
 	std::string complete_command_line;
@@ -54,7 +55,18 @@ struct cmd_line_params {
 	std::optional<int> autoupdate_delay;
 
 	augs::path_type apply_config;
-	augs::path_type tournament;
+
+	/*
+		A tournament, as given - read and checked by tournament_definition.h:
+		--tournament <players> (open first round), or --tournament-teams "alice, bob; carol, dave";
+		--tournament-team-size <n>, --tournament-arenas <a,b,...>. Also the HYPERSOMNIA_TOURNAMENT* variables.
+	*/
+
+	std::string tournament_players;
+	std::string tournament_team_size;
+	std::string tournament_teams;
+	std::string tournament_arenas;
+
 	augs::path_type export_weapon_stats;
 
 	int test_fp_consistency = -1;
@@ -254,7 +266,16 @@ struct cmd_line_params {
 				apply_config = get_next();
 			}
 			else if (a == "--tournament") {
-				tournament = get_next();
+				tournament_players = get_next();
+			}
+			else if (a == "--tournament-team-size") {
+				tournament_team_size = get_next();
+			}
+			else if (a == "--tournament-teams") {
+				tournament_teams = get_next();
+			}
+			else if (a == "--tournament-arenas") {
+				tournament_arenas = get_next();
 			}
 			else if (a == "--export-weapon-stats") {
 				export_weapon_stats = get_next();
@@ -317,6 +338,31 @@ struct cmd_line_params {
 		complete_command_line = exe_path.string();
 
 		parse(argc, argv, 1);
+
+		/*
+			A HYPERSOMNIA_* variable that is a flag (environment_variables.h) - as if it were given, unless it was.
+		*/
+
+		for (const auto& f : environment_flags) {
+			const auto value = std::getenv(f.variable);
+
+			if (value == nullptr) {
+				continue;
+			}
+
+			const bool given = std::any_of(argv + 1, argv + argc, [&f](const char* const arg) {
+				return std::string(arg) == f.flag;
+			});
+
+			if (!given) {
+				const char* const as_flag[] = { "", f.flag, value };
+				parse(3, as_flag, 1);
+			}
+		}
+	}
+
+	bool is_tournament() const {
+		return !tournament_players.empty() || !tournament_teams.empty();
 	}
 
 	bool is_cli_server() const {

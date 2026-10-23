@@ -139,7 +139,11 @@ public:
 		downloading.emplace(std::forward<Args>(args)...);
 	}
 
-	arena_synchronizer_input launch_download_all(const address_string_type&);
+	/*
+		All the arenas not on disk - or only those of them named in only_these, if given.
+	*/
+
+	arena_synchronizer_input launch_download_all(const address_string_type&, const std::vector<std::string>& only_these = {});
 
 	bool finalize_download();
 

@@ -11,6 +11,7 @@ enum class server_maintenance_command : unsigned char {
 	REQUEST_RUNTIME_INFO,
 	DOWNLOAD_LOGS,
 	CLEAR_RUNTIME_PREFS,
+	CLOSE_ROUND_1,
 
 	COUNT
 };

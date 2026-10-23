@@ -134,11 +134,13 @@ void headless_map_catalogue::rescan_official_arenas() {
 	augs::for_each_directory_in_directory(source_directory, register_arena);
 }
 
-arena_synchronizer_input headless_map_catalogue::launch_download_all(const address_string_type& address) {
+arena_synchronizer_input headless_map_catalogue::launch_download_all(const address_string_type& address, const std::vector<std::string>& only_these) {
 	arena_synchronizer_input downloadable_arenas;
 
 	for (const auto& s : map_list) {
-		if (s.get_state() != S::ON_DISK) {
+		const bool wanted = only_these.empty() || std::find(only_these.begin(), only_these.end(), s.name) != only_these.end();
+
+		if (wanted && s.get_state() != S::ON_DISK) {
 			downloadable_arenas.push_back({ s.name, s.version_timestamp, s.last_displayed_index });
 		}
 	}

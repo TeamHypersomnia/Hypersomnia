@@ -40,6 +40,7 @@ struct server_runtime_info {
 	// GEN INTROSPECTOR struct server_runtime_info
 	std::vector<arena_identifier> arenas_on_disk;
 	std::string runtime_prefs;
+	bool can_close_round_1 = false;
 	// END GEN INTROSPECTOR
 };
 

@@ -3950,6 +3950,8 @@ void server_setup::unset_client(const client_id_type& id) {
 	if (clients[id].is_set()) {
 		LOG("Client disconnected. Details:\n%x", describe_client(id));
 
+		leave_open_match(clients[id].authenticated_id);
+
 		if (webrtc_server) {
 			if (clients[id].is_webrtc_client()) {
 				LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
@@ -4176,6 +4178,8 @@ void server_setup::advance_clients_state() {
 				if (c.is_authenticated()) {
 					const auto this_id = c.authenticated_id;
 
+					take_into_open_match(client_id, c);
+
 					const bool not_among_suspended = 
 						has_suspended_players() && !is_currently_suspended(this_id)
 					;
@@ -4191,7 +4195,7 @@ void server_setup::advance_clients_state() {
 							c.authenticated_id
 						);
 
-						kick_now(client_id, std::string(rejoin_wrong_match_reason_v));
+						kick_now(client_id, is_open_match() ? std::string("This match is full - join another one.") : std::string(rejoin_wrong_match_reason_v));
 					}
 				}
 			}
@@ -4771,6 +4775,14 @@ message_handler_result server_setup::handle_rcon_payload(
 
 			case command::REQUEST_RUNTIME_INFO: 
 				refresh_runtime_info_for_rcon();
+
+				return continue_v;
+
+			case command::CLOSE_ROUND_1:
+				if (close_open_round != nullptr) {
+					close_open_round->store(true);
+					notification("closed round 1 of the tournament");
+				}
 
 				return continue_v;
 
@@ -6393,6 +6405,7 @@ const netcode_socket_t* server_setup::find_underlying_socket() const {
 
 void server_setup::rescan_runtime_prefs() {
 	runtime_info.runtime_prefs = augs::to_json_diff_string(vars, canon_with_confd_vars);
+	runtime_info.can_close_round_1 = is_open_match() && close_open_round != nullptr && !close_open_round->load();
 }
 
 void server_setup::rescan_arenas_on_disk() {
@@ -7048,7 +7061,203 @@ void server_setup::handle_client_chat_command(
 }
 
 bool server_setup::has_assigned_teams() const { 
-	return !assigned_teams.id_to_faction.empty();
+	return !assigned_teams.id_to_faction.empty() || is_open_match();
+}
+
+std::string server_setup::find_nickname_of_account(const std::string& authenticated_id) const {
+	std::string found;
+
+	for_each_id_and_client([&](auto, const auto& c) {
+		if (c.authenticated_id == authenticated_id) {
+			found = c.get_nickname();
+		}
+	}, only_connected_v);
+
+	return found;
+}
+
+bool server_setup::is_open_match() const {
+	return assigned_teams.open_team_size > 0;
+}
+
+/*
+	A tournament's server: an admin watches any match (and closes round 1 from it); an open match of round 1
+	takes the first players to join, by turns into the two teams, until it has its 2 * team size.
+*/
+
+void server_setup::take_into_open_match(const client_id_type, const server_client_state& c) {
+	const auto& id = c.authenticated_id;
+
+	if (!has_assigned_teams() || found_in(assigned_teams.id_to_faction, id)) {
+		return;
+	}
+
+	if (const auto profile = find_admin_profile_of(id); profile.has_value() && profile->rcon_level != rcon_level_type::DENIED) {
+		LOG("%x is an admin - watches the tournament's match as a spectator.", c.get_nickname());
+		assigned_teams.id_to_faction[id] = faction_type::SPECTATOR;
+		return;
+	}
+
+	if (!is_open_match() || is_ranked_live_or_starting()) {
+		return;
+	}
+
+	auto num_in = [&](const faction_type f) {
+		std::size_t n = 0;
+
+		for (const auto& [roster_id, faction] : assigned_teams.id_to_faction) {
+			(void)roster_id;
+			n += faction == f ? 1 : 0;
+		}
+
+		return n;
+	};
+
+	const auto resistance = num_in(faction_type::RESISTANCE);
+	const auto metropolis = num_in(faction_type::METROPOLIS);
+
+	if (resistance + metropolis >= 2 * assigned_teams.open_team_size) {
+		return;
+	}
+
+	if (open_match_name.empty()) {
+		open_match_name = vars.server_name;
+	}
+
+	const auto faction = resistance <= metropolis ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+	assigned_teams.id_to_faction[id] = faction;
+
+	LOG("Open match: %x takes a place in %x.", id, faction);
+
+	if (open_round_players != nullptr) {
+		const auto came = open_round_players->fetch_add(1) + 1;
+
+		if (close_open_round != nullptr && open_round_expected_players > 0 && came >= open_round_expected_players) {
+			LOG("All %x players of the tournament came - round 1 closes by itself.", open_round_expected_players);
+			close_open_round->store(true);
+		}
+	}
+
+	open_match_named = false;
+}
+
+/*
+	Before its match starts, whoever leaves an open match frees the place.
+*/
+
+void server_setup::leave_open_match(const std::string& authenticated_id) {
+	if (!is_open_match() || is_ranked_live_or_starting() || authenticated_id.empty()) {
+		return;
+	}
+
+	const auto it = assigned_teams.id_to_faction.find(authenticated_id);
+
+	if (it == assigned_teams.id_to_faction.end() || !::is_actual_faction(it->second)) {
+		return;
+	}
+
+	assigned_teams.id_to_faction.erase(it);
+	LOG("Open match: %x left before the match - the place is free again.", authenticated_id);
+
+	open_match_named = false;
+
+	if (open_round_players != nullptr) {
+		open_round_players->fetch_sub(1);
+	}
+
+	if (!open_match_name.empty() && vars.server_name != open_match_name) {
+		vars.server_name = open_match_name;
+		request_immediate_heartbeat();
+	}
+}
+
+/*
+	Full: named by its players, as the matches of the later rounds - "[alice] vs [bob]".
+	Every tick until it is - a player's nickname is known a moment after their place is taken.
+*/
+
+void server_setup::name_open_match() {
+	if (!is_open_match() || open_match_named) {
+		return;
+	}
+
+	std::string resistance;
+	std::string metropolis;
+	std::size_t named = 0;
+
+	for_each_id_and_client([&](auto, const auto& c) {
+		const auto faction = get_assigned_team(c.authenticated_id);
+
+		if (!::is_actual_faction(faction) || c.get_nickname().empty()) {
+			return;
+		}
+
+		auto& names = faction == faction_type::RESISTANCE ? resistance : metropolis;
+		names += (names.empty() ? "" : ", ") + c.get_nickname();
+		++named;
+	}, only_connected_v);
+
+	if (named < 2 * assigned_teams.open_team_size) {
+		return;
+	}
+
+	open_match_named = true;
+	vars.server_name = "[" + resistance + "] vs [" + metropolis + "]";
+	LOG("Open match is full: %x", vars.server_name);
+	request_immediate_heartbeat();
+}
+
+void server_setup::close_open_match_if_requested() {
+	name_open_match();
+
+	if (!is_open_match() || open_match_closed || close_open_round == nullptr || !close_open_round->load()) {
+		return;
+	}
+
+	/*
+		A match that started - or has its players and is about to - plays on.
+	*/
+
+	const auto [present, expected] = count_assigned_players_present();
+	(void)present;
+
+	std::size_t assigned_playing = 0;
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		(void)id;
+		assigned_playing += ::is_actual_faction(faction) ? 1 : 0;
+	}
+
+	if (is_ranked_live_or_starting() || assigned_playing == expected) {
+		return;
+	}
+
+	/*
+		Whoever waits goes on with their nickname - the next rounds' servers are named by it. It comes a moment
+		after their place is taken (the round can close at that very moment), so wait for it - a few seconds at most.
+	*/
+
+	bool nickname_missing = false;
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		if (::is_actual_faction(faction) && find_nickname_of_account(id).empty()) {
+			nickname_missing = true;
+		}
+	}
+
+	if (nickname_missing && ++open_match_close_waits < static_cast<int>(5 / get_inv_tickrate())) {
+		return;
+	}
+
+	open_match_closed = true;
+
+	LOG("Round 1 closed: this open match ends with %x waiting.", assigned_playing);
+
+	if (on_open_match_closed) {
+		on_open_match_closed(assigned_teams);
+	}
+
+	schedule_shutdown();
 }
 
 std::pair<std::size_t, std::size_t> server_setup::count_assigned_players_present() const {
@@ -7065,6 +7274,10 @@ std::pair<std::size_t, std::size_t> server_setup::count_assigned_players_present
 		if (::is_actual_faction(faction)) {
 			++expected_playing;
 		}
+	}
+
+	if (is_open_match()) {
+		expected_playing = 2 * assigned_teams.open_team_size;
 	}
 
 	std::size_t playing_in_game = 0;

@@ -17,6 +17,10 @@ COPY --from=downloader --chown=hypersomniac:hypersomniac \
     Hypersomnia-Headless.AppImage /home/hypersomniac/Hypersomnia-Headless.AppImage
 
 USER hypersomniac
+
+# Updates every day at 03:00 unless set otherwise - HYPERSOMNIA_DAILY_UPDATE=off or another hour in compose.yaml
+ENV HYPERSOMNIA_DAILY_UPDATE=03:00
+
 CMD ["./Hypersomnia-Headless.AppImage", "--appimage-extract-and-run"]
 
 # For native clients via POSIX sockets

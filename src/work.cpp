@@ -84,6 +84,7 @@
 #include "application/main/favorite_servers.h"
 #include "application/setups/client/connect_target.h"
 #include "application/main/server_key.h"
+#include "application/main/environment_variables.h"
 
 #include "application/gui/headless_map_catalogue.h"
 #include "application/platform_settings.h"
@@ -194,6 +195,7 @@
 #include "augs/templates/main_thread_queue.h"
 #include "augs/misc/httplib_utils.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/string/string_templates.h"
 #include "augs/string/parse_url.h"
 #endif
 
@@ -659,6 +661,12 @@ work_result work(
 
 	WEBSTATIC auto config_layers = std::vector<config_layer> { { canon_config_path, false } };
 
+	/*
+		A HYPERSOMNIA_* variable with a value that can't be read - the server doesn't start with it.
+	*/
+
+	WEBSTATIC auto environment_errors = std::vector<std::string>();
+
 	WEBSTATIC auto config_ptr = [&]() {
 		auto result = std::make_unique<config_json_table>(canon_config);
 
@@ -703,6 +711,48 @@ work_result work(
 			result->load_patch_from_string(env_config, env_config_name);
 			config_layers.push_back({ env_config_name, false, env_config });
 		}
+
+		/*
+			The HYPERSOMNIA_* variables, one per setting (environment_variables.h) - counted with conf.d as the canon,
+			under runtime_prefs.json so that the panel's changes survive a container's daily restart.
+		*/
+
+		for (const auto& warning : ::unknown_environment_variable_warnings()) {
+			LOG("WARNING! %x", warning);
+		}
+
+		{
+			const auto before_environment = *result;
+			environment_errors = ::apply_config_environment_variables(*result);
+
+			/*
+				What the variables changed - the secrets masked - so an admin sees their container's settings arrived.
+			*/
+
+			auto shown = *result;
+			auto shown_before = before_environment;
+
+			for (auto* const c : { &shown, &shown_before }) {
+				if (!c->server_private.server_password.empty()) {
+					c->server_private.server_password = "***";
+				}
+
+				if (!c->server_private.discord_webhook_url.empty()) {
+					c->server_private.discord_webhook_url = "***";
+				}
+			}
+
+			auto log_changed = [](const auto& section, const auto& now, const auto& before) {
+				if (const auto changed = augs::to_json_diff_string(now, before); changed != "{}") {
+					LOG("The environment variables set in \"%x\":\n%x", section, changed);
+				}
+			};
+
+			log_changed("server_start", shown.server_start, shown_before.server_start);
+			log_changed("instances", shown.instances, shown_before.instances);
+			log_changed("server", shown.server, shown_before.server);
+			log_changed("server_private", shown.server_private, shown_before.server_private);
+		}
 #endif
 
 		canon_config_with_confd = *result;
@@ -738,6 +788,14 @@ work_result work(
 	}();
 
 	LOG("Loaded all user configs.");
+
+	if (!environment_errors.empty()) {
+		for (const auto& error : environment_errors) {
+			LOG("ERROR: %x", error);
+		}
+
+		return work_result::FAILURE;
+	}
 
 	WEBSTATIC auto& config = *config_ptr;
 
@@ -1302,8 +1360,65 @@ work_result work(
 		bool sync = false;
 		bool quit_after_sync = false;
 
+		/*
+			The community arenas the server is set to play (its arena, the map cycle, a tournament's arenas)
+			that aren't on disk yet - downloaded before it starts, from the same catalogue the players get them from.
+		*/
+
+		const auto missing_arenas = [&]() {
+			std::vector<std::string> named;
+
+			if (params.type != app_type::DEDICATED_SERVER) {
+				return named;
+			}
+
+			auto name = [&](const std::string& arena_and_mode) {
+				const auto arena = ::get_first_word(arena_and_mode);
+
+				if (arena.empty() || found_in(named, arena)) {
+					return;
+				}
+
+				if (augs::exists(OFFICIAL_ARENAS_DIR / arena) || augs::exists(DOWNLOADED_ARENAS_DIR / arena)) {
+					return;
+				}
+
+				named.push_back(arena);
+			};
+
+			name(config.server.arena);
+
+			for (const auto& entry : config.server.cycle_list) {
+				name(entry);
+			}
+
+			std::string tournament_arena;
+
+			for (const auto c : params.tournament_arenas + ",") {
+				if (c == ',') {
+					name(tournament_arena);
+					tournament_arena.clear();
+				}
+				else {
+					tournament_arena += c;
+				}
+			}
+
+			return named;
+		}();
+
 		if (params.type == app_type::DEDICATED_SERVER && config.server.sync_all_external_arenas_on_startup) {
 			LOG("sync_all_external_arenas_on_startup specified.");
+			sync = true;
+		}
+		else if (!missing_arenas.empty()) {
+			std::string names;
+
+			for (const auto& arena : missing_arenas) {
+				names += (names.empty() ? "" : ", ") + arena;
+			}
+
+			LOG("Arenas to play that aren't on disk yet: %x - downloading them.", names);
 			sync = true;
 		}
 		else if (params.sync_external_arenas) {
@@ -1351,7 +1466,8 @@ work_result work(
 							break;
 						}
 						else {
-							const auto all = headless.launch_download_all({ provider });
+							const bool only_missing = !config.server.sync_all_external_arenas_on_startup && !params.sync_external_arenas && !params.sync_external_arenas_and_quit;
+							const auto all = headless.launch_download_all({ provider }, only_missing ? missing_arenas : std::vector<std::string>());
 
 							if (all.empty()) {
 								LOG("All arenas are up to date. There's nothing to sync.");
@@ -1608,19 +1724,6 @@ work_result work(
 		};
 
 #if HEADLESS
-		auto resolve_user_config_path = [](const augs::path_type& p) -> augs::path_type {
-			/*
-				Resolves a path the user supplied through configuration. Absolute paths
-				pass through; relative paths are taken to be next to the user's editable
-				config (runtime_prefs.json) under USER_DIR. This matters on AppImage builds
-				whose AppRun chdirs into the read-only mount, making "raw" relative paths
-				point at bundled content rather than user data. Cmdline args use
-				CALLING_CWD instead (where the operator invoked the binary from).
-			*/
-
-			return p.empty() || p.is_absolute() ? p : (USER_DIR / p);
-		};
-
 		/*
 			All the instances' key is server.key (tournament matches' too).
 		*/
@@ -1630,59 +1733,45 @@ work_result work(
 			return work_result::FAILURE;
 		}
 
-		const auto tournament_file_path = [&]() -> augs::path_type {
-			if (!params.tournament.empty()) {
-				return CALLING_CWD / params.tournament;
-			}
-
-			return resolve_user_config_path(config_pattern.tournament_file);
-		}();
-
-		if (!tournament_file_path.empty()) {
+		if (params.is_tournament()) {
 			/*
-				Missing tournament file isn't fatal: operators commonly point a
-				dedicated server at a configured tournament path that only exists
-				during scheduled events. Falling through to the normal multi-instance
-				path lets the same binary host casual/ranked the rest of the time
-				without manual config edits.
+				A tournament, from the flags or the HYPERSOMNIA_TOURNAMENT* variables - no file, no config section.
 			*/
 
-			if (!augs::exists(tournament_file_path)) {
-				LOG(
-					"Tournament file %x does not exist; skipping tournament mode and falling back to normal dedicated-server startup.",
-					tournament_file_path.string()
-				);
+			auto tournament_error = std::string();
+			auto tournament = tournament_config::from_params(params, tournament_error);
+
+			if (!tournament_error.empty()) {
+				LOG("ERROR: %x", tournament_error);
+				return work_result::FAILURE;
 			}
-			else {
-				LOG("Tournament mode enabled (file: %x).", tournament_file_path.string());
 
-				const auto state_file_path = USER_DIR / "tournament.ongoing.json";
+			const auto state_file_path = USER_DIR / "tournament.ongoing.json";
 
-				/*
-					The matches are ranked instances: the ranked vars.
-				*/
+			/*
+				The matches are ranked instances: the ranked vars.
+			*/
 
-				auto ranked_pattern = config_pattern;
-				ranked_pattern.server = ranked_vars_of(config_pattern.server, true);
+			auto ranked_pattern = config_pattern;
+			ranked_pattern.server = ranked_vars_of(config_pattern.server, true);
 
-				auto ranked_canon = canon_config_with_confd;
-				ranked_canon.server = ranked_vars_of(canon_config_with_confd.server, false);
+			auto ranked_canon = canon_config_with_confd;
+			ranked_canon.server = ranked_vars_of(canon_config_with_confd.server, false);
 
-				auto runner_in = run_tournament_input {
-					*official,
-					ranked_pattern,
-					ranked_canon,
-					params,
+			auto runner_in = run_tournament_input {
+				*official,
+				ranked_pattern,
+				ranked_canon,
+				params,
 #if CRASH_RECOVERY
-					recovery_worker,
+				recovery_worker,
 #endif
-					handle_sigint,
-					tournament_file_path,
-					state_file_path
-				};
+				handle_sigint,
+				std::move(tournament),
+				state_file_path
+			};
 
-				return ::run_tournament(runner_in);
-			}
+			return ::run_tournament(runner_in);
 		}
 #endif
 

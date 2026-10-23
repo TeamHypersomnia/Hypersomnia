@@ -159,7 +159,6 @@ struct config_json_table {
 	server_listen_input server_start;
 
 	server_instance_counts instances;
-	augs::path_type tournament_file;
 
 	server_vars server;
 	server_private_vars server_private;

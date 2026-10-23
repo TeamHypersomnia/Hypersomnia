@@ -2,6 +2,7 @@
 #if HEADLESS
 #include <functional>
 #include "augs/filesystem/path_declaration.h"
+#include "application/setups/server/tournament/tournament_config.h"
 #include "work_result.h"
 
 struct config_json_table;
@@ -21,7 +22,7 @@ struct run_tournament_input {
 	server_recovery_worker& recovery_worker;
 #endif
 	std::function<bool()> handle_sigint;
-	augs::path_type tournament_file_path;
+	tournament_config config;
 	augs::path_type state_file_path;
 };
 
