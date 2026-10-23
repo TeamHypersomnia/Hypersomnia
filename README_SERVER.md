@@ -111,7 +111,7 @@ The complete reference of all settings, with comments: [`default_config.json`](h
 
 ### Where the config goes
 
-- **Docker:** [environment variables](#environment-variables) in `docker-compose.yaml` or the `docker run` command, or a `.json` file in `/opt/hypersomnia/conf.d/`. Apply it with `docker compose up -d` or `docker restart hypersomnia-server`.
+- **Docker:** [environment variables](#environment-variables) in `compose.yaml` or the `docker run` command, or a `.json` file in `/opt/hypersomnia/conf.d/`. Apply it with `docker compose up -d` or `docker restart hypersomnia-server`.
 - **AppImage:** `~/.config/Hypersomnia/user/conf.d/server.json` (`/opt/hypersomnia/user/conf.d/` with a separate user). Apply it by starting the server again, or `systemctl --user restart hypersomnia`. The [environment variables](#environment-variables) work too - as `Environment=` lines in the service.
 
 Any number of `.json` files can go into `conf.d/` - they apply in alphabetical order. The server never changes them.
@@ -241,7 +241,7 @@ The setting was changed from the panel before - see [Changes made in the panel c
 The data folder must belong to the user `999`: `sudo chown -R 999:999 /opt/hypersomnia`.
 
 **AppImage: `fuse: failed to exec fusermount` / `Cannot mount AppImage`.**
-Add `--appimage-extract-and-run`, or install `fuse` (`fuse2` on Arch) and tick `FUSE installed?` under the start command in the [config generator](https://hypersomnia.io/generator).
+Add `--appimage-extract-and-run`, or install `fuse` (`fuse2` on Arch) and tick `FUSE installed?` in the [config generator](https://hypersomnia.io/generator).
 
 **Players with the new version can't join.**
 The server is outdated - see [Updates](#updates). Restart it to update right away.
