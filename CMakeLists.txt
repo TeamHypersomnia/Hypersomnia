@@ -1083,6 +1083,11 @@ include_directories(${GENERATORS_OUTPUT_PATH})
 
 set(GENERATED_INTROSPECTORS_HEADER "${GENERATED_SOURCES_PATH}/introspectors.h")
 
+# The generator also writes these two. They must be its declared outputs too:
+# tests_of_traits.cpp includes enums.cpp, and otherwise could compile before the generator rewrote it.
+set(GENERATED_ENUMS_SOURCE "${GENERATED_SOURCES_PATH}/enums.cpp")
+set(GENERATED_SPECIALIZATIONS_HEADER "${GENERATED_SOURCES_PATH}/specializations.h")
+
 # Before Hypersomnia builds,
 # Introspector-generator must first generate the type information.
 
@@ -1123,7 +1128,7 @@ configure_file(
 )
 
 add_custom_command(
-	OUTPUT ${GENERATED_INTROSPECTORS_HEADER}
+	OUTPUT ${GENERATED_INTROSPECTORS_HEADER} ${GENERATED_ENUMS_SOURCE} ${GENERATED_SPECIALIZATIONS_HEADER}
 	COMMAND ${INTROSPECTOR_GENERATOR_PATH} ${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH}
 	COMMENT "Generating type information for introspection..."
 	DEPENDS ${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
