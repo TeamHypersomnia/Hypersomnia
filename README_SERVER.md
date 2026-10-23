@@ -1,12 +1,10 @@
 # Host a Hypersomnia server
 
+**[Use the config generator (recommended)](https://hypersomnia.io/generator)**
+
+The **config generator** will walk you step by step to a working Hypersomnia server instance - a persistent server or a tournament, with Docker or the AppImage. This page explains the rest.
+
 A Hypersomnia server runs on any Linux machine or VPS - as a Docker container or a single AppImage file. It needs two UDP ports, updates itself, shows up on the [server list](https://hypersomnia.io/servers) on its own, and you manage it from inside the game.
-
-The config generator walks you through it, step by step - a persistent server or a tournament, with Docker or the AppImage:
-
-**[Open the config generator](https://hypersomnia.io/generator)**
-
-This page explains the rest.
 
 - [Ports](#ports)
 - [Updates](#updates)
@@ -83,8 +81,8 @@ The server knows its admins by their accounts: an `Ed25519` key that every game 
 
 1. In the game, open `Settings → Account` and click the copy icon next to your account. You get your account id:
    - `steam_7656119...` in the Steam version,
-   - `0x...` with an account key (the game outside Steam, the browser).
-2. Paste it into `Admin account id` in the [config generator](https://hypersomnia.io/generator) and use its result.
+   - `0x...` with an account key (the game outside Steam, or the browser).
+2. Tick `Admin account id` in the [config generator](https://hypersomnia.io/generator), paste it there and use the result.
 3. Restart the server, join it and press `Esc` - the administration panel opens.
 
 The generator makes full admins. Moderators with fewer rights go into the config by hand - in `admin_profiles` of `server_private`, e.g. `{ "account": "0x8aed41f2...", "rcon": "RCON", "badge": "MOD" }`:
@@ -243,7 +241,7 @@ The setting was changed from the panel before - see [Changes made in the panel c
 The data folder must belong to the user `999`: `sudo chown -R 999:999 /opt/hypersomnia`.
 
 **AppImage: `fuse: failed to exec fusermount` / `Cannot mount AppImage`.**
-Add `--appimage-extract-and-run`, or install `fuse` (`fuse2` on Arch) and tick `FUSE is installed` in the [config generator](https://hypersomnia.io/generator).
+Add `--appimage-extract-and-run`, or install `fuse` (`fuse2` on Arch) and tick `FUSE installed?` under the start command in the [config generator](https://hypersomnia.io/generator).
 
 **Players with the new version can't join.**
 The server is outdated - see [Updates](#updates). Restart it to update right away.
