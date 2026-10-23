@@ -171,7 +171,7 @@ void update_arena_mode_ai_team(
 			for (auto& bot : only_bot(players)) {
 				if (bot.second.controlled_character_id == most.example_bot) {
 					bot.second.ai_state.patrol_letter = least.letter;
-					bot.second.ai_state.reached_patrol_letter = marker_letter_type::COUNT;
+					bot.second.ai_state.rebalanced_in_transit = true;
 
 					if (auto* patrol = ::get_behavior_if<ai_behavior_patrol>(bot.second.ai_state.last_behavior)) {
 						*patrol = ai_behavior_patrol();
@@ -829,19 +829,6 @@ arena_ai_result update_arena_mode_ai(
 		is_gun_game,
 		should_avoid_combat
 	);
-
-	/*
-		The bot reaches its site with the first patrol waypoint of its letter - until then it is in transit.
-	*/
-	if (const auto* patrol = ::get_behavior_if<ai_behavior_patrol>(ai_state.last_behavior)) {
-		if (!patrol->going_to_first_waypoint) {
-			if (const auto waypoint = cosm[patrol->patrol_waypoint]) {
-				if (waypoint.template get<components::marker>().letter == ai_state.patrol_letter) {
-					ai_state.reached_patrol_letter = ai_state.patrol_letter;
-				}
-			}
-		}
-	}
 
 	/*
 		Check if behavior changed - if so, handle transition.

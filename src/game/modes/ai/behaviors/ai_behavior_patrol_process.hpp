@@ -203,6 +203,16 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 			/* Push waypoint reached — mark push phase as done so the bomb carrier can plant. */
 			ai_state.push_phase = push_phase_type::COMPLETED;
 		}
+		else if (wp_handle.alive()) {
+			/*
+				At a patrol waypoint of its letter the bot moved by the rebalancing has arrived.
+			*/
+			if (const auto marker = wp_handle.template find<components::marker>()) {
+				if (marker->letter == ai_state.patrol_letter) {
+					ai_state.rebalanced_in_transit = false;
+				}
+			}
+		}
 
 		if (wp_handle.alive()) {
 			if (::is_camp_waypoint(cosm, current_waypoint_id)) {

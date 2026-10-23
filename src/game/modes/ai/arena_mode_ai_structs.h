@@ -201,7 +201,7 @@ struct arena_mode_ai_arena_meta {
 	Held in arena_mode per faction.
 
 	hot_bombsite: Metropolis only - the patrol_letter of the bot that most recently
-	died or entered combat on its site (not in transit to it).
+	died or entered combat on its site (not on the way to a site the rebalancing moved it to).
 	Rebalancing sends one more bot there even when the sites differ by only 1,
 	and never takes bots away from it - a short fight would otherwise send the help right back.
 	It cools down hot_bombsite_cooldown_secs after the last death or fight there, or at the round end.
@@ -458,7 +458,7 @@ struct arena_mode_ai_state {
 	entity_id perceived_enemy;
 
 	marker_letter_type patrol_letter = marker_letter_type::COUNT;
-	marker_letter_type reached_patrol_letter = marker_letter_type::COUNT;
+	bool rebalanced_in_transit = false;
 	bool loss_reported = false;
 	push_phase_type push_phase = push_phase_type::NOT_DECIDED;
 	bool recoil_cooldown = false;
@@ -527,10 +527,11 @@ struct arena_mode_ai_state {
 	}
 
 	/*
-		Reached the site of its patrol_letter - not in transit to it.
+		Holds its site - not moved to another one by the rebalancing and still on the way there.
+		From the spawn the bot already counts as holding its site, enemies rush it from the round start.
 	*/
 	bool is_on_patrol_site() const {
-		return patrol_letter != marker_letter_type::COUNT && reached_patrol_letter == patrol_letter;
+		return patrol_letter != marker_letter_type::COUNT && !rebalanced_in_transit;
 	}
 
 	void round_reset() {
@@ -539,7 +540,7 @@ struct arena_mode_ai_state {
 		alertness.clear();
 		perceived_enemy = {};
 		patrol_letter = marker_letter_type::COUNT;
-		reached_patrol_letter = marker_letter_type::COUNT;
+		rebalanced_in_transit = false;
 		loss_reported = false;
 		push_phase = push_phase_type::NOT_DECIDED;
 		recoil_cooldown = false;
