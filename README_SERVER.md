@@ -85,7 +85,7 @@ The server knows its admins by their accounts: an `Ed25519` key that every game 
 2. Tick `Admin account id` in the [config generator](https://hypersomnia.io/generator), paste it there and use the result.
 3. Restart the server, join it and press `Esc` - the administration panel opens.
 
-The generator makes full admins. Moderators with fewer rights go into the config by hand - in `admin_profiles` of `server_private`, e.g. `{ "account": "0x8aed41f2...", "rcon": "RCON", "badge": "MOD" }`:
+The generator makes full admins. Moderators with fewer rights go into the config by hand - in `admin_profiles` of `server_private` (in `conf.d/private.json`), e.g. `{ "account": "0x8aed41f2...", "rcon": "RCON", "badge": "MOD" }`:
 
 | `rcon` | What the admin can do |
 |---|---|
@@ -116,6 +116,8 @@ The complete reference of all settings, with comments: [`default_config.json`](h
 
 Any number of `.json` files can go into `conf.d/` - they apply in alphabetical order. The server never changes them.
 
+`server_private` - passwords, webhooks, admins - goes apart from the config, so it can be shown to others when asking for help: into `conf.d/private.json` readable only by the server (`chmod 600`), or for Docker compose into a `.env` next to `compose.yaml` (`chmod 600 .env`), which fills in its `${HYPERSOMNIA_PASSWORD}` (passwords and webhooks; admins stay in `compose.yaml`). The [config generator](https://hypersomnia.io/generator) writes them so.
+
 ### Environment variables
 
 Every field of the [config generator](https://hypersomnia.io/generator) has its own variable - the generator writes them for Docker:
@@ -125,6 +127,7 @@ Every field of the [config generator](https://hypersomnia.io/generator) has its 
 | `HYPERSOMNIA_SERVER_NAME` | The name on the server list | `My server` |
 | `HYPERSOMNIA_ARENA` | The arena, and the game mode after a space if not its default | `fy_iceworld bomb_defusal` |
 | `HYPERSOMNIA_MAP_CYCLE` | The arenas that follow each other | `de_silo,de_metro` |
+| `HYPERSOMNIA_MAP_CYCLE_RANDOM` | `off` plays the cycle in its order - by default the arenas after the first one come in random order | `off` |
 | `HYPERSOMNIA_ADMINS` | [Admins](#become-an-admin) with full rights | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_PASSWORD` | Only players who know it can join | |
 | `HYPERSOMNIA_SLOTS` | Players per server | `10` |
