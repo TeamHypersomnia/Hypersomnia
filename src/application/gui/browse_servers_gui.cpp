@@ -1368,6 +1368,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	bool has_local_servers = false;
 	bool has_tournament_servers = false;
+	bool has_lan_tournament_servers = false;
 	bool has_official_servers = false;
 	bool has_community_servers = false;
 
@@ -1418,7 +1419,17 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			target_list.push_back(&s);
 		};
 
-		if (is_internal) {
+		/*
+			A tournament on the local network (a LAN party) is shown as one too - on the public list
+			only an official server's is, or anyone could dress up a server as a tournament.
+		*/
+
+		if (is_internal && s.heartbeat.is_tournament_server()) {
+			has_tournament_servers = true;
+			has_lan_tournament_servers = true;
+			push_if_passes(tournament_server_list);
+		}
+		else if (is_internal) {
 			has_local_servers = true;
 			push_if_passes(local_server_list);
 		}
@@ -1584,13 +1595,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		Only right after the first opening - never switching the tab under the cursor later.
 	*/
 
-	had_local_servers = has_local_servers;
+	had_local_servers = has_local_servers || has_lan_tournament_servers;
 
 	if (local_tab_precedence_pending && augs::steady_secs() - first_shown_at > 2.0) {
 		local_tab_precedence_pending = false;
 	}
 
-	if (local_tab_precedence_pending && has_local_servers) {
+	if (local_tab_precedence_pending && (has_local_servers || has_lan_tournament_servers)) {
 		local_tab_precedence_pending = false;
 		current_tab = browser_tab::LOCAL;
 	}
@@ -1898,8 +1909,29 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			return;
 		}
 
-		if (t == browser_tab::LOCAL || (t == browser_tab::ALL && has_local_servers)) {
-			section(local_servers_label, green, "local", locals, has_local_servers ? "" : "No servers found on your local network.");
+		if (t == browser_tab::LOCAL) {
+			/*
+				The local network's tournament matches above its other servers.
+			*/
+
+			auto lan_tournaments = std::vector<server_list_entry*>();
+
+			for (const auto e : tournaments) {
+				if (e->progress.found_on_internal_network) {
+					lan_tournaments.push_back(e);
+				}
+			}
+
+			if (has_lan_tournament_servers) {
+				section(typesafe_sprintf("Ongoing Tournament (%x)", lan_tournaments.size()), cyan, "tournament", lan_tournaments, "");
+			}
+
+			if (has_local_servers || !has_lan_tournament_servers) {
+				section(local_servers_label, green, "local", locals, has_local_servers ? "" : "No servers found on your local network.");
+			}
+		}
+		else if (t == browser_tab::ALL && has_local_servers) {
+			section(local_servers_label, green, "local", locals, "");
 		}
 
 		if (t == browser_tab::ALL) {

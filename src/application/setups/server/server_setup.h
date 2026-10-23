@@ -1042,6 +1042,12 @@ public:
 	bool is_idle() const;
 
 	bool has_assigned_teams() const;
+
+	/*
+		Of the players the assigned teams wait for (not their spectators): how many are in the game, out of how many.
+	*/
+
+	std::pair<std::size_t, std::size_t> count_assigned_players_present() const;
 	faction_type get_assigned_team(const std::string&) const;
 
 	std::string get_browser_location() const;

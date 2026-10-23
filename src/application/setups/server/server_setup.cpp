@@ -3025,6 +3025,19 @@ void server_setup::send_heartbeat_to_server_list() {
 		heartbeat.server_slots = heartbeat.num_online;
 	}
 
+	if (has_assigned_teams()) {
+		/*
+			A tournament match: how many of its players joined, out of how many it waits for (2 in a 1v1) -
+			not its slots, and neither the bots warming it up nor the casters watching.
+		*/
+
+		const auto [present, expected] = count_assigned_players_present();
+
+		heartbeat.num_online_humans = static_cast<uint8_t>(present);
+		heartbeat.num_online = static_cast<uint8_t>(present);
+		heartbeat.server_slots = static_cast<uint8_t>(expected);
+	}
+
 	heartbeat.server_version = hypersomnia_version().get_version_string();
 	heartbeat.is_editor_playtesting_server = is_playtesting_server();
 
@@ -3508,35 +3521,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.preassigned_factions = has_assigned_teams();
 
 	if (has_assigned_teams()) {
-		/*
-			Spectators in the roster (e.g. defeated tournament teams) are optional;
-			only count actual playing assignments toward the "all present" gate.
-		*/
-
-		std::size_t expected_playing = 0;
-
-		for (const auto& [id, faction] : assigned_teams.id_to_faction) {
-			(void)id;
-
-			if (::is_actual_faction(faction)) {
-				++expected_playing;
-			}
-		}
-
-		std::size_t playing_in_game = 0;
-
-		auto count_in_game = [&](auto, auto& c) {
-			if (c.state != client_state_type::IN_GAME) {
-				return;
-			}
-
-			if (::is_actual_faction(get_assigned_team(c.authenticated_id))) {
-				++playing_in_game;
-			}
-		};
-
-		for_each_id_and_client(count_in_game, connected_and_integrated_v);
-
+		const auto [playing_in_game, expected_playing] = count_assigned_players_present();
 		out.all_assigned_present = playing_in_game == expected_playing;
 	}
 
@@ -7064,6 +7049,39 @@ void server_setup::handle_client_chat_command(
 
 bool server_setup::has_assigned_teams() const { 
 	return !assigned_teams.id_to_faction.empty();
+}
+
+std::pair<std::size_t, std::size_t> server_setup::count_assigned_players_present() const {
+	/*
+		Spectators in the roster (e.g. defeated tournament teams) are optional;
+		only count actual playing assignments toward the "all present" gate.
+	*/
+
+	std::size_t expected_playing = 0;
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		(void)id;
+
+		if (::is_actual_faction(faction)) {
+			++expected_playing;
+		}
+	}
+
+	std::size_t playing_in_game = 0;
+
+	auto count_in_game = [&](auto, const auto& c) {
+		if (c.state != client_state_type::IN_GAME) {
+			return;
+		}
+
+		if (::is_actual_faction(get_assigned_team(c.authenticated_id))) {
+			++playing_in_game;
+		}
+	};
+
+	for_each_id_and_client(count_in_game, connected_and_integrated_v);
+
+	return { playing_in_game, expected_playing };
 }
 
 faction_type server_setup::get_assigned_faction(const mode_player_id id) const { 
