@@ -1,438 +1,274 @@
-# Hypersomnia dedicated server guide 
+# Host a Hypersomnia server
 
-You can either use the *headless* server [`AppImage`](#manual-appimage-setup) or the [docker container](#docker-setup). 
+A Hypersomnia server runs on any Linux machine or VPS - as a Docker container or a single AppImage file. It needs two UDP ports, updates itself, shows up on the [server list](https://hypersomnia.io/servers) on its own, and you manage it from inside the game.
 
-The server `AppImage` is known to work on Ubuntu 22.04 or later.
+The config generator walks you through it, step by step - a persistent server or a tournament, with Docker or the AppImage:
 
-Check out this [handy script to quickly deploy the `AppImage` as a service](https://git.libregaming.org/hyperdev/Gameserver/src/branch/main/scripts/deploy_hypersomnia.sh), used for onFOSS events.
+**[Open the config generator](https://hypersomnia.io/generator)**
 
-- [Docker setup](#docker-setup)
-  * [Prerequisites](#prerequisites)
-  * [Example with `docker run`](#example-with-docker-run)
-  * [Example with `docker compose`](#example-with-docker-compose)
-  * [Configuring via an environment variable](#configuring-via-an-environment-variable)
-  * [Passing the server private key via an environment variable](#passing-the-server-private-key-via-an-environment-variable)
-- [Manual `AppImage` setup](#manual-appimage-setup)
-  * [(Optional) Download all community maps (<100 MB)](#optional-download-all-community-maps-100-mb)
-  * [libfuse](#libfuse)
-- [Configuration](#configuration)
-  * [Ports](#ports)
-  * [CLI flags](#cli-flags)
-    - [--as-service](#--as-service)
-    - [--daily-autoupdate](#--daily-autoupdate)
-    - [--appdata-dir](#--appdata-dir)
-    - [--apply-config](#--apply-config)
-    - [--tournament](#--tournament)
-- [Hosting a tournament](#hosting-a-tournament)
-  * [Quickstart](#quickstart)
-  * [How players join](#how-players-join)
-  * [Results, crashes, recovery](#results-crashes-recovery)
+This page explains the rest.
 
-# Docker setup
+- [Ports](#ports)
+- [Updates](#updates)
+- [Tournaments](#tournaments)
+- [Advanced](#advanced)
+  - [Become an admin](#become-an-admin)
+  - [Configuration](#configuration)
+  - [Several servers, ranked](#several-servers-ranked)
+  - [The server key, official servers](#the-server-key-official-servers)
+- [Troubleshooting](#troubleshooting)
+- [Command line flags](#command-line-flags)
 
-You can build the [`Dockerfile`](./Dockerfile) yourself, or use the official image:
+# Ports
 
-```bash
-docker pull ghcr.io/teamhypersomnia/hypersomnia-server:latest
-```
+| Port | Protocol | For |
+|---|---|---|
+| `8412` | UDP | Players of the game (Steam, Windows, Linux, macOS) |
+| `9000` | UDP | Players in the browser ([play.hypersomnia.io](https://play.hypersomnia.io)) |
+| `8430` (outgoing) | UDP | The server list: `masterserver.hypersomnia.io` - usually allowed already |
 
-## Prerequisites
-
-- [Docker engine](https://docs.docker.com/engine/install/) - or any OCI engine capable of running OCI containers.
-- Hypersomnia server directory with permissions for the user `999`.
-
-## Example with `docker run`
-
-Simply run:
-
-```bash
-SERVER_DIR=/opt/hypersomnia
-mkdir $SERVER_DIR
-chown 999:999 $SERVER_DIR
-cd $SERVER_DIR
-
-docker run \
-  --restart unless-stopped \
-  --volume $SERVER_DIR:/home/hypersomniac/.config/Hypersomnia/user \
-  ghcr.io/teamhypersomnia/hypersomnia-server:latest
-```
-
-This already creates `/opt/hypersomnia` directory with proper permissions. Any other directory may be chosen.
-
-## Example with `docker compose`
-
-Simply run:
-
-```bash
-wget https://raw.githubusercontent.com/TeamHypersomnia/Hypersomnia/refs/heads/master/docker-compose.yaml
-docker compose up
-```
-
-The [latest `docker-compose.yaml`](/docker-compose.yaml) will be used, for example:
-
-```yaml
-services:
-  hypersomnia-server:
-    image: ghcr.io/teamhypersomnia/hypersomnia-server:latest
-    pull_policy: daily
-    volumes:
-      - /opt/hypersomnia:/home/hypersomniac/.config/Hypersomnia/user
-    ports:
-      - '8412:8412/udp'
-      - '9000:9000/udp'
-    restart: unless-stopped
-```
-
-It is recommended to use the `latest` tag and [`pull_policy` set to `daily`](https://github.com/compose-spec/compose-spec/blob/main/spec.md#pull_policy) for the server to keep up with frequent updates.
-
-Since we're mounting a volume, the server will create the `conf.d/` directory at:
-
-```bash
-/opt/hypersomnia/conf.d/
-```
-
-This is now the folder for your [`.json` configuration files](#configuration).
-
-## Configuring via an environment variable
-
-Instead of a file in `conf.d/`, you can pass the [configuration](#configuration) as JSON in the `HYPERSOMNIA_CONFIG` environment variable.
-It is exactly as if the config was the last file in `conf.d/` (see [Config loading order](#config-loading-order)):
-
-```yaml
-services:
-  hypersomnia-server:
-    image: ghcr.io/teamhypersomnia/hypersomnia-server:latest
-    pull_policy: daily
-    environment:
-      HYPERSOMNIA_SERVER_PRIVATE_KEY: "hypersomnia-key-v1:..."
-      HYPERSOMNIA_CONFIG: |
-        {
-          "server_start": { "port": 8412 },
-          "server": { "server_name": "My server", "arena": "de_cyberaqua" }
-        }
-    ports:
-      - '8412:8412/udp'
-      - '9000:9000/udp'
-    restart: unless-stopped
-```
-
-Or with `docker run`:
-
-```bash
-docker run --env HYPERSOMNIA_CONFIG='{ "server": { "server_name": "My server" } }' ...
-```
-
-No volume is needed then. When the container is recreated, only the downloaded maps (fetched again) and the runtime settings (`runtime_prefs.json`, e.g. vars tweaked through the administration panel) are lost - mount the volume as above to keep them too.
-
-## Passing the server private key via an environment variable
-
-The server's key is its identity on the server list and in the players' favorites.
-Without `HYPERSOMNIA_SERVER_PRIVATE_KEY` and without a volume, a new key is made every time the container is recreated - the server looks like a new one.
-
-To get a key, start the server once without `HYPERSOMNIA_SERVER_PRIVATE_KEY` and copy the one line of the key it made:
-
-```bash
-docker exec <container> cat /home/hypersomniac/.config/Hypersomnia/user/.keys/server.key
-# hypersomnia-key-v1:...
-```
-
-Then pass it in `HYPERSOMNIA_SERVER_PRIVATE_KEY` as above - `server.key` is then neither read nor made.
-With a volume, the same line is in `/opt/hypersomnia/.keys/server.key`.
-
-Keep the key secret - anyone with it can pose as your server. Note that environment variables are visible to whoever can run `docker inspect` on the host.
-
-# Manual `AppImage` setup
+Open the first two, e.g. with `ufw`:
 
 ```sh
-wget https://hypersomnia.io/builds/latest/Hypersomnia-Headless.AppImage
-chmod +x Hypersomnia-Headless.AppImage
-nohup ./Hypersomnia-Headless.AppImage --appimage-extract-and-run --daily-autoupdate > /dev/null 2>&1 &
+sudo ufw allow 8412/udp
+sudo ufw allow 9000/udp
 ```
 
-This will run the server in the background.
+With a cloud provider (AWS, Hetzner, OVH...) open them in its firewall panel as well.
 
-## (Optional) Download all community maps (<100 MB)
+Other ports? Set them under `Ports` in the [config generator](https://hypersomnia.io/generator).
 
-```sh
-./Hypersomnia-Headless.AppImage --appimage-extract-and-run --sync-external-arenas-and-quit
-```
+# Updates
 
-The maps will be saved to ``~/.config/Hypersomnia/user/downloads/arenas``.
-Anyone who connects will be able to play them - upon connection, the player will download the custom map from the same catalogue (over HTTPS) or directly from your server over UDP should the map catalogue be offline.
+The game is in active development, and players with a newer version can't join an older server - keep it updated:
 
-## libfuse
+- **Docker:** nothing to do. The server updates itself on every start, and every day at 03:00 (the host's time) it restarts to do so - `restart: unless-stopped` brings it back up.
+- **AppImage:** it updates itself on every start, and with `--daily-autoupdate` every day at 03:00 - it starts again by itself, or systemd starts the service again.
+- **A tournament** never updates in the middle of it.
 
-Note you can skip the ``--appimage-extract-and-run`` flag if you have [fuse](https://packages.ubuntu.com/jammy/fuse) installed. It's ``fuse2`` on Arch.
+Change the hour or turn it off under `Show advanced options` in the [config generator](https://hypersomnia.io/generator).
 
-``--appimage-extract-and-run`` will work out-of-the-box but involves an extraction step into ``/tmp``.
+<!-- toc highlight icon=trophy -->
 
-Not a big deal as the ``Hypersomnia-Headless.AppImage`` is rather small (< 30 MB) but it's something to keep in mind.
+# Tournaments
 
-# Configuration
+![A tournament's matches in Browse servers](docs/images/server_browser_tournament_open.png)
 
-See [``default_config.json``](./hypersomnia/default_config.json) for the complete configuration variables reference.
-- You will be interested in `server_start`, `server` and `server_private` sections.
+One setting turns your server into a knockout tournament: a server for every match, all of them open at once, and the winners go on round by round through the bracket until one team is left. No file, no list of players.
 
-Create a ``server.json`` file in ``~/.config/Hypersomnia/user/conf.d/`` (or in `/opt/hypersomnia/conf.d`, wherever you mounted your container). This will be your server configuration.
+Pick the `Tournament` tab of the [config generator](https://hypersomnia.io/generator) - it gives you the commands and the ports to open.
 
-A good start would be:
+## How it goes
 
-```json
+1. Players join any free match server - until it's full, it says `Match #1 (any pair)`. The first ones there make the match, and it starts, named by its players.
+2. The winners go on to the next bracket round - those servers let in only them.
+3. Fewer players came? `Close round 1` in the administration panel: whoever waits alone advances without playing, the empty servers close.
+4. Progress is saved all the time. After a crash, start it again with the same settings (Docker does it by itself) - it carries on, mid-round. Once it's over, the same settings don't start it again; the results are in `tournament.completed.<time>.state.json` in the user folder.
+
+On the local network (a LAN party) every player sees the matches together under `Ongoing Tournament`, as above. On the public server list only the official servers' tournaments are shown so.
+
+## Fixed teams and pairings
+
+To decide the teams and who plays whom yourself, choose `Set up beforehand` under `Player pairings` in the [config generator](https://hypersomnia.io/generator): one team per line, lines 1 and 2 play each other, 3 and 4, and so on. Players set these exact nicknames to be let in - or the teams can be account ids.
+
+<!-- toc highlight icon=gear children -->
+
+# Advanced
+
+Admins, the config files, several servers on one machine and the server key.
+
+## Become an admin
+
+The server knows its admins by their accounts: an `Ed25519` key that every game generates for itself, or a Steam account in the Steam version.
+
+1. In the game, open `Settings → Account` and click the copy icon next to your account. You get your account id:
+   - `steam_7656119...` in the Steam version,
+   - `0x...` with an account key (the game outside Steam, the browser).
+2. Paste it into `Admin account id` in the [config generator](https://hypersomnia.io/generator) and use its result.
+3. Restart the server, join it and press `Esc` - the administration panel opens.
+
+The generator makes full admins. Moderators with fewer rights go into the config by hand - in `admin_profiles` of `server_private`, e.g. `{ "account": "0x8aed41f2...", "rcon": "RCON", "badge": "MOD" }`:
+
+| `rcon` | What the admin can do |
+|---|---|
+| `MASTER_RCON` | Everything: all settings, restarts, kicks and bans. |
+| `RCON` | Kick, ban, change the arena, the game mode and the map cycle - but not the server's settings. |
+| `NONE` | Nothing - only the `[ADMIN]` badge (or `badge`) next to the name. |
+
+> [!NOTE]
+> A `steam_...` account is an admin only when it joins from the Steam version. A key linked to Steam (the game outside Steam, the browser) is its own `0x...` account - add both to be an admin from either.
+
+The panel's `Players` tab kicks and bans by account. Bans are kept in `server_bans.json` in the user folder - you can edit it by hand.
+
+## Configuration
+
+The complete reference of all settings, with comments: [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json). For a server, these sections matter:
+
+| Section | What's in it |
+|---|---|
+| `server_start` | `port`, `slots` |
+| `server` | Name, arenas, map cycle, bots, game rules, web clients, updates |
+| `server_private` | Admins, password, Discord webhook - never sent to players |
+| `instances` | How many casual and ranked servers to run - see [Several servers](#several-servers-ranked) |
+
+### Where the config goes
+
+- **Docker:** [environment variables](#environment-variables) in `docker-compose.yaml` or the `docker run` command, or a `.json` file in `/opt/hypersomnia/conf.d/`. Apply it with `docker compose up -d` or `docker restart hypersomnia-server`.
+- **AppImage:** `~/.config/Hypersomnia/user/conf.d/server.json` (`/opt/hypersomnia/user/conf.d/` with a separate user). Apply it by starting the server again, or `systemctl --user restart hypersomnia`. The [environment variables](#environment-variables) work too - as `Environment=` lines in the service.
+
+Any number of `.json` files can go into `conf.d/` - they apply in alphabetical order. The server never changes them.
+
+### Environment variables
+
+Every field of the [config generator](https://hypersomnia.io/generator) has its own variable - the generator writes them for Docker:
+
+| Variable | What it sets | Example |
+|---|---|---|
+| `HYPERSOMNIA_SERVER_NAME` | The name on the server list | `My server` |
+| `HYPERSOMNIA_ARENA` | The arena, and the game mode after a space if not its default | `fy_iceworld bomb_defusal` |
+| `HYPERSOMNIA_MAP_CYCLE` | The arenas that follow each other | `de_silo,de_metro` |
+| `HYPERSOMNIA_ADMINS` | [Admins](#become-an-admin) with full rights | `steam_7656119...,0x8aed41f2...` |
+| `HYPERSOMNIA_PASSWORD` | Only players who know it can join | |
+| `HYPERSOMNIA_SLOTS` | Players per server | `10` |
+| `HYPERSOMNIA_SERVER_INSTANCES` | How many servers, on consecutive ports | `3` |
+| `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports, `8412` and `9000` by default | `8500` |
+| `HYPERSOMNIA_BROWSER_PLAYERS` | `off` - no players in the browser, no browser ports | `off` |
+| `HYPERSOMNIA_DAILY_UPDATE` | When to update every day, or `off` | `05:00` |
+| `HYPERSOMNIA_TIME_ZONE` | Where the server is, for happy hours | `Europe/Berlin` |
+| `HYPERSOMNIA_DISCORD_WEBHOOK` | Posts who joined and the match results to your Discord | |
+| `HYPERSOMNIA_TOURNAMENT` | A [tournament](#tournaments) for this many players | `16` |
+| `HYPERSOMNIA_TOURNAMENT_TEAM_SIZE` | `2` for 2v2 and so on | `2` |
+| `HYPERSOMNIA_TOURNAMENT_TEAMS` | The teams set up beforehand: one per line (or separated by `;`), players separated by commas | `alice, bob; carol, dave` |
+| `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena for each bracket round | `de_cyberaqua,de_silo` |
+| `HYPERSOMNIA_CONFIG` | Anything else - the whole config as JSON, like a file in `conf.d/` | |
+| `HYPERSOMNIA_SERVER_PRIVATE_KEY` | The [server key](#the-server-key-official-servers), instead of the file | |
+
+They override `conf.d/` and `HYPERSOMNIA_CONFIG`.
+
+### A typical config
+
+```json title="conf.d/server.json"
 {
   "server_start": {
+    "port": 8412,
     "slots": 10
   },
 
   "server": {
-    "server_name": "[VA] Vatican City",
-    // "domain": "hypersomnia.example.com",
-
-    "sync_all_external_arenas_on_startup": true,
-    "daily_autoupdate": true, // set to false for the docker build, managed by pull_policy
+    "server_name": "[DE] Berlin",
 
     "arena": "de_cyberaqua",
-
     "cycle": "LIST",
-    "cycle_list": [
-      "de_cyberaqua",
-      "de_silo",
-      "de_metro",
-      "de_duel_practice",
-      "de_facing_worlds"
-    ]
+    "cycle_list": [ "de_cyberaqua", "de_silo", "fy_minilab bomb_defusal", "de_metro" ]
   },
 
   "server_private": {
-    // "discord_webhook_url": "https://discord.com/api/webhooks/put_your/secret_here",
-    // "server_password": "...", // only players who know it can join
+    "server_password": "", // set it to let in only those who know it
+    "discord_webhook_url": "", // posts who joined and the match results to your Discord
     "admin_profiles": [
-      { "account": "steam_76561198000000000", "rcon": "MASTER_RCON" } // your account id - see below
+      { "account": "steam_76561198000000000", "rcon": "MASTER_RCON" }
     ]
-  },
-
-  "instances": { "casual": 1 } // explained later
-}
-```
-
-You can put any number of files in the `conf.d` folder - they will be applied in lexicographic (natural) order.
-
-The files in ``conf.d/`` are *never* modified. Another config file will be created once the server starts: ``~/.config/Hypersomnia/user/runtime_prefs.json``, but it will be *both read and written to* as it contains vars changed during the server operation, like e.g. the current arena or vars tweaked through administration panel (RCON). **It will override** the changes in ``conf.d``.
-
-To be able to access the administration panel of your server, add your account to ``admin_profiles`` in ``server_private``: ``{ "account": "<account id>", "rcon": "NONE" | "RCON" | "MASTER_RCON", "badge": "optional badge" }``. Find your account id in the game under ``Settings -> Account`` (the copy icon next to it) - ``steam_...`` in the Steam build, ``0x...`` (the same as ``key_...``) with an account key. Then press ``Esc`` when you're on your server to open the administration panel. There are no RCON passwords, and no address is trusted on its own - not even the server's own machine. A ``steam_...`` account is an admin only when it joins from the Steam build: a key linked to Steam (the game outside Steam, a browser) counts as its own ``key_...`` account - put both in ``admin_profiles`` to be an admin from either.
-
-The panel's *Players* tab kicks and bans by account. Bans are kept in ``server_bans.json`` in the user folder and can be edited by hand - each holds the account and the address of the player.
-
-If your server has a domain pointing to it, set `domain` in the `server` section, e.g. `"domain": "hypersomnia.example.com"` - without the port. The server list will show it instead of the bare IP, players can copy it, and the game remembers it for the next launch, so they still find your server if its IP changes. It is only a label: nothing checks that the domain really points to your server, and it does not make the server official.
-
-Ranked matches of an official server get happy hours - 2x, Friday to Sunday from 19:00 to 21:00 - in the time zone of the host's system (e.g. `timedatectl set-timezone Europe/Berlin`), or in `time_zone` of the `server` section if set (an IANA name, e.g. `"Europe/Berlin"`). A host left in UTC (common for a VPS or a container) has no happy hours until one of these is set - the log says so.
-
-### The server key
-
-Every server makes an Ed25519 key on its first start, ``server.key`` in the user folder (``~/.config/Hypersomnia/user/.keys/server.key``). One key per host: all the instances it runs (``instances``, tournament matches) share it and differ by their labels - ``c1``, ``c2``, ``r1``, ``t1`` - shown on the server list. Every connection to the server is encrypted to its key, and the server signs its heartbeats to the server list with it. Players can join a given instance by its address and the key (``<address>:<port>,0x<key>``), or the host's best one with the key alone. Print the public key with:
-
-```sh
-./Hypersomnia-Headless.AppImage --print-server-key
-```
-
-Back ``server.key`` up and keep it private. Moving a server to another host: copy ``server.key`` - the key stays the same. Players know a server by its key: a server with another one (e.g. reinstalled without the file) is not the server they added to their favorites. Hosts in different regions should have different keys.
-
-One key, one password: players save a server's password under its key, so all the instances of one key should have the same password (or none). Instances that need different passwords need different keys.
-
-### Official servers
-
-Official servers are hosted by volunteers together with the developers. Send the developers the output of ``--print-server-key`` - the server list then shows the server as official, and hypersomnia.io takes its ranked match reports, which it signs with that key. Nothing secret changes hands.
-
-Ranked servers take only players whose account was confirmed by hypersomnia.io (Steam, CrazyGames, or an account key) - at most ``max_ranked_players_per_ip`` (2) per address. A community server that turns ranked on needs to be official for its matches to count.
-
-Players carry their account to every server in the handshake; the server checks it offline, so a server keeps taking players while hypersomnia.io or the server list is down. Keep the host's clock synchronized (e.g. `systemd-timesyncd` or `chrony`): accounts are confirmed for 2 hours at a time.
-
-If you have a Discord server, you might want to setup a [Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) and set `discord_webhook_url` to the webhook URL. This will notify your community whenever someone connects, as well as report all match results.
-
-## Config loading order:
-
-1) ``default_config.json``, comes with the game.
-2) All configs inside ``~/.config/Hypersomnia/user/conf.d/``, in lexicographical order, if any.
-3) The ``HYPERSOMNIA_CONFIG`` [environment variable](#configuring-via-an-environment-variable), if set - as if it were the last file in ``conf.d/``.
-4) ``~/.config/Hypersomnia/user/runtime_prefs.json``, if any.
-    - This means that the vars you tweak from the administration panel *override* the ones in ``conf.d/`` and ``HYPERSOMNIA_CONFIG`` on every start - a later change to such a var in ``conf.d/`` has no effect until you remove it from ``runtime_prefs.json``.
-5) Config specified by ``--apply-config`` flag, if any.
-
-## Ports
-
-You'll need these ports open:
-- One UDP port for native clients (``8412`` is recommended).
-- One UDP port for [Web clients](https://play.hypersomnia.io).
-	- ``9000`` by default - multiple web clients will be multiplexed.
-	  - Optionally, you can disable UDP multiplexing and use multiple UDP ports.
-
-For example:
-
-```json
-  "server": {
-    "webrtc_udp_mux": true,
-    "webrtc_port_range_begin": 9000,
-    // "webrtc_port_range_end": 9020 // only matters if "webrtc_udp_mux": false
-  },
-  "server_start": {
-    "port": 8412
-  }
-```
-
-With these settings, you will only need to expose UDP ports ``8412`` and ``9000``.
-
-## Many server instances
-
-By default there will be only one casual server instance and it will exactly match your ``conf.d/`` files.
-
-However, you can easily manage multiple server instances - casual and ranked - by adding:
-
-```json
-"instances": {
-  "casual": 1,
-  "ranked": 4
-}
-```
-
-Only a ranked instance plays ranked matches - its match starts when the warmup ends, or earlier once all the players type ``/go``, with at least one player in each team.
-
-The ranked instances run with the ``server`` vars with ``instance_vars.ranked`` over them - any of its fields, e.g.:
-
-```json
-"instance_vars": {
-  "ranked": {
-    "friendly_fire": true,
-    "client_network_timeout_secs": 1.5
   }
 }
 ```
 
-This will result in:
+An arena is written as `"name"` (its default game mode) or `"name game_mode"`, e.g. `"fy_minilab bomb_defusal"`.
+Official arenas come with the game. Community arenas ([hypersomnia.io/arenas](https://hypersomnia.io/arenas)) are downloaded by the server the first time it needs them - players get them from the same catalogue when they join.
 
-![last_region_select](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/345beed2-f66b-4a8a-a507-55d108c1909e)
+### Changes made in the panel come first
 
-The instances will get incrementing ports, starting from the specified ``port`` in ``server_start``.
-Analogously for the web, the ports will be incrementing by 1 starting from ``webrtc_port_range_begin``, with UDP muxing force-enabled for every instance.
+> [!WARNING]
+> Whatever you change in the administration panel is saved to `runtime_prefs.json` in the user folder, and it **overrides** `conf.d/` on every start.
+> If you change a setting in `conf.d/` and nothing happens, it was changed from the panel before: remove it from `runtime_prefs.json` (or reset it in the panel) and restart.
 
-It's worth mentioning, that docker compose **does not** support range mappings, so you have to explicitly list each port mapping in the `ports:` section.
+The full order, later ones win:
 
-For example:
+1. `default_config.json` - comes with the game.
+2. `conf.d/*.json` - in alphabetical order.
+3. `HYPERSOMNIA_CONFIG` - as if it were the last file in `conf.d/` - and then the other [environment variables](#environment-variables).
+4. `runtime_prefs.json` - the changes made from the panel.
+5. The file given with `--apply-config`, if any.
+
+## Several servers, ranked
+
+One process can run several servers - set how many under `Server instances` in the [config generator](https://hypersomnia.io/generator). Ranked ones go into the config by hand, e.g. `"instances": { "casual": 1, "ranked": 2 }`.
+
+- They take consecutive ports: the casual one at `8412`, the ranked ones at `8413-8414` - and in the browser `9000`, `9001-9002`. Open all of them (the generator lists them).
+- They're named `My server #1`, `#2`... and labelled `c1`, `r1`, `r2` on the server list.
+- A ranked server plays matches: a match starts when the warmup ends, or once all players type `/go` - with at least one player in each team. When someone drops out, the match freezes until they come back.
+- Ranked matches count on the [leaderboards](https://hypersomnia.io/leaderboards/bomb-defusal) only on [official servers](#the-server-key-official-servers). On your own server they are still good for a match with friends that waits for whoever drops out.
+- Settings just for the ranked servers go into `instance_vars.ranked`, e.g. `"instance_vars": { "ranked": { "friendly_fire": true } }`.
+
+In Docker, map the ports as ranges:
+
 ```yaml
 ports:
-  - '8412:8412/udp'
-  - '8413:8413/udp'
-  - '9000:9000/udp'
-  - '9001:9001/udp'
+  - '8412-8414:8412-8414/udp'
+  - '9000-9002:9000-9002/udp'
 ```
 
-The server instances will also get unique server names - with added ``#1``, ``#2``, etc. suffixes - and labels on the server list: ``c1``, ``c2``... and ``r1``, ``r2``...
+Restarting one of them from the panel restarts all of them. Changes made in the panel on `c1` are kept for all of them, on `r1` for the ranked ones; on the others they last only until the next restart.
 
-The process first creates the Casual instances, then the Ranked ones, so with the settings above and ``port`` 8000 the Casual one will be at ``8000`` and the Ranked ones at ``8001-8004``.
+## The server key, official servers
 
-If you restart/shutdown just one server instance from the panel, all servers will follow.
-The runtime changes to config vars are kept in ``runtime_prefs.json`` when made on the first instance of a kind: on ``c1`` they go to the ``server`` section (and so reach the ranked instances too), on ``r1`` to ``instance_vars.ranked``. Changes to other instances only last for the current server run.
+On its first start the server makes its key: `.keys/server.key` in the user folder - `/opt/hypersomnia/.keys/server.key` with Docker, `~/.config/Hypersomnia/user/.keys/server.key` with the AppImage. Players know your server by it - their favorites remember it, and their connections are encrypted with it.
 
-## CLI flags
+> [!WARNING]
+> **Back up `server.key` and keep it secret.** A server reinstalled without it is a new server to the players. Anyone who has it can pose as your server.
 
-Additionally to the config vars, you can tweak the server behavior from the CLI.
+- Moving to another machine: copy `server.key` over.
+- In Docker without a volume, pass the key in `HYPERSOMNIA_SERVER_PRIVATE_KEY` (the one line from `server.key`), or a new one is made every time the container is recreated.
+- Print the public key with `./Hypersomnia-Headless.AppImage --print-server-key`.
+- All the servers of one machine share the key. Servers in different regions should have different keys, and servers that need different passwords need different keys.
 
-### --as-service
+**Official servers** are hosted by volunteers together with the developers: send us the output of `--print-server-key` on [Discord](https://discord.gg/YC49E4G). Your server then shows as official, and its ranked matches count on the [leaderboards](https://hypersomnia.io/leaderboards/bomb-defusal). Nothing secret changes hands.
 
-Adjusts server restarting behavior so the server is suitable to be run as a **systemd service**.
+Good to know for ranked servers:
+- They take only players signed in with an account (Steam, CrazyGames or an account key) - at most 2 from one IP address (`max_ranked_players_per_ip`).
+- Keep the machine's clock right (`systemd-timesyncd` or `chrony`) - a player's sign-in is valid for 2 hours, so a clock that is off turns players away.
+- Happy hours (2x MMR, Friday to Sunday 19:00-21:00) follow the machine's time zone, or `Time zone` under `Show advanced options` in the [config generator](https://hypersomnia.io/generator). A machine in UTC (most VPSes and containers) has none until you set one.
 
-- Prevents spawning another process when the server is about to restart (e.g. in order to apply updates).
-  - A non-service process restarted itself by spawning a separate process right before shutting down.
-  - In case of a systemd service however, it is the **systemd** that is responsible for restarting the service process.
-- Allows to propagade all CLI flags like e.g. ``--appdata-dir`` across server restarts.
-  - A non-service process was able to do this by respecifying them in the CLI of the newly spawned process.
-  - A service-based server has to save its CLI flags in a temporary file in ``logs/launch.flags`` before shutting down - this file will be read on subsequent server launch. Among others, this will e.g. suppress "new server" Telegram/Discord notifications from being posted whenever the server restarts.
+# Troubleshooting
 
-### --daily-autoupdate
+**The server isn't on the server list.**
+Look in the log for errors. Check that the server can reach `masterserver.hypersomnia.io` (UDP `8430`), and that `notified_server_list` isn't changed in your config.
 
-Causes the server to update itself every 24 hours at 03:00 AM (your local time), if a newer game version is available. This flag is highly recommended so you don't have to keep up with frequent game updates (the game is in active development). You can change the autoupdate hour with ``daily_autoupdate_hour`` var in config.
+**It's on the list, but nobody can join.**
+The UDP ports are closed: open them in the system's firewall and in the cloud provider's panel - see [Ports](#ports). Browser players need `9000` too.
 
-### --appdata-dir
+**I changed `conf.d/`, nothing changed.**
+The setting was changed from the panel before - see [Changes made in the panel come first](#changes-made-in-the-panel-come-first).
 
-The server will use ``~/.config/Hypersomnia`` as its "AppData" folder by default - this is where it will store its ``user``, ``cache`` and ``logs`` folders.
-This is important as it determines where to store your config files.
+**Docker: `Permission denied` in the log.**
+The data folder must belong to the user `999`: `sudo chown -R 999:999 /opt/hypersomnia`.
 
-If the default ``~/.config/Hypersomnia`` folder is unavailable for some reason, ``--appdata-dir`` parameter comes to the rescue.
+**AppImage: `fuse: failed to exec fusermount` / `Cannot mount AppImage`.**
+Add `--appimage-extract-and-run`, or install `fuse` (`fuse2` on Arch) and tick `FUSE is installed` in the [config generator](https://hypersomnia.io/generator).
 
-You can easily:
+**Players with the new version can't join.**
+The server is outdated - see [Updates](#updates). Restart it to update right away.
 
-```sh
-nohup ./Hypersomnia-Headless.AppImage --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
+**Where are the logs?**
+On the standard output (`docker compose logs`, `journalctl --user -u hypersomnia`), and in the `logs/` folder next to `user/`. A server that started fine shows its name and key there:
+
+```
+Server name: My server
+Server key: 3f9a2c... (.../.keys/server.key)
 ```
 
-This will use ``./servers/1`` instead of ``~/.config/Hypersomnia`` and will thus apply the config files at ``./servers/1/user/conf.d/``.
+Still stuck? Ask on [Discord](https://discord.gg/YC49E4G).
 
-### --apply-config 
+# Command line flags
 
-Applies another config file *after* ``config.json``, ``conf.d/`` and ``runtime_prefs.json``. **Can only use this flag once in the whole command.**
-
-E.g. this:
-
-```sh
-nohup ./Hypersomnia-Headless.AppImage --apply-config ./some_config.json --appdata-dir ./servers/1 --daily-autoupdate > /dev/null 2>&1 &
-```
-
-will read:
-
-- ``./servers/1/user/conf.d/``
-- ``HYPERSOMNIA_CONFIG``, if set
-- ``./servers/1/user/runtime_prefs.json``
-- ``./some_config.json``
-
-In this order.
-
-### --tournament
-
-Runs a [tournament](#hosting-a-tournament) defined by the given file:
-
-```sh
-./Hypersomnia-Headless.AppImage --tournament ./tournament.json
-```
-
-The path is relative to the directory you invoke the binary from. Equivalent to setting the ``tournament_file`` config var, which resolves relative paths against ``~/.config/Hypersomnia/user/`` instead.
-
-# Hosting a tournament
-
-The dedicated server can run a complete single-elimination tournament on its own - no manual bracket management. It spawns one ranked server instance per match, waits for the results, advances the winners stage by stage and reseeds the bracket, until a single winning team remains.
-
-**This is a Linux dedicated server feature.**
-
-## Quickstart
-
-1) Download [`tournament.example.json`](./hypersomnia/tournament.example.json) - it documents every field. Save it e.g. as ``~/.config/Hypersomnia/user/tournament.json``.
-2) Edit ``"teams"`` (player nicknames, one or more players per team) and ``"arenas"`` (one entry per stage).
-3) Launch the server with:
-
-```sh
-./Hypersomnia-Headless.AppImage --tournament ~/.config/Hypersomnia/user/tournament.json
-```
-
-Alternatively, set this in your ``conf.d/`` config:
-
-```json
-"tournament_file": "tournament.json"
-```
-
-Relative paths are resolved against ``~/.config/Hypersomnia/user/``. If the file does not exist, the server just starts normally - so you can keep the var set at all times and only drop the file in when you host an event.
-
-## How players join
-
-- Every match of a stage runs concurrently on its own UDP port - consecutive ports starting from ``server_start.port``, exactly like with [multiple server instances](#many-server-instances). With ``N`` teams, open ``N / 2`` consecutive native ports, and as many web ports starting from ``webrtc_port_range_begin``.
-- The matches appear on the server list with names built from the team rosters, e.g. ``[alice] vs [bob]`` - semifinals and finals are specially tagged.
-- If ``"teams"`` hold plain nicknames, nickname authentication is forced on, so LAN tournaments work out of the box: a player simply connects with the exact nickname listed in ``"teams"``. If they hold account ids (``steam_...``, ``key_...``), players are matched by their accounts instead. Clients that are not on the match's roster are kicked, so nobody can wander onto the wrong server.
-- People listed in ``"additional_spectators"`` (casters, admins) may spectate every match of every stage.
-- A match autostarts as soon as both teams join, with full ranked logistics: the match freezes when someone disconnects so they can rejoin, and overtime is forced on since a bracket cannot handle ties.
-
-## Results, crashes, recovery
-
-Tournament progress is continuously persisted to ``~/.config/Hypersomnia/user/tournament.ongoing.json``. If the host machine crashes or you stop the server, just launch it again the same way: already-resolved matches are not replayed, and thanks to per-round recovery snapshots, live rounds resume mid-match.
-
-If a match somehow ends up unresolvable, you can hand-edit ``tournament.ongoing.json`` to force a winner and relaunch.
-
-When the tournament concludes, the winner is logged and two archives are written next to their source files:
-
-- ``tournament.completed.[timestamp].state.json`` - the full bracket history and results.
-- ``tournament.completed.[timestamp].config.json`` - the tournament definition it ran with (the original file is renamed, so the next launch starts normally).
+| Flag | What it does |
+|---|---|
+| `--daily-autoupdate` | Update every day at 03:00 if there's a new version. Same as `"daily_autoupdate": true`. |
+| `--as-service` | For systemd: when the server restarts (e.g. to update), it just exits and systemd starts it again. |
+| `--appdata-dir <dir>` | Keep everything (`user/`, `logs/`, `cache/`) in `<dir>` instead of `~/.config/Hypersomnia`. |
+| `--apply-config <file>` | One more config file, applied after all the others. Only one. |
+| `--tournament <players>` | Run a [tournament](#tournaments) for this many players. |
+| `--tournament-team-size <n>` | `2` for 2v2 and so on. |
+| `--tournament-teams <teams>` | The teams set up beforehand, e.g. `"alice, bob; carol, dave"` - instead of `--tournament`. |
+| `--tournament-arenas <arenas>` | An arena for each bracket round, e.g. `de_cyberaqua,de_silo`. |
+| `--print-server-key` | Print the server's public key and quit. |
+| `--sync-external-arenas-and-quit` | Download all community arenas (<100 MB) and quit. |
