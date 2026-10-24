@@ -118,6 +118,12 @@ public:
 
 	augs::path_type completed_archive;
 
+	/*
+		After run() returned true: stopped because a match ended without a result - not over.
+	*/
+
+	bool aborted = false;
+
 private:
 	bool finished() const;
 	void initialize_state_if_fresh();

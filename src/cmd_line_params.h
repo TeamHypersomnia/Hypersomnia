@@ -57,7 +57,7 @@ struct cmd_line_params {
 	augs::path_type apply_config;
 
 	/*
-		A tournament, as given - read and checked by tournament_definition.h:
+		A tournament, as given - read and checked by tournament_config::from_params (run_tournament.cpp):
 		--tournament <players> (open first round), or --tournament-teams "alice, bob; carol, dave";
 		--tournament-team-size <n>, --tournament-arenas <a,b,...>. Also the HYPERSOMNIA_TOURNAMENT* variables.
 	*/

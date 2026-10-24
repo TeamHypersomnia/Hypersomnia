@@ -104,12 +104,13 @@ Options:
                                 Remember to set --no-router if you're hosting e.g. on a proper VPS without a router.
 	--no-router					Disables NAT traversal for incoming connections. NAT traversal is unnecessary if you forwarded the ports,
                                 plan to only play over LAN or have a proper server instance with a dedicated IP address, without a router.
-    --daily-autoupdates         Dedicated server only. Set this to apply updates when available, at a given hour every day - 03:00 (AM) by default.
+    --daily-autoupdate          Dedicated server only. Set this to apply updates when available, at a given hour every day - 03:00 (AM) by default.
                                 To change the hour, set the server.daily_autoupdate_hour variable in config.json, e.g. to "19:30".
     --tournament [PLAYERS]      Dedicated server only. A knockout tournament for this many players - an open first round:
                                 a server per pair, named Match #N (any pair) until the first players to join it make its match.
     --tournament-teams [TEAMS]  Instead of --tournament: the teams set up beforehand, e.g. "alice, bob; carol, dave" -
-                                lines 1 and 2 play each other, 3 and 4... Nicknames, or account ids.
+                                lines 1 and 2 play each other, 3 and 4... Nicknames, or nickname=account id for every player
+                                (e.g. "alice=0x8aed..., bob=steam_7656...") - let in by their accounts.
     --tournament-team-size [N]  2 for 2v2 and so on.
     --tournament-arenas [LIST]  An arena per bracket round, the final last, e.g. de_cyberaqua,de_silo.
     --tournament-page [PORT]    The tournament's live results page's TCP port - by default the first game port's number,

@@ -120,9 +120,9 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 
 A knockout tournament: a server for every match, the winners go on round by round.
 
-**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: `/tournament.json`.
+**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: `/tournament.json`. A port below `1024` needs root; a port taken by something else: the tournament goes on without the page.
 
-- Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
+- Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8; at least two teams' worth of players); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
 - Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing.
   - **Listed nicknames** (`alice, bob; carol, dave`): players set those exact nicknames to be let in - insecure, but enough for a LAN.
   - **Listed accounts** (`alice=0x8aed..., bob=steam_7656...; ...`): let in by their account (`Settings → Account → Copy account id` in the game), shown by the nickname written here - they play under any name. Every player needs one; a list with one missing doesn't start.

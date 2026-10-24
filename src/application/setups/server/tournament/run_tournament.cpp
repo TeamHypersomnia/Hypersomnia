@@ -72,7 +72,7 @@ namespace {
 	}
 
 	std::optional<uint32_t> as_count(const std::string& value, const uint32_t min, const uint32_t max) {
-		if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos) {
+		if (value.empty() || value.size() > 9 || value.find_first_not_of("0123456789") != std::string::npos) {
 			return std::nullopt;
 		}
 
@@ -102,6 +102,11 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 			error = typesafe_sprintf("--tournament-team-size: expected a number from 1 to 8, got \"%x\"", params.tournament_team_size);
 			return out;
 		}
+	}
+
+	if (!params.tournament_teams.empty() && !params.tournament_players.empty()) {
+		error = "--tournament and --tournament-teams (HYPERSOMNIA_TOURNAMENT and HYPERSOMNIA_TOURNAMENT_TEAMS) are given both - keep one";
+		return out;
 	}
 
 	if (!params.tournament_teams.empty()) {
@@ -200,17 +205,26 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 			return out;
 		}
 
-		if (!params.tournament_team_size.empty()) {
-			for (const auto& team : out.teams) {
-				if (team.size() != out.open_team_size) {
-					error = typesafe_sprintf("--tournament-teams: a team of %x players, expected %x (--tournament-team-size)", team.size(), out.open_team_size);
-					return out;
-				}
+		/*
+			Every team as big as --tournament-team-size, or without it as the first one.
+		*/
+
+		const auto expected_size = params.tournament_team_size.empty() ? out.teams[0].size() : std::size_t(out.open_team_size);
+
+		for (const auto& team : out.teams) {
+			if (team.size() != expected_size) {
+				error = typesafe_sprintf("--tournament-teams: a team of %x players, expected %x", team.size(), expected_size);
+				return out;
 			}
 		}
 	}
 	else if (const auto players = ::as_count(params.tournament_players, 2, 128)) {
 		out.open_players = *players;
+
+		if (out.open_players < 2 * out.open_team_size) {
+			error = typesafe_sprintf("--tournament: %x players can't make two teams of %x", out.open_players, out.open_team_size);
+			return out;
+		}
 	}
 	else {
 		error = typesafe_sprintf("--tournament: expected a number of players from 2 to 128, got \"%x\"", params.tournament_players);
@@ -488,6 +502,13 @@ work_result run_tournament(const run_tournament_input& in) {
 	std::unique_ptr<httplib::Server> page_server;
 	std::thread page_thread;
 
+	/*
+		The port the matches tell the server list - none if the page couldn't take its port,
+		so the list never links to a page that isn't there.
+	*/
+
+	auto served_page_port = uint16_t(0);
+
 	if (page_port != 0) {
 		const auto page_html = [&]() {
 			try {
@@ -506,25 +527,45 @@ work_result run_tournament(const run_tournament_input& in) {
 		});
 
 		page_server->Get("/tournament.json", [&](const httplib::Request&, httplib::Response& res) {
-			auto json = std::string();
+			/*
+				Copied under the lock, serialized outside it - the match servers take the same lock every second.
+			*/
+
+			auto state_copy = tournament_state();
+			auto live_copy = live_states();
 
 			{
 				std::scoped_lock lk(page_lk);
-				json = augs::to_json_string_nopretty(::make_page_state(page_cfg, page_state, page_live, page_finished.load()));
+				state_copy = page_state;
+				live_copy = page_live;
 			}
+
+			const auto json = augs::to_json_string_nopretty(::make_page_state(page_cfg, state_copy, live_copy, page_finished.load()));
 
 			res.set_header("Cache-Control", "no-store");
 			res.set_header("Access-Control-Allow-Origin", "*");
 			res.set_content(json, "application/json");
 		});
 
-		page_thread = std::thread([&page_server, page_port]() {
-			if (!page_server->listen("0.0.0.0", page_port)) {
-				LOG("Tournament: the live page could not take TCP port %x - not served.", page_port);
-			}
-		});
+		/*
+			Bound here, before the matches start - they tell the server list the page's port only if it's taken.
+			Running before going on, so stop() at the end always finds it listening.
+		*/
 
-		LOG("Tournament: the live page is at http://<this server>:%x/ (TCP %x).", page_port, page_port);
+		if (page_server->bind_to_port("0.0.0.0", page_port)) {
+			page_thread = std::thread([&page_server]() {
+				page_server->listen_after_bind();
+			});
+
+			page_server->wait_until_ready();
+			served_page_port = page_port;
+
+			LOG("Tournament: the live page is at http://<this server>:%x/ (TCP %x).", page_port, page_port);
+		}
+		else {
+			LOG("Tournament: the live page could not take TCP port %x - not served.", page_port);
+			page_server.reset();
+		}
 	}
 
 	tournament_coordinator_dependencies deps;
@@ -588,6 +629,18 @@ work_result run_tournament(const run_tournament_input& in) {
 		tournament_commit_match_result_fn commit
 	) {
 		std::atomic<bool> any_failure = false;
+
+		/*
+			A port used again in this stage: the last stage's final score there isn't this match's live one.
+		*/
+
+		{
+			std::scoped_lock lk(page_lk);
+
+			for (const auto& m : matches) {
+				page_live.erase(m.port);
+			}
+		}
 
 		auto stage_should_interrupt = [&in]() {
 			return in.handle_sigint && in.handle_sigint();
@@ -770,7 +823,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				close_open_round,
 				open_round_players,
 				expected_players = in.config.open_players,
-				page_port,
+				served_page_port,
 				&page_lk,
 				&page_live,
 				&in
@@ -846,7 +899,7 @@ work_result run_tournament(const run_tournament_input& in) {
 
 				server_ptr->heartbeat_reported_tournament_stage = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
 
-				server_ptr->tournament_page_port = page_port;
+				server_ptr->tournament_page_port = served_page_port;
 				server_ptr->on_live_state = [&page_lk, &page_live, port = match_ptr->port](const server_setup::live_match_state& s) {
 					std::scoped_lock lk(page_lk);
 					page_live[port] = s;
@@ -1056,6 +1109,23 @@ work_result run_tournament(const run_tournament_input& in) {
 
 		page_finished = true;
 		idle_until_interrupted();
+	}
+	else if (coordinator.aborted) {
+		/*
+			Not over - a match ended without a result. Quit with a failure rather than show it finished.
+		*/
+
+		LOG("ERROR: Tournament: stopped - a match ended without a result. Start it again to carry on.");
+
+		if (page_server) {
+			page_server->stop();
+		}
+
+		if (page_thread.joinable()) {
+			page_thread.join();
+		}
+
+		return work_result::FAILURE;
 	}
 	else if (!(in.handle_sigint && in.handle_sigint())) {
 		page_finished = true;

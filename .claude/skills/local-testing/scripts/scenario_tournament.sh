@@ -21,7 +21,8 @@
 #   crash_open          TOURNAMENT=4: #1 decided, #2 live when the server is killed - #1 stays decided, #2's pair
 #                       plays again on a fresh open server, 4 teams in the end, no duplicates
 #   page_heartbeat      the masterserver's list gives the tournament's page; HYPERSOMNIA_TOURNAMENT_PAGE=off: no page;
-#                       =18600: the page on its own port; =abc: the server doesn't start
+#                       =18600: the page on its own port; =abc: the server doesn't start; a taken port: no page in the list;
+#                       flags that make no tournament (4 players 5v5, players and teams both, teams of other sizes) don't start
 #
 # Usage: [CASES="crash_mid_match open_leave"] scenario_tournament.sh
 . "$(dirname "$0")/test_env.sh"
@@ -467,6 +468,29 @@ EOF
 	start_server HYPERSOMNIA_TOURNAMENT=2 HYPERSOMNIA_TOURNAMENT_PAGE=abc --
 	sleep 3
 	check "a wrong port stops the start" in_log "expected off or a port"
+	stop_server
+
+	# the page's port taken by something else: the tournament goes on, the list gives no page
+	python3 -m http.server 18601 --bind 0.0.0.0 > /dev/null 2>&1 &
+	local blocker=$!
+	sleep 1
+	start_server HYPERSOMNIA_TOURNAMENT=2 HYPERSOMNIA_TOURNAMENT_PAGE=18601 --
+	sleep 15
+	curl -s http://127.0.0.1:18420/server_list_json > $T/list.json
+	check "a taken port: not served, said so" in_log "could not take TCP port 18601"
+	check "a taken port: no page in the list" python3 -c "import json,sys; l=json.load(open('$T/list.json')); sys.exit(0 if l and all(not e.get('tournament_page') for e in l) else 1)"
+	stop_server
+	kill $blocker 2>/dev/null
+
+	# flags that make no tournament don't start
+	start_server HYPERSOMNIA_TOURNAMENT=4 HYPERSOMNIA_TOURNAMENT_TEAM_SIZE=5 --
+	check "4 players for 5v5 don't start" in_log "can't make two teams"
+	stop_server
+	start_server HYPERSOMNIA_TOURNAMENT=4 -- --tournament-teams "alice; bob"
+	check "players and teams both don't start" in_log "are given both"
+	stop_server
+	start_server -- --tournament-teams "alice, bob; carol"
+	check "teams of other sizes don't start" in_log "a team of 1 players, expected 2"
 	stop_server
 	for pid in $(pgrep -f -- "--appdata-dir $T/ms "); do kill $pid 2>/dev/null; done
 }

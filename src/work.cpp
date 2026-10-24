@@ -1373,7 +1373,12 @@ work_result work(
 			}
 
 			auto name = [&](const std::string& arena_and_mode) {
-				const auto arena = ::get_first_word(arena_and_mode);
+				/*
+					"de_cyberaqua, de_silo": the space after the comma isn't the arena's first word.
+				*/
+
+				const auto first = arena_and_mode.find_first_not_of(" \t");
+				const auto arena = first == std::string::npos ? std::string() : ::get_first_word(arena_and_mode.substr(first));
 
 				if (arena.empty() || found_in(named, arena)) {
 					return;

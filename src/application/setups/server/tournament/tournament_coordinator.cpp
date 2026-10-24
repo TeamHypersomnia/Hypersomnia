@@ -721,6 +721,7 @@ bool tournament_coordinator::run() {
 				);
 
 				persist();
+				aborted = true;
 				return true;
 			}
 		}
