@@ -68,7 +68,7 @@ struct cmd_line_params {
 	std::string tournament_arenas;
 
 	/*
-		"off": no live page (by default at http://<server>:<its first port>/, TCP).
+		"off": no live page, or its TCP port - by default the first game port's number: http://<server>:8412/.
 	*/
 
 	std::string tournament_page;

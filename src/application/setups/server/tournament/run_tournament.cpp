@@ -380,7 +380,23 @@ work_result run_tournament(const run_tournament_input& in) {
 	live_states page_live;
 	std::atomic<bool> page_finished = false;
 
-	const auto page_port = in.params.tournament_page == "off" ? uint16_t(0) : static_cast<uint16_t>(base_port);
+	/*
+		--tournament-page: off, or the page's TCP port - by default the first game port's number.
+	*/
+
+	const auto& page_flag = in.params.tournament_page;
+	const auto chosen_page_port = page_flag.empty() || page_flag == "off" ? std::optional<uint32_t>() : ::as_count(page_flag, 1, 65535);
+
+	if (!page_flag.empty() && page_flag != "off" && !chosen_page_port.has_value()) {
+		LOG("ERROR: --tournament-page: expected off or a port from 1 to 65535, got \"%x\"", page_flag);
+		return work_result::FAILURE;
+	}
+
+	const auto page_port =
+		page_flag == "off" ? uint16_t(0) :
+		chosen_page_port.has_value() ? static_cast<uint16_t>(*chosen_page_port) :
+		static_cast<uint16_t>(base_port)
+	;
 
 	std::unique_ptr<httplib::Server> page_server;
 	std::thread page_thread;

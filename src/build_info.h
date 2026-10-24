@@ -112,7 +112,8 @@ Options:
                                 lines 1 and 2 play each other, 3 and 4... Nicknames, or account ids.
     --tournament-team-size [N]  2 for 2v2 and so on.
     --tournament-arenas [LIST]  An arena per bracket round, the final last, e.g. de_cyberaqua,de_silo.
-    --tournament-page off       No live page of the tournament - by default it's at http://<server>:<its first port>/ (TCP).
+    --tournament-page [PORT]    The tournament's live results page's TCP port - by default the first game port's number,
+                                http://<server>:8412/. Or "off": no page.
                                 Each of these five is also a HYPERSOMNIA_TOURNAMENT* environment variable - see README_SERVER.md.
 
 If debugger_file_path is supplied and it is a directory,

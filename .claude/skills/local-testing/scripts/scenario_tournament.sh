@@ -17,7 +17,8 @@
 #   crash_between       A; B; C: right as round 2 starts the server is killed - resumed at round 2, round 1 not replayed
 #   crash_open          TOURNAMENT=4: #1 decided, #2 live when the server is killed - #1 stays decided, #2's pair
 #                       plays again on a fresh open server, 4 teams in the end, no duplicates
-#   page_heartbeat      the masterserver's list gives the tournament's page; HYPERSOMNIA_TOURNAMENT_PAGE=off: no page
+#   page_heartbeat      the masterserver's list gives the tournament's page; HYPERSOMNIA_TOURNAMENT_PAGE=off: no page;
+#                       =18600: the page on its own port; =abc: the server doesn't start
 #
 # Usage: [CASES="crash_mid_match open_leave"] scenario_tournament.sh
 . "$(dirname "$0")/test_env.sh"
@@ -35,7 +36,7 @@ mkdir -p $SUITE
 RESULTS=$SUITE/results
 touch $RESULTS
 
-for p in 18410 18420 18430 18500 18501 18502 18503 19500 19501 19502 19503; do
+for p in 18410 18420 18430 18500 18501 18502 18503 18600 19500 19501 19502 19503; do
 	if ss -tuln | grep -q ":$p "; then echo "port $p busy, abort"; exit 1; fi
 done
 
@@ -409,6 +410,18 @@ EOF
 	curl -s http://127.0.0.1:18420/server_list_json > $T/list.json
 	check "off: no page in the list" python3 -c "import json,sys; sys.exit(0 if all(not e.get('tournament_page') for e in json.load(open('$T/list.json'))) else 1)"
 	check "off: no page served" bash -c "! curl -sf --max-time 3 http://127.0.0.1:$PORT/"
+	stop_server
+
+	start_server HYPERSOMNIA_TOURNAMENT=2 HYPERSOMNIA_TOURNAMENT_PAGE=18600 --
+	sleep 15
+	curl -s http://127.0.0.1:18420/server_list_json > $T/list.json
+	check "its own port: in the list" python3 -c "import json,sys; sys.exit(0 if any(e.get('tournament_page')=='http://127.0.0.1:18600/' for e in json.load(open('$T/list.json'))) else 1)"
+	check "its own port: served" curl -sf --max-time 3 http://127.0.0.1:18600/tournament.json
+	stop_server
+
+	start_server HYPERSOMNIA_TOURNAMENT=2 HYPERSOMNIA_TOURNAMENT_PAGE=abc --
+	sleep 3
+	check "a wrong port stops the start" in_log "expected off or a port"
 	stop_server
 	for pid in $(pgrep -f -- "--appdata-dir $T/ms "); do kill $pid 2>/dev/null; done
 }

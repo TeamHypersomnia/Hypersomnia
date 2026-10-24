@@ -98,7 +98,7 @@ Later ones win:
 | `HYPERSOMNIA_TOURNAMENT_TEAM_SIZE` | `2` for 2v2 and so on | `2` |
 | `HYPERSOMNIA_TOURNAMENT_TEAMS` | Teams set up beforehand: one per line or `;`, players by `,` | `alice, bob; carol, dave` |
 | `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last | `de_cyberaqua,de_silo` |
-| `HYPERSOMNIA_TOURNAMENT_PAGE` | `off`: no [live results page](#tournaments) | `off` |
+| `HYPERSOMNIA_TOURNAMENT_PAGE` | The [live results page](#tournaments)'s TCP port, or `off` | `8080` |
 | `HYPERSOMNIA_CONFIG` | Anything else - JSON, like a file in `conf.d/` | |
 | `HYPERSOMNIA_SERVER_PRIVATE_KEY` | The [server key](#the-server-key), instead of the file | |
 
@@ -120,7 +120,7 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 
 A knockout tournament: a server for every match, the winners go on round by round.
 
-**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number), and linked from the [server list](https://hypersomnia.io/servers). Its data: `/tournament.json`.
+**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: `/tournament.json`.
 
 - Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
 - Set up beforehand: lines 1 and 2 play each other, 3 and 4...; players set those exact nicknames (or the teams are account ids). Teams short of 2, 4, 8, 16...: the first lines advance without playing.
@@ -168,6 +168,6 @@ A knockout tournament: a server for every match, the winners go on round by roun
 | `--tournament-team-size <n>` | `2` for 2v2 and so on |
 | `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"` |
 | `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` |
-| `--tournament-page off` | No [live results page](#tournaments) |
+| `--tournament-page <port>` | The [live results page](#tournaments)'s TCP port (the first game port's number by default), or `off` |
 | `--print-server-key` | Print the server's public key and quit |
 | `--sync-external-arenas-and-quit` | Download all community arenas and quit |
