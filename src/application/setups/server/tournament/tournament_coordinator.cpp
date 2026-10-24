@@ -179,6 +179,14 @@ void tournament_coordinator::initialize_state_if_fresh() {
 			ts.player_ids.push_back(::normalize_account_id(written));
 		}
 
+		/*
+			Listed with account ids: shown by the nicknames written next to them.
+		*/
+
+		if (team_idx < cfg.team_nicknames.size()) {
+			ts.nicknames = cfg.team_nicknames[team_idx];
+		}
+
 		ts.skill = static_cast<float>(N - rank);
 		ts.eliminated = false;
 

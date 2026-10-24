@@ -10,6 +10,9 @@
 #   open_leave          TOURNAMENT=4: C leaves #2 before D comes - the place is free, nothing closes (3 of 4 here);
 #                       C comes back, #2 fills, both matches play - no walkover
 #   teams_2v2           --tournament-teams "alice, bob; carol, dave": 2v2 by nicknames
+#   teams_accounts      --tournament-teams "alice=<id>; bob=<id>; carol=<id>" (Listed accounts): mallory, playing as "bob",
+#                       is turned away; the real bob gets in under another name in the game; the servers, the page and
+#                       the next round named by the listed nicknames; a list with an id missing doesn't start
 #   crash_mid_match     A vs B live, the server killed (SIGKILL) and started again with the same flags: resumed,
 #                       the match goes on, one result
 #   crash_in_freeze     A vs B live, B leaves (the match freezes, max_rejoins 2), the server killed in the freeze;
@@ -28,7 +31,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="teams_bye open_auto_close open_leave teams_2v2 crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat"
+ALL="teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -79,11 +82,12 @@ EOF
 
 declare -A ID
 
+# player <name> [the nickname in the game - the name by default]
 player() {
 	mkdir -p $T/$1/user/conf.d $T/$1/user/.keys
 	echo "hypersomnia-key-v1:$(openssl rand -hex 32)" > $T/$1/user/.keys/account.key
 	cat > $T/$1/user/conf.d/test.json <<EOF
-{ "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:1", "window": { "fullscreen": false, "size": [480, 270] }, "client": { "nickname": "$1" } }
+{ "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:1", "window": { "fullscreen": false, "size": [480, 270] }, "client": { "nickname": "${2:-$1}" } }
 EOF
 	ID[$1]=$(python3 - $T/$1/user/.keys/account.key <<'PY'
 import sys
@@ -105,7 +109,7 @@ start_server() {
 	SERVER_RUN=$((SERVER_RUN + 1))
 	SRV=$T/server$SERVER_RUN.out
 	(cd $REPO/hypersomnia && exec env "${envs[@]}" timeout 600 $BIN --appdata-dir $T/server $GAME_TEST_FLAGS "$@" > $SRV 2>&1) &
-	wait_log "server listening on\|played to the end already" 30
+	wait_log "server listening on\|played to the end already\|ERROR:" 30
 }
 
 # The server's own process (under the subshell and timeout) - by its appdata dir
@@ -130,7 +134,7 @@ kill_client() {
 }
 
 kill_all_clients() {
-	for c in alice bob carol dave; do kill_client $c; done
+	for c in alice bob carol dave mallory; do kill_client $c; done
 	sleep 2
 }
 
@@ -288,6 +292,41 @@ case_teams_2v2() {
 	kill_client carol; kill_client dave
 	wait_log "Tournament WINNER" 120
 	check "alice and bob won" in_log "Tournament WINNER: \[alice, bob\]"
+	finish_case
+}
+
+case_teams_accounts() {
+	new_case teams_accounts
+	player alice; player bob bobby_in_game; player carol; player mallory bob
+	local flags=(--tournament-teams "alice=0x${ID[alice]#key_}; bob=${ID[bob]}; carol=${ID[carol]}")
+
+	start_server -- --tournament-teams "alice=${ID[alice]}; bob"
+	check "a list with an id missing doesn't start" in_log "no account id for bob"
+	stop_server
+
+	start_server -- "${flags[@]}"
+	check "by account" in_log "authenticates players by account"
+	check "round 1 named by the list: [bob] vs [carol]" in_log "Match: \[bob\] vs \[carol\]"
+	client mallory $PORT
+	wait_log "connected to a match that's not theirs" 60
+	check "mallory as bob turned away" in_log "connected to a match that's not theirs"
+	kill_client mallory
+	client bob $PORT; sleep 2; client carol $PORT
+	wait_count "Starting ranked" 1 90
+	sleep 3
+	check "page: bob vs carol, as listed" page 'sorted(t["rounds"][0]["matches"][0]["team_a"]+t["rounds"][0]["matches"][0]["team_b"])==["bob","carol"]'
+	kill_client carol
+	wait_log "Tournament stage 1: running" 120
+	check "round 2 named by the list: alice and bob" in_log "Match: \[alice\] vs \[bob\]\|Match: \[bob\] vs \[alice\]"
+	kill_client bob; sleep 2
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 2 90
+	sleep 5
+	kill_client alice
+	wait_log "Tournament WINNER" 120
+	check "bob won" winner_is bob
+	sleep 2
+	check "page: everyone by the listed nickname" page "$all_named"' and "bobby_in_game" not in str(t)'
 	finish_case
 }
 

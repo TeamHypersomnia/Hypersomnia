@@ -29,6 +29,9 @@ enum class tournament_matchup_scheme {
 	A tournament, made from the flags (or the HYPERSOMNIA_TOURNAMENT* variables) - see from_params.
 	Either the teams are listed (lines 1 and 2 play each other, 3 and 4...; the byes go to the first lines),
 	or the first round is open: open_players come, open_team_size each, and they make the matches as they join.
+
+	Listed teams are nicknames ("alice" - let in by that nickname), or nicknames with account ids
+	("alice=0x8aed..." - let in by the account, shown as alice): teams then holds the ids, team_nicknames the names.
 */
 
 struct tournament_config {
@@ -40,6 +43,7 @@ struct tournament_config {
 	tournament_matchup_scheme matchup_scheme = tournament_matchup_scheme::STRONGEST_VS_STRONGEST;
 
 	std::vector<std::vector<std::string>> teams;
+	std::vector<std::vector<std::string>> team_nicknames;
 	std::vector<std::string> arenas;
 	std::vector<std::string> additional_spectators;
 

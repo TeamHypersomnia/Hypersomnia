@@ -22,6 +22,7 @@
 #include "application/setups/server/server_setup.h"
 #include "application/setups/server/server_assigned_teams.h"
 #include "application/setups/server/server_nickname_auth.h"
+#include "application/network/account_id.h"
 #if CRASH_RECOVERY
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
 #endif
@@ -104,8 +105,94 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 	}
 
 	if (!params.tournament_teams.empty()) {
+		/*
+			"alice=0x8aed..., bob=steam_7656...; carol=..." - every player with an account id, or none of them:
+			a list with some let in by their nicknames only would quietly let anyone in as them.
+		*/
+
+		std::size_t with_ids = 0;
+		std::size_t players = 0;
+		std::vector<std::string> seen_names;
+		std::vector<std::string> seen_ids;
+
 		for (const auto& line : ::split_list(params.tournament_teams, ";\n")) {
-			out.teams.push_back(::split_list(line, ","));
+			std::vector<std::string> ids;
+			std::vector<std::string> names;
+
+			for (const auto& entry : ::split_list(line, ",")) {
+				++players;
+
+				const auto eq = entry.find('=');
+				const auto name = ::trimmed(entry.substr(0, eq));
+
+				if (name.empty()) {
+					error = typesafe_sprintf("--tournament-teams: a player with no nickname: \"%x\"", entry);
+					return out;
+				}
+
+				if (std::find(seen_names.begin(), seen_names.end(), name) != seen_names.end()) {
+					error = typesafe_sprintf("--tournament-teams: %x is listed more than once", name);
+					return out;
+				}
+
+				seen_names.push_back(name);
+
+				if (eq == std::string::npos) {
+					ids.push_back(name);
+					names.push_back(name);
+					continue;
+				}
+
+				const auto written_id = ::trimmed(entry.substr(eq + 1));
+				const auto id = ::normalize_account_id(written_id);
+
+				const bool valid =
+					identity_cert::is_key_account(id)
+					|| (id.rfind("steam_", 0) == 0 && id.size() == 6 + 17 && id.find_first_not_of("0123456789", 6) == std::string::npos)
+					|| (id.rfind("crazygames_", 0) == 0 && id.size() > 11)
+				;
+
+				if (written_id.empty() || !valid || id.find('=') != std::string::npos) {
+					error = typesafe_sprintf("--tournament-teams: %x: \"%x\" is not an account id (0x... or steam_...)", name, written_id);
+					return out;
+				}
+
+				if (std::find(seen_ids.begin(), seen_ids.end(), id) != seen_ids.end()) {
+					error = typesafe_sprintf("--tournament-teams: %x has the account id of another player", name);
+					return out;
+				}
+
+				seen_ids.push_back(id);
+				ids.push_back(id);
+				names.push_back(name);
+				++with_ids;
+			}
+
+			out.teams.push_back(ids);
+			out.team_nicknames.push_back(names);
+		}
+
+		if (with_ids > 0 && with_ids != players) {
+			std::string missing;
+
+			for (std::size_t t = 0; t < out.teams.size(); ++t) {
+				for (std::size_t p = 0; p < out.teams[t].size(); ++p) {
+					if (out.teams[t][p] == out.team_nicknames[t][p]) {
+						missing += (missing.empty() ? "" : ", ") + out.team_nicknames[t][p];
+					}
+				}
+			}
+
+			error = typesafe_sprintf("--tournament-teams: no account id for %x - give every player one (nickname=id), or none", missing);
+			return out;
+		}
+
+		/*
+			Nicknames only: the list is the roster itself.
+		*/
+
+		if (with_ids == 0) {
+			out.team_nicknames.clear();
 		}
 
 		if (out.teams.size() < 2) {
