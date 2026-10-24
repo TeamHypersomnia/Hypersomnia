@@ -50,7 +50,7 @@ namespace augs {
 			A copy icon (two overlapping sheets) that copies the text when clicked and shows a check mark for a moment.
 		*/
 
-		inline bool copy_icon_button(const std::string& id, const std::string& text_to_copy) {
+		inline bool copy_icon_button(const std::string& id, const std::string& text_to_copy, const char* const tooltip = nullptr) {
 			static std::unordered_map<ImGuiID, double> copied_at;
 
 			const auto size = ImGui::GetTextLineHeight();
@@ -62,6 +62,7 @@ namespace augs {
 			const bool clicked = ImGui::InvisibleButton("##copy", ImVec2(size, size));
 			const bool hovered = ImGui::IsItemHovered();
 			ImGui::PopID();
+
 
 			if (clicked) {
 				ImGui::SetClipboardText(text_to_copy.c_str());
@@ -92,7 +93,7 @@ namespace augs {
 			}
 
 			if (hovered) {
-				ImGui::SetTooltip("%s", just_copied ? "Copied" : "Copy");
+				ImGui::SetTooltip("%s", just_copied ? "Copied" : (tooltip != nullptr ? tooltip : "Copy"));
 			}
 
 			return clicked;

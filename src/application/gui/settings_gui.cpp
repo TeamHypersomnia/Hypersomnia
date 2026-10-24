@@ -4243,7 +4243,11 @@ void settings_gui_state::perform(
 							text_color(label, is_key ? rgba(white) : rgba(green));
 							ImGui::SameLine();
 
-							copy_icon_button("AccountId", is_key ? "0x" + current_account_id.substr(4) : current_account_id);
+							/*
+								Named so that a tournament's organizer (or a server's admin) can point to it.
+							*/
+
+							copy_icon_button("AccountId", is_key ? "0x" + current_account_id.substr(4) : current_account_id, "Copy account id");
 
 #if !WEB_CRAZYGAMES
 							/*
