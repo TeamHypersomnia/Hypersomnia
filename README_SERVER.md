@@ -104,7 +104,7 @@ Later ones win:
 
 # Admins
 
-An admin is an account: in the game, `Settings → Account` → copy. `steam_...` in the Steam version, `0x...` elsewhere (a key linked to Steam is its own `0x...` account - add both). Join the server and press `Esc` for the administration panel.
+An admin is an account: in the game, `Settings → Account → Copy account id`. `steam_...` in the Steam version, `0x...` elsewhere (a key linked to Steam is its own `0x...` account - add both). Join the server and press `Esc` for the administration panel.
 
 The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `{ "account": "0x8aed41f2...", "rcon": "RCON", "badge": "MOD" }`:
 

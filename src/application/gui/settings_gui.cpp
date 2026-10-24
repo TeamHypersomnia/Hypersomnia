@@ -4229,25 +4229,26 @@ void settings_gui_state::perform(
 							const bool is_key = identity_cert::is_key_account(current_account_id);
 							const auto& provider = signed_in.provider_label;
 
+							/*
+								The account as one reads it - "Key account", "Steam: name" - and under it its id,
+								with the copy icon a tournament's organizer or a server's admin asks for.
+							*/
+
 							const auto label = [&]() -> std::string {
 								if (is_key) {
-									return identity_key::account_kind_name() + " (" + identity_key::short_form_of_account(current_account_id) + ")";
+									return identity_key::account_kind_name();
 								}
 
 								const auto name = identity != nullptr ? identity->get_profile().name : std::string();
 								return (provider.empty() ? std::string("Steam") : provider) + ": " + (name.empty() ? current_account_id : name);
 							}();
 
+							const auto copied_id = is_key ? "0x" + current_account_id.substr(4) : current_account_id;
+							const auto shown_id = is_key ? identity_key::short_form_of_account(current_account_id) : current_account_id;
+
 							text("Account:");
 							ImGui::SameLine();
 							text_color(label, is_key ? rgba(white) : rgba(green));
-							ImGui::SameLine();
-
-							/*
-								Named so that a tournament's organizer (or a server's admin) can point to it.
-							*/
-
-							copy_icon_button("AccountId", is_key ? "0x" + current_account_id.substr(4) : current_account_id, "Copy account id");
 
 #if !WEB_CRAZYGAMES
 							/*
@@ -4260,6 +4261,12 @@ void settings_gui_state::perform(
 								augs::open_url(config.website_url + "/user/" + current_account_id);
 							}
 #endif
+
+							text("Account id:");
+							ImGui::SameLine();
+							text_disabled(shown_id);
+							ImGui::SameLine();
+							copy_icon_button("AccountId", copied_id, "Copy account id");
 
 							if (is_key && !signed_in.provider_label.empty()) {
 								/*
