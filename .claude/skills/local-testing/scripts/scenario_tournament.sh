@@ -23,6 +23,14 @@
 #   page_heartbeat      the masterserver's list gives the tournament's page; HYPERSOMNIA_TOURNAMENT_PAGE=off: no page;
 #                       =18600: the page on its own port; =abc: the server doesn't start; a taken port: no page in the list;
 #                       flags that make no tournament (4 players 5v5, players and teams both, teams of other sizes) don't start
+#   join_timeout_listed "alice; bob; carol; dave", a 1 minute join timeout: only alice comes - she wins hers by walkover,
+#                       nobody comes to carol-dave - both out; alice the winner without a match
+#   join_timeout_equal  2v2, only alice and carol come: equal numbers - the match starts with them after the timeout
+#   join_timeout_open   TOURNAMENT=4, alice alone on #1, bob alone on #2: the timeout closes round 1, they play the final
+#   open_one_place      TOURNAMENT=4: alice has a place on #1 - the same account on #2 is sent back to #1
+#   admin_live          alice vs bob live, carol (an admin) joins: a spectator - not "too late", not "not theirs"
+#   admission_allowed   a persistent server with allowed_accounts [alice]: bob is refused, alice and carol (an admin) get in
+#   admission_full      a persistent server of 2 slots, full: dave is refused, carol (an admin) gets in
 #
 # Usage: [CASES="crash_mid_match open_leave"] scenario_tournament.sh
 . "$(dirname "$0")/test_env.sh"
@@ -32,7 +40,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat"
+ALL="teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place admin_live admission_allowed admission_full"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -135,7 +143,7 @@ kill_client() {
 }
 
 kill_all_clients() {
-	for c in alice bob carol dave mallory; do kill_client $c; done
+	for c in alice bob carol dave mallory alice2; do kill_client $c; done
 	sleep 2
 }
 
@@ -182,6 +190,11 @@ archived() {
 finish_case() {
 	kill_all_clients
 	stop_server
+}
+
+# server_extra '<json>' - one more config file for the case's server, applied after the test's own
+server_extra() {
+	echo "$1" > $T/server/user/conf.d/zz_case.json
 }
 
 # ---------- the cases ----------
@@ -493,6 +506,144 @@ EOF
 	check "teams of other sizes don't start" in_log "a team of 1 players, expected 2"
 	stop_server
 	for pid in $(pgrep -f -- "--appdata-dir $T/ms "); do kill $pid 2>/dev/null; done
+}
+
+case_join_timeout_listed() {
+	new_case join_timeout_listed
+	player alice; player bob; player carol; player dave
+	start_server -- --tournament-teams "alice; bob; carol; dave" --tournament-join-timeout 1
+	client alice $PORT
+	wait_log "Join timeout" 100
+	wait_count "Join timeout: " 4 30
+	check "alice wins hers by walkover" in_log "the team that came wins by walkover"
+	check "nobody came to carol-dave" in_log "nobody came - both teams are out"
+	wait_log "Tournament WINNER\|Tournament over" 60
+	check "alice the winner" in_log "Tournament WINNER: \[alice\]"
+	sleep 2
+	check "page: alice's walkover" page 'any(m["status"]=="walkover" and m["team_a"]==["alice"] for m in t["rounds"][0]["matches"])'
+	finish_case
+}
+
+case_join_timeout_equal() {
+	new_case join_timeout_equal
+	player alice; player bob; player carol; player dave
+	start_server -- --tournament-teams "alice, bob; carol, dave" --tournament-team-size 2 --tournament-join-timeout 1
+	client alice $PORT; sleep 2; client carol $PORT
+	wait_log "equal numbers - the match starts" 100
+	check "equal numbers start the match" in_log "equal numbers - the match starts"
+	wait_count "Starting ranked" 1 90
+	check "the match started 1v1" in_log "Starting ranked"
+	sleep 5
+	kill_client carol
+	wait_log "Tournament WINNER" 200
+	check "alice and bob won" in_log "Tournament WINNER: \[alice, bob\]"
+	finish_case
+}
+
+case_join_timeout_open() {
+	new_case join_timeout_open
+	player alice; player bob
+	start_server HYPERSOMNIA_TOURNAMENT=4 HYPERSOMNIA_TOURNAMENT_JOIN_TIMEOUT=1 --
+	client alice $PORT; sleep 3; client bob $((PORT + 1))
+	wait_count "takes a place" 2 60
+	wait_count "Join timeout: round 1's match here closes" 2 100
+	check "round 1 closed by the timeout" in_log "Join timeout: round 1's match here closes"
+	wait_log "Tournament stage 1: running" 60
+	check "the final: alice vs bob" in_log "Tournament stage 1: running"
+	kill_client alice; kill_client bob; sleep 2
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 1 90
+	sleep 5
+	kill_client bob
+	wait_log "Tournament WINNER" 200
+	check "alice won" winner_is alice
+	finish_case
+}
+
+case_open_one_place() {
+	new_case open_one_place
+	player alice
+	mkdir -p $T/alice2/user
+	cp -r $T/alice/user/conf.d $T/alice/user/.keys $T/alice2/user/
+	start_server HYPERSOMNIA_TOURNAMENT=4 --
+	client alice $PORT
+	wait_count "takes a place" 1 60
+	client alice2 $((PORT + 1))
+	wait_log "has a place in Match #1" 60
+	check "the same account sent back to Match #1" in_log "has a place in Match #1"
+	check "no second place" bash -c "[ \$(grep -c 'takes a place' $SRV) = 1 ]"
+	finish_case
+}
+
+case_admin_live() {
+	new_case admin_live
+	player alice; player bob; player carol
+	server_extra "{ \"server_private\": { \"admin_profiles\": [ { \"account\": \"${ID[carol]}\", \"rcon\": \"MASTER_RCON\" } ] } }"
+	start_server -- --tournament-teams "alice; bob"
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 1 90
+	sleep 8
+	client carol $PORT
+	wait_log "is an admin - watches" 60
+	check "carol watches as a spectator" in_log "is an admin - watches"
+	sleep 5
+	check "not too late, not theirs" not_in_log "carol has connected to a match that's not theirs"
+	check "the match goes on" not_in_log "Tournament WINNER"
+	kill_client bob
+	wait_log "Tournament WINNER" 200
+	check "alice won with carol watching" in_log "Tournament WINNER: \[alice\]"
+	finish_case
+}
+
+# a local masterserver on 18420 (its list) / 18430 (heartbeats) - the test servers tell it, never the real one
+start_masterserver() {
+	mkdir -p $T/ms/user/conf.d $T/official_servers.d
+	cat > $T/ms/user/conf.d/test.json <<EOF
+{ "masterserver": { "ip": "127.0.0.1", "signalling_server_port": 18000, "first_udp_command_port": 18430, "num_udp_command_ports": 1,
+  "server_list_port": 18420, "fallback_http_server_list_port": 18410, "report_rtc_errors_to_webhook": false,
+  "official_servers_dir": "$T/official_servers.d" } }
+EOF
+	(cd $REPO/hypersomnia && exec timeout 300 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1) &
+	sleep 3
+}
+
+# a persistent server for the admission cases - no tournament, no bots
+start_persistent() {
+	server_extra "$1"
+	start_server -- 
+}
+
+case_admission_allowed() {
+	new_case admission_allowed
+	player alice; player bob; player carol
+	start_masterserver
+	start_persistent "{ \"server\": { \"bot_quota\": [0] }, \"server_private\": { \"allowed_accounts\": [ \"${ID[alice]}\" ], \"admin_profiles\": [ { \"account\": \"${ID[carol]}\" } ] } }"
+	client bob $PORT
+	wait_log "is not among the listed players" 60
+	check "bob refused" in_log "${ID[bob]} is not among the listed players"
+	client alice $PORT; sleep 2; client carol $PORT
+	sleep 12
+	check "alice in" in_log "Adding alice to game state"
+	check "carol (an admin) in" in_log "Adding carol to game state"
+	curl -s http://127.0.0.1:18420/server_list_json > $T/list.json
+	check "a padlock on the list, no password" python3 -c "import json,sys; l=json.load(open('$T/list.json')); sys.exit(0 if l and all(e.get('listed_players_only') and not e.get('require_password') for e in l) else 1)"
+	for pid in $(pgrep -f -- "--appdata-dir $T/ms "); do kill $pid 2>/dev/null; done
+	finish_case
+}
+
+case_admission_full() {
+	new_case admission_full
+	player alice; player bob; player carol; player dave
+	start_persistent "{ \"server_start\": { \"slots\": 2 }, \"server\": { \"bot_quota\": [0] }, \"server_private\": { \"admin_profiles\": [ { \"account\": \"${ID[carol]}\" } ] } }"
+	client alice $PORT; sleep 3; client bob $PORT; sleep 8
+	client dave $PORT
+	sleep 10
+	check "dave refused - full" in_log "The server is full"
+	client carol $PORT
+	sleep 12
+	check "carol (an admin) in on the full server" in_log "Adding carol to game state"
+	check "only dave refused" bash -c "[ \$(grep -c '(reason=The server is full' $SRV) = 1 ]"
+	finish_case
 }
 
 for c in $CASES; do

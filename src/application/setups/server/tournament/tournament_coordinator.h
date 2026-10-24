@@ -27,6 +27,12 @@ struct tournament_match_outcome {
 	bool walkover = false;
 
 	/*
+		Join timeout with nobody on the server: no winner - both teams out.
+	*/
+
+	bool nobody_came = false;
+
+	/*
 		An open match's teams - set into the match under the coordinator's lock, as other matches' threads
 		may be saving the state meanwhile.
 	*/

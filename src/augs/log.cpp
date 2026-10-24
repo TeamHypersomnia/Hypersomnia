@@ -103,8 +103,17 @@ std::string& LOG_THREAD_PREFFIX() {
 	return preffix;
 }
 
+bool& LOG_THREAD_MUTED() {
+	thread_local bool muted = false;
+	return muted;
+}
+
 void LOG_NOFORMAT(const std::string& s) {
 #if ENABLE_LOG 
+	if (LOG_THREAD_MUTED()) {
+		return;
+	}
+
 	auto lock = augs::scoped_lock(log_mutex);
 
 	auto lg = [&](const auto& f) {

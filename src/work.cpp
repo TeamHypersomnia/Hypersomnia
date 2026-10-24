@@ -166,6 +166,7 @@
 #endif
 
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
+#include "application/setups/server/server_config_check.h"
 
 #include "application/masterserver/masterserver.h"
 #include "application/network/network_common.h"
@@ -796,6 +797,25 @@ work_result work(
 
 		return work_result::FAILURE;
 	}
+
+#if !PLATFORM_WEB
+	/*
+		A typo in the config stops a tournament - other servers only warn (server_config_check.h).
+	*/
+
+	if (params.type == app_type::DEDICATED_SERVER) {
+		auto sources = std::vector<server_config_source>();
+
+		for (std::size_t i = 1; i < config_layers.size(); ++i) {
+			const auto& layer = config_layers[i];
+			sources.push_back({ layer.path, layer.content, params.is_tournament() && layer.path != runtime_prefs_path });
+		}
+
+		if (!::check_server_config(sources, canon_config_path, *config_ptr, params.is_tournament())) {
+			return work_result::FAILURE;
+		}
+	}
+#endif
 
 	WEBSTATIC auto& config = *config_ptr;
 
@@ -1522,6 +1542,14 @@ work_result work(
 			else {
 				LOG("Map sync finished.");
 			}
+		}
+
+		/*
+			A tournament's arenas, after the download: on disk, with their game modes (server_config_check.h).
+		*/
+
+		if (params.type == app_type::DEDICATED_SERVER && params.is_tournament() && !::check_tournament_arenas(params.tournament_arenas)) {
+			return work_result::FAILURE;
 		}
 	}
 

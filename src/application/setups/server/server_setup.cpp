@@ -76,6 +76,7 @@
 #include "augs/misc/httplib_utils.h"
 #include "application/gui/client/chat_gui_entry.hpp"
 #include "application/setups/server/server_assigned_teams.hpp"
+#include "application/setups/server/server_slots.h"
 #include "steam_integration.h"
 #include "augs/string/typesafe_sscanf.h"
 #include "hypersomnia_version.h"
@@ -98,6 +99,7 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 
 #include "application/setups/server/server_nickname_auth.h"
 #include "application/setups/server/server_handle_payload.hpp"
+#include "application/setups/server/server_join_timeout.hpp"
 #include "application/platform_settings.h"
 
 #if BUILD_WEBRTC
@@ -1461,6 +1463,15 @@ void server_setup::verify_client_identity(const client_id_type id) {
 		if (!c.when_kicked.has_value() && !c.is_authenticated()) {
 			kick_now(id, "Authentication failure. Try again.");
 		}
+
+		/*
+			A server for its listed players only (allowed_accounts) - its admins always get in.
+		*/
+
+		if (!c.when_kicked.has_value() && !::is_allowed_account(private_vars.allowed_accounts, c.authenticated_id) && !find_admin_profile_of(c.admin_account).has_value()) {
+			LOG("%x is not among the listed players - refused.", c.authenticated_id);
+			kick_now(id, "This server lets in only its listed players.");
+		}
 	}
 	else if (is_banned(verified->account)) {
 		/*
@@ -1489,10 +1500,14 @@ uint32_t server_setup::get_game_capacity() const {
 	and a troll is for the admins to ban.
 
 	On a ranked server at most max_ranked_players_per_ip from one address: two at home, never a team of one's own accounts.
+
+	An admin always gets in: past the per-address limit, and into the places kept for admins on a full server
+	(server_slots.h) - a server being played on, ranked or a tournament's, takes them only as spectators.
 */
 
 void server_setup::admit_or_refuse(const client_id_type id) {
 	const auto ip = get_client_ip_for_bans(id);
+	const bool admin = find_admin_profile_of(clients[id].admin_account).has_value();
 
 	auto is_counted = [&](const auto other_id, const auto& other) {
 		return other_id != id && other.is_set() && !other.when_kicked.has_value();
@@ -1506,7 +1521,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}, only_connected_v);
 
-	if (requires_authentication() && !ip.empty()) {
+	if (requires_authentication() && !ip.empty() && !admin) {
 		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
 			return get_client_ip_for_bans(other_id) == ip;
 		});
@@ -1517,7 +1532,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}
 
-	const auto capacity = get_game_capacity();
+	const auto capacity = get_game_capacity() + (admin ? static_cast<uint32_t>(reserved_admin_places_v) : 0u);
 
 	if (admitted.size() < capacity) {
 		return;
@@ -1622,12 +1637,28 @@ void server_setup::apply_authentication(
 	update_badges();
 }
 
+/*
+	The players by their accounts too, not only the nicknames they chose - who played is known from the log.
+*/
+
+std::string server_setup::account_of_player(const mode_player_id id, const std::string& known) const {
+	if (!known.empty()) {
+		return known;
+	}
+
+	if (const auto c = find_client_state(id)) {
+		return c->authenticated_id;
+	}
+
+	return std::string();
+}
+
 void server_setup::log_match_start_json(const messages::team_match_start_message& msg) {
 	server_json_events::match_start start;
 
 	auto write_faction = [&](auto& to, const auto& from) {
 		for (const auto& player : from) {
-			to.players.push_back({ player.nickname });
+			to.players.push_back({ player.nickname, account_of_player(player.id, "") });
 		}
 	};
 
@@ -1646,7 +1677,8 @@ void server_setup::log_match_end_json(const messages::match_summary_message& sum
 		for (const auto& player : from) {
 			to.players.push_back({
 				player.score,
-				player.nickname
+				player.nickname,
+				account_of_player(player.id, player.account_id)
 			});
 		}
 	};
@@ -2870,7 +2902,11 @@ void server_setup::update_integrated_avatar() {
 
 
 uint32_t server_setup::get_num_slots() const {
-	return last_start.slots;
+	/*
+		Never more than the netcode has room for with its spare connections and the admins' places.
+	*/
+
+	return static_cast<uint32_t>(std::clamp(static_cast<int>(last_start.slots), 1, max_server_slots_v));
 }
 
 uint32_t server_setup::get_num_connected() const {
@@ -2985,6 +3021,13 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.show_on_server_list = vars.show_on_server_list;
 	heartbeat.require_password = !private_vars.server_password.empty();
+
+	/*
+		A clan's server (allowed_accounts): a padlock on the lists - but no password asked, nor the accounts told;
+		whoever isn't listed is refused on joining.
+	*/
+
+	heartbeat.listed_players_only = !private_vars.allowed_accounts.empty();
 
 	{
 		const auto& clk = scene.world.get_clock();
@@ -3523,7 +3566,11 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 
 	if (has_assigned_teams()) {
 		const auto [playing_in_game, expected_playing] = count_assigned_players_present();
-		out.all_assigned_present = playing_in_game == expected_playing;
+		/*
+			After the join timeout with equal numbers on both sides: they're enough.
+		*/
+
+		out.all_assigned_present = playing_in_game == expected_playing || (join_timeout_relaxed && playing_in_game > 0);
 	}
 
 	out.all_authenticated = all_authenticated || !requires_authentication();
@@ -4171,7 +4218,13 @@ void server_setup::advance_clients_state() {
 					and connections that wait to be kicked could hold all of them - keeping out a player rejoining after a drop.
 				*/
 
-				if (!is_joinable()) {
+				/*
+					An admin gets in also to a match being played - as a spectator, without a word in the chat.
+				*/
+
+				const bool admin = find_admin_profile_of(c.admin_account).has_value();
+
+				if (!is_joinable() && !admin) {
 					/* Joined too late. */
 					kick_now(client_id, std::string(rejoin_too_late_reason_v));
 				}
@@ -4181,8 +4234,12 @@ void server_setup::advance_clients_state() {
 
 					take_into_open_match(client_id, c);
 
+					if (c.kick_no_linger) {
+						return;
+					}
+
 					const bool not_among_suspended = 
-						has_suspended_players() && !is_currently_suspended(this_id)
+						has_suspended_players() && !is_currently_suspended(this_id) && !admin
 					;
 
 					const bool not_among_assigned = 
@@ -7092,18 +7149,24 @@ bool server_setup::is_open_match() const {
 	takes the first players to join, by turns into the two teams, until it has its 2 * team size.
 */
 
-void server_setup::take_into_open_match(const client_id_type, const server_client_state& c) {
+void server_setup::take_into_open_match(const client_id_type client_id, const server_client_state& c) {
 	const auto& id = c.authenticated_id;
 
 	if (!has_assigned_teams() || found_in(assigned_teams.id_to_faction, id)) {
 		return;
 	}
 
-	if (const auto profile = find_admin_profile_of(id); profile.has_value() && profile->rcon_level != rcon_level_type::DENIED) {
+	/*
+		An admin gets in anywhere: where there's no place for them (a match of listed teams, one being played,
+		a full one, or they have their place in another one) - as a spectator. Otherwise they play, as anyone.
+	*/
+
+	const bool admin = find_admin_profile_of(c.admin_account).has_value() || find_admin_profile_of(id).has_value();
+
+	auto as_spectator = [&]() {
 		LOG("%x is an admin - watches the tournament's match as a spectator.", c.get_nickname());
 		assigned_teams.id_to_faction[id] = faction_type::SPECTATOR;
-		return;
-	}
+	};
 
 	/*
 		A match recovered after a crash: its players come back as suspended ones - into the places they had.
@@ -7129,12 +7192,47 @@ void server_setup::take_into_open_match(const client_id_type, const server_clien
 		if (::is_actual_faction(suspended_faction)) {
 			assigned_teams.id_to_faction[id] = suspended_faction;
 			LOG("Open match: %x comes back to the recovered match, in %x.", id, suspended_faction);
+
+			if (open_places != nullptr) {
+				open_places->take(id, open_match_server_name);
+			}
+
+			/*
+				Came to round 1 - counted for its closing by itself, as anyone taking a place.
+			*/
+
+			if (open_round_players != nullptr) {
+				open_round_players->fetch_add(1);
+			}
+
 			return;
 		}
 	}
 
 	if (!is_open_match() || is_ranked_live_or_starting()) {
+		if (admin) {
+			as_spectator();
+		}
+
 		return;
+	}
+
+	/*
+		One place per account in round 1: someone with a place on another server goes back there.
+	*/
+
+	if (open_places != nullptr) {
+		if (const auto other = open_places->elsewhere(id, open_match_server_name)) {
+			if (admin) {
+				as_spectator();
+			}
+			else {
+				LOG("Open match: %x has a place in %x already.", id, *other);
+				kick_now(client_id, typesafe_sprintf("You have a place in %x - go back there.", *other));
+			}
+
+			return;
+		}
 	}
 
 	auto num_in = [&](const faction_type f) {
@@ -7152,6 +7250,10 @@ void server_setup::take_into_open_match(const client_id_type, const server_clien
 	const auto metropolis = num_in(faction_type::METROPOLIS);
 
 	if (resistance + metropolis >= 2 * assigned_teams.open_team_size) {
+		if (admin) {
+			as_spectator();
+		}
+
 		return;
 	}
 
@@ -7163,6 +7265,10 @@ void server_setup::take_into_open_match(const client_id_type, const server_clien
 	assigned_teams.id_to_faction[id] = faction;
 
 	LOG("Open match: %x takes a place in %x.", id, faction);
+
+	if (open_places != nullptr) {
+		open_places->take(id, open_match_server_name);
+	}
 
 	if (open_round_players != nullptr) {
 		open_round_players->fetch_add(1);
@@ -7192,6 +7298,10 @@ void server_setup::leave_open_match(const std::string& authenticated_id) {
 
 	assigned_teams.id_to_faction.erase(it);
 	LOG("Open match: %x left before the match - the place is free again.", authenticated_id);
+
+	if (open_places != nullptr) {
+		open_places->free(authenticated_id, open_match_server_name);
+	}
 
 	open_match_named = false;
 
@@ -7296,7 +7406,7 @@ void server_setup::close_open_match_if_requested() {
 		&& open_round_players->load() >= open_round_expected_players
 	;
 
-	if (!all_came && !close_open_round->load()) {
+	if (!all_came && !close_open_round->load() && !join_timeout_due()) {
 		return;
 	}
 
@@ -7339,6 +7449,9 @@ void server_setup::close_open_match_if_requested() {
 
 	if (all_came && !close_open_round->load()) {
 		LOG("All %x players of the tournament came - round 1 closes by itself.", open_round_expected_players);
+	}
+	else if (join_timeout_due() && !close_open_round->load()) {
+		LOG("Join timeout: round 1's match here closes.");
 	}
 
 	LOG("Round 1 closed: this open match ends with %x waiting.", assigned_playing);

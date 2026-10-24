@@ -72,6 +72,7 @@ struct cmd_line_params {
 	*/
 
 	std::string tournament_page;
+	std::string tournament_join_timeout;
 
 	augs::path_type export_weapon_stats;
 
@@ -285,6 +286,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--tournament-page") {
 				tournament_page = get_next();
+			}
+			else if (a == "--tournament-join-timeout") {
+				tournament_join_timeout = get_next();
 			}
 			else if (a == "--export-weapon-stats") {
 				export_weapon_stats = get_next();

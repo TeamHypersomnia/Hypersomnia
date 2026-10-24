@@ -151,13 +151,7 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 				const auto written_id = ::trimmed(entry.substr(eq + 1));
 				const auto id = ::normalize_account_id(written_id);
 
-				const bool valid =
-					identity_cert::is_key_account(id)
-					|| (id.rfind("steam_", 0) == 0 && id.size() == 6 + 17 && id.find_first_not_of("0123456789", 6) == std::string::npos)
-					|| (id.rfind("crazygames_", 0) == 0 && id.size() > 11)
-				;
-
-				if (written_id.empty() || !valid || id.find('=') != std::string::npos) {
+				if (!::is_valid_account_id(written_id)) {
 					error = typesafe_sprintf("--tournament-teams: %x: \"%x\" is not an account id (0x... or steam_...)", name, written_id);
 					return out;
 				}
@@ -231,6 +225,23 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 		return out;
 	}
 
+	/*
+		--tournament-join-timeout <minutes> | off - 10 minutes by default.
+	*/
+
+	if (params.tournament_join_timeout == "off") {
+		out.join_timeout_secs = 0;
+	}
+	else if (!params.tournament_join_timeout.empty()) {
+		if (const auto minutes = ::as_count(params.tournament_join_timeout, 1, 24 * 60)) {
+			out.join_timeout_secs = *minutes * 60;
+		}
+		else {
+			error = typesafe_sprintf("--tournament-join-timeout: expected off or minutes from 1 to 1440, got \"%x\"", params.tournament_join_timeout);
+			return out;
+		}
+	}
+
 	out.arenas = ::split_list(params.tournament_arenas, ",");
 
 	if (out.arenas.empty()) {
@@ -259,16 +270,6 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 
 namespace {
 	using live_states = std::unordered_map<uint16_t, server_setup::live_match_state>;
-
-	uint32_t bracket_of(const uint32_t teams) {
-		uint32_t bracket = 2;
-
-		while (bracket < teams) {
-			bracket *= 2;
-		}
-
-		return bracket;
-	}
 
 	std::string round_name(const uint32_t round, const uint32_t rounds) {
 		const auto from_end = rounds - 1 - round;
@@ -337,17 +338,27 @@ namespace {
 			}
 		}
 
-		const auto bracket = bracket_of(cfg.num_teams());
-		uint32_t rounds = 0;
+		/*
+			The rounds as they are now: before an open round 1 is over, the bracket made for the players declared;
+			after it, the rounds left for the teams that are left - fewer came, fewer rounds.
+		*/
 
-		while ((1u << rounds) < bracket) {
-			++rounds;
-		}
+		const auto rounds = [&]() {
+			if (finished) {
+				return state.stage_index + 1;
+			}
+
+			if (cfg.is_open() && state.stage_index == 0) {
+				return tournament_config::rounds_for_teams(cfg.num_teams());
+			}
+
+			return state.stage_index + tournament_config::rounds_for_teams(static_cast<uint32_t>(state.surviving_team_indices().size()));
+		}();
 
 		for (uint32_t r = 0; r < rounds; ++r) {
 			tournament_page_round round;
 			round.name = round_name(r, rounds);
-			round.arena = cfg.arenas.empty() ? std::string() : cfg.arenas[std::min<std::size_t>(r, cfg.arenas.size() - 1)];
+			round.arena = cfg.arenas.empty() ? std::string() : cfg.arena_for_rounds_left(rounds - r);
 
 			if (r < state.stage_index || (finished && r <= state.stage_index)) {
 				for (const auto& h : state.match_history) {
@@ -437,7 +448,7 @@ namespace {
 				}
 			}
 			else {
-				const auto places = bracket >> (r + 1);
+				const auto places = 1u << (rounds - r - 1);
 
 				for (uint32_t i = 0; i < places; ++i) {
 					auto m = tournament_page_match();
@@ -451,6 +462,23 @@ namespace {
 
 		return page;
 	}
+}
+
+uint32_t tournament_config::rounds_for_teams(const uint32_t teams) {
+	uint32_t rounds = 1;
+
+	while ((1u << rounds) < teams) {
+		++rounds;
+	}
+
+	return rounds;
+}
+
+const std::string& tournament_config::arena_for_rounds_left(const uint32_t rounds_left) const {
+	const auto n = arenas.size();
+	const auto index = rounds_left >= n ? std::size_t(0) : n - rounds_left;
+
+	return arenas[index];
 }
 
 std::string tournament_config::compute_hash() const {
@@ -659,7 +687,41 @@ work_result run_tournament(const run_tournament_input& in) {
 		*/
 
 		const auto close_open_round = std::make_shared<std::atomic<bool>>(false);
-		const auto open_round_players = std::make_shared<std::atomic<uint32_t>>(0);
+
+		/*
+			Started again after a crash: the players of the matches decided before it came already - counted,
+			so round 1 still closes by itself once the rest are here.
+		*/
+
+		const auto already_came = [&]() {
+			uint32_t n = 0;
+
+			for (const auto& m : matches) {
+				if (m.open_team_size > 0 && m.result.has_value()) {
+					n += static_cast<uint32_t>(m.team_a_player_ids.size() + m.team_b_player_ids.size());
+				}
+			}
+
+			return n;
+		}();
+
+		const auto open_round_players = std::make_shared<std::atomic<uint32_t>>(already_came);
+
+		/*
+			Who has a place on which open match - one place per account; the decided matches' players have theirs.
+		*/
+
+		const auto open_places = std::make_shared<open_round_places>();
+
+		for (const auto& m : matches) {
+			if (m.open_team_size > 0 && m.result.has_value()) {
+				for (const auto& ids : { m.team_a_player_ids, m.team_b_player_ids }) {
+					for (const auto& id : ids) {
+						open_places->take(id, m.server_name);
+					}
+				}
+			}
+		}
 
 		std::vector<std::thread> threads;
 		threads.reserve(matches.size());
@@ -822,7 +884,9 @@ work_result run_tournament(const run_tournament_input& in) {
 				commit,
 				close_open_round,
 				open_round_players,
+				open_places,
 				expected_players = in.config.open_players,
+				join_timeout_secs = in.config.join_timeout_secs,
 				served_page_port,
 				&page_lk,
 				&page_live,
@@ -900,6 +964,20 @@ work_result run_tournament(const run_tournament_input& in) {
 				server_ptr->heartbeat_reported_tournament_stage = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
 
 				server_ptr->tournament_page_port = served_page_port;
+
+				/*
+					The join timeout: a match of known teams decided by who came (server_join_timeout.hpp) -
+					an open one closes as Close round 1 does.
+				*/
+
+				server_ptr->join_timeout_secs = join_timeout_secs;
+				server_ptr->on_join_timeout = [match_ptr, commit](const faction_type came) {
+					auto outcome = tournament_match_outcome();
+					outcome.walkover = true;
+					outcome.nobody_came = came == faction_type::COUNT;
+					outcome.team_a_won = came == team_a_faction;
+					commit(*match_ptr, outcome);
+				};
 				server_ptr->on_live_state = [&page_lk, &page_live, port = match_ptr->port](const server_setup::live_match_state& s) {
 					std::scoped_lock lk(page_lk);
 					page_live[port] = s;
@@ -936,11 +1014,14 @@ work_result run_tournament(const run_tournament_input& in) {
 				if (match_ptr->open_team_size > 0) {
 					server_ptr->close_open_round = close_open_round;
 					server_ptr->open_round_players = open_round_players;
+					server_ptr->open_places = open_places;
+					server_ptr->open_match_server_name = match_ptr->server_name;
 					server_ptr->open_round_expected_players = expected_players;
 
 					/*
-						Closed before its pair was there: whoever waited advances without playing - all of them as one
-						team, whichever side they took. Nobody: an empty server, gone.
+						Closed before its pair was there: whoever waited advances without playing - as one team of at most
+						the team size, whichever side they took: the fuller side, filled up from the other one.
+						Who doesn't fit is out. Nobody: an empty server, gone.
 					*/
 
 					server_ptr->on_open_match_closed = [match_ptr, commit, take_open_teams](const server_assigned_teams& roster) {
@@ -949,12 +1030,24 @@ work_result run_tournament(const run_tournament_input& in) {
 
 						take_open_teams(roster, outcome);
 
-						auto& waiting = outcome.open_team_a;
-						waiting.insert(waiting.end(), outcome.open_team_b.begin(), outcome.open_team_b.end());
-						outcome.open_team_b.clear();
+						if (outcome.open_team_b.size() > outcome.open_team_a.size()) {
+							std::swap(outcome.open_team_a, outcome.open_team_b);
+							std::swap(outcome.open_names_a, outcome.open_names_b);
+						}
 
-						auto& waiting_names = outcome.open_names_a;
-						waiting_names.insert(waiting_names.end(), outcome.open_names_b.begin(), outcome.open_names_b.end());
+						const auto team_size = static_cast<std::size_t>(match_ptr->open_team_size);
+
+						for (std::size_t i = 0; i < outcome.open_team_b.size(); ++i) {
+							if (outcome.open_team_a.size() < team_size) {
+								outcome.open_team_a.push_back(outcome.open_team_b[i]);
+								outcome.open_names_a.push_back(outcome.open_names_b[i]);
+							}
+							else {
+								LOG("Tournament: %x (%x) didn't fit into a team of %x - out.", outcome.open_names_b[i], outcome.open_team_b[i], team_size);
+							}
+						}
+
+						outcome.open_team_b.clear();
 						outcome.open_names_b.clear();
 
 						commit(*match_ptr, outcome);

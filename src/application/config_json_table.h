@@ -196,4 +196,12 @@ struct config_json_table {
 
 	void load_patch(const augs::path_type& config_lua_path);
 	void load_patch_from_string(const std::string& json, const augs::path_type& source_name);
+
+	/*
+		What loading this config text would pass over without a word: unknown keys, values of another type,
+		enum values that don't exist. Empty: every setting in it is read as written.
+		A key default_config.json has is never unknown - a setting of another platform's build.
+	*/
+
+	static std::vector<std::string> find_problems(const std::string& json, const std::string& default_config_json);
 };

@@ -52,6 +52,7 @@
 #include "application/network/resolve_address_result.h"
 #include "application/setups/server/server_bans.h"
 #include "application/setups/server/report_queue.h"
+#include "application/setups/server/tournament/open_round_places.h"
 #include "application/masterserver/server_request_signature.h"
 
 struct netcode_socket_t;
@@ -426,6 +427,8 @@ private:
 	void leave_open_match(const std::string& authenticated_id);
 	void name_open_match();
 	void close_open_match_if_requested();
+	void check_join_timeout();
+	bool join_timeout_due() const;
 	void publish_live_state_if_its_time();
 	double when_last_published_live_state = -1.0;
 
@@ -544,6 +547,26 @@ public:
 
 	std::shared_ptr<std::atomic<uint32_t>> open_round_players;
 	uint32_t open_round_expected_players = 0;
+
+	/*
+		Which open match each player has their place in - one place per account in round 1.
+		open_match_server_name: this server's own name in it, "Match #2 (any pair)".
+	*/
+
+	std::shared_ptr<open_round_places> open_places;
+	std::string open_match_server_name;
+
+	/*
+		A tournament match's join timeout (server_join_timeout.hpp): this long after the server started,
+		a match still waiting for its players is decided - on_join_timeout with the team that came
+		(faction_type::COUNT: nobody), or it starts with the equal numbers present. 0: no timeout.
+	*/
+
+	uint32_t join_timeout_secs = 0;
+	std::optional<net_time_t> join_timeout_since;
+	bool join_timeout_passed = false;
+	bool join_timeout_relaxed = false;
+	std::function<void(faction_type)> on_join_timeout;
 
 	/*
 		A tournament's live page: its match's players and score, published from this server's own thread once
@@ -700,6 +723,7 @@ public:
 			}
 
 			close_open_match_if_requested();
+			check_join_timeout();
 			publish_live_state_if_its_time();
 
 			{
@@ -1051,6 +1075,7 @@ public:
 
 	void log_match_end_json(const messages::match_summary_message&);
 	void log_match_start_json(const messages::team_match_start_message&);
+	std::string account_of_player(mode_player_id, const std::string& known) const;
 
 	void schedule_shutdown();
 	void schedule_restart();

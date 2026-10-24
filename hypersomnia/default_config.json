@@ -6,7 +6,7 @@
     "gore": true,
 
     "singleplayer_game_speed": 1.0,
-    "singleplayer_bullet_speed": { "is_enabled": false, "value": 1.0 },
+    "OFF_singleplayer_bullet_speed": 1.0,
 
     "log_timestamp_format": "[%H:%M:%S] ",
     // "log_timestamp_format": "[%d-%m-%y %H:%M:%S] ",
@@ -206,8 +206,6 @@
         "teammate_nickname_position": "OVER_CHARACTER",
         "teammate_nickname_offset": 0,
         "small_health_bar_offset": 0,
-        "draw_bullet_trails": true,
-        "draw_long_bullet_neons": true,
         "draw_crosshairs": true,
         "draw_weapon_laser": true,
         "draw_grenade_trajectories": true,
@@ -507,8 +505,11 @@
         // Admins recognized by the account their cert proves - no password needed. Never a nickname.
         // { "account": "<account id>", "rcon": "NONE" (default) | "RCON" | "MASTER_RCON", "badge": optional, shown in place of [ADMIN] }, e.g.:
         // [ { "account": "steam_76561198000000000", "rcon": "MASTER_RCON" }, { "account": "key_<64 hex characters>", "rcon": "RCON", "badge": "MOD" } ]
-        // Your id: Settings - Advanced - "Copy my account id".
-        "admin_profiles": []
+        // Your id: Settings - Account - "Copy account id".
+        "admin_profiles": [],
+
+        // Only these accounts get in (a clan's server) - empty: anyone. Admins always do. E.g. ["steam_76561198000000000", "0x8aed41f2..."]
+        "allowed_accounts": []
     },
 
     "dedicated_server": {
@@ -644,7 +645,6 @@
         "colorize_inside_when_selected": true,
         "hide_unassigned_hotbar_buttons": true,
         "show_bomb_in_hotbar": true,
-        "autocollapse_hotbar_buttons": true,
         "primary_selected_color": [0, 255, 255, 255],
         "secondary_selected_color": [86, 156, 214, 255]
     },

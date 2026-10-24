@@ -9,6 +9,7 @@ struct server_list_entry_json {
 	bool is_web_server = false;
 	bool is_ranked = false;
 	bool require_password = false;
+	bool listed_players_only = false;
 
 	std::string site_displayed_address;
 

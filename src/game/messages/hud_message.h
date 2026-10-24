@@ -31,6 +31,7 @@ namespace messages {
 	struct team_match_start_message {
 		struct player_entry {
 			std::string nickname;
+			mode_player_id id;
 		};
 
 		std::vector<player_entry> team_1;

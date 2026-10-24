@@ -12,6 +12,7 @@
 
 #include "application/network/net_serialize.h"
 #include "application/network/identity_cert.h"
+#include "application/setups/server/server_slots.h"
 #include "3rdparty/yojimbo/netcode/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/thread_templates.h"
@@ -20,6 +21,7 @@
 #undef SetPort
 
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
+static_assert(max_netcode_connections_v == yojimbo::MaxClients);
 
 namespace augs {
 	double steady_secs();
@@ -281,11 +283,10 @@ server_adapter::server_adapter(
 	/*
 		A few connections more than the game slots: the game decides who gets a slot (server_setup::admit_or_refuse) -
 		e.g. a player back after a crash replaces the connection that has not timed out yet, even on a full server,
-		and a full server answers why instead of netcode saying nothing.
+		and a full server answers why instead of netcode saying nothing. And the admins' places (server_slots.h).
 	*/
 
-	const auto spare_connections = 4;
-	const auto netcode_slots = std::min(std::max(1, slots) + spare_connections, static_cast<int>(yojimbo::MaxClients));
+	const auto netcode_slots = std::min(std::max(1, slots) + spare_connections_v + reserved_admin_places_v, static_cast<int>(yojimbo::MaxClients));
 
 	LOG("Starting yojimbo::Server with %x connections for %x slots.", netcode_slots, std::max(1, slots));
 	server.Start(netcode_slots);

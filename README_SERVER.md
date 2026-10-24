@@ -87,10 +87,13 @@ Later ones win:
 | `HYPERSOMNIA_MAP_CYCLE_RANDOM` | `off`: the cycle in its order, not shuffled | `off` |
 | `HYPERSOMNIA_ADMINS` | [Admins](#admins) with full rights | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_PASSWORD` | Only players who know it can join | |
-| `HYPERSOMNIA_SLOTS` | Players per server | `10` |
+| `HYPERSOMNIA_ALLOWED_ACCOUNTS` | Only these accounts get in, and the [admins](#admins) | `steam_7656119...,0x8aed41f2...` |
+| `HYPERSOMNIA_SLOTS` | Players per server, at most `58` | `10` |
 | `HYPERSOMNIA_SERVER_INSTANCES` | How many servers | `3` |
 | `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports | `8500` |
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
+| `HYPERSOMNIA_BOT_QUOTA` | How many bots, `0` for none - the arena's own number when not set | `6` |
+| `HYPERSOMNIA_BOT_DIFFICULTY` | `VERY_EASY`, `EASY`, `MEDIUM`, `HARD` or `PROGRESSIVE` (the default) | `HARD` |
 | `HYPERSOMNIA_DAILY_UPDATE` | When to update every day, or `off` | `05:00` |
 | `HYPERSOMNIA_TIME_ZONE` | Where the server is - happy hours follow it | `Europe/Berlin` |
 | `HYPERSOMNIA_DISCORD_WEBHOOK` | Posts joins and match results to your Discord | |
@@ -98,6 +101,7 @@ Later ones win:
 | `HYPERSOMNIA_TOURNAMENT_TEAM_SIZE` | `2` for 2v2 and so on | `2` |
 | `HYPERSOMNIA_TOURNAMENT_TEAMS` | Teams set up beforehand: one per line or `;`, players by `,` - with `=<account id>` to verify them | `alice=0x8aed..., bob=steam_7656...; carol=..., dave=...` |
 | `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last | `de_cyberaqua,de_silo` |
+| `HYPERSOMNIA_TOURNAMENT_JOIN_TIMEOUT` | Minutes a match waits for its players, or `off` (10 by default) | `5` |
 | `HYPERSOMNIA_TOURNAMENT_PAGE` | The [live results page](#tournaments)'s TCP port, or `off` | `8080` |
 | `HYPERSOMNIA_CONFIG` | Anything else - JSON, like a file in `conf.d/` | |
 | `HYPERSOMNIA_SERVER_PRIVATE_KEY` | The [server key](#the-server-key), instead of the file | |
@@ -114,6 +118,10 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 | `RCON` | Kick, ban, the arena, the game mode and the map cycle - not the server's settings |
 | `NONE` | Nothing - only the badge |
 
+Every admin, whatever their `rcon`, always gets in: without the password, past the per-network limit of ranked servers, and into a full server (2 places are kept for admins, not shown on the server list). Into a ranked match or a tournament's match being played - only as a spectator, without a word in the chat.
+
+**A clan's server:** `"allowed_accounts": ["steam_7656...", "0x8aed..."]` in `server_private` (`HYPERSOMNIA_ALLOWED_ACCOUNTS`) - only these accounts get in, and the admins. The server lists show it with a padlock; nobody's asked for a password - whoever isn't listed is refused on joining.
+
 # Tournaments
 
 ![A tournament's matches in Browse servers](docs/images/server_browser_tournament_open.png)
@@ -126,8 +134,12 @@ A knockout tournament: a server for every match, the winners go on round by roun
 - Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing.
   - **Listed nicknames** (`alice, bob; carol, dave`): players set those exact nicknames to be let in - insecure, but enough for a LAN.
   - **Listed accounts** (`alice=0x8aed..., bob=steam_7656...; ...`): let in by their account (`Settings → Account → Copy account id` in the game), shown by the nickname written here - they play under any name. Every player needs one; a list with one missing doesn't start.
-- Once all the players it's for came, round 1 closes by itself: whoever waits alone advances without playing, the empty servers close. Fewer came? `Close round 1` (administration panel, `Maintenance`) does the same.
-- Admins join any match as spectators - to watch, and to close round 1.
+- Once all the players it's for came, round 1 closes by itself: whoever waits alone advances without playing, the empty servers close. Fewer came? `Close round 1` (administration panel, `Maintenance`) does the same - or the join timeout.
+- One place per account in round 1: a player with a place on one server who joins another is sent back to theirs.
+- **Join timeout** (10 minutes by default, `--tournament-join-timeout <minutes>` or `off`): a match still waiting for its players that long after its round started is decided without them - the team with more players present wins by walkover, equal numbers play as they are, nobody came - both teams are out (in the final: the tournament ends without a winner). Round 1 with anyone joining: closes as `Close round 1` does. Matches being played aren't touched.
+- Byes fill the bracket up to 2, 4, 8... once - from round 2, counted from the teams that are left. They go to the strongest: the first lines, then by how fast they won; a walkover counts as the weakest. The final is always on the last arena.
+- Admins join any match: before it starts as anyone (a player in round 1 with anyone joining), once it's played as spectators.
+- A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, an arena or a game mode that doesn't exist. Other servers only warn.
 - After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings don't start it again; results in `tournament.completed.<time>.state.json`.
 - It never updates in the middle of it.
 - On a LAN everyone sees the matches together under `Ongoing Tournament`; on the public list only official servers' tournaments show so.
@@ -136,7 +148,7 @@ A knockout tournament: a server for every match, the winners go on round by roun
 
 - **Discord or Telegram:** `Discord webhook` in the config generator (`server_private.discord_webhook_url`; for Telegram `telegram_webhook_url` and `telegram_channel_id`) - who joined, duels, every match's result. More of them, e.g. filtered by a clan: `custom_webhook_urls`.
 - **A tournament:** its [live results page](#tournaments); the final results in `tournament.completed.<time>.state.json` in the user folder.
-- **Anything else:** every match's start and end as a `SERVER_EVENT` line with JSON in the log, and the rest in [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json).
+- **Anything else:** every match's start and end as a `SERVER_EVENT` line with JSON in the log - each player's nickname and account id, and the rest in [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json).
 
 # Several servers, ranked
 
@@ -170,6 +182,7 @@ A knockout tournament: a server for every match, the winners go on round by roun
 | `--tournament-team-size <n>` | `2` for 2v2 and so on |
 | `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"`, or verified by their accounts: `"alice=0x8aed..., bob=steam_7656...; ..."` |
 | `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` |
+| `--tournament-join-timeout <minutes>` | How long a match waits for its players (10 by default), or `off` |
 | `--tournament-page <port>` | The [live results page](#tournaments)'s TCP port (the first game port's number by default), or `off` |
 | `--print-server-key` | Print the server's public key and quit |
 | `--sync-external-arenas-and-quit` | Download all community arenas and quit |

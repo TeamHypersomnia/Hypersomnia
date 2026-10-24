@@ -348,6 +348,12 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 
 - When implementing new functionality in the `augs/` folder, always put it in the `augs::` namespace.
 
+- Code separation: when a new feature needs code in several places of existing files, put all of it in one header
+  named after the feature and leave only short calls at those places - even if the calls must pass a few arguments.
+  Don't merge existing headers into one; only keep what a feature adds out of the files it touches.
+  Example: the dedicated server's config check at start lives in `src/application/setups/server/server_config_check.h`
+  (`check_server_config`, `check_tournament_arenas`); `work.cpp` has only the two calls.
+
 - Separate generic algorithmic logic (BFS, A*, sorting, etc.) into `augs/algorithm/` headers. Game-specific code should call these generic functions with appropriate parameters. This keeps algorithms reusable and testable independent of game code.
 
 ## Common vec2 and ltrb functions (from augs/math/vec2.h and augs/math/rects.h)

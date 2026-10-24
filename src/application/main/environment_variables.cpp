@@ -1,11 +1,14 @@
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <functional>
 #include <regex>
 #include "augs/string/typesafe_sprintf.h"
+#include "game/modes/difficulty_type.h"
 #include "application/network/account_id.h"
 #include "application/config_json_table.h"
 #include "application/main/environment_variables.h"
+#include "application/setups/server/server_slots.h"
 
 #if PLATFORM_WINDOWS
 #include <stdlib.h>
@@ -59,7 +62,7 @@ namespace {
 	}
 
 	int as_number(const std::string& value, const int min, const int max) {
-		static const auto number = std::regex("[0-9]+");
+		static const auto number = std::regex("[0-9]{1,9}");
 
 		if (!std::regex_match(value, number)) {
 			throw bad_value { typesafe_sprintf("a number from %x to %x", min, max) };
@@ -72,6 +75,40 @@ namespace {
 		}
 
 		return n;
+	}
+
+	/*
+		The bots' difficulty as in the config: VERY_EASY, EASY, MEDIUM, HARD, PROGRESSIVE (any case).
+	*/
+
+	difficulty_type as_bot_difficulty(const std::string& value) {
+		auto upper = value;
+		std::transform(upper.begin(), upper.end(), upper.begin(), [](const unsigned char c) { return static_cast<char>(std::toupper(c)); });
+
+		const std::pair<const char*, difficulty_type> names[] = {
+			{ "VERY_EASY", difficulty_type::VERY_EASY },
+			{ "EASY", difficulty_type::EASY },
+			{ "MEDIUM", difficulty_type::MEDIUM },
+			{ "HARD", difficulty_type::HARD },
+			{ "PROGRESSIVE", difficulty_type::PROGRESSIVE }
+		};
+
+		for (const auto& [name, difficulty] : names) {
+			if (upper == name) {
+				return difficulty;
+			}
+		}
+
+		throw bad_value { "one of VERY_EASY, EASY, MEDIUM, HARD, PROGRESSIVE" };
+	}
+
+	/*
+		How many bots: 0 - none; the map's own number when the variable isn't set.
+	*/
+
+	void set_bot_quota(config_json_table& c, const std::string& value) {
+		c.server.bot_quota.clear();
+		c.server.bot_quota.push_back(static_cast<uint8_t>(::as_number(value, 0, 64)));
 	}
 
 	/*
@@ -152,11 +189,37 @@ namespace {
 		c.server_private.admin_profiles.clear();
 
 		for (const auto& id : ids) {
+			if (!::is_valid_account_id(id)) {
+				throw bad_value { "account ids (steam_..., 0x... or key_...) separated by commas" };
+			}
+
 			auto entry = admin_profile_entry();
 			entry.account = ::normalize_account_id(id);
 			entry.rcon = "MASTER_RCON";
 
 			c.server_private.admin_profiles.push_back(entry);
+		}
+	}
+
+	/*
+		The only accounts let in (admins always are): "steam_765...,0x8aed...".
+	*/
+
+	void set_allowed_accounts(config_json_table& c, const std::string& value) {
+		const auto ids = ::split_list(value, ", \t\n");
+
+		if (ids.empty()) {
+			throw bad_value { "account ids separated by commas, e.g. steam_76561198000000000,0x8aed41f2..." };
+		}
+
+		c.server_private.allowed_accounts.clear();
+
+		for (const auto& id : ids) {
+			if (!::is_valid_account_id(id)) {
+				throw bad_value { "account ids (steam_..., 0x... or key_...) separated by commas" };
+			}
+
+			c.server_private.allowed_accounts.push_back(::normalize_account_id(id));
 		}
 	}
 
@@ -197,12 +260,15 @@ namespace {
 		environment_variable { "HYPERSOMNIA_MAP_CYCLE", [](auto& c, const auto& v) { ::set_map_cycle(c, v); } },
 		environment_variable { "HYPERSOMNIA_MAP_CYCLE_RANDOM", [](auto& c, const auto& v) { c.server.cycle_randomize_order = ::as_on_off(v); } },
 		environment_variable { "HYPERSOMNIA_ADMINS", [](auto& c, const auto& v) { ::set_master_admins(c, v); } },
+		environment_variable { "HYPERSOMNIA_ALLOWED_ACCOUNTS", [](auto& c, const auto& v) { ::set_allowed_accounts(c, v); } },
 		environment_variable { "HYPERSOMNIA_PASSWORD", [](auto& c, const auto& v) { c.server_private.server_password = v; } },
-		environment_variable { "HYPERSOMNIA_SLOTS", [](auto& c, const auto& v) { c.server_start.slots = ::as_number(v, 1, 64); } },
+		environment_variable { "HYPERSOMNIA_SLOTS", [](auto& c, const auto& v) { c.server_start.slots = ::as_number(v, 1, max_server_slots_v); } },
 		environment_variable { "HYPERSOMNIA_SERVER_INSTANCES", [](auto& c, const auto& v) { c.instances.casual = ::as_number(v, 1, 20); } },
 		environment_variable { "HYPERSOMNIA_PORT", [](auto& c, const auto& v) { c.server_start.port = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_WEB_PORT", [](auto& c, const auto& v) { c.server.webrtc_port_range_begin = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_BROWSER_PLAYERS", [](auto& c, const auto& v) { c.server.allow_webrtc_clients = ::as_on_off(v); } },
+		environment_variable { "HYPERSOMNIA_BOT_QUOTA", [](auto& c, const auto& v) { ::set_bot_quota(c, v); } },
+		environment_variable { "HYPERSOMNIA_BOT_DIFFICULTY", [](auto& c, const auto& v) { c.server.bot_difficulty = ::as_bot_difficulty(v); } },
 		environment_variable { "HYPERSOMNIA_DAILY_UPDATE", [](auto& c, const auto& v) { ::set_daily_update(c, v); } },
 		environment_variable { "HYPERSOMNIA_TIME_ZONE", [](auto& c, const auto& v) { c.server.time_zone = v; } },
 		environment_variable { "HYPERSOMNIA_DISCORD_WEBHOOK", [](auto& c, const auto& v) { c.server_private.discord_webhook_url = v; } }

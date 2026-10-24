@@ -216,7 +216,7 @@ void tournament_coordinator::pair_open_first_round() {
 		m.team_b_index = no_tournament_team_v;
 		m.open_team_size = cfg.open_team_size;
 		m.port = port_cursor++;
-		m.arena_and_mode = cfg.arenas.front();
+		m.arena_and_mode = cfg.arena_for_rounds_left(tournament_config::rounds_for_teams(cfg.num_teams()));
 		m.heartbeat_ranked_type = static_cast<uint8_t>(bracket == 2 ? ranked_server_type::TOURNAMENT_FINALS : ranked_server_type::TOURNAMENT_MID);
 		m.server_name = typesafe_sprintf("Match #%x (any pair)", i + 1);
 
@@ -262,7 +262,7 @@ void tournament_coordinator::pair_teams() {
 				playing.assign(alive.begin(), alive.end() - byes);
 			}
 
-			LOG("Tournament stage 0: %x byes (to %x).", byes, cfg.byes_to_strongest ? "strongest" : "weakest");
+			LOG("Tournament stage %x: %x byes (to %x).", state.stage_index, byes, cfg.byes_to_strongest ? "strongest" : "weakest");
 
 			/*
 				Apply synthetic match-time skills to bye teams immediately so subsequent
@@ -287,8 +287,11 @@ void tournament_coordinator::pair_teams() {
 		}
 	}
 
-	const auto map_index = std::min(static_cast<size_t>(state.stage_index), cfg.arenas.size() - 1);
-	const std::string& arena_and_mode_for_stage = cfg.arenas[map_index];
+	/*
+		Counted from the end of the list: the final always on the last arena, whatever number came.
+	*/
+
+	const std::string& arena_and_mode_for_stage = cfg.arena_for_rounds_left(tournament_config::rounds_for_teams(static_cast<uint32_t>(alive.size())));
 
 	uint16_t port_cursor = deps.base_port;
 
@@ -414,6 +417,23 @@ void tournament_coordinator::commit_match_result(tournament_match& m, const tour
 		return;
 	}
 
+	/*
+		Nobody came to a match of known teams before the join timeout: both are out (eliminate_losers).
+	*/
+
+	if (outcome.nobody_came && m.team_a_index != no_tournament_team_v) {
+		m.closed_empty = true;
+		LOG("Tournament: nobody came to the match on port %x (%x) - both teams are out.", m.port, m.server_name);
+
+		state.save(state_path);
+
+		if (deps.on_state_changed) {
+			deps.on_state_changed(state);
+		}
+
+		return;
+	}
+
 	if (m.open_team_size > 0 && m.team_a_index == no_tournament_team_v) {
 		/*
 			An open match: its teams are whoever played it - or whoever waited on it when round 1 was closed.
@@ -496,16 +516,26 @@ void tournament_coordinator::update_skills() {
 		}
 
 		/*
-			A walkover takes no time - the strongest, as the byes of listed teams.
+			A walkover - nobody came to play them: the weakest, so the byes of the next round go to the teams that played.
 		*/
 
-		state.teams[m.result->winner_team_index].skill = ::skill_from_match_time(m.result->duration_secs);
+		state.teams[m.result->winner_team_index].skill = m.result->walkover ? 0.0f : ::skill_from_match_time(m.result->duration_secs);
 	}
 }
 
 void tournament_coordinator::eliminate_losers() {
 	for (const auto& m : state.current_stage_matches) {
 		if (m.closed_empty) {
+			/*
+				A match of known teams nobody came to: both out. An open one nobody came to had no teams.
+			*/
+
+			for (const auto team : { m.team_a_index, m.team_b_index }) {
+				if (team < state.teams.size()) {
+					state.teams[team].eliminated = true;
+				}
+			}
+
 			continue;
 		}
 
@@ -548,6 +578,12 @@ void tournament_coordinator::eliminate_losers() {
 		h.winner_score = winner_is_a ? r.team_a_score : r.team_b_score;
 		h.loser_score = winner_is_a ? r.team_b_score : r.team_a_score;
 
+		/*
+			The join timeout's walkover of known teams: the other one didn't come.
+		*/
+
+		h.walkover = r.walkover;
+
 		state.match_history.push_back(std::move(h));
 	}
 }
@@ -582,7 +618,7 @@ void tournament_coordinator::declare_winner() const {
 		LOG("Tournament WINNER: [%x]", roster);
 	}
 	else {
-		LOG("Tournament ended without a sole winner (interrupted?).");
+		LOG("Tournament over without a winner - nobody came to the last match.");
 	}
 }
 
@@ -749,5 +785,210 @@ bool tournament_coordinator::run() {
 
 	return true;
 }
+
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+
+namespace {
+	/*
+		An open tournament played by a script: every stage's matches resolved as `play` says - a stage's
+		matches seen by the test as they were run.
+	*/
+
+	struct scripted_tournament {
+		std::vector<std::vector<tournament_match>> stages;
+
+		void run(
+			tournament_config cfg,
+			std::function<void(std::size_t stage, std::vector<tournament_match>&, tournament_commit_match_result_fn)> play
+		) {
+			/*
+				Unit tests run at every start, servers' too: the coordinator's lines muted - never read as a tournament.
+			*/
+
+			LOG_THREAD_MUTED() = true;
+
+			static uint32_t run_counter = 0;
+
+			const auto dir = std::filesystem::temp_directory_path() / typesafe_sprintf(
+				"hypersomnia-tournament-test-%x-%x",
+				static_cast<uint64_t>(augs::date_time::secs_since_epoch() * 1000.0),
+				run_counter++
+			);
+
+			std::filesystem::create_directories(dir);
+
+			tournament_coordinator_dependencies deps;
+			deps.base_port = 30000;
+
+			deps.run_stage = [&](std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+				play(stages.size(), matches, commit);
+				stages.push_back(matches);
+			};
+
+			auto coordinator = tournament_coordinator(std::move(cfg), dir / "tournament.ongoing.json", std::move(deps));
+			coordinator.run();
+
+			std::error_code ec;
+			std::filesystem::remove_all(dir, ec);
+
+			LOG_THREAD_MUTED() = false;
+		}
+	};
+
+	tournament_match_outcome open_match(const std::vector<account_id_string>& a, const std::vector<account_id_string>& b, const float secs) {
+		auto out = tournament_match_outcome();
+		out.open_team_a = a;
+		out.open_team_b = b;
+		out.open_names_a = a;
+		out.open_names_b = b;
+		out.duration_secs = secs;
+		out.walkover = b.empty();
+		return out;
+	}
+
+	tournament_config open_config(const uint32_t players) {
+		auto cfg = tournament_config();
+		cfg.open_players = players;
+		cfg.arenas = { "a1", "a2", "a3" };
+		return cfg;
+	}
+
+	auto team_a_wins = [](std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		for (auto& m : matches) {
+			auto outcome = tournament_match_outcome();
+			outcome.duration_secs = 100;
+			commit(m, outcome);
+		}
+	};
+}
+
+TEST_CASE("Tournament: a walkover doesn't take the next round's bye") {
+	auto t = scripted_tournament();
+
+	t.run(open_config(8), [](const std::size_t stage, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		if (stage == 0) {
+			REQUIRE(matches.size() == 4);
+
+			commit(matches[0], open_match({ "A" }, { "B" }, 100));
+			commit(matches[1], open_match({ "D" }, { "E" }, 50));
+			commit(matches[2], open_match({ "C" }, {}, 0));
+			commit(matches[3], open_match({}, {}, 0));
+			return;
+		}
+
+		team_a_wins(matches, commit);
+	});
+
+	REQUIRE(t.stages.size() == 3);
+
+	/*
+		Round 2: A, C and D - the bye to D, the fastest winner; C, who waited alone, plays.
+	*/
+
+	const auto& round_2 = t.stages[1];
+	REQUIRE(round_2.size() == 1);
+
+	auto ids = round_2[0].team_a_player_ids;
+	ids.insert(ids.end(), round_2[0].team_b_player_ids.begin(), round_2[0].team_b_player_ids.end());
+	std::sort(ids.begin(), ids.end());
+
+	REQUIRE(ids == std::vector<account_id_string> { "A", "C" });
+}
+
+TEST_CASE("Tournament: the final on the last arena when fewer came") {
+	auto t = scripted_tournament();
+
+	t.run(open_config(8), [](const std::size_t stage, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		if (stage == 0) {
+			REQUIRE(matches[0].arena_and_mode == "a1");
+
+			commit(matches[0], open_match({ "A" }, { "B" }, 100));
+			commit(matches[1], open_match({ "C" }, {}, 0));
+			commit(matches[2], open_match({}, {}, 0));
+			commit(matches[3], open_match({}, {}, 0));
+			return;
+		}
+
+		team_a_wins(matches, commit);
+	});
+
+	/*
+		3 came of 8: A and C left after round 1 - round 2 is the final, on the arena chosen for the final.
+	*/
+
+	REQUIRE(t.stages.size() == 2);
+	REQUIRE(t.stages[1].size() == 1);
+	REQUIRE(t.stages[1][0].arena_and_mode == "a3");
+}
+
+TEST_CASE("Tournament: join timeout - nobody came, both teams are out") {
+	auto cfg = tournament_config();
+	cfg.teams = { { "A" }, { "B" }, { "C" }, { "D" } };
+	cfg.arenas = { "a1", "a2" };
+
+	auto t = scripted_tournament();
+
+	t.run(cfg, [](const std::size_t stage, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		if (stage == 0) {
+			REQUIRE(matches.size() == 2);
+
+			auto nobody = tournament_match_outcome();
+			nobody.walkover = true;
+			nobody.nobody_came = true;
+			commit(matches[0], nobody);
+
+			auto a_came = tournament_match_outcome();
+			a_came.walkover = true;
+			a_came.team_a_won = true;
+			commit(matches[1], a_came);
+			return;
+		}
+
+		team_a_wins(matches, commit);
+	});
+
+	/*
+		One match nobody came to, the other one's team that came wins: it's the only one left - no final to play.
+	*/
+
+	REQUIRE(t.stages.size() == 1);
+}
+
+TEST_CASE("Tournament: join timeout - nobody came to the final, no winner") {
+	auto cfg = tournament_config();
+	cfg.teams = { { "A" }, { "B" } };
+	cfg.arenas = { "a1" };
+
+	auto t = scripted_tournament();
+
+	t.run(cfg, [](const std::size_t, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		auto nobody = tournament_match_outcome();
+		nobody.walkover = true;
+		nobody.nobody_came = true;
+		commit(matches[0], nobody);
+	});
+
+	REQUIRE(t.stages.size() == 1);
+}
+
+TEST_CASE("Tournament: rounds and arenas counted from the end") {
+	auto cfg = open_config(8);
+
+	REQUIRE(tournament_config::rounds_for_teams(2) == 1);
+	REQUIRE(tournament_config::rounds_for_teams(3) == 2);
+	REQUIRE(tournament_config::rounds_for_teams(4) == 2);
+	REQUIRE(tournament_config::rounds_for_teams(5) == 3);
+	REQUIRE(tournament_config::rounds_for_teams(8) == 3);
+
+	REQUIRE(cfg.arena_for_rounds_left(3) == "a1");
+	REQUIRE(cfg.arena_for_rounds_left(1) == "a3");
+	REQUIRE(cfg.arena_for_rounds_left(5) == "a1");
+
+	cfg.arenas = { "only" };
+	REQUIRE(cfg.arena_for_rounds_left(4) == "only");
+}
+#endif
 
 #endif

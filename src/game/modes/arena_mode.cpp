@@ -2659,7 +2659,13 @@ bool arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 		const auto result = add_player_custom(in, a);
 		(void)result;
 
-		if (const auto entry = find(a.id)) {
+		/*
+			A spectator coming to a ranked match being played is an admin watching it - nobody's told.
+		*/
+
+		const bool silent = a.faction == faction_type::SPECTATOR && ranked_state != ranked_state_type::NONE;
+
+		if (const auto entry = find(a.id); entry != nullptr && !silent) {
 			messages::mode_notification notification;
 
 			notification.subject_mode_id = a.id;
@@ -2687,7 +2693,7 @@ bool arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 	if (logically_set(g.removed_player)) {
 		added_or_removed = true;
 
-		if (const auto entry = find(g.removed_player)) {
+		if (const auto entry = find(g.removed_player); entry != nullptr && !(entry->get_faction() == faction_type::SPECTATOR && ranked_state != ranked_state_type::NONE)) {
 			messages::mode_notification notification;
 
 			notification.subject_mode_id = g.removed_player;
@@ -3744,8 +3750,8 @@ void arena_mode::post_team_match_start(const input_type in, const logic_step ste
 	messages::team_match_start_message start;
 
 	auto setup_team = [&](auto& into, const auto faction) {
-		for_each_player_in(faction, [&](const auto&, const auto& data) {
-			into.push_back({ data.get_nickname() });
+		for_each_player_in(faction, [&](const auto& id, const auto& data) {
+			into.push_back({ data.get_nickname(), id });
 
 			return callback_result::CONTINUE;
 		});

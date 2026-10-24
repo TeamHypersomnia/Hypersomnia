@@ -51,6 +51,14 @@ struct tournament_config {
 	uint32_t open_team_size = 1;
 	// END GEN INTROSPECTOR
 
+	/*
+		Join timeout: how long a match waits for all its players - then it's decided without them
+		(server_join_timeout.hpp). 0: it waits. Not part of the tournament's identity (compute_hash) -
+		changed on a restart, the tournament carries on.
+	*/
+
+	uint32_t join_timeout_secs = 10 * 60;
+
 	bool is_open() const {
 		return teams.empty() && open_players > 0;
 	}
@@ -68,6 +76,19 @@ struct tournament_config {
 	*/
 
 	static tournament_config from_params(const cmd_line_params&, std::string& error);
+
+	/*
+		How many rounds are left for this many teams - the byes fill them up to 2, 4, 8... once, in the next round.
+	*/
+
+	static uint32_t rounds_for_teams(uint32_t teams);
+
+	/*
+		The arena of a round with this many rounds left, this one included: counted from the end of the list,
+		so the last arena is always the final's - also when fewer came than the bracket was made for.
+	*/
+
+	const std::string& arena_for_rounds_left(uint32_t rounds_left) const;
 
 	std::string compute_hash() const;
 };

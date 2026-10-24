@@ -79,3 +79,9 @@ std::ostream& write_nvps(
 #endif
 
 std::string& LOG_THREAD_PREFFIX();
+
+/*
+	True: this thread's LOGs go nowhere - e.g. unit tests that drive code which logs, at every start of the game.
+*/
+
+bool& LOG_THREAD_MUTED();

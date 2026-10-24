@@ -4,6 +4,7 @@ namespace server_json_events {
 	struct match_start_player {
 		// GEN INTROSPECTOR struct server_json_events::match_start_player
 		std::string nickname;
+		std::string account;
 		// END GEN INTROSPECTOR
 	};
 
@@ -11,6 +12,7 @@ namespace server_json_events {
 		// GEN INTROSPECTOR struct server_json_events::match_end_player
 		int score = 0;
 		std::string nickname;
+		std::string account;
 		// END GEN INTROSPECTOR
 	};
 

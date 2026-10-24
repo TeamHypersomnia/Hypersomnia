@@ -28,7 +28,8 @@ inline constexpr auto environment_flags = std::array {
 	environment_flag { "HYPERSOMNIA_TOURNAMENT_TEAM_SIZE", "--tournament-team-size" },
 	environment_flag { "HYPERSOMNIA_TOURNAMENT_TEAMS", "--tournament-teams" },
 	environment_flag { "HYPERSOMNIA_TOURNAMENT_ARENAS", "--tournament-arenas" },
-	environment_flag { "HYPERSOMNIA_TOURNAMENT_PAGE", "--tournament-page" }
+	environment_flag { "HYPERSOMNIA_TOURNAMENT_PAGE", "--tournament-page" },
+	environment_flag { "HYPERSOMNIA_TOURNAMENT_JOIN_TIMEOUT", "--tournament-join-timeout" }
 };
 
 /*

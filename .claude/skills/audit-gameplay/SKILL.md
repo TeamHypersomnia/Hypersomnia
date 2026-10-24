@@ -60,6 +60,15 @@ description: Audit/review a Hypersomnia feature or system (recently added gamepl
 14. **Settings and editor UI/UX** - new settings and related editor controls are thematically grouped,
     not cluttered, and use imgui properly: grouping, indentation, collapsing headers/tree nodes,
     showing only what is relevant/enabled.
+15. **Code separation** - if the code for a new feature is mixed into several places in existing code,
+    but all these additional snippets could be isolated in a single header, it should be done,
+    even at the cost of passing some arguments at the call sites. This is not to say that multiple headers should be
+    merged into one - only that whatever is being put into existing code, should be aggressively moved into separate
+    headers with names after the original feature they implement.
+    Example: checking a dedicated server's config at start (unknown keys, wrong types, bad admin profiles, a tournament's
+    arenas and game modes) first went into `work.cpp` as about 120 lines in two places. Now it is all in
+    `src/application/setups/server/server_config_check.h` (`check_server_config`, `check_tournament_arenas`), and
+    `work.cpp` keeps only two calls that pass in the config layers, the default config path, the admins and the flags.
 
 ## Report format
 

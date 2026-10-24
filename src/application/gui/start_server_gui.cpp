@@ -7,6 +7,7 @@
 #include "augs/misc/imgui/imgui_enum_radio.h"
 #include "application/gui/do_server_vars.h"
 #include "application/setups/server/server_vars.h"
+#include "application/setups/server/server_slots.h"
 #include "application/nat/nat_detection_session.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
@@ -146,7 +147,7 @@ as well as to test your skills in a laggy environment.
 			checkbox("Show##serverpw", show);
 		}
 
-		slider("Slots", into.slots, 2, 64);
+		slider("Slots", into.slots, 2, max_server_slots_v);
 
 		const auto new_feature_color = ::get_new_feature_color();
 

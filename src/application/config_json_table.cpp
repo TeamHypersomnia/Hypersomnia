@@ -2,6 +2,7 @@
 #include "augs/templates/corresponding_field.h"
 
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/readwrite/json_check.h"
 #include "augs/window_framework/window.h"
 
 #include "application/config_json_table.h"
@@ -64,6 +65,16 @@ void config_json_table::load_patch_from_string(const std::string& json, const au
 	catch (const augs::json_deserialization_error& err) {
 		throw config_read_error(source_name, err.what());
 	}
+}
+
+std::vector<std::string> config_json_table::find_problems(const std::string& json, const std::string& default_config_json) {
+	constexpr auto rapidjson_flags = 
+		rapidjson::kParseDefaultFlags |
+		rapidjson::kParseCommentsFlag | 
+		rapidjson::kParseTrailingCommasFlag
+	;
+
+	return augs::find_json_problems<config_json_table, rapidjson_flags>(json, default_config_json);
 }
 
 void config_json_table::save_patch(

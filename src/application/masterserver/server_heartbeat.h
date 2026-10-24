@@ -75,6 +75,7 @@ struct server_heartbeat {
 
 	uint8_t ranked_state = 0;
 	bool require_password = false;
+	bool listed_players_only = false;
 
 	uint8_t speed_hundredths = 100;
 	uint8_t bullet_speed_hundredths = 100;

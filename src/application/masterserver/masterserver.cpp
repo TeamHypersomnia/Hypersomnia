@@ -775,6 +775,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.is_ranked = meta.is_official_server() && data.is_ranked_server();
 			next.is_web_server = meta.type == server_type::WEB;
 			next.require_password = data.require_password;
+			next.listed_players_only = data.listed_players_only;
 			next.name = data.server_name;
 			next.instance_label = data.instance_label;
 			next.ip = ::ToString(ip);

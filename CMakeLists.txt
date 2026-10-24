@@ -1293,7 +1293,9 @@ if(GCC OR CLANG)
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -ffp-model=strict")
 	endif()
 
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${XCLANG_STR} -fno-threadsafe-statics")
+	# No -fno-threadsafe-statics: function-local statics are first reached from several threads at once
+	# (the server instances of one process, the tournament's matches, the thread pools) - without the guard
+	# each thread constructs its own copy and registers its destructor, so they're destroyed twice at exit.
 
 	message("-O0 will be specified for Debug build.")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} ${XCLANG_STR} -O0")

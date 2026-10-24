@@ -983,10 +983,10 @@ void browse_servers_gui_state::show_server_list(
 			}
 
 			/*
-				A padlock before the name of a server with a password.
+				A padlock before the name of a server with a password - or one for its listed players only (a clan's).
 			*/
 
-			if (d.require_password) {
+			if (d.require_password || d.listed_players_only) {
 				padlock(ImGui::GetTextLineHeight(), rgba(ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]));
 				ImGui::SameLine();
 			}
@@ -1389,7 +1389,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			if (no_password) {
-				if (s.heartbeat.require_password) {
+				if (s.heartbeat.require_password || s.heartbeat.listed_players_only) {
 					return;
 				}
 			}
@@ -2314,7 +2314,7 @@ std::optional<server_list_entry> browse_servers_gui_state::find_quick_play_serve
 
 	erase_if(candidates, [&](const auto& s) {
 		const bool is_ranked = s.is_official_server() && s.heartbeat.is_ranked_server();
-		return !s.heartbeat.versions_compatible() || is_ranked || s.heartbeat.require_password || s.heartbeat.is_full();
+		return !s.heartbeat.versions_compatible() || is_ranked || s.heartbeat.require_password || s.heartbeat.listed_players_only || s.heartbeat.is_full();
 	});
 
 	auto public_ones = candidates;
