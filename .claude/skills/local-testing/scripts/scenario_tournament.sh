@@ -28,6 +28,7 @@
 #   join_timeout_equal  2v2, only alice and carol come: equal numbers - the match starts with them after the timeout
 #   join_timeout_open   TOURNAMENT=4, alice alone on #1, bob alone on #2: the timeout closes round 1, they play the final
 #   open_one_place      TOURNAMENT=4: alice has a place on #1 - the same account on #2 is sent back to #1
+#   open_admin_elsewhere carol, an admin with a place on #1, joins #2 too: there she watches - not sent back, no second place
 #   admin_live          alice vs bob live, carol (an admin) joins: a spectator - not "too late", not "not theirs"
 #   admission_allowed   a persistent server with allowed_accounts [alice]: bob is refused, alice and carol (an admin) get in
 #   admission_full      a persistent server of 2 slots, full: dave is refused, carol (an admin) gets in
@@ -40,7 +41,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place admin_live admission_allowed admission_full"
+ALL="teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -143,7 +144,7 @@ kill_client() {
 }
 
 kill_all_clients() {
-	for c in alice bob carol dave mallory alice2; do kill_client $c; done
+	for c in alice bob carol dave mallory alice2 carol2; do kill_client $c; done
 	sleep 2
 }
 
@@ -572,6 +573,22 @@ case_open_one_place() {
 	wait_log "has a place in Match #1" 60
 	check "the same account sent back to Match #1" in_log "has a place in Match #1"
 	check "no second place" bash -c "[ \$(grep -c 'takes a place' $SRV) = 1 ]"
+	finish_case
+}
+
+case_open_admin_elsewhere() {
+	new_case open_admin_elsewhere
+	player carol
+	mkdir -p $T/carol2/user
+	cp -r $T/carol/user/conf.d $T/carol/user/.keys $T/carol2/user/
+	server_extra "{ \"server_private\": { \"admin_profiles\": [ { \"account\": \"${ID[carol]}\" } ] } }"
+	start_server HYPERSOMNIA_TOURNAMENT=4 --
+	client carol $PORT
+	wait_count "takes a place" 1 60
+	client carol2 $((PORT + 1))
+	wait_log "is an admin - watches" 60
+	check "the admin with a place elsewhere watches" in_log "is an admin - watches"
+	check "not sent back, no second place" bash -c "! grep -q 'has a place in' $SRV && [ \$(grep -c 'takes a place' $SRV) = 1 ]"
 	finish_case
 }
 
