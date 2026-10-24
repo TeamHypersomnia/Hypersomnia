@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include "augs/log_direct.h"
 #include "application/arena/arena_paths.h"
 #include "application/setups/editor/project/editor_project_paths.h"
@@ -37,11 +38,24 @@ struct choose_arena_input {
 	}
 };
 
+/*
+	Building an arena writes into the official resources (packaged_official_content, one per process) the flavours
+	it made of them - read back in the same build. Several servers of one process (instances, a tournament's matches)
+	build their arenas one at a time, so none reads another's.
+*/
+
+inline std::mutex& arena_build_mutex() {
+	static std::mutex lk;
+	return lk;
+}
+
 inline void load_arena_from_path(
 	const choose_arena_input in,
 	const augs::path_type& json_path,
 	augs::secure_hash_type* const output_arena_hash
 ) {
+	std::scoped_lock building(::arena_build_mutex());
+
 	auto project = editor_project_readwrite::read_project_json(
 		json_path,
 		official_get_resources(in.official),
@@ -77,6 +91,8 @@ inline void load_arena_from_string(
 	const std::string& json_document,
 	scene_entity_to_node_map* const entity_to_node = nullptr
 ) {
+	std::scoped_lock building(::arena_build_mutex());
+
 	auto project = editor_project_readwrite::read_project_json(
 		project_dir,
 		json_document,

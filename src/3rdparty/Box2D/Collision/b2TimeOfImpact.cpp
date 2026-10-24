@@ -25,9 +25,10 @@
 
 #include <stdio.h>
 
-float32 b2_toiTime, b2_toiMaxTime;
-int32 b2_toiCalls, b2_toiIters, b2_toiMaxIters;
-int32 b2_toiRootIters, b2_toiMaxRootIters;
+// Hypersomnia: statistics only, never read - per thread, as several servers' worlds step at once in one process.
+thread_local float32 b2_toiTime, b2_toiMaxTime;
+thread_local int32 b2_toiCalls, b2_toiIters, b2_toiMaxIters;
+thread_local int32 b2_toiRootIters, b2_toiMaxRootIters;
 
 //
 struct b2SeparationFunction
