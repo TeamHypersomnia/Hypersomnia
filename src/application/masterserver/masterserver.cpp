@@ -778,6 +778,17 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			next.name = data.server_name;
 			next.instance_label = data.instance_label;
 			next.ip = ::ToString(ip);
+
+			/*
+				A tournament's live page, served by the server itself over TCP - at its own address, so it can only
+				ever lead to that server.
+			*/
+
+			if (data.tournament_page_port != 0) {
+				auto host = ip;
+				host.port = data.tournament_page_port;
+				next.tournament_page = "http://" + ::ToString(host) + "/";
+			}
 			next.webrtc_id = meta.webrtc_id;
 
 			{

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hypersomnia tournament</title>
+<!--
+	A tournament's live page, served by the tournament's server itself (run_tournament.cpp) -
+	the bracket from /tournament.json, read again every second.
+-->
+<style>
+	:root {
+		--bg: #030303;
+		--panel: #0a0a0a;
+		--line: rgb(60, 60, 60);
+		--line-dim: rgb(35, 35, 35);
+		--text: rgb(185, 185, 185);
+		--bright: rgb(225, 225, 225);
+		--dim: rgb(150, 150, 150);
+		--accent: rgb(255, 176, 64);
+		--live: rgb(255, 80, 80);
+		--won: rgb(34, 197, 76);
+		--mono: Consolas, monaco, "DejaVu Sans Mono", monospace;
+		--font: Verdana, "DejaVu Sans", sans-serif;
+	}
+
+	* { box-sizing: border-box; }
+
+	body {
+		margin: 0;
+		background: var(--bg);
+		color: var(--text);
+		font-family: var(--font);
+		font-size: 14px;
+	}
+
+	main {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 24px 16px 48px;
+	}
+
+	header {
+		margin-bottom: 24px;
+		padding: 16px;
+		border: 1px solid var(--line-dim);
+		text-align: center;
+	}
+
+	h1 {
+		margin: 0;
+		color: var(--bright);
+		font-family: var(--mono);
+		font-weight: normal;
+		font-size: 1.8em;
+	}
+
+	.subtitle {
+		margin-top: 6px;
+		color: var(--dim);
+	}
+
+	.winner {
+		margin: 0 0 24px;
+		padding: 18px;
+		border: 1px solid var(--accent);
+		color: var(--accent);
+		font-family: var(--mono);
+		font-size: 1.5em;
+		text-align: center;
+	}
+
+	.bracket {
+		display: flex;
+		gap: 16px;
+		overflow-x: auto;
+		padding-bottom: 8px;
+	}
+
+	.round {
+		flex: 1 0 220px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.round h2 {
+		margin: 0 0 2px;
+		color: var(--accent);
+		font-size: 1em;
+		font-weight: normal;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+
+	.round .arena {
+		margin-bottom: 10px;
+		color: var(--dim);
+		font-family: var(--mono);
+		font-size: 0.85em;
+	}
+
+	.round.current h2::after {
+		content: " - now";
+		color: var(--dim);
+		text-transform: none;
+		letter-spacing: 0;
+	}
+
+	.matches {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		gap: 10px;
+	}
+
+	.match {
+		border: 1px solid var(--line);
+		background: var(--panel);
+	}
+
+	.match.live {
+		border-color: var(--live);
+	}
+
+	.match.coming {
+		border-style: dashed;
+		border-color: var(--line-dim);
+	}
+
+	.team {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 10px;
+		min-height: 32px;
+	}
+
+	.team + .team {
+		border-top: 1px solid var(--line-dim);
+	}
+
+	.team .names {
+		flex: 1;
+		overflow: hidden;
+		color: var(--bright);
+		font-family: var(--mono);
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.team .names.none {
+		color: var(--dim);
+		font-family: var(--font);
+		font-style: italic;
+	}
+
+	.team.won .names {
+		color: var(--won);
+	}
+
+	.team.lost .names {
+		color: var(--dim);
+		text-decoration: line-through;
+	}
+
+	.team .score {
+		color: var(--bright);
+		font-family: var(--mono);
+	}
+
+	.status {
+		padding: 3px 10px;
+		border-top: 1px solid var(--line-dim);
+		color: var(--dim);
+		font-size: 0.8em;
+	}
+
+	.match.live .status {
+		color: var(--live);
+	}
+
+	.match.live .status::before {
+		content: "\25CF ";
+		animation: blink 1.2s infinite;
+	}
+
+	@keyframes blink {
+		50% { opacity: 0.2; }
+	}
+
+	.byes {
+		margin-top: 10px;
+		color: var(--dim);
+		font-size: 0.85em;
+	}
+
+	.byes span {
+		color: var(--bright);
+		font-family: var(--mono);
+	}
+
+	.error {
+		color: var(--live);
+		text-align: center;
+	}
+
+	footer {
+		margin-top: 32px;
+		color: var(--dim);
+		font-size: 0.85em;
+		text-align: center;
+	}
+
+	footer a {
+		color: var(--accent);
+	}
+</style>
+</head>
+<body>
+<main>
+	<header>
+		<h1 id="title">Hypersomnia tournament</h1>
+		<div class="subtitle" id="subtitle">Live - updated every second</div>
+	</header>
+	<div id="winner"></div>
+	<div class="bracket" id="bracket"></div>
+	<p class="error" id="error" hidden></p>
+	<footer>Join from the game: <b>Browse servers</b>. &middot; <a href="https://hypersomnia.io" target="_blank">hypersomnia.io</a></footer>
+</main>
+<script>
+(() => {
+	const el = (tag, cls, text) => {
+		const e = document.createElement(tag);
+
+		if (cls) {
+			e.className = cls;
+		}
+
+		if (text !== undefined) {
+			e.textContent = text;
+		}
+
+		return e;
+	};
+
+	const STATUS = {
+		waiting: 'Waiting for players',
+		live: 'Live',
+		done: 'Finished',
+		walkover: 'Advanced without playing',
+		empty: 'Nobody came',
+		coming: ''
+	};
+
+	function team(names, score, outcome, placeholder) {
+		const row = el('div', 'team' + (outcome ? ' ' + outcome : ''));
+		const shown = names && names.length ? names.join(', ') : placeholder;
+		row.appendChild(el('span', 'names' + (names && names.length ? '' : ' none'), shown));
+
+		if (score >= 0) {
+			row.appendChild(el('span', 'score', String(score)));
+		}
+
+		return row;
+	}
+
+	function match(m) {
+		const box = el('div', 'match ' + m.status);
+		const outcome = side => m.winner ? (m.winner === side ? 'won' : 'lost') : '';
+		const waitingFor = m.status === 'coming' ? 'To be decided' : (m.status === 'waiting' ? 'Waiting...' : '-');
+
+		box.appendChild(team(m.team_a, m.score_a, outcome('a'), waitingFor));
+
+		if (m.status !== 'walkover') {
+			box.appendChild(team(m.team_b, m.score_b, outcome('b'), waitingFor));
+		}
+
+		const status = STATUS[m.status] || '';
+		const where = m.status === 'waiting' && m.server_name ? ' - join ' + m.server_name : '';
+
+		if (status) {
+			box.appendChild(el('div', 'status', status + where));
+		}
+
+		return box;
+	}
+
+	function render(t) {
+		document.getElementById('title').textContent = 'Hypersomnia ' + t.title;
+		document.getElementById('subtitle').textContent = t.finished
+			? 'Finished'
+			: (t.open_first_round ? `${t.players} players - live, updated every second` : 'Live - updated every second');
+
+		const winner = document.getElementById('winner');
+		winner.innerHTML = '';
+
+		if (t.finished && t.winner && t.winner.length) {
+			winner.appendChild(el('div', 'winner', '\u{1F3C6} ' + t.winner.join(', ')));
+		}
+
+		const bracket = document.getElementById('bracket');
+		bracket.innerHTML = '';
+
+		t.rounds.forEach((r, i) => {
+			const round = el('div', 'round' + (!t.finished && i === t.current_round ? ' current' : ''));
+			round.appendChild(el('h2', '', r.name));
+			round.appendChild(el('div', 'arena', r.arena || ''));
+
+			const matches = el('div', 'matches');
+			r.matches.forEach(m => matches.appendChild(match(m)));
+			round.appendChild(matches);
+
+			if (r.byes && r.byes.length) {
+				const byes = el('div', 'byes', 'Advance without playing: ');
+				r.byes.forEach((b, j) => {
+					byes.appendChild(el('span', '', b.join(', ')));
+
+					if (j < r.byes.length - 1) {
+						byes.appendChild(document.createTextNode(', '));
+					}
+				});
+				round.appendChild(byes);
+			}
+
+			bracket.appendChild(round);
+		});
+	}
+
+	async function refresh() {
+		const error = document.getElementById('error');
+
+		try {
+			const res = await fetch('tournament.json', { cache: 'no-store' });
+			render(await res.json());
+			error.hidden = true;
+		}
+		catch (e) {
+			error.textContent = 'The server is not answering - retrying...';
+			error.hidden = false;
+		}
+
+		setTimeout(refresh, 1000);
+	}
+
+	refresh();
+})();
+</script>
+</body>
+</html>

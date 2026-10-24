@@ -419,6 +419,11 @@ void tournament_coordinator::commit_match_result(tournament_match& m, const tour
 			LOG("Tournament: open match on port %x closed with nobody on it.", m.port);
 
 			state.save(state_path);
+
+			if (deps.on_state_changed) {
+				deps.on_state_changed(state);
+			}
+
 			return;
 		}
 
@@ -439,6 +444,10 @@ void tournament_coordinator::commit_match_result(tournament_match& m, const tour
 	m.result = r;
 
 	state.save(state_path);
+
+	if (deps.on_state_changed) {
+		deps.on_state_changed(state);
+	}
 }
 
 void tournament_coordinator::run_current_stage() {
@@ -497,6 +506,12 @@ void tournament_coordinator::eliminate_losers() {
 				A walkover: whoever waited alone goes on, nobody's eliminated.
 			*/
 
+			tournament_match_history_entry h;
+			h.played_in_stage = state.stage_index;
+			h.winner_player_ids = state.teams[r.winner_team_index].player_ids;
+			h.walkover = true;
+
+			state.match_history.push_back(std::move(h));
 			continue;
 		}
 
@@ -523,6 +538,10 @@ void tournament_coordinator::advance_stage() {
 
 void tournament_coordinator::persist() const {
 	state.save(state_path);
+
+	if (deps.on_state_changed) {
+		deps.on_state_changed(state);
+	}
 }
 
 void tournament_coordinator::declare_winner() const {
@@ -595,6 +614,8 @@ void tournament_coordinator::cleanup() const {
 bool tournament_coordinator::run() {
 	if (!resumed) {
 		if (const auto archive = find_completed_archive()) {
+			completed_archive = *archive;
+
 			LOG(
 				"Tournament: this tournament was played to the end already - the results are in %x. "
 				"It doesn't start again with the same settings; remove that file to play it once more.",

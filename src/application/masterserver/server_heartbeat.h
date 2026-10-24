@@ -85,6 +85,7 @@ struct server_heartbeat {
 	event_name_type next_event_name;
 	int32_t secs_until_next_event = -1;
 	instance_label_type instance_label;
+	uint16_t tournament_page_port = 0;
 	heartbeat_nonce_type ack_nonce = {};
 	std::optional<server_request_signature> signature;
 	// END GEN INTROSPECTOR

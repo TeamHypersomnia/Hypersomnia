@@ -63,6 +63,7 @@ struct tournament_match_history_entry {
 	float duration_secs = 0.f;
 	uint32_t winner_score = 0;
 	uint32_t loser_score = 0;
+	bool walkover = false;
 	// END GEN INTROSPECTOR
 };
 

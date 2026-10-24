@@ -91,6 +91,11 @@ struct tournament_coordinator_dependencies {
 		Returns true if the user has signalled a shutdown (SIGINT etc.).
 	*/
 	std::function<bool()> should_interrupt;
+
+	/*
+		Optional - a copy of the state every time it's saved, for the live page (served from another thread).
+	*/
+	std::function<void(const tournament_state&)> on_state_changed;
 };
 
 class tournament_coordinator {
@@ -106,6 +111,12 @@ public:
 	*/
 
 	bool run();
+
+	/*
+		After run() returned false: the results of this tournament, played before.
+	*/
+
+	augs::path_type completed_archive;
 
 private:
 	bool finished() const;

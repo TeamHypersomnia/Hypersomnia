@@ -26,5 +26,8 @@ CMD ["./Hypersomnia-Headless.AppImage", "--appimage-extract-and-run"]
 # For native clients via POSIX sockets
 EXPOSE 8412/udp
 
+# A tournament's live results page
+EXPOSE 8412/tcp
+
 # For Web clients via WebRTC
 EXPOSE 9000/udp

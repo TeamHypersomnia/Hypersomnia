@@ -17,6 +17,8 @@
 #include "application/setups/server/tournament/tournament_config.h"
 #include "application/setups/server/tournament/tournament_state.h"
 #include "application/setups/server/tournament/tournament_coordinator.h"
+#include "application/setups/server/tournament/tournament_page.h"
+#include "3rdparty/include_httplib.h"
 #include "application/setups/server/server_setup.h"
 #include "application/setups/server/server_assigned_teams.h"
 #include "application/setups/server/server_nickname_auth.h"
@@ -149,6 +151,207 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 	return out;
 }
 
+/*
+	The live page's view of the tournament: every round of the bracket - the played ones from the history,
+	the current one with its servers' live scores, the coming ones as empty places.
+*/
+
+namespace {
+	using live_states = std::unordered_map<uint16_t, server_setup::live_match_state>;
+
+	uint32_t bracket_of(const uint32_t teams) {
+		uint32_t bracket = 2;
+
+		while (bracket < teams) {
+			bracket *= 2;
+		}
+
+		return bracket;
+	}
+
+	std::string round_name(const uint32_t round, const uint32_t rounds) {
+		const auto from_end = rounds - 1 - round;
+
+		if (from_end == 0) {
+			return "Final";
+		}
+
+		if (from_end == 1) {
+			return "Semifinals";
+		}
+
+		if (from_end == 2) {
+			return "Quarterfinals";
+		}
+
+		return typesafe_sprintf("Round %x", round + 1);
+	}
+
+	tournament_page_state make_page_state(
+		const tournament_config& cfg,
+		const tournament_state& state,
+		const live_states& live,
+		const bool finished
+	) {
+		/*
+			Everyone by their nickname - an account id only where none is known, shortened.
+		*/
+
+		std::unordered_map<std::string, std::string> nickname_of;
+
+		for (const auto& team : state.teams) {
+			for (std::size_t i = 0; i < team.player_ids.size() && i < team.nicknames.size(); ++i) {
+				if (!team.nicknames[i].empty()) {
+					nickname_of[team.player_ids[i]] = team.nicknames[i];
+				}
+			}
+		}
+
+		auto names = [&](const std::vector<account_id_string>& ids) {
+			std::vector<std::string> out;
+
+			for (const auto& id : ids) {
+				if (const auto found = nickname_of.find(id); found != nickname_of.end()) {
+					out.push_back(found->second);
+				}
+				else {
+					out.push_back(id.size() > 16 ? id.substr(0, 12) + "..." : id);
+				}
+			}
+
+			return out;
+		};
+
+		tournament_page_state page;
+		page.open_first_round = cfg.is_open();
+		page.players = cfg.is_open() ? cfg.open_players : static_cast<uint32_t>(cfg.teams.size() * std::max<std::size_t>(1, cfg.teams.empty() ? 1 : cfg.teams.front().size()));
+		page.team_size = cfg.is_open() ? cfg.open_team_size : static_cast<uint32_t>(cfg.teams.empty() ? 1 : cfg.teams.front().size());
+		page.current_round = state.stage_index;
+		page.finished = finished;
+		page.title = typesafe_sprintf("%xv%x tournament", page.team_size, page.team_size);
+
+		if (finished) {
+			if (const auto winner = state.sole_surviving_team_index()) {
+				page.winner = names(state.teams[*winner].player_ids);
+			}
+		}
+
+		const auto bracket = bracket_of(cfg.num_teams());
+		uint32_t rounds = 0;
+
+		while ((1u << rounds) < bracket) {
+			++rounds;
+		}
+
+		for (uint32_t r = 0; r < rounds; ++r) {
+			tournament_page_round round;
+			round.name = round_name(r, rounds);
+			round.arena = cfg.arenas.empty() ? std::string() : cfg.arenas[std::min<std::size_t>(r, cfg.arenas.size() - 1)];
+
+			if (r < state.stage_index || (finished && r <= state.stage_index)) {
+				for (const auto& h : state.match_history) {
+					if (h.played_in_stage != r) {
+						continue;
+					}
+
+					tournament_page_match m;
+					m.team_a = names(h.winner_player_ids);
+					m.team_b = names(h.loser_player_ids);
+					m.winner = "a";
+
+					if (h.walkover) {
+						m.status = "walkover";
+					}
+					else {
+						m.status = "done";
+						m.score_a = static_cast<int>(h.winner_score);
+						m.score_b = static_cast<int>(h.loser_score);
+					}
+
+					round.matches.push_back(std::move(m));
+				}
+			}
+			else if (r == state.stage_index && !finished) {
+				std::vector<bool> playing(state.teams.size(), false);
+
+				for (const auto& cm : state.current_stage_matches) {
+					tournament_page_match m;
+					m.server_name = cm.server_name;
+					m.port = cm.port;
+
+					if (cm.team_a_index < state.teams.size()) {
+						playing[cm.team_a_index] = true;
+						m.team_a = names(state.teams[cm.team_a_index].player_ids);
+					}
+
+					if (cm.team_b_index < state.teams.size()) {
+						playing[cm.team_b_index] = true;
+						m.team_b = names(state.teams[cm.team_b_index].player_ids);
+					}
+
+					if (cm.closed_empty) {
+						m.status = "empty";
+					}
+					else if (cm.result.has_value()) {
+						m.status = cm.result->walkover ? "walkover" : "done";
+						m.winner = cm.result->winner_team_index == cm.team_a_index ? "a" : "b";
+
+						if (!cm.result->walkover) {
+							m.score_a = static_cast<int>(cm.result->team_a_score);
+							m.score_b = static_cast<int>(cm.result->team_b_score);
+						}
+					}
+					else {
+						const auto found = live.find(cm.port);
+						const bool started = found != live.end() && found->second.started;
+
+						m.status = started ? "live" : "waiting";
+
+						if (found != live.end()) {
+							const auto& l = found->second;
+
+							/*
+								An open match has no teams yet - whoever took the places is on its server.
+							*/
+
+							if (cm.open_team_size > 0 && cm.team_a_index == no_tournament_team_v) {
+								m.team_a = l.resistance;
+								m.team_b = l.metropolis;
+							}
+
+							if (started) {
+								m.score_a = l.score_resistance;
+								m.score_b = l.score_metropolis;
+							}
+						}
+					}
+
+					round.matches.push_back(std::move(m));
+				}
+
+				for (uint32_t t = 0; t < state.teams.size(); ++t) {
+					if (!state.teams[t].eliminated && !playing[t]) {
+						round.byes.push_back(names(state.teams[t].player_ids));
+					}
+				}
+			}
+			else {
+				const auto places = bracket >> (r + 1);
+
+				for (uint32_t i = 0; i < places; ++i) {
+					auto m = tournament_page_match();
+					m.status = "coming";
+					round.matches.push_back(std::move(m));
+				}
+			}
+
+			page.rounds.push_back(std::move(round));
+		}
+
+		return page;
+	}
+}
+
 std::string tournament_config::compute_hash() const {
 	const auto serialized = augs::to_json_string_nopretty(*this);
 	return augs::bytes_to_hex(augs::secure_hash(serialized));
@@ -165,7 +368,68 @@ work_result run_tournament(const run_tournament_input& in) {
 
 	const auto base_port = in.config_pattern.server_start.port;
 
+	/*
+		The live page: http://<this server>:<its first port>/ - the game's port number, but TCP.
+		The state comes from the coordinator each time it's saved, the scores from the match servers once a second.
+	*/
+
+	const auto page_cfg = cfg;
+
+	std::mutex page_lk;
+	tournament_state page_state;
+	live_states page_live;
+	std::atomic<bool> page_finished = false;
+
+	const auto page_port = in.params.tournament_page == "off" ? uint16_t(0) : static_cast<uint16_t>(base_port);
+
+	std::unique_ptr<httplib::Server> page_server;
+	std::thread page_thread;
+
+	if (page_port != 0) {
+		const auto page_html = [&]() {
+			try {
+				return augs::file_to_string(DETAIL_DIR / "web" / "tournament_page.html");
+			}
+			catch (const std::exception& err) {
+				LOG("Tournament: no live page - could not read it: %x", err.what());
+				return std::string();
+			}
+		}();
+
+		page_server = std::make_unique<httplib::Server>();
+
+		page_server->Get("/", [page_html](const httplib::Request&, httplib::Response& res) {
+			res.set_content(page_html, "text/html; charset=utf-8");
+		});
+
+		page_server->Get("/tournament.json", [&](const httplib::Request&, httplib::Response& res) {
+			auto json = std::string();
+
+			{
+				std::scoped_lock lk(page_lk);
+				json = augs::to_json_string_nopretty(::make_page_state(page_cfg, page_state, page_live, page_finished.load()));
+			}
+
+			res.set_header("Cache-Control", "no-store");
+			res.set_header("Access-Control-Allow-Origin", "*");
+			res.set_content(json, "application/json");
+		});
+
+		page_thread = std::thread([&page_server, page_port]() {
+			if (!page_server->listen("0.0.0.0", page_port)) {
+				LOG("Tournament: the live page could not take TCP port %x - not served.", page_port);
+			}
+		});
+
+		LOG("Tournament: the live page is at http://<this server>:%x/ (TCP %x).", page_port, page_port);
+	}
+
 	tournament_coordinator_dependencies deps;
+
+	deps.on_state_changed = [&page_lk, &page_state](const tournament_state& s) {
+		std::scoped_lock lk(page_lk);
+		page_state = s;
+	};
 	deps.base_port = base_port;
 	deps.should_interrupt = in.handle_sigint;
 
@@ -403,6 +667,9 @@ work_result run_tournament(const run_tournament_input& in) {
 				close_open_round,
 				open_round_players,
 				expected_players = in.config.open_players,
+				page_port,
+				&page_lk,
+				&page_live,
 				&in
 			]() {
 				LOG_THREAD_PREFFIX() = typesafe_sprintf("[T%x] ", match_ptr->port);
@@ -475,6 +742,12 @@ work_result run_tournament(const run_tournament_input& in) {
 				}
 
 				server_ptr->heartbeat_reported_tournament_stage = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
+
+				server_ptr->tournament_page_port = page_port;
+				server_ptr->on_live_state = [&page_lk, &page_live, port = match_ptr->port](const server_setup::live_match_state& s) {
+					std::scoped_lock lk(page_lk);
+					page_live[port] = s;
+				};
 
 				/*
 					An open match's teams are whoever took the places - read from its roster once it's decided.
@@ -644,6 +917,17 @@ work_result run_tournament(const run_tournament_input& in) {
 		}
 	};
 
+	/*
+		Over: stay up rather than quit - a container would only be started again and again (restart: unless-stopped) -
+		with the live page showing the results.
+	*/
+
+	auto idle_until_interrupted = [&in]() {
+		while (!(in.handle_sigint && in.handle_sigint())) {
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+	};
+
 	auto coordinator = tournament_coordinator(
 		std::move(cfg),
 		in.state_file_path,
@@ -651,14 +935,26 @@ work_result run_tournament(const run_tournament_input& in) {
 	);
 
 	if (!coordinator.run()) {
-		/*
-			Played to the end already. Stay up doing nothing rather than quit - a container would
-			only be started again and again (restart: unless-stopped).
-		*/
-
-		while (!(in.handle_sigint && in.handle_sigint())) {
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+		if (const auto played = tournament_state::load(coordinator.completed_archive)) {
+			std::scoped_lock lk(page_lk);
+			page_state = *played;
 		}
+
+		page_finished = true;
+		idle_until_interrupted();
+	}
+	else if (!(in.handle_sigint && in.handle_sigint())) {
+		page_finished = true;
+		LOG("Tournament: over - the live page shows the results. Ctrl+C (or stopping the service) to quit.");
+		idle_until_interrupted();
+	}
+
+	if (page_server) {
+		page_server->stop();
+	}
+
+	if (page_thread.joinable()) {
+		page_thread.join();
 	}
 
 	return work_result::SUCCESS;

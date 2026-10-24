@@ -3073,6 +3073,7 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.domain = vars.domain;
 	heartbeat.instance_label = instance_label;
+	heartbeat.tournament_page_port = tournament_page_port;
 	heartbeat.time_zone = get_time_zone();
 
 	/*
@@ -7098,6 +7099,34 @@ void server_setup::take_into_open_match(const client_id_type, const server_clien
 		return;
 	}
 
+	/*
+		A match recovered after a crash: its players come back as suspended ones - into the places they had.
+	*/
+
+	if (is_open_match()) {
+		const auto suspended_faction = get_arena_handle().on_mode(
+			[&](const auto& mode) {
+				using M = std::remove_cvref_t<decltype(mode)>;
+
+				if constexpr(std::is_same_v<M, arena_mode>) {
+					const auto& suspended = mode.get_suspended_players();
+
+					if (const auto found = suspended.find(mode.find_suspended_player_id(id)); found != suspended.end()) {
+						return found->second.get_faction();
+					}
+				}
+
+				return faction_type::COUNT;
+			}
+		);
+
+		if (::is_actual_faction(suspended_faction)) {
+			assigned_teams.id_to_faction[id] = suspended_faction;
+			LOG("Open match: %x comes back to the recovered match, in %x.", id, suspended_faction);
+			return;
+		}
+	}
+
 	if (!is_open_match() || is_ranked_live_or_starting()) {
 		return;
 	}
@@ -7130,12 +7159,7 @@ void server_setup::take_into_open_match(const client_id_type, const server_clien
 	LOG("Open match: %x takes a place in %x.", id, faction);
 
 	if (open_round_players != nullptr) {
-		const auto came = open_round_players->fetch_add(1) + 1;
-
-		if (close_open_round != nullptr && open_round_expected_players > 0 && came >= open_round_expected_players) {
-			LOG("All %x players of the tournament came - round 1 closes by itself.", open_round_expected_players);
-			close_open_round->store(true);
-		}
+		open_round_players->fetch_add(1);
 	}
 
 	open_match_named = false;
@@ -7146,7 +7170,11 @@ void server_setup::take_into_open_match(const client_id_type, const server_clien
 */
 
 void server_setup::leave_open_match(const std::string& authenticated_id) {
-	if (!is_open_match() || is_ranked_live_or_starting() || authenticated_id.empty()) {
+	/*
+		Closed: whoever waited went on already - leaving the server that shuts down isn't leaving the round.
+	*/
+
+	if (!is_open_match() || open_match_closed || is_ranked_live_or_starting() || authenticated_id.empty()) {
 		return;
 	}
 
@@ -7207,10 +7235,56 @@ void server_setup::name_open_match() {
 	request_immediate_heartbeat();
 }
 
+void server_setup::publish_live_state_if_its_time() {
+	if (!on_live_state || (when_last_published_live_state >= 0.0 && server_time - when_last_published_live_state < 1.0)) {
+		return;
+	}
+
+	when_last_published_live_state = server_time;
+
+	auto state = live_match_state();
+	state.started = is_ranked_live_or_starting();
+
+	get_arena_handle().on_mode_with_input(
+		[&state](const auto& mode, const auto&) {
+			auto names_in = [&](const faction_type faction, auto& out) {
+				mode.for_each_player_in(faction, [&](const auto, const auto& player) {
+					if (!player.is_bot) {
+						out.push_back(player.get_nickname());
+					}
+				});
+			};
+
+			names_in(faction_type::RESISTANCE, state.resistance);
+			names_in(faction_type::METROPOLIS, state.metropolis);
+
+			state.score_resistance = mode.get_faction_score(faction_type::RESISTANCE);
+			state.score_metropolis = mode.get_faction_score(faction_type::METROPOLIS);
+		}
+	);
+
+	on_live_state(state);
+}
+
 void server_setup::close_open_match_if_requested() {
 	name_open_match();
 
-	if (!is_open_match() || open_match_closed || close_open_round == nullptr || !close_open_round->load()) {
+	if (!is_open_match() || open_match_closed || close_open_round == nullptr) {
+		return;
+	}
+
+	/*
+		Closed by an admin - or by itself while all the players the tournament is for are here: nobody else is coming
+		to pair with whoever waits alone. Counted as it is - someone who leaves before their match makes it wait again.
+	*/
+
+	const bool all_came =
+		open_round_players != nullptr
+		&& open_round_expected_players > 0
+		&& open_round_players->load() >= open_round_expected_players
+	;
+
+	if (!all_came && !close_open_round->load()) {
 		return;
 	}
 
@@ -7250,6 +7324,10 @@ void server_setup::close_open_match_if_requested() {
 	}
 
 	open_match_closed = true;
+
+	if (all_came && !close_open_round->load()) {
+		LOG("All %x players of the tournament came - round 1 closes by itself.", open_round_expected_players);
+	}
 
 	LOG("Round 1 closed: this open match ends with %x waiting.", assigned_playing);
 

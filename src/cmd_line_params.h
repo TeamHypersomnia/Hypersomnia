@@ -67,6 +67,12 @@ struct cmd_line_params {
 	std::string tournament_teams;
 	std::string tournament_arenas;
 
+	/*
+		"off": no live page (by default at http://<server>:<its first port>/, TCP).
+	*/
+
+	std::string tournament_page;
+
 	augs::path_type export_weapon_stats;
 
 	int test_fp_consistency = -1;
@@ -276,6 +282,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--tournament-arenas") {
 				tournament_arenas = get_next();
+			}
+			else if (a == "--tournament-page") {
+				tournament_page = get_next();
 			}
 			else if (a == "--export-weapon-stats") {
 				export_weapon_stats = get_next();

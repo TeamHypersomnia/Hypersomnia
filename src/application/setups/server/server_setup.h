@@ -426,6 +426,8 @@ private:
 	void leave_open_match(const std::string& authenticated_id);
 	void name_open_match();
 	void close_open_match_if_requested();
+	void publish_live_state_if_its_time();
+	double when_last_published_live_state = -1.0;
 
 	server_name_type open_match_name;
 	bool open_match_closed = false;
@@ -542,6 +544,22 @@ public:
 
 	std::shared_ptr<std::atomic<uint32_t>> open_round_players;
 	uint32_t open_round_expected_players = 0;
+
+	/*
+		A tournament's live page: its match's players and score, published from this server's own thread once
+		a second - the page is served from another one. And its port, told in the heartbeat (0: no page).
+	*/
+
+	struct live_match_state {
+		std::vector<std::string> resistance;
+		std::vector<std::string> metropolis;
+		int score_resistance = 0;
+		int score_metropolis = 0;
+		bool started = false;
+	};
+
+	std::function<void(const live_match_state&)> on_live_state;
+	uint16_t tournament_page_port = 0;
 
 	/*
 		Who plays this match - an open match's roster grows as players join.
@@ -677,6 +695,7 @@ public:
 			}
 
 			close_open_match_if_requested();
+			publish_live_state_if_its_time();
 
 			{
 				/* 

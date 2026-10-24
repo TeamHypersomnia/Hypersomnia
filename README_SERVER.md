@@ -8,6 +8,7 @@
 - [Environment variables](#environment-variables)
 - [Admins](#admins)
 - [Tournaments](#tournaments)
+- [Match results](#match-results)
 - [Several servers, ranked](#several-servers-ranked)
 - [The server key](#the-server-key)
 - [Command line flags](#command-line-flags)
@@ -49,6 +50,7 @@ Still stuck? Ask on [Discord](https://discord.gg/YC49E4G).
 | `8412` | UDP | Players of the game (Steam, Windows, Linux, macOS) |
 | `9000` | UDP | Players in the browser ([play.hypersomnia.io](https://play.hypersomnia.io)) |
 | `8430` (outgoing) | UDP | The server list - usually allowed already |
+| `8412` | TCP | A tournament's [live results page](#tournaments) |
 
 Several servers take the next ports: `8412-8414`, `9000-9002` for three.
 
@@ -96,6 +98,7 @@ Later ones win:
 | `HYPERSOMNIA_TOURNAMENT_TEAM_SIZE` | `2` for 2v2 and so on | `2` |
 | `HYPERSOMNIA_TOURNAMENT_TEAMS` | Teams set up beforehand: one per line or `;`, players by `,` | `alice, bob; carol, dave` |
 | `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last | `de_cyberaqua,de_silo` |
+| `HYPERSOMNIA_TOURNAMENT_PAGE` | `off`: no [live results page](#tournaments) | `off` |
 | `HYPERSOMNIA_CONFIG` | Anything else - JSON, like a file in `conf.d/` | |
 | `HYPERSOMNIA_SERVER_PRIVATE_KEY` | The [server key](#the-server-key), instead of the file | |
 
@@ -117,6 +120,8 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 
 A knockout tournament: a server for every match, the winners go on round by round.
 
+**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number), and linked from the [server list](https://hypersomnia.io/servers). Its data: `/tournament.json`.
+
 - Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
 - Set up beforehand: lines 1 and 2 play each other, 3 and 4...; players set those exact nicknames (or the teams are account ids). Teams short of 2, 4, 8, 16...: the first lines advance without playing.
 - Once all the players it's for came, round 1 closes by itself: whoever waits alone advances without playing, the empty servers close. Fewer came? `Close round 1` (administration panel, `Maintenance`) does the same.
@@ -124,6 +129,12 @@ A knockout tournament: a server for every match, the winners go on round by roun
 - After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings don't start it again; results in `tournament.completed.<time>.state.json`.
 - It never updates in the middle of it.
 - On a LAN everyone sees the matches together under `Ongoing Tournament`; on the public list only official servers' tournaments show so.
+
+# Match results
+
+- **Discord or Telegram:** `Discord webhook` in the config generator (`server_private.discord_webhook_url`; for Telegram `telegram_webhook_url` and `telegram_channel_id`) - who joined, duels, every match's result. More of them, e.g. filtered by a clan: `custom_webhook_urls`.
+- **A tournament:** its [live results page](#tournaments); the final results in `tournament.completed.<time>.state.json` in the user folder.
+- **Anything else:** every match's start and end as a `SERVER_EVENT` line with JSON in the log, and the rest in [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json).
 
 # Several servers, ranked
 
@@ -157,5 +168,6 @@ A knockout tournament: a server for every match, the winners go on round by roun
 | `--tournament-team-size <n>` | `2` for 2v2 and so on |
 | `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"` |
 | `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` |
+| `--tournament-page off` | No [live results page](#tournaments) |
 | `--print-server-key` | Print the server's public key and quit |
 | `--sync-external-arenas-and-quit` | Download all community arenas and quit |
