@@ -831,6 +831,17 @@ work_result run_tournament(const run_tournament_input& in) {
 					const auto& team_a_ids = match_ptr->open_team_size > 0 ? outcome.open_team_a : match_ptr->team_a_player_ids;
 					const auto& team_b_ids = match_ptr->open_team_size > 0 ? outcome.open_team_b : match_ptr->team_b_player_ids;
 
+					// a listed team's nicknames, as they played - in its order
+					if (match_ptr->open_team_size == 0) {
+						for (const auto& id : team_a_ids) {
+							outcome.open_names_a.push_back(server_raw->find_nickname_of_account(nickname_auth ? nickname_to_account_id(id) : id));
+						}
+
+						for (const auto& id : team_b_ids) {
+							outcome.open_names_b.push_back(server_raw->find_nickname_of_account(nickname_auth ? nickname_to_account_id(id) : id));
+						}
+					}
+
 					/*
 						Faction of `first_faction` shifts after a halftime swap (a player who
 						started on RESISTANCE can be on METROPOLIS by match end), so the

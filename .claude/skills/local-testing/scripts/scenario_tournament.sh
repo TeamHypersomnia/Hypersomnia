@@ -161,6 +161,9 @@ not_in_log() { ! grep -q "$1" $SRV; }
 
 winner_is() { grep -q "Tournament WINNER: \[${ID[$1]}\]" $SRV; }
 
+# Every player on the page by their nickname - never a shortened account id, also of a loser who quit
+all_named='all("..." not in n for r in t["rounds"] for m in r["matches"] for n in m["team_a"]+m["team_b"])'
+
 # page '<python expression on t, the page's JSON>' - e.g. page 't["finished"]'
 page() {
 	curl -s --max-time 3 http://127.0.0.1:$PORT/tournament.json > $T/page.json || return 1
@@ -200,6 +203,7 @@ case_teams_bye() {
 	check "round 2 on de_silo" in_log "Choosing arena: de_silo"
 	sleep 2
 	check "page: finished, one winner" page 't["finished"] and len(t["winner"])==1'
+	check "page: everyone by nickname" page "$all_named"
 	finish_case
 
 	start_server -- "${flags[@]}"
@@ -267,6 +271,8 @@ case_open_leave() {
 	kill_client carol
 	wait_log "Tournament WINNER" 120
 	check "alice won" winner_is alice
+	sleep 2
+	check "page: everyone by nickname, the losers too" page "$all_named"
 	finish_case
 }
 

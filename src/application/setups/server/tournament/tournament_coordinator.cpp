@@ -434,6 +434,19 @@ void tournament_coordinator::commit_match_result(tournament_match& m, const tour
 		}
 	}
 
+	/*
+		Teams listed by account ids get their nicknames from the match they played - for the live page.
+	*/
+
+	auto name_team = [&](const uint32_t team, const std::vector<std::string>& names) {
+		if (team < state.teams.size() && state.teams[team].nicknames.empty() && names.size() == state.teams[team].player_ids.size()) {
+			state.teams[team].nicknames = names;
+		}
+	};
+
+	name_team(m.team_a_index, outcome.open_names_a);
+	name_team(m.team_b_index, outcome.open_names_b);
+
 	tournament_match_result r;
 	r.winner_team_index = outcome.team_a_won ? m.team_a_index : m.team_b_index;
 	r.duration_secs = outcome.duration_secs;

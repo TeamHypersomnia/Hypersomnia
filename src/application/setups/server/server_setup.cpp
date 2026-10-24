@@ -7074,6 +7074,12 @@ std::string server_setup::find_nickname_of_account(const std::string& authentica
 		}
 	}, only_connected_v);
 
+	if (found.empty()) {
+		if (const auto known = nickname_by_account.find(authenticated_id); known != nickname_by_account.end()) {
+			return known->second;
+		}
+	}
+
 	return found;
 }
 
@@ -7241,6 +7247,12 @@ void server_setup::publish_live_state_if_its_time() {
 	}
 
 	when_last_published_live_state = server_time;
+
+	for_each_id_and_client([&](auto, const auto& c) {
+		if (!c.authenticated_id.empty() && !c.get_nickname().empty()) {
+			nickname_by_account[c.authenticated_id] = c.get_nickname();
+		}
+	}, only_connected_v);
 
 	auto state = live_match_state();
 	state.started = is_ranked_live_or_starting();

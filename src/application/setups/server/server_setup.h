@@ -569,7 +569,12 @@ public:
 		return assigned_teams;
 	}
 
+	/*
+		Also of whoever was here and left - a loser who quit is still named by their nickname.
+	*/
+
 	std::string find_nickname_of_account(const std::string& authenticated_id) const;
+	std::unordered_map<std::string, std::string> nickname_by_account;
 
 	server_setup(
 		const packaged_official_content& official,
