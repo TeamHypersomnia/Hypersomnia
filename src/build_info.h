@@ -118,7 +118,8 @@ Options:
     --tournament-join-timeout [MINUTES]  How long a match waits for all its players (10 by default), or "off".
                                 Then the team with more players present wins; equal numbers start the match;
                                 nobody came - both teams are out. Round 1 with anyone joining: whoever waits alone goes on.
-                                Each of these six is also a HYPERSOMNIA_TOURNAMENT* environment variable - see README_SERVER.md.
+    --tournament-name [NAME]    Shown on the live results page and sent with the results, e.g. "onFOSS November Cup 2026".
+                                Each of these seven is also a HYPERSOMNIA_TOURNAMENT* environment variable - see README_SERVER.md.
 
 If debugger_file_path is supplied and it is a directory,
 the game will automatically launch the editor to try and open the project inside it, if there is one.)"

@@ -1,44 +1,63 @@
 #pragma once
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
 /*
-	What a tournament's live page shows - /tournament.json, served by the tournament's server itself
-	(see run_tournament.cpp) and drawn by detail/web/tournament_page.html.
+	A tournament as anyone may read it - /tournament.json, served by the tournament's server itself (see run_tournament.cpp),
+	drawn by detail/web/tournament_page.html, and posted once to the results webhook when it's over:
+	the rounds from the final down, each match's teams and score, the settings it's played with last.
 */
+
+struct tournament_page_player {
+	// GEN INTROSPECTOR struct tournament_page_player
+	std::string nickname;
+	std::string account;
+	// END GEN INTROSPECTOR
+};
+
+using tournament_page_team = std::vector<tournament_page_player>;
 
 struct tournament_page_match {
 	// GEN INTROSPECTOR struct tournament_page_match
-	std::vector<std::string> team_a;
-	std::vector<std::string> team_b;
-	int score_a = -1;
-	int score_b = -1;
 	std::string status;
 	std::string winner;
-	std::string server_name;
-	uint16_t port = 0;
+	tournament_page_team team_a;
+	tournament_page_team team_b;
+	std::optional<int> score_a;
+	std::optional<int> score_b;
+	std::optional<std::string> server_name;
+	std::optional<uint16_t> port;
 	// END GEN INTROSPECTOR
 };
 
 struct tournament_page_round {
 	// GEN INTROSPECTOR struct tournament_page_round
 	std::string name;
+	std::string state;
 	std::string arena;
 	std::vector<tournament_page_match> matches;
-	std::vector<std::vector<std::string>> byes;
+	std::vector<tournament_page_team> byes;
+	// END GEN INTROSPECTOR
+};
+
+struct tournament_page_config {
+	// GEN INTROSPECTOR struct tournament_page_config
+	std::string who_gets_in;
+	uint32_t team_size = 1;
+	uint32_t teams = 0;
+	std::vector<std::string> arenas;
+	uint32_t join_timeout_minutes = 0;
 	// END GEN INTROSPECTOR
 };
 
 struct tournament_page_state {
 	// GEN INTROSPECTOR struct tournament_page_state
-	std::string title;
-	bool open_first_round = false;
-	uint32_t players = 0;
-	uint32_t team_size = 1;
-	uint32_t current_round = 0;
-	bool finished = false;
-	std::vector<std::string> winner;
+	std::optional<std::string> name;
+	std::string state;
+	tournament_page_team winner_team;
 	std::vector<tournament_page_round> rounds;
+	tournament_page_config config;
 	// END GEN INTROSPECTOR
 };

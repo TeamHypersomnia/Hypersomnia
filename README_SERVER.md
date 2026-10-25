@@ -88,7 +88,8 @@ Later ones win:
 | `HYPERSOMNIA_ADMINS` | [Admins](#admins) with full rights | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_PASSWORD` | Only players who know it can join | |
 | `HYPERSOMNIA_ALLOWED_ACCOUNTS` | Only these accounts get in, and the [admins](#admins) | `steam_7656119...,0x8aed41f2...` |
-| `HYPERSOMNIA_SLOTS` | Players per server, at most `58` | `10` |
+| `HYPERSOMNIA_SPECTATOR` | The [spectator account](#watching-a-match): always gets in, only to watch | `steam_7656119...` |
+| `HYPERSOMNIA_SLOTS` | Players per server, at most `57` | `10` |
 | `HYPERSOMNIA_SERVER_INSTANCES` | How many servers | `3` |
 | `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports | `8500` |
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
@@ -103,6 +104,8 @@ Later ones win:
 | `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last | `de_cyberaqua,de_silo` |
 | `HYPERSOMNIA_TOURNAMENT_JOIN_TIMEOUT` | Minutes a match waits for its players, or `off` (10 by default) | `5` |
 | `HYPERSOMNIA_TOURNAMENT_PAGE` | The [live results page](#tournaments)'s TCP port, or `off` | `8080` |
+| `HYPERSOMNIA_TOURNAMENT_NAME` | On the live results page and in the results | `onFOSS November Cup 2026` |
+| `HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK` | Gets the [results](#the-results-as-json) in one `POST` when the tournament is over | `https://example.com/results` |
 | `HYPERSOMNIA_CONFIG` | Anything else - JSON, like a file in `conf.d/` | |
 | `HYPERSOMNIA_SERVER_PRIVATE_KEY` | The [server key](#the-server-key), instead of the file | |
 
@@ -118,7 +121,20 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 | `RCON` | Kick, ban, the arena, the game mode and the map cycle - not the server's settings |
 | `NONE` | Nothing - only the badge |
 
-Every admin, whatever their `rcon`, always gets in: without the password, past the per-network limit of ranked servers, and into a full server (2 places are kept for admins, not shown on the server list). Into a ranked match or a tournament's match being played - only as a spectator, without a word in the chat.
+Every admin, whatever their `rcon`, always gets in: without the password, past the per-network limit of ranked servers, and into a full server (2 places are kept for admins, not shown on the server list). Before a ranked match or a tournament's match starts, an admin plays as anyone; once it's played, only [watches](#watching-a-match).
+
+`Timeout absent players` (administration panel, `Maintenance`) decides a tournament's match now: the team with more players present wins - equal numbers play as they are - nobody there: both teams are out.
+
+## Watching a match
+
+Who comes into a ranked match or a tournament's match while it's played - only as a spectator, and back whenever they like:
+
+- whoever was a spectator when it started;
+- the admins;
+- **the spectator account** - one account for a caster or a bot streaming the matches: `"spectator_account": "steam_7656..."` in `server_private` (`HYPERSOMNIA_SPECTATOR`). It always gets in - no password, a place kept for it on a full server - and is never on a team. In a tournament: into every match;
+- in a tournament: a team whose own match in this round is decided (won, lost, or a bye) watches the others. With anyone joining round 1: once their own match there is decided.
+
+Spectators are quiet: nobody's told they came or left, and what they write in the chat only spectators read. They read all of it - the teams' chat too.
 
 **A clan's server:** `"allowed_accounts": ["steam_7656...", "0x8aed..."]` in `server_private` (`HYPERSOMNIA_ALLOWED_ACCOUNTS`) - only these accounts get in, and the admins. The server lists show it with a padlock; nobody's asked for a password - whoever isn't listed is refused on joining.
 
@@ -128,7 +144,7 @@ Every admin, whatever their `rcon`, always gets in: without the password, past t
 
 A knockout tournament: a server for every match, the winners go on round by round.
 
-**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: `/tournament.json`. A port below `1024` needs root; a port taken by something else: the tournament goes on without the page.
+**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: [`/tournament.json`](#the-results-as-json). A port below `1024` needs root; a port taken by something else: the tournament goes on without the page. `--tournament-name "onFOSS November Cup 2026"` titles it - without a name: `2v2 tournament`.
 
 - Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8; at least two teams' worth of players); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
 - Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing.
@@ -140,14 +156,26 @@ A knockout tournament: a server for every match, the winners go on round by roun
 - Byes fill the bracket up to 2, 4, 8... once - from round 2, counted from the teams that are left. They go to the strongest: the first lines, then by how fast they won; a walkover counts as the weakest. The final is always on the last arena.
 - Admins join any match: before it starts as anyone (a player in round 1 with anyone joining), once it's played as spectators.
 - A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, an arena or a game mode that doesn't exist. Other servers only warn.
-- After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings don't start it again; results in `tournament.completed.<time>.state.json`.
+- After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew.
 - It never updates in the middle of it.
 - On a LAN everyone sees the matches together under `Ongoing Tournament`; on the public list only official servers' tournaments show so.
+
+## The results as JSON
+
+`http://<your server>:8412/tournament.json` while it's played (at most 5 requests a second from one address, made anew once a second), and one `POST` of the same to `server_private.tournament_results_webhook_url` (`HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK`) when it's over - tried 3 times until answered with a `2xx`. The very same JSON is saved to `tournament_results.json` in the user folder once it's over. `Show example payload` in the config generator shows a whole one.
+
+Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key (what `--print-server-key` prints), `X-Hypersomnia-Signature` - Ed25519 of the body, in hex. Check that the key is your server's and the signature is right, and nobody could have made up the results.
+
+- `name` - only when set; `state` - `ONGOING` or `FINISHED`; `winner_team` - its players, empty until it's over.
+- `rounds` - the final first: `name`, `state` (`PLAYED`, `PLAYING`, `COMING`), `arena`, `matches`, `byes` (the teams that go on without playing).
+- A match: `status` (`done`, `walkover`, `live`, `waiting`, `empty` - nobody came, `coming` - its teams not known yet), `winner` (`a` or `b`), `team_a`, `team_b`; `score_a`, `score_b` once it's played; `server_name`, `port` while it's waited for or played.
+- A player: `nickname` and `account` - empty where the nicknames are the players' identities.
+- `config` - `who_gets_in` (`anyone`, `listed nicknames`, `listed accounts`), `team_size`, `teams`, `arenas`, `join_timeout_minutes` (`0`: off).
 
 # Match results
 
 - **Discord or Telegram:** `Discord webhook` in the config generator (`server_private.discord_webhook_url`; for Telegram `telegram_webhook_url` and `telegram_channel_id`) - who joined, duels, every match's result. More of them, e.g. filtered by a clan: `custom_webhook_urls`.
-- **A tournament:** its [live results page](#tournaments); the final results in `tournament.completed.<time>.state.json` in the user folder.
+- **A tournament:** its [live results page](#tournaments), the [results webhook](#the-results-as-json); the final results in `tournament.completed.<time>.state.json` in the user folder.
 - **Anything else:** every match's start and end as a `SERVER_EVENT` line with JSON in the log - each player's nickname and account id, and the rest in [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json).
 
 # Several servers, ranked
@@ -184,5 +212,6 @@ A knockout tournament: a server for every match, the winners go on round by roun
 | `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` |
 | `--tournament-join-timeout <minutes>` | How long a match waits for its players (10 by default), or `off` |
 | `--tournament-page <port>` | The [live results page](#tournaments)'s TCP port (the first game port's number by default), or `off` |
+| `--tournament-name <name>` | On the live results page and in the results, e.g. `"onFOSS November Cup 2026"` |
 | `--print-server-key` | Print the server's public key and quit |
 | `--sync-external-arenas-and-quit` | Download all community arenas and quit |

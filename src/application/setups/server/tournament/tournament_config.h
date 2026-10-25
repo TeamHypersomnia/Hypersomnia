@@ -59,6 +59,13 @@ struct tournament_config {
 
 	uint32_t join_timeout_secs = 10 * 60;
 
+	/*
+		The tournament's name (--tournament-name) - on its page and in its results. Part of its identity (compute_hash):
+		the same settings under a new name are a new tournament.
+	*/
+
+	std::string name;
+
 	bool is_open() const {
 		return teams.empty() && open_players > 0;
 	}

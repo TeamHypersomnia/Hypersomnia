@@ -10,146 +10,323 @@
 	with the live score of a match being played in the middle.
 -->
 <style>
+	/*
+		The look of the first hypersomnia.io/tournament: glowing rounded cards, the shimmering WINNER -
+		in hypersomnia.io's amber instead of its purple. Calibri everywhere (Carlito on Linux - the same metrics).
+	*/
+
 	:root {
-		--bg: #030303;
-		--line: rgb(60, 60, 60);
-		--line-dim: rgb(35, 35, 35);
-		--bright: rgb(220, 220, 220);
-		--white: #fff;
-		--dim: rgb(127, 127, 127);
-		--faint: rgb(90, 90, 90);
-		--accent: rgb(255, 176, 64);
-		--number: rgb(205, 230, 235);
-		--online: rgb(34, 197, 76);
-		--red: rgb(244, 71, 71);
-		--gold: rgb(255, 215, 0);
-		--live: rgb(255, 80, 80);
-		--font: Verdana, "DejaVu Sans", "Bitstream Vera Sans", sans-serif;
+		--amber: 255, 176, 64;
+		--amber-text: rgb(255, 226, 184);
+		--gold: 255, 215, 0;
+		--green: 74, 222, 128;
+		--red: 248, 113, 113;
+		--font: Calibri, Carlito, "Segoe UI", system-ui, sans-serif;
+		/* one measure: a round's header is this tall - the rounds' panel's padding and the room between them too */
+		--rhythm: 2.6rem;
+		--rainbow: linear-gradient(90deg, #ffe680, #ffd700, #ffb040, #ff8a3d, #ff5a3d, #ff8a3d, #ffb040, #ffd700, #ffe680);
 	}
 
 	* {
 		box-sizing: border-box;
 	}
 
-	body {
-		margin: 0;
-		background: var(--bg);
-		color: var(--bright);
-		font-family: var(--font);
+	html {
+		background: #0a0806;
 	}
 
+	body {
+		margin: 0;
+		min-height: 100vh;
+		color: rgba(255, 255, 255, 0.85);
+		font-family: var(--font);
+		background: #0a0806;
+	}
+
+	/* the footer at the window's bottom also when the page is short */
+	body {
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* across the whole page - the rounds' panel too, like the bars above and below it */
 	.tournament-page {
-		font-size: 18px;
-		max-width: 1400px;
-		margin: 0 auto;
-		padding: 3em 1.5em 4em;
+		flex: 1;
+		width: 100%;
+		padding: 3em 0 0;
+	}
+
+	/*
+		The amber rainbow where it means the top: the WINNERS (and the final's frame, the matches being played).
+		The name and the final's label in plain gold.
+	*/
+
+	.tournament-winner-label {
+		background: var(--rainbow);
+		background-size: 200% auto;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		animation: shimmer 4s linear infinite;
+	}
+
+	@keyframes shimmer {
+		to {
+			background-position: 200% center;
+		}
+	}
+
+	/* the name in a bar across the whole page - darker, its edges barely there */
+	/* the cup, then the name - centered together */
+	.title-bar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6em;
+		padding: 1.5em 1.875em;
+		background: #050403;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+	}
+
+	.title-cup {
+		flex: none;
+		width: clamp(1.8rem, 4.4vw, 2.9rem);
+		height: clamp(1.8rem, 4.4vw, 2.9rem);
+	}
+
+	.tournament-name {
+		color: rgb(var(--gold));
+		text-align: center;
+		font-size: clamp(2rem, 5vw, 3.25rem);
+		font-weight: 800;
+		letter-spacing: 0.02em;
+		margin: 0;
 	}
 
 	.tournament-empty {
 		text-align: center;
 		margin: 4em 0;
-		font-size: 1.4em;
-		color: var(--dim);
+		font-size: 1.1rem;
+		color: rgba(255, 255, 255, 0.55);
+		letter-spacing: 0.02em;
 	}
 
 	.tournament-winner {
 		display: flex;
+		justify-content: center;
+		margin: 1em 0 3em;
+	}
+
+	/* the label and the whole team inside the button - its frame drawn by game_button_frame */
+	.winner-button {
+		position: relative;
+		isolation: isolate;
+		/* as wide as a round's box */
+		width: min(100%, 1080px);
+		display: flex;
 		flex-direction: column;
 		align-items: center;
-		margin: 1em 0 2em;
-		gap: 1em;
+		gap: 0.6em;
+		padding: 44px 58px 56px 48px;
+	}
+
+	.winner-button-frame {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -1;
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	.frame-inside {
+		fill: rgba(var(--amber), 0.035);
+		stroke: none;
+	}
+
+	.frame-border,
+	.frame-corners {
+		fill: none;
+		stroke-width: 1;
+		stroke-linecap: square;
+	}
+
+	.frame-border {
+		stroke: rgba(var(--amber), 0.75);
+	}
+
+	.frame-corners {
+		stroke: rgb(var(--amber));
 	}
 
 	.tournament-winner-label {
-		font-size: clamp(1.5em, 5vw, 3em);
+		font-size: clamp(2.5rem, 6vw, 4.25rem);
+		font-weight: 800;
+		letter-spacing: 0.22em;
 		margin: 0;
-		color: var(--gold);
-		animation: blink 1s steps(1, end) infinite;
+		filter: drop-shadow(0 0 14px rgba(var(--gold), 0.35));
 	}
 
-	@keyframes blink {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.55; }
-	}
-
-	@keyframes blink-show {
-		0%, 100% { opacity: 0; }
-		50% { opacity: 1; }
-	}
-
+	/* the winners centered - their boxes as wide as the longest nickname, the lines aligned left within */
 	.tournament-winner .team-card.won {
-		min-width: 260px;
-		font-size: 1.6em;
-		padding: 0.8em 1.6em;
-		color: var(--gold);
-		border-color: var(--gold);
-		box-shadow: 0 0 0 1px var(--gold), 0 0 24px rgba(255, 215, 0, 0.35);
+		width: auto;
+		align-items: center;
+		font-size: 2.6rem;
 	}
 
-	.tournament-winner .team-card::after {
-		content: '';
-		position: absolute;
-		inset: -4px;
-		border: 1px dotted var(--gold);
-		pointer-events: none;
-		animation: blink-show 1s steps(1, end) infinite;
+	/* twice the size - their avatars too */
+	.tournament-winner .avatar-slot,
+	.tournament-winner .avatar {
+		width: 52px;
+		height: 52px;
 	}
 
-	.tournament-separator {
-		border: none;
-		border-top: 1px dotted var(--line);
-		margin: 2em 0 2.5em;
+	.tournament-winner .team-card.won .players {
+		width: max-content;
+		max-width: 90vw;
+		border-color: transparent;
+		background: none;
 	}
 
+	.tournament-winner .team-card.won .player {
+		padding: 8px 22px;
+	}
+
+	/* the winners: no boxes - their names in gold, glowing; each avatar glows in its own average color (avatar_glow) */
+	.tournament-winner .team-card.won .player {
+		min-height: 64px;
+		gap: 16px;
+		color: rgb(var(--gold));
+	}
+
+	.tournament-winner .nickname {
+		filter: drop-shadow(0 0 10px rgba(var(--gold), 0.35));
+	}
+
+	/* the rounds together in one panel across the page - as dark as the bars, its edges barely there */
 	.bracket-stack {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 0.5em 0;
+		width: 100%;
+		padding: var(--rhythm);
+		gap: var(--rhythm);
+		background: #050403;
+		border-top: 1px solid rgba(255, 255, 255, 0.07);
 	}
 
-	.stage-section {
+	.site-footer {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 10px;
-		padding: 0.5em 0;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.6em 2em;
+		padding: 1.8em 2em;
+		background: #050403;
+		border-top: 1px solid rgba(255, 255, 255, 0.07);
+		color: rgba(255, 255, 255, 0.45);
+		font-size: 0.95rem;
 	}
 
-	.stage-separator {
-		margin: 1.2em 0;
-		width: min(80%, 480px);
+	.site-footer a {
+		color: var(--amber-text);
+		text-decoration: none;
+	}
+
+	.site-footer a:hover {
+		text-decoration: underline;
+	}
+
+	.site-footer {
+		align-items: center;
+	}
+
+	.footer-logo img {
+		display: block;
+	}
+
+	/* a round in a box of its own: its arena on the left, its matches on the right */
+	.stage-section {
+		display: grid;
+		/* one width for every round's arena column - the widest miniature's (fit_miniatures) - the ladders line up */
+		grid-template-columns: min(var(--arena-column, 240px), 320px, 45vw) 1fr;
+		align-items: center;
+		gap: 24px;
+		/* room for the widest miniature (320px) and the ladder (about 630px) side by side */
+		width: min(100%, 1080px);
+		padding: 1.2em 1.4em 1.4em;
+		margin: 0;
+		/* in grey - only the final's frame has a color */
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(0, 0, 0, 0.32);
+	}
+
+
+	/* the box's header: the round, then its arena - a thin line under them, so the arena's name has its ground */
+	.stage-head {
+		position: relative;
+		grid-column: 1 / -1;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		height: var(--rhythm);
+		box-sizing: border-box;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
 	.stage-label {
 		position: relative;
-		align-self: center;
-		font-size: 0.6em;
+		font-weight: 800;
+		/* in grey, a bit dark - the final's own in its rainbow */
+		color: rgba(255, 255, 255, 0.55);
 		text-transform: uppercase;
-		color: var(--accent);
-		padding: 0.6em 1em;
-		border: 1px solid var(--accent);
-		margin-bottom: 0.4em;
+		letter-spacing: 0.12em;
+		font-size: 1.3rem;
 	}
 
-	.stage-label::before {
-		content: "[ ";
-		color: var(--dim);
+	/* the semifinals' name in white - the rounds before them stay grey */
+	.stage-section.semifinal .stage-label {
+		color: #fff;
 	}
 
-	.stage-label::after {
-		content: " ]";
-		color: var(--dim);
+	.stage-side {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
 	}
 
+	.stage-body {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		/* the matches apart - their teams' boxes close together - so each reads as one */
+		gap: 24px;
+	}
+
+	/* the arena: as big as the round's name, in grey italics */
 	.stage-arena {
-		margin: -0.6em 0 0.4em;
-		color: var(--faint);
-		font-size: 0.6em;
+		color: rgba(255, 255, 255, 0.45);
+		font-size: 1.3rem;
+		font-style: italic;
+		letter-spacing: 0.02em;
+	}
+
+	/*
+		At its own size (1:1) - taller than the matches beside it if it is; smaller only when wider than 320px
+		(the arena column's most) or on a narrow screen.
+	*/
+
+	.stage-miniature {
+		display: block;
+		max-width: 100%;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		image-rendering: pixelated;
 	}
 
 	.match-pair {
 		display: flex;
+		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 		position: relative;
@@ -163,120 +340,253 @@
 		align-items: stretch;
 		justify-content: center;
 		gap: 10px;
-		width: 110px;
+		width: 130px;
 	}
 
 	.match-score {
-		font-size: 1.8em;
-		color: var(--number);
-		background: var(--bg);
-		border: 1px solid var(--line);
+		font-family: var(--font);
+		font-variant-numeric: tabular-nums;
+		font-size: 2rem;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		/* a played match's score in grey - amber is for what's still on */
+		color: rgba(255, 255, 255, 0.6);
+		background: #0a0909;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 4px 0;
+		min-height: 54px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 18px;
 		line-height: 1.2;
 		white-space: pre;
 		width: 100%;
 		text-align: center;
 	}
 
-	/* a match being played: its score as it is */
-	.match-score.live {
-		color: var(--live);
-		border-color: var(--live);
+	/* why a team goes on alone - in the score's chip, its size */
+	.match-score.reason {
+		font-size: 0.85rem;
+		letter-spacing: 0.08em;
+		color: rgba(255, 255, 255, 0.5);
+		border-color: rgba(255, 255, 255, 0.15);
+	}
+
+	/* a match waiting for its players: where its score will be, a call to come in */
+	/* as big as fits: two lines */
+	.match-score.join {
+		font-family: var(--font);
+		font-size: 1.6rem;
+		font-weight: 800;
+		letter-spacing: 0.02em;
+		line-height: 1;
+		white-space: normal;
+		padding: 8px 4px;
+		color: rgb(var(--amber));
+		background: rgba(var(--amber), 0.08);
+		border-color: rgba(var(--amber), 0.55);
+		animation: join-pulse 1.6s ease-in-out infinite;
+	}
+
+	/* the call to come in, pulsing */
+	@keyframes join-pulse {
+		0%, 100% {
+			border-color: rgba(var(--amber), 0.3);
+			background-color: rgba(var(--amber), 0.04);
+			color: rgba(var(--amber), 0.7);
+		}
+
+		50% {
+			border-color: rgba(var(--amber), 1);
+			background-color: rgba(var(--amber), 0.16);
+			color: rgb(var(--amber));
+		}
+	}
+
+	/* the final: framed as every round - its name in gold, bigger, tells it apart */
+	.stage-section.final .stage-label {
+		font-size: 1.7rem;
+		color: rgb(var(--gold));
 	}
 
 	.match-line {
 		display: block;
 		width: 100%;
-		height: 0;
-		border-top: 2px dotted var(--line);
+		height: 2px;
+		background: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(var(--amber), 0.7), rgba(0, 0, 0, 0));
 	}
+
+	/*
+		A team as the config generator shows one: a box per player, all of one width - the avatars in one column,
+		the nicknames starting in one line; a long nickname cut with "..." (whole on hover), never wider.
+		A team's players in one box - one border around them all, no lines between them; the team's colors on it.
+	*/
 
 	.team-card {
 		position: relative;
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.5em 1em;
-		min-width: 200px;
-		text-align: center;
-		font-size: 1.3em;
-		word-break: break-word;
-		color: var(--bright);
-		background: var(--bg);
-		border: 1px solid var(--line);
+		flex-direction: column;
+		gap: 4px;
+		width: 240px;
+		font-weight: 700;
+		font-size: 1.2rem;
+		line-height: 1.2;
+		color: var(--amber-text);
 	}
 
-	.team-card:hover {
-		border-color: var(--white);
-	}
-
-	.team-card.won {
-		color: var(--online);
-		border-color: var(--online);
-		box-shadow: 0 0 10px rgba(34, 197, 76, 0.25);
-	}
-
-	.team-card.lost {
-		color: var(--red);
-		border-color: rgba(244, 71, 71, 0.5);
-		text-decoration: line-through;
-		text-decoration-thickness: 2px;
-		opacity: 0.8;
-	}
-
-	/* nobody there yet: an open match of round 1 waiting for its pair */
+	.team-card .player,
 	.team-card.empty {
-		color: var(--faint);
-		border-style: dotted;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 40px;
+		padding: 6px 10px;
+		text-align: left;
 	}
 
-	.team-card.bye {
-		color: var(--faint);
-		border-color: var(--line-dim);
-		border-style: dotted;
+	.team-card .players,
+	.team-card.empty {
+		border: 1px solid rgba(var(--amber), 0.25);
+		background: #120e09;
 	}
 
-	.team-card.pulse::after,
-	.stage-label.pulse::after {
+	/* a match being played: its score and its teams framed in the moving rainbow */
+	.match-score.live,
+	.team-card.live .players {
+		position: relative;
+		border-color: transparent;
+	}
+
+	/* the amber rainbow through its digits and its frame, as the final's label */
+	.match-score.live .score-number {
+		background: var(--rainbow);
+		background-size: 200% auto;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		animation: shimmer 4s linear infinite;
+	}
+
+	.match-score.live::before,
+	.team-card.live .players::before {
 		content: '';
 		position: absolute;
-		inset: -4px;
-		border: 1px dotted var(--white);
+		inset: -1px;
+		padding: 1px;
+		background: var(--rainbow);
+		background-size: 200% auto;
+		animation: shimmer 4s linear infinite;
+		-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
 		pointer-events: none;
-		animation: blink-show 1s steps(1, end) infinite;
 	}
 
-	.stage-label.pulse::after {
-		color: transparent;
+	.team-card.empty {
+		justify-content: center;
+		color: rgba(255, 255, 255, 0.35);
+		font-weight: 600;
 	}
 
-	.team-card .bye-tag {
-		display: inline-block;
-		margin-left: 0.5em;
-		font-size: 0.75em;
-		text-transform: uppercase;
-		text-decoration: none;
-		color: var(--faint);
+	.team-card.won .players {
+		border-color: rgba(var(--green), 0.3);
+		background: #09170d;
+		color: rgb(var(--green));
 	}
 
-	.team-card .bye-tag::before {
-		content: "[";
+	.team-card.lost .players {
+		border-color: rgba(var(--red), 0.25);
+		background: #170909;
+		color: rgba(var(--red), 0.85);
+		text-decoration: line-through;
+		text-decoration-thickness: 2px;
+		text-decoration-color: rgba(var(--red), 0.7);
 	}
 
-	.team-card .bye-tag::after {
-		content: "]";
+	/* where nobody is: the place kept, so the team stays left like every other */
+	.team-card.absent {
+		visibility: hidden;
+	}
+
+	.team-card.bye .players {
+		border-color: rgba(255, 255, 255, 0.08);
+		background: #0e0c0a;
+		color: rgba(255, 255, 255, 0.35);
+		font-weight: 600;
+	}
+
+	.players {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.nickname {
+		min-width: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* the avatar's place is kept also without one - the nicknames start in one line */
+	.avatar-slot {
+		flex: none;
+		width: 26px;
+		height: 26px;
+	}
+
+	.avatar {
+		display: block;
+		width: 26px;
+		height: 26px;
+		image-rendering: pixelated;
+	}
+
+	/* narrower than both side by side: the miniature over the ladder */
+	@media (max-width: 1120px) {
+		/* the column as narrow as the box - the miniature shrinks to it, never pushes the ladder out */
+		.stage-section {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.stage-section > * {
+			min-width: 0;
+		}
+
+		.stage-side {
+			justify-self: center;
+		}
 	}
 
 	@media (max-width: 700px) {
 		.tournament-page {
-			padding: 1.5em 0.75em 2em;
+			padding: 1.5em 0 0;
 		}
 
 		.stage-section {
-			gap: 8px;
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+
+		.stage-miniature {
+			max-height: 160px !important;
 		}
 
 		.match-pair {
 			gap: 4px;
+		}
+
+		:root {
+			--rhythm: 1.8rem;
+		}
+
+		/* sideways only a little - the ladder needs the room */
+		.bracket-stack {
+			padding: var(--rhythm) 0.4em;
+		}
+
+		.stage-section {
+			padding: 0.8em 0.5em 1em;
 		}
 
 		.match-connector {
@@ -285,26 +595,58 @@
 		}
 
 		.match-score {
-			font-size: 1.3em;
+			font-size: 1.3rem;
+			min-height: 40px;
+			gap: 10px;
+			padding: 3px 0;
 		}
 
 		.team-card {
-			min-width: 120px;
-			padding: 0.4em 0.6em;
-			font-size: 1em;
+			width: 118px;
+			font-size: 0.85rem;
 		}
 
-		.tournament-winner .team-card {
-			min-width: 200px;
-			font-size: 1.3em;
+		.tournament-winner .team-card.won {
+			font-size: 1.6rem;
+		}
+
+		.tournament-winner .avatar-slot,
+		.tournament-winner .avatar {
+			width: 36px;
+			height: 36px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*, *::after {
+			animation: none !important;
+			transition: none !important;
 		}
 	}
 </style>
 </head>
 <body>
+<header class="title-bar">
+	<svg class="title-cup" viewBox="0 0 24 24" aria-hidden="true">
+		<defs>
+			<linearGradient id="cup-gold" x1="0" y1="0" x2="1" y2="1">
+				<stop offset="0" stop-color="#ffe680"/>
+				<stop offset="0.5" stop-color="#ffb040"/>
+				<stop offset="1" stop-color="#ff8a3d"/>
+			</linearGradient>
+		</defs>
+		<path fill="url(#cup-gold)" d="M6 2h12v3h3v3a5 5 0 0 1-5 5h-.3A6 6 0 0 1 13 15.9V19h4v3H7v-3h4v-3.1A6 6 0 0 1 8.3 13H8a5 5 0 0 1-5-5V5h3V2zm-1 5v1a3 3 0 0 0 1.4 2.5A6 6 0 0 1 6 9V7H5zm13 0v2c0 .5 0 1-.4 1.5A3 3 0 0 0 19 8V7h-1z"/>
+	</svg>
+	<h1 id="tournament-name" class="tournament-name"></h1>
+</header>
 <main class="tournament-page">
 	<div id="tournament-root"><p class="tournament-empty">Loading the tournament...</p></div>
 </main>
+<footer class="site-footer">
+	<a class="footer-logo" href="https://hypersomnia.io" target="_blank" rel="noopener"><img src="logo.png" srcset="logo.png 1x, logo@2x.png 2x" width="169" height="30" alt="Hypersomnia"></a>
+	<span>Host your own tournament: <a href="https://hypersomnia.io/generator" target="_blank" rel="noopener">hypersomnia.io/generator</a></span>
+	<a href="tournament.json" target="_blank">tournament.json</a>
+</footer>
 <script>
 (() => {
 	const root = document.getElementById('tournament-root');
@@ -323,22 +665,156 @@
 		return e;
 	};
 
-	const label = names => names && names.length ? names.join(', ') : '?';
-	const pad2 = n => String(n).padStart(2, ' ');
+	// a figure space - as wide as a digit
+	const pad2 = n => String(n).padStart(2, '\u2007');
 
-	function teamCard(names, cls, placeholder) {
-		const empty = !names || !names.length;
-		return el('div', 'team-card' + (cls ? ' ' + cls : '') + (empty ? ' empty' : ''), empty ? placeholder : label(names));
+	/*
+		A team's players, one per line, each after their avatar - served by this server, by the account or,
+		where there are none, the nickname; the game's default one where a player has none.
+	*/
+
+	function players(team) {
+		const list = el('div', 'players');
+
+		(team || []).forEach(p => {
+			const line = el('div', 'player');
+			const slot = el('span', 'avatar-slot');
+			const avatar = el('img', 'avatar');
+			avatar.alt = '';
+			avatar.src = `avatar?id=${encodeURIComponent(p.account || p.nickname)}`;
+			// none of their own: the game's default one
+			avatar.onerror = () => {
+				avatar.onerror = () => avatar.remove();
+				avatar.src = avatar.closest('.tournament-winner') ? 'default_avatar_52.png' : 'default_avatar.png';
+			};
+			slot.appendChild(avatar);
+			line.appendChild(slot);
+			const nickname = el('span', 'nickname', p.nickname);
+			nickname.title = p.nickname;
+			line.appendChild(nickname);
+			list.appendChild(line);
+		});
+
+		return list;
+	}
+
+	/*
+		The winners on a frame drawn as hypersomnia.io's menu buttons (menu_buttons.js) - the game's own menu buttons:
+		the corners cut top left and bottom right, small inner corners, a faint fill - in amber, three pixels per game pixel.
+		Drawn again whenever the box changes size (the avatars arriving, the window).
+	*/
+
+	const BUTTON_SCALE = 3;
+	const SIDE_L = 8, SIDE_T = 8, SIDE_R = 12, SIDE_B = 12;
+
+	function game_button_frame(box) {
+		const ns = 'http://www.w3.org/2000/svg';
+		const svg = document.createElementNS(ns, 'svg');
+		svg.setAttribute('class', 'winner-button-frame');
+		svg.setAttribute('aria-hidden', 'true');
+		svg.setAttribute('shape-rendering', 'crispEdges');
+
+		const path = cls => {
+			const p = document.createElementNS(ns, 'path');
+			p.setAttribute('class', cls);
+			svg.appendChild(p);
+			return p;
+		};
+
+		const inside = path('frame-inside');
+		const border = path('frame-border');
+		const corners = path('frame-corners');
+		box.prepend(svg);
+
+		const draw = () => {
+			// in game pixels: (0, 0, W, H) is the inside rect, coordinates are pixel centers
+			const bw = Math.round(box.offsetWidth / BUTTON_SCALE);
+			const bh = Math.round(box.offsetHeight / BUTTON_SCALE);
+			const W = bw - SIDE_L - SIDE_R, H = bh - SIDE_T - SIDE_B;
+
+			svg.setAttribute('viewBox', `${-SIDE_L} ${-SIDE_T} ${bw} ${bh}`);
+
+			const outline =
+				`M-7.5 -0.5L-0.5 -7.5L${W + 11.5} -7.5L${W + 11.5} ${H + 0.5}` +
+				`L${W + 0.5} ${H + 11.5}L-7.5 ${H + 11.5}Z`
+			;
+
+			inside.setAttribute('d', outline);
+			border.setAttribute('d', outline);
+			corners.setAttribute('d',
+				`M-0.5 -3.5L-3.5 -0.5` +
+				`M${W + 0.5} -3.5L${W + 7.5} -3.5L${W + 7.5} -0.5` +
+				`M${W + 7.5} ${H + 0.5}L${W + 0.5} ${H + 7.5}` +
+				`M-3.5 ${H + 0.5}L-3.5 ${H + 7.5}L-0.5 ${H + 7.5}`
+			);
+		};
+
+		draw();
+
+		if (window.ResizeObserver) {
+			new ResizeObserver(draw).observe(box);
+		}
+	}
+
+	/*
+		A glow under an avatar in its average color: the picture shrunk to one pixel. Served by this server,
+		so the canvas may read it.
+	*/
+
+	function avatar_glow(avatar) {
+		const glow = () => {
+			try {
+				const canvas = document.createElement('canvas');
+				canvas.width = canvas.height = 1;
+				const context = canvas.getContext('2d');
+				context.drawImage(avatar, 0, 0, 1, 1);
+				const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+				avatar.style.filter = `drop-shadow(0 0 14px rgba(${r}, ${g}, ${b}, 0.85))`;
+			}
+			catch (e) {}
+		};
+
+		if (avatar.complete && avatar.naturalWidth) {
+			glow();
+		}
+		else {
+			avatar.addEventListener('load', glow);
+		}
+	}
+
+	function card(cls, team) {
+		const c = el('div', 'team-card' + (cls ? ' ' + cls : ''));
+		c.appendChild(players(team));
+		return c;
+	}
+
+	function teamCard(team, cls, placeholder) {
+		if (!team || !team.length) {
+			return el('div', 'team-card empty' + (cls ? ' ' + cls : ''), placeholder);
+		}
+
+		return card(cls, team);
 	}
 
 	function connector(m) {
 		const box = el('div', 'match-connector');
 
-		if (m.status === 'done' && m.score_a >= 0) {
-			box.appendChild(el('span', 'match-score', `${pad2(m.score_a)} ${pad2(m.score_b)}`));
+		// the two numbers apart, each as wide as two digits
+		const score = cls => {
+			const chip = el('span', cls);
+			chip.appendChild(el('span', 'score-number', pad2(m.score_a)));
+			chip.appendChild(el('span', 'score-number', pad2(m.score_b)));
+			return chip;
+		};
+
+		if ((m.status === 'done' || m.status === 'live') && m.score_a !== undefined) {
+			box.appendChild(score('match-score' + (m.status === 'live' ? ' live' : '')));
 		}
-		else if (m.status === 'live' && m.score_a >= 0) {
-			box.appendChild(el('span', 'match-score live', `${pad2(m.score_a)} ${pad2(m.score_b)}`));
+		else if (m.status === 'waiting') {
+			// its players are to come in - the server's name on hover
+			const join = el('span', 'match-score join', 'JOIN NOW');
+			join.title = m.server_name || '';
+			box.appendChild(join);
 		}
 		else {
 			box.appendChild(el('span', 'match-line'));
@@ -352,15 +828,29 @@
 		on the right, the score between them - a match being played with its live score there.
 	*/
 
-	function matchPair(m, current) {
+	/*
+		A team that goes on without playing - by a walkover, or a bye: in its place on the left, the reason where
+		the score goes, nobody on the right.
+	*/
+
+	function alonePair(team, reason) {
+		const pair = el('div', 'match-pair');
+		const box = el('div', 'match-connector');
+		box.appendChild(el('span', 'match-score reason', reason));
+
+		pair.appendChild(card('bye', team));
+		pair.appendChild(box);
+		pair.appendChild(el('div', 'team-card absent'));
+		return pair;
+	}
+
+	function matchPair(m) {
 		if (m.status === 'empty' || m.status === 'coming') {
 			return null;
 		}
 
 		if (m.status === 'walkover') {
-			const card = el('div', 'team-card bye', label(m.team_a));
-			card.appendChild(el('span', 'bye-tag', 'walkover'));
-			return card;
+			return alonePair(m.team_a, 'WALKOVER');
 		}
 
 		const pair = el('div', 'match-pair');
@@ -372,30 +862,45 @@
 		const leftScore = winnerIsB ? m.score_b : m.score_a;
 		const rightScore = winnerIsB ? m.score_a : m.score_b;
 
-		const pending = current && !decided ? 'pulse' : '';
 		const waiting = m.status === 'waiting' ? (m.server_name || 'waiting...') : '?';
 
-		pair.appendChild(teamCard(left, decided ? 'won' : pending, waiting));
+		// a match being played: its players framed as its score
+		const playing = m.status === 'live' ? 'live' : '';
+
+		pair.appendChild(teamCard(left, decided ? 'won' : playing, waiting));
 		pair.appendChild(connector(Object.assign({}, m, { score_a: leftScore, score_b: rightScore })));
-		pair.appendChild(teamCard(right, decided ? 'lost' : pending, waiting));
+		pair.appendChild(teamCard(right, decided ? 'lost' : playing, waiting));
 
 		return pair;
 	}
 
 	function render(t) {
 		root.innerHTML = '';
-		document.title = `Hypersomnia ${t.title}`;
 
-		if (t.finished && t.winner && t.winner.length) {
-			const winner = el('div', 'tournament-winner');
-			winner.appendChild(el('h2', 'tournament-winner-label', 'WINNER'));
-			winner.appendChild(el('div', 'team-card won', label(t.winner)));
-			root.appendChild(winner);
-			root.appendChild(el('hr', 'tournament-separator'));
+		const size = t.config ? t.config.team_size : 1;
+		document.title = t.name ? `${t.name} - Hypersomnia` : `Hypersomnia ${size}v${size} tournament`;
+
+		const heading = document.getElementById('tournament-name');
+
+		if (heading) {
+			heading.textContent = t.name || `${size}v${size} tournament`;
 		}
 
-		// the rounds played and the one being played - the newest first
-		const played = t.rounds.filter((r, i) => i <= t.current_round);
+		const finished = t.state === 'FINISHED';
+
+		if (finished && t.winner_team && t.winner_team.length) {
+			const winner = el('div', 'tournament-winner');
+			const button = el('div', 'winner-button');
+			button.appendChild(el('h2', 'tournament-winner-label', t.winner_team.length > 1 ? 'WINNERS' : 'WINNER'));
+			button.appendChild(card('won', t.winner_team));
+			button.querySelectorAll('.avatar').forEach(avatar_glow);
+			winner.appendChild(button);
+			root.appendChild(winner);
+			game_button_frame(button);
+		}
+
+		// the rounds played and the one being played - the final first, as they come
+		const played = t.rounds.filter(r => r.state !== 'COMING');
 
 		if (!played.length) {
 			root.appendChild(el('p', 'tournament-empty', 'No matches found.'));
@@ -404,45 +909,140 @@
 
 		const stack = el('div', 'bracket-stack');
 
-		played.slice().reverse().forEach((r, idx) => {
-			const i = played.length - 1 - idx;
-			const current = !t.finished && i === t.current_round;
+		played.forEach((r, idx) => {
 
-			if (idx > 0) {
-				stack.appendChild(el('hr', 'tournament-separator stage-separator'));
-			}
+			/*
+				A round: its arena on the left - the miniature big, served by this server (gone if it has none) -
+				its name and matches on the right. The final (the first of the rounds) framed in gold.
+			*/
 
-			const section = el('div', 'stage-section');
-			section.appendChild(el('div', 'stage-label' + (current ? ' pulse' : ''), r.name));
+			const section = el('div', 'stage-section' + (r === t.rounds[0] ? ' final' : r === t.rounds[1] ? ' semifinal' : ''));
+			const head = el('div', 'stage-head');
+			const side = el('div', 'stage-side');
+			const body = el('div', 'stage-body');
+
+			head.appendChild(el('div', 'stage-label', r.name));
 
 			if (r.arena) {
-				section.appendChild(el('div', 'stage-arena', r.arena));
+				head.appendChild(el('div', 'stage-arena', r.arena));
+
+				const miniature = el('img', 'stage-miniature');
+				miniature.alt = '';
+				miniature.src = `miniature/${encodeURIComponent(r.arena.split(' ')[0])}.png`;
+				miniature.onerror = () => miniature.remove();
+				side.appendChild(miniature);
 			}
 
+			section.appendChild(head);
+
 			r.matches.forEach(m => {
-				const pair = matchPair(m, current);
+				const pair = matchPair(m);
 
 				if (pair) {
-					section.appendChild(pair);
+					body.appendChild(pair);
 				}
 			});
 
 			(r.byes || []).forEach(b => {
-				const card = el('div', 'team-card bye', label(b));
-				card.appendChild(el('span', 'bye-tag', 'bye'));
-				section.appendChild(card);
+				body.appendChild(alonePair(b, 'BYE'));
 			});
 
+			section.appendChild(side);
+			section.appendChild(body);
 			stack.appendChild(section);
 		});
 
 		root.appendChild(stack);
+		fit_miniatures();
 	}
+
+	/*
+		The arena column as wide as the widest miniature - known once each is loaded.
+	*/
+
+	let arena_column = 0;
+
+	function fit_miniatures() {
+		document.querySelectorAll('.stage-miniature').forEach(miniature => {
+			const widen = () => {
+				if (miniature.naturalWidth > arena_column) {
+					arena_column = miniature.naturalWidth;
+					document.documentElement.style.setProperty('--arena-column', `${arena_column + 2}px`);
+				}
+			};
+
+			if (miniature.complete) {
+				widen();
+			}
+			else {
+				miniature.addEventListener('load', () => {
+					widen();
+					align_arena_names();
+				});
+			}
+		});
+
+		align_arena_names();
+	}
+
+	/*
+		Each arena's name ends where its miniature ends - right edge over right edge;
+		left in place next to the round's name where they'd meet.
+	*/
+
+	function align_arena_names() {
+		document.querySelectorAll('.stage-section').forEach(section => {
+			const head = section.querySelector('.stage-head');
+			const label = section.querySelector('.stage-label');
+			const name = section.querySelector('.stage-arena');
+			const miniature = section.querySelector('.stage-miniature');
+
+			if (!head || !name) {
+				return;
+			}
+
+			name.style.position = '';
+			name.style.right = '';
+
+			if (!miniature || !miniature.complete || !miniature.naturalWidth) {
+				return;
+			}
+
+			const head_box = head.getBoundingClientRect();
+			const right = head_box.right - miniature.getBoundingClientRect().right;
+			const left = head_box.width - right - name.offsetWidth;
+
+			if (left > label.offsetWidth + 14) {
+				name.style.position = 'absolute';
+				name.style.right = `${right}px`;
+			}
+		});
+	}
+
+	window.addEventListener('resize', align_arena_names);
+
+
+
+	/*
+		Drawn anew only when something changed - and then every animation is put back on one clock,
+		so the shimmers run on instead of starting over.
+	*/
+
+	let shown = '';
 
 	async function refresh() {
 		try {
 			const res = await fetch('tournament.json', { cache: 'no-store' });
-			render(await res.json());
+			const text = await res.text();
+
+			if (text !== shown) {
+				shown = text;
+				render(JSON.parse(text));
+
+				if (document.getAnimations) {
+					document.getAnimations().forEach(a => { a.startTime = 0; });
+				}
+			}
 		}
 		catch (e) {}
 
