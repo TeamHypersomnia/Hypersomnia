@@ -113,10 +113,38 @@ bool server_setup::accept_while_match_refuses(const uint8_t* const binding, cons
 
 /*
 	Who may play on this server: a player of its roster or of the match being played, anyone in an open match with places
-	left - and, while a roster by nicknames isn't all claimed, anyone (who it is is known only once the nickname comes).
+	left - and whoever comes with a listed nickname not claimed yet (claim_listed_nickname takes it a moment later).
+	Before its nickname came, anyone while a listed one is unclaimed - decided again once it comes (take_into_open_match).
 */
 
-bool server_setup::may_play_here(const std::string& account) const {
+/*
+	An admin or the spectator account: a place of its own, never one of the slots (server_slots.h).
+*/
+
+bool server_setup::has_own_place(const server_client_state& c) const {
+	return
+		find_admin_profile_of(c.admin_account).has_value()
+		|| is_spectator_account(c.admin_account)
+		|| is_spectator_account(c.authenticated_id)
+	;
+}
+
+bool server_setup::has_unclaimed_listed_nicknames() const {
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		(void)faction;
+
+		if (begins_with(id, nickname_account_id_prefix_v)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool server_setup::may_play_here(const server_client_state& c) const {
+	const auto& account = c.authenticated_id;
+
 	if (::is_actual_faction(get_assigned_team(account)) || plays_running_match(account)) {
 		return true;
 	}
@@ -138,13 +166,11 @@ bool server_setup::may_play_here(const std::string& account) const {
 		}
 	}
 
-	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
-		if (begins_with(id, nickname_account_id_prefix_v)) {
-			return true;
-		}
+	if (c.state == client_state_type::PENDING_WELCOME) {
+		return has_unclaimed_listed_nicknames();
 	}
 
-	return false;
+	return found_in(assigned_teams.id_to_faction, ::nickname_to_account_id(c.get_nickname()));
 }
 
 /*
@@ -158,13 +184,7 @@ bool server_setup::no_place_to_watch(const client_id_type id) const {
 	}
 
 	auto watches = [&](const server_client_state& c) {
-		const bool own_place =
-			find_admin_profile_of(c.admin_account).has_value()
-			|| is_spectator_account(c.admin_account)
-			|| is_spectator_account(c.authenticated_id)
-		;
-
-		return !own_place && !may_play_here(c.authenticated_id);
+		return !has_own_place(c) && !may_play_here(c);
 	};
 
 	if (!watches(clients[id])) {

@@ -37,6 +37,7 @@ bool browse_servers_gui_state::take_favorite_from_clipboard(const std::string& c
 	if (!already_there) {
 		favorites.add_manual(found->key, address, name);
 		added_favorite_note = name.empty() ? address : name;
+		added_favorite_address = address;
 		LOG("Added %x (%x) to the favorites from the clipboard.", added_favorite_note.value(), address);
 	}
 
@@ -59,7 +60,8 @@ bool browse_servers_gui_state::take_favorite_from_clipboard(const std::string& c
 }
 
 /*
-	"Added to favorites", a check mark and the server's name - [OK].
+	"Added to favorites", a check mark, the server's name and under it its address - a name anyone can give
+	(a page rewriting the clipboard), the address is where it really is - [OK].
 */
 
 void browse_servers_gui_state::draw_added_favorite_modal() {
@@ -97,6 +99,12 @@ void browse_servers_gui_state::draw_added_favorite_modal() {
 		ImGui::Dummy(ImVec2(size, size));
 		ImGui::SameLine();
 		ImGui::TextUnformatted(added_favorite_note->c_str());
+
+		if (added_favorite_address != *added_favorite_note) {
+			ImGui::Dummy(ImVec2(size, size));
+			ImGui::SameLine();
+			ImGui::TextDisabled("%s", added_favorite_address.c_str());
+		}
 
 		ImGui::Separator();
 

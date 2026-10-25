@@ -39,7 +39,7 @@ start)
   "server": {
     "server_name": "[PL] E2E ranked",
     "domain": "e2e-test.hypersomnia.io",
-    "arena": "de_cyberaqua",
+    "map_cycle": [ "de_cyberaqua" ],
     "notified_server_list": "${ARENAUS_IP:-154.12.226.211}:18430",
     "suppress_new_community_server_webhook": true,
     "ranked": { "countdown_time": 5, "max_rejoins": 0 },

@@ -42,7 +42,7 @@ start)
   "webrtc_signalling_server_url": "ws://${ARENAUS_IP:-154.12.226.211}:18000",
   "server": {
     "server_name": "[PL] E2E community",
-    "arena": "de_cyberaqua",
+    "map_cycle": [ "de_cyberaqua" ],
     $NOTIFY
     "suppress_new_community_server_webhook": true,
     "webrtc_port_range_begin": 9006,

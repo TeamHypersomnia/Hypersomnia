@@ -143,7 +143,7 @@ public:
 		player is that account, in this match, its team and the history. Called from the match servers' threads.
 	*/
 
-	void claim_listed_nickname(tournament_match&, const account_id_string& placeholder, const account_id_string& account);
+	bool claim_listed_nickname(tournament_match&, const account_id_string& placeholder, const account_id_string& account);
 
 private:
 	bool finished() const;

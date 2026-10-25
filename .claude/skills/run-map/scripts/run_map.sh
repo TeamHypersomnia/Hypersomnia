@@ -40,7 +40,7 @@ fi
 
 cat > $T/srv/user/conf.d/test.json <<J
 { "server_start": { "ip": "127.0.0.1", "port": $PORT, "slots": 16 },
-  "server": { "server_name": "map test", "arena": "$MAP", "bots": $BOTS_JSON, "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
+  "server": { "server_name": "map test", "map_cycle": [ "$MAP" ], "bots": $BOTS_JSON, "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
               "webrtc_port_range_begin": 19930, "webrtc_port_range_end": 19935 $SERVER_EXTRA } $CONF_EXTRA }
 J
 cat > $T/c/user/conf.d/test.json <<J

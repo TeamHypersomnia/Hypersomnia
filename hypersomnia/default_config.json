@@ -353,7 +353,7 @@
     },
 
     "server": {
-        "arena": "de_cyberaqua",
+        "map": "", // The map being played - kept for a restart. Empty: the first of map_cycle (a random one with map_cycle_random).
         "game_mode": "",
         "ranked": {
             /*
@@ -376,19 +376,18 @@
         "bot_quota": [ ], // empty for map default, [ 10 ] for always 10, [ 3, 4 ] for team specific.
         "allow_overtime": false, // On a tie at (max_team_score - 1) each, play on until one team leads by two rounds (e.g. 17:15, then 18:16...).
         "OFF_max_team_score": 16, // Rename to "max_team_score" to override the map's score-to-win (and the short match for browser players). Normally maps use 16.
-        "cycle": "LIST", // or: "REPEAT_CURRENT" | "ALL_ON_DISK"
-        "cycle_list": [
+        "map_cycle": [ // The maps that follow each other. One map alone (or none): it stays. [ "*" ]: all arenas on disk.
             "de_cyberaqua",
             "de_silo",
-            "fy_minilab bomb_defusal"
+            "fy_minilab"
         ],
-        "cycle_always_game_mode": "",
-        "cycle_randomize_order": true,
+        "map_cycle_game_mode_always": "", // Every map of the cycle in this game mode, e.g. "gun_game".
+        "map_cycle_random": true, // false: in the order of the list.
         "allow_webrtc_clients": true,
         "webrtc_udp_mux": true,
         "webrtc_port_range_begin": 9000,
         "webrtc_port_range_end": 9050, // only matters if "webrtc_udp_mux": false
-        "server_name": "", // Will be "Nickname's server" by default.
+        "server_name": "", // Empty: "My server" on a dedicated server, "Nickname's server" when hosted from the game.
         "domain": "", // Optional, e.g. "hypersomnia.example.com" - shown in the server list so players can remember it instead of the IP.
         "time_zone": "", // Where the server is, as an IANA time zone, e.g. "Europe/Berlin" - empty: the system's (not UTC). Ranked matches get happy hours there (2x, Friday to Sunday 19:00-21:00), and players in the browser see roughly how far it is.
         "notified_server_list": "masterserver.hypersomnia.io:8430",

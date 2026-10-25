@@ -108,12 +108,22 @@ bool tournament_coordinator::may_watch_others(const std::function<bool(const std
 	return false;
 }
 
-void tournament_coordinator::claim_listed_nickname(
+bool tournament_coordinator::claim_listed_nickname(
 	tournament_match& m,
 	const account_id_string& placeholder,
 	const account_id_string& account
 ) {
 	std::scoped_lock lk(state_lk);
+
+	/*
+		An account in a team already: it would play for two teams.
+	*/
+
+	for (const auto& t : state.teams) {
+		if (std::find(t.player_ids.begin(), t.player_ids.end(), account) != t.player_ids.end()) {
+			return false;
+		}
+	}
 
 	auto claim_in = [&](std::vector<account_id_string>& ids) {
 		for (auto& id : ids) {
@@ -138,6 +148,7 @@ void tournament_coordinator::claim_listed_nickname(
 
 	LOG("Tournament: %x is %x from now on.", ::account_id_to_nickname(placeholder), account);
 	persist();
+	return true;
 }
 
 bool tournament_coordinator::finished() const {

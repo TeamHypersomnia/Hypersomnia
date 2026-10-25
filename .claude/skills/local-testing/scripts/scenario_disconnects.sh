@@ -19,7 +19,7 @@ server() { # name port slots extra-server-json extra-top-json
 	mkdir -p $T/srv_$1/user/conf.d
 	cat > $T/srv_$1/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": $2, "slots": $3 },
-  "server": { "server_name": "disc $1", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
+  "server": { "server_name": "disc $1", "map_cycle": [ "de_cyberaqua" ], "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
               "webrtc_port_range_begin": $(($2 + 9000)), "webrtc_port_range_end": $(($2 + 9005)) $4 } $5 }
 J
 	(cd $REPO/hypersomnia && setsid timeout 150 $BIN --dedicated-server --appdata-dir $T/srv_$1 $GAME_TEST_FLAGS > $T/srv_$1.out 2>&1 < /dev/null &)

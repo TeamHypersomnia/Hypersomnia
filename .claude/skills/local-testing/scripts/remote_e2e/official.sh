@@ -32,7 +32,7 @@ start)
   "webrtc_signalling_server_url": "ws://${ARENAUS_IP:-154.12.226.211}:18000",
   "server": {
     "server_name": "[PL] Test official",
-    "arena": "de_cyberaqua",
+    "map_cycle": [ "de_cyberaqua" ],
     "notified_server_list": "${ARENAUS_IP:-154.12.226.211}:18430",
     "suppress_new_community_server_webhook": true,
     "time_zone": "Europe/Warsaw",

@@ -5085,11 +5085,11 @@ void do_server_vars_section(
 
 	switch (section) {
 		case server_vars_section::ARENA: {
-			if (perform_arena_chooser(vars.arena, runtime_info)) {
+			if (perform_arena_chooser(vars.map, runtime_info)) {
 				vars.game_mode = "";
 			}
 
-			revert(vars.arena);
+			revert(vars.map);
 
 			perform_game_mode_chooser(vars.game_mode);
 			revert(vars.game_mode);
@@ -5097,86 +5097,95 @@ void do_server_vars_section(
 			break;
 		}
 		case server_vars_section::MAP_CYCLE: {
-			revertable_enum("Cycle type", vars.cycle);
+			/*
+				The arenas that follow each other - one alone, or none, and the arena stays; "*" - all on disk.
+			*/
 
-			if (vars.cycle == arena_cycle_type::LIST || vars.cycle == arena_cycle_type::ALL_ON_DISK) {
-				text("Force a specific game mode when cycling");
-				ImGui::SameLine();
-				perform_game_mode_chooser(vars.cycle_always_game_mode, "##ForceChooser");
+			text("Force a specific game mode when cycling");
+			ImGui::SameLine();
+			perform_game_mode_chooser(vars.map_cycle_game_mode_always, "##ForceChooser");
 
-				revert(vars.cycle_always_game_mode);
+			revert(vars.map_cycle_game_mode_always);
 
-				revertable_checkbox("Randomize order", vars.cycle_randomize_order);
-				revertable_slider("When idle, change map once every minutes", vars.when_idle_change_maps_once_every_mins, float(0.0f), float(120.0f));
-				tooltip_on_hover("0 disables changing on idle.");
+			revertable_checkbox("Randomize order", vars.map_cycle_random);
+			revertable_slider("When idle, change map once every minutes", vars.when_idle_change_maps_once_every_mins, float(0.0f), float(120.0f));
+			tooltip_on_hover("0 disables changing on idle.");
+
+			ImGui::Separator();
+			text_color("Cycle arena list", yellow);
+			text_disabled("Empty or one arena: the arena stays.");
+			ImGui::Separator();
+
+			std::optional<std::size_t> to_remove;
+
+			if (ImGui::Button("Add arena to list")) {
+				vars.map_cycle.push_back("de_cyberaqua");
 			}
 
-			if (vars.cycle == arena_cycle_type::LIST) {
-				ImGui::Separator();
-				text_color("Cycle arena list", yellow);
-				ImGui::Separator();
+			ImGui::SameLine();
 
-				std::optional<std::size_t> to_remove;
+			if (ImGui::Button("All arenas on disk")) {
+				vars.map_cycle = { "*" };
+			}
 
-				if (ImGui::Button("Add arena to list")) {
-					vars.cycle_list.push_back("de_cyberaqua");
+			ImGui::SameLine();
+
+			if (ImGui::Button("Clear list")) {
+				vars.map_cycle.clear();
+			}
+
+			for (std::size_t i = 0; i < vars.map_cycle.size(); ++i) {
+				auto scope = scoped_id(i);
+
+				auto& entry = vars.map_cycle[i];
+
+				if (ImGui::Button("-")) {
+					to_remove = i;
 				}
 
 				ImGui::SameLine();
 
-				if (ImGui::Button("Clear list")) {
-					vars.cycle_list.clear();
+				if (entry == "*") {
+					text("All arenas on disk");
+					continue;
 				}
 
-				for (std::size_t i = 0; i < vars.cycle_list.size(); ++i) {
-					auto scope = scoped_id(i);
+				bool modified = false;
 
-					auto& entry = vars.cycle_list[i];
+				auto arena = arena_identifier(::get_first_word(entry));
+				auto mode = game_mode_name_type(::get_second_word(entry));
 
-					if (ImGui::Button("-")) {
-						to_remove = i;
-					}
+				/*
+					The game mode under the tall arena frame, aligned with it.
+				*/
 
-					ImGui::SameLine();
+				const auto chooser_x = ImGui::GetCursorPosX();
 
-					bool modified = false;
+				if (perform_arena_chooser(arena, runtime_info)) {
+					mode = "";
 
-					auto arena = arena_identifier(::get_first_word(entry));
-					auto mode = game_mode_name_type(::get_second_word(entry));
-
-					/*
-						The game mode under the tall arena frame, aligned with it.
-					*/
-
-					const auto chooser_x = ImGui::GetCursorPosX();
-
-					if (perform_arena_chooser(arena, runtime_info)) {
-						mode = "";
-
-						modified = true;
-					}
-
-					ImGui::SetCursorPosX(chooser_x);
-
-					if (perform_game_mode_chooser(mode)) {
-						modified = true;
-					}
-
-					if (modified) {
-						if (mode.empty()) {
-							entry = arena.operator std::string();
-						}
-						else {
-							entry = typesafe_sprintf("%x %x", arena, mode);
-						}
-					}
+					modified = true;
 				}
 
-				if (to_remove.has_value()) {
-					vars.cycle_list.erase(vars.cycle_list.begin() + *to_remove);
+				ImGui::SetCursorPosX(chooser_x);
+
+				if (perform_game_mode_chooser(mode)) {
+					modified = true;
+				}
+
+				if (modified) {
+					if (mode.empty()) {
+						entry = arena.operator std::string();
+					}
+					else {
+						entry = typesafe_sprintf("%x %x", arena, mode);
+					}
 				}
 			}
 
+			if (to_remove.has_value()) {
+				vars.map_cycle.erase(vars.map_cycle.begin() + *to_remove);
+			}
 
 			break;
 		}

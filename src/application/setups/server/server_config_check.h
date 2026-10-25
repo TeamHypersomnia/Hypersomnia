@@ -188,6 +188,14 @@ inline bool check_tournament_arenas(const std::string& tournament_arenas) {
 	*/
 
 	for (const auto c : tournament_arenas + ",") {
+		/*
+			A list written on Windows: its lines end with \r too.
+		*/
+
+		if (c == '\r') {
+			continue;
+		}
+
 		if (c != ',' && c != '\n') {
 			current += c;
 			continue;

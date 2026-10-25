@@ -11,7 +11,7 @@ if ss -tuln | grep -q ":10090 "; then echo "port 10090 busy, abort"; exit 1; fi
 rm -rf $T; mkdir -p $T/srv/user/conf.d $T/c/user/conf.d
 cat > $T/srv/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": 10090, "slots": 8 },
-  "server": { "server_name": "demo test", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
+  "server": { "server_name": "demo test", "map_cycle": [ "de_cyberaqua" ], "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
               "webrtc_port_range_begin": 19900, "webrtc_port_range_end": 19905 } }
 J
 cat > $T/c/user/conf.d/test.json <<J

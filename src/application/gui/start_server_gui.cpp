@@ -130,7 +130,17 @@ as well as to test your skills in a laggy environment.
 
 		// auto& scope_cfg = into;
 
-		if (perform_arena_chooser(into_vars.arena)) {
+		/*
+			No map set ("map": "" - the cycle's first at the start): the window shows that one.
+		*/
+
+		if (std::string(into_vars.map).empty()) {
+			const auto first = into_vars.map_cycle.empty() || into_vars.map_cycle[0] == "*" ? std::string("de_cyberaqua") : std::string(into_vars.map_cycle[0]);
+			into_vars.map = ::get_first_word(first);
+			into_vars.game_mode = ::get_second_word(first);
+		}
+
+		if (perform_arena_chooser(into_vars.map)) {
 			into_vars.game_mode = "";
 		}
 

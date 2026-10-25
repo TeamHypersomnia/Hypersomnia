@@ -1046,7 +1046,7 @@ server_setup::server_setup(
 		);
 
 		if (target.has_value()) {
-			initial_vars_modified.arena = target->arena;
+			initial_vars_modified.map = target->arena;
 			initial_vars_modified.game_mode = target->game_mode;
 		}
 #endif
@@ -1539,8 +1539,12 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 	const bool roster_decides = has_assigned_teams() && !is_open_match();
 
 	if (requires_authentication() && !ip.empty() && !admin && !spectator_account && !roster_decides) {
+		/*
+			Players only: an organizer and a caster on the same network leave the places to its players.
+		*/
+
 		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
-			return get_client_ip_for_bans(other_id) == ip;
+			return !has_own_place(clients[other_id]) && get_client_ip_for_bans(other_id) == ip;
 		});
 
 		if (static_cast<uint32_t>(from_this_ip) >= vars.max_ranked_players_per_ip) {
@@ -1554,13 +1558,29 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		return;
 	}
 
-	const auto capacity =
-		get_game_capacity()
-		+ (admin ? static_cast<uint32_t>(reserved_admin_places_v) : 0u)
-		+ (spectator_account ? static_cast<uint32_t>(reserved_spectator_places_v) : 0u)
-	;
+	/*
+		The admins and the spectator account sit in places of their own (server_slots.h): they always get in,
+		and never take a slot of the players or the watchers - a match's server has exactly as many as it needs.
+	*/
 
-	if (admitted.size() < capacity) {
+	if (admin || spectator_account) {
+		return;
+	}
+
+	/*
+		On a tournament's match, who hasn't said their nickname yet takes no slot: who they are - a listed player or not -
+		is decided with it (take_into_open_match checks again then).
+	*/
+
+	const bool decided_with_nickname = tournament_spectator_places.has_value() && has_assigned_teams();
+
+	const auto taken = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
+		const auto& other = clients[other_id];
+		const bool not_known_yet = decided_with_nickname && other.state == client_state_type::PENDING_WELCOME;
+		return !has_own_place(other) && !not_known_yet;
+	});
+
+	if (static_cast<uint32_t>(taken) < get_game_capacity()) {
 		return;
 	}
 
@@ -1733,7 +1753,7 @@ void server_setup::crash_recovery_dump_on_round_start(const const_logic_step ste
 				get_arena_handle(),
 				vars.ranked.dump_server_recovery_state_every_round,
 				is_ranked_live(),
-				vars.arena,
+				vars.map,
 				vars.game_mode,
 				current_arena_hash
 			);
@@ -1829,61 +1849,100 @@ void server_setup::announce_ranked_abandons(const const_logic_step step) {
 	}
 }
 
-template <class T>
-void server_setup::choose_next_map_from(const T& list) {
-	if (list.empty()) {
+/*
+	The arenas the server goes through (map_cycle) - "*" stands for all on disk.
+	Empty: none - the map stays.
+*/
+
+std::vector<arena_and_mode_identifier> server_setup::get_map_cycle(const server_vars& of) const {
+	auto out = std::vector<arena_and_mode_identifier>();
+
+	for (const auto& entry : of.map_cycle) {
+		if (entry == "*") {
+			for (const auto& arena : runtime_info.arenas_on_disk) {
+				out.emplace_back(arena);
+			}
+		}
+		else {
+			out.push_back(entry);
+		}
+	}
+
+	return out;
+}
+
+/*
+	In order: the entry after the one played (map_cycle_position - the same map may be listed more than once).
+	At random: a shuffled round of the list, never the same map twice in a row. One that fails to load - the next one.
+	A cycle of one: nothing to go to - the map stays as it is (also after /map).
+*/
+
+void server_setup::choose_next_map_from_cycle() {
+	const auto cycle = get_map_cycle(vars);
+
+	if (cycle.size() < 2) {
 		return;
 	}
 
-	auto rebuild_indices = [&]() {
-		for (std::size_t l = 0; l < list.size(); ++l) {
-			shuffled_cycle_indices.push_back(l);
+	auto played_index = [&]() -> std::optional<std::size_t> {
+		if (map_cycle_position.has_value() && *map_cycle_position < cycle.size() && ::get_first_word(cycle[*map_cycle_position]) == std::string(vars.map)) {
+			return map_cycle_position;
 		}
 
-		reverse_range(shuffled_cycle_indices);
-
-		if (vars.cycle_randomize_order) {
-			shuffle_range(shuffled_cycle_indices, cycle_rng);
+		for (std::size_t i = 0; i < cycle.size(); ++i) {
+			if (::get_first_word(cycle[i]) == std::string(vars.map)) {
+				return i;
+			}
 		}
+
+		return std::nullopt;
+	}();
+
+	auto next_in_order = played_index.has_value() ? *played_index + 1 : std::size_t(0);
+
+	auto next_index = [&]() {
+		if (!vars.map_cycle_random) {
+			return next_in_order++ % cycle.size();
+		}
+
+		for (std::size_t tries = 0; tries < cycle.size() + 1; ++tries) {
+			if (shuffled_cycle_indices.empty() || shuffled_cycle_indices.back() >= cycle.size()) {
+				shuffled_cycle_indices.clear();
+
+				for (std::size_t l = 0; l < cycle.size(); ++l) {
+					shuffled_cycle_indices.push_back(l);
+				}
+
+				shuffle_range(shuffled_cycle_indices, cycle_rng);
+			}
+
+			const auto picked = shuffled_cycle_indices.back();
+			shuffled_cycle_indices.pop_back();
+
+			if (::get_first_word(cycle[picked]) != std::string(vars.map)) {
+				return picked;
+			}
+		}
+
+		return next_in_order++ % cycle.size();
 	};
 
-	for (std::size_t tries = 0; tries < list.size(); ++tries) {
-		if (shuffled_cycle_indices.empty() || shuffled_cycle_indices.back() >= list.size()) {
-			rebuild_indices();
-		}
-
-		const auto next_index = shuffled_cycle_indices.back();
-		shuffled_cycle_indices.pop_back();
-
-		const auto next_entry = list[next_index];
+	for (std::size_t tries = 0; tries < cycle.size(); ++tries) {
+		const auto index = next_index();
+		const auto& next_entry = cycle[index];
 
 		auto new_vars = vars;
-		new_vars.arena = ::get_first_word(next_entry);
+		new_vars.map = ::get_first_word(next_entry);
 		new_vars.game_mode = ::get_second_word(next_entry);
 
-		if (!vars.cycle_always_game_mode.empty()) {
-			new_vars.game_mode = vars.cycle_always_game_mode;
+		if (!vars.map_cycle_game_mode_always.empty()) {
+			new_vars.game_mode = vars.map_cycle_game_mode_always;
 		}
 
-		if (apply(new_vars)) {
+		if (new_vars == vars || apply(new_vars)) {
+			map_cycle_position = index;
 			break;
 		}
-	}
-}
-
-void server_setup::choose_next_map_from_cycle() {
-	switch (vars.cycle) {
-		case arena_cycle_type::REPEAT_CURRENT:
-			break;
-		case arena_cycle_type::LIST:
-			choose_next_map_from(vars.cycle_list);
-			break;
-		case arena_cycle_type::ALL_ON_DISK:
-			choose_next_map_from(runtime_info.arenas_on_disk);
-			break;
-
-		default:
-			break;
 	}
 }
 
@@ -3643,7 +3702,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 server_public_vars server_setup::make_public_vars() const {
 	server_public_vars pub;
 
-	pub.arena = vars.arena;
+	pub.arena = vars.map;
 	pub.game_mode = vars.game_mode;
 	pub.server_name = get_server_name();
 	pub.instance_label = instance_label;
@@ -3685,19 +3744,50 @@ void server_setup::rebroadcast_server_public_vars() {
 	for_each_id_and_client(broadcast_new_vars, only_connected_v);
 }
 
-bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
+/*
+	No map set ("map": "" - the default, and after RCON's reset to defaults): the cycle's first, or a random one of it;
+	an empty cycle too: de_cyberaqua.
+*/
+
+server_vars server_setup::with_map_chosen(server_vars v) {
+	if (!std::string(v.map).empty()) {
+		return v;
+	}
+
+	if (runtime_info.arenas_on_disk.empty()) {
+		rescan_arenas_on_disk();
+	}
+
+	const auto cycle = get_map_cycle(v);
+
+	if (cycle.empty()) {
+		LOG("No map and no map_cycle set - de_cyberaqua.");
+		v.map = "de_cyberaqua";
+		return v;
+	}
+
+	const auto picked = v.map_cycle_random ? static_cast<std::size_t>(cycle_rng.randval(0u, static_cast<uint32_t>(cycle.size() - 1))) : std::size_t(0);
+	v.map = ::get_first_word(cycle[picked]);
+	v.game_mode = ::get_second_word(cycle[picked]);
+
+	if (!v.map_cycle_game_mode_always.empty()) {
+		v.game_mode = v.map_cycle_game_mode_always;
+	}
+
+	map_cycle_position = picked;
+	return v;
+}
+
+bool server_setup::apply(const server_vars& requested_vars, const bool first_time) {
+	const auto new_vars = with_map_chosen(requested_vars);
+
 	if (!first_time) {
 		if (new_vars == vars) {
 			return false;
 		}
 	}
 
-	if (
-		vars.cycle_randomize_order != new_vars.cycle_randomize_order
-		|| vars.cycle != new_vars.cycle
-		|| vars.cycle_list != new_vars.cycle_list
-	
-	) {
+	if (vars.map_cycle_random != new_vars.map_cycle_random || vars.map_cycle != new_vars.map_cycle) {
 		shuffled_cycle_indices.clear();
 	}
 
@@ -3714,9 +3804,9 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 
 	bool chosen_next_area = false;
 
-	const auto previous_arena = vars.arena;
+	const auto previous_arena = vars.map;
 
-	const bool reload_arena = first_time || vars.arena != new_vars.arena || vars.game_mode != new_vars.game_mode;
+	const bool reload_arena = first_time || vars.map != new_vars.map || vars.game_mode != new_vars.game_mode;
 	const bool reload_net_sim = first_time || vars.network_simulator != new_vars.network_simulator;
 
 	const auto new_speed = ::sanitize_logic_speed(new_vars.game_speed);
@@ -3764,21 +3854,21 @@ bool server_setup::apply(const server_vars& new_vars, const bool first_time) {
 			chosen_next_area = true;
 		}
 		catch (const augs::json_deserialization_error& err) {
-			LOG("Failed to load \"%x\":\n%x. Keeping the current arena.", vars.arena, err.what());
+			LOG("Failed to load \"%x\":\n%x. Keeping the current arena.", vars.map, err.what());
 
-			vars.arena = previous_arena;
+			vars.map = previous_arena;
 			rechoose_arena();
 		}
 		catch (const augs::file_open_error& err) {
-			LOG("Arena named \"%x\" was not found on the server! Keeping the current arena.", new_vars.arena);
+			LOG("Arena named \"%x\" was not found on the server! Keeping the current arena.", new_vars.map);
 
-			vars.arena = previous_arena;
+			vars.map = previous_arena;
 			rechoose_arena();
 		}
 		catch (...) {
-			LOG("Failed to load \"%x\":\nUnknown error. Keeping the current arena.", vars.arena);
+			LOG("Failed to load \"%x\":\nUnknown error. Keeping the current arena.", vars.map);
 
-			vars.arena = previous_arena;
+			vars.map = previous_arena;
 			rechoose_arena();
 		}
 	}
@@ -3893,7 +3983,7 @@ void register_external_resources_of(
 }
 
 void server_setup::rechoose_arena() {
-	LOG("Choosing arena: %x", vars.arena);
+	LOG("Choosing arena: %x", vars.map);
 
 	/*
 		Any /bots override is scoped to the current arena.
@@ -3916,7 +4006,7 @@ void server_setup::rechoose_arena() {
 			editor_project_readwrite::reading_settings(),
 			arena,
 			official,
-			vars.arena,
+			vars.map,
 			vars.game_mode,
 			clean_round_state,
 			vars.playtesting_context,
@@ -4927,12 +5017,11 @@ message_handler_result server_setup::handle_rcon_payload(
 		const auto requested_vars = [&]() {
 			if (level == rcon_level_type::BASIC) {
 				auto only_what_is_played = vars;
-				only_what_is_played.arena = typed_payload.arena;
+				only_what_is_played.map = typed_payload.map;
 				only_what_is_played.game_mode = typed_payload.game_mode;
-				only_what_is_played.cycle = typed_payload.cycle;
-				only_what_is_played.cycle_list = typed_payload.cycle_list;
-				only_what_is_played.cycle_always_game_mode = typed_payload.cycle_always_game_mode;
-				only_what_is_played.cycle_randomize_order = typed_payload.cycle_randomize_order;
+								only_what_is_played.map_cycle = typed_payload.map_cycle;
+				only_what_is_played.map_cycle_game_mode_always = typed_payload.map_cycle_game_mode_always;
+				only_what_is_played.map_cycle_random = typed_payload.map_cycle_random;
 				return only_what_is_played;
 			}
 
@@ -4942,8 +5031,8 @@ message_handler_result server_setup::handle_rcon_payload(
 		const auto& new_v = requested_vars;
 		auto& old_v = vars;
 		
-		if (new_v.arena != old_v.arena) {
-			notification(typesafe_sprintf("changed arena to %x", new_v.arena));
+		if (new_v.map != old_v.map) {
+			notification(typesafe_sprintf("changed arena to %x", new_v.map));
 		}
 		else if (new_v.game_mode != old_v.game_mode) {
 			notification(typesafe_sprintf("changed game mode to %x", new_v.game_mode.empty() ? "map default" : new_v.game_mode));
@@ -5642,7 +5731,7 @@ server_name_type server_setup::get_server_name() const {
 }
 
 std::string server_setup::get_current_arena_name() const {
-	return vars.arena;
+	return vars.map;
 }
 
 server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) const {
@@ -7088,7 +7177,11 @@ void server_setup::handle_client_chat_command(
 				return;
 			}
 
-			if (vars.cycle == arena_cycle_type::LIST || vars.cycle == arena_cycle_type::ALL_ON_DISK) {
+			/*
+				A cycle of more than the map being played - otherwise there's nothing to go to.
+			*/
+
+			if (get_map_cycle(vars).size() > 1) {
 				auto perform_if_can_already = [&]() {
 					if (server_time - when_last_used_map_command < map_command_interval_secs_v) {
 						const auto message = typesafe_sprintf("Map can only be changed once every %x seconds. Please wait.", map_command_interval_secs_v);
@@ -7142,11 +7235,11 @@ void server_setup::handle_client_chat_command(
 				auto new_vars = vars;
 
 				if (!with.empty()) {
-					new_vars.arena = arena_identifier(::get_first_word(with));
+					new_vars.map = arena_identifier(::get_first_word(with));
 					new_vars.game_mode = game_mode_name_type(::get_second_word(with));
 				}
 				else {
-					new_vars.arena = arena;
+					new_vars.map = arena;
 					new_vars.game_mode = mode;
 				}
 
@@ -7154,18 +7247,16 @@ void server_setup::handle_client_chat_command(
 			};
 
 			if (is_ranked_server()) {
-				if (vars.cycle == arena_cycle_type::ALL_ON_DISK && found_in(runtime_info.arenas_on_disk, arena)) {
+				const auto cycle = get_map_cycle(vars);
+
+				if (found_in(cycle, requested_map)) {
 					perform_if_can_already();
 				}
-				else if (vars.cycle == arena_cycle_type::LIST) {
-					if (found_in(vars.cycle_list, requested_map)) {
-						perform_if_can_already();
-					}
-					else if (mode == "") {
-						for (const auto& cycle_entry : vars.cycle_list) {
-							if (::get_first_word(cycle_entry) == arena) {
-								perform_if_can_already(cycle_entry);
-							}
+				else if (mode == "") {
+					for (const auto& cycle_entry : cycle) {
+						if (::get_first_word(cycle_entry) == arena) {
+							perform_if_can_already(cycle_entry);
+							break;
 						}
 					}
 				}
@@ -7228,8 +7319,21 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 		return;
 	}
 
-	if (claim_listed_nickname(c)) {
+	if (claim_listed_nickname(client_id, c)) {
 		return;
+	}
+
+	/*
+		Let in before its nickname came (admit_or_refuse) - now it's known and not a listed one:
+		a place to watch and a slot, as anyone's.
+	*/
+
+	if (tournament_spectator_places.has_value()) {
+		admit_or_refuse(client_id);
+
+		if (clients[client_id].when_kicked.has_value()) {
+			return;
+		}
 	}
 
 	/*

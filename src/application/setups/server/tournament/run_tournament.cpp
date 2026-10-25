@@ -73,18 +73,7 @@ namespace {
 		return out;
 	}
 
-	/*
-		The teams as written: "alice, bob; carol, dave", or a team per line - or, with empty lines between the teams,
-		a player per line (no commas to type):
-
-			alice
-			bob
-
-			carol
-			dave
-	*/
-
-	std::vector<std::vector<std::string>> split_teams(const std::string& written) {
+	std::vector<std::string> written_lines(const std::string& written) {
 		std::vector<std::string> raw_lines;
 
 		{
@@ -103,30 +92,48 @@ namespace {
 			raw_lines.push_back(current);
 		}
 
-		/*
-			An empty line between two written ones: the teams are apart by empty lines.
-		*/
+		return raw_lines;
+	}
 
-		const bool by_empty_lines = [&]() {
-			bool seen_written = false;
-			bool empty_after_written = false;
+	/*
+		An empty line between two written ones: the teams are apart by empty lines.
+	*/
 
-			for (const auto& line : raw_lines) {
-				const bool empty = ::trimmed(line).empty();
+	bool teams_apart_by_empty_lines(const std::vector<std::string>& raw_lines) {
+		bool seen_written = false;
+		bool empty_after_written = false;
 
-				if (!empty && empty_after_written) {
-					return true;
-				}
+		for (const auto& line : raw_lines) {
+			const bool empty = ::trimmed(line).empty();
 
-				if (empty && seen_written) {
-					empty_after_written = true;
-				}
-
-				seen_written = seen_written || !empty;
+			if (!empty && empty_after_written) {
+				return true;
 			}
 
-			return false;
-		}();
+			if (empty && seen_written) {
+				empty_after_written = true;
+			}
+
+			seen_written = seen_written || !empty;
+		}
+
+		return false;
+	}
+
+	/*
+		The teams as written: "alice, bob; carol, dave", or a team per line - or, with empty lines between the teams,
+		a player per line (no commas to type):
+
+			alice
+			bob
+
+			carol
+			dave
+	*/
+
+	std::vector<std::vector<std::string>> split_teams(const std::string& written) {
+		const auto raw_lines = ::written_lines(written);
+		const bool by_empty_lines = ::teams_apart_by_empty_lines(raw_lines);
 
 		std::vector<std::vector<std::string>> teams;
 
@@ -202,6 +209,15 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 	}
 
 	if (!params.tournament_teams.empty()) {
+		/*
+			One format at a time: with empty lines between the teams, a line with "," or ";" would quietly join teams.
+		*/
+
+		if (::teams_apart_by_empty_lines(::written_lines(params.tournament_teams)) && params.tournament_teams.find_first_of(",;") != std::string::npos) {
+			error = "--tournament-teams: a team per line (\",\" between the players) or a player per line (an empty line between the teams) - not both";
+			return out;
+		}
+
 		/*
 			"alice=0x8aed..., bob=steam_7656...; carol=..." - every player with an account id, or none of them:
 			a list with some let in by their nicknames only would quietly let anyone in as them.
@@ -904,7 +920,7 @@ work_result run_tournament(const run_tournament_input& in) {
 	*/
 
 	std::function<bool(const std::function<bool(const std::string&)>&)> may_watch_others;
-	std::function<void(tournament_match&, const account_id_string&, const account_id_string&)> claim_listed_nickname;
+	std::function<bool(tournament_match&, const account_id_string&, const account_id_string&)> claim_listed_nickname;
 
 	deps.run_stage = [&](
 		std::vector<tournament_match>& matches,
@@ -1009,7 +1025,7 @@ work_result run_tournament(const run_tournament_input& in) {
 			auto this_config = in.config_pattern;
 
 			this_config.server_start.port = match.port;
-			this_config.server.arena = ::get_first_word(match.arena_and_mode);
+			this_config.server.map = ::get_first_word(match.arena_and_mode);
 			this_config.server.game_mode = ::get_second_word(match.arena_and_mode);
 			this_config.server.server_name = match.server_name;
 			this_config.server.shutdown_after_one_match = true;
@@ -1018,9 +1034,8 @@ work_result run_tournament(const run_tournament_input& in) {
 				The round's arena only - the default cycle would change it while the server waits for its players.
 			*/
 
-			this_config.server.cycle = arena_cycle_type::REPEAT_CURRENT;
+			this_config.server.map_cycle = { match.arena_and_mode };
 
-			auto canon_server_vars = in.canon_config_with_confd.server;
 			this_config.server.webrtc_udp_mux = true;
 			this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
 			this_config.server.daily_autoupdate = false;
@@ -1030,15 +1045,21 @@ work_result run_tournament(const run_tournament_input& in) {
 				The admins and the spectator account have places of their own.
 			*/
 
-			{
-				const auto players =
+			/*
+				Past the ceiling, fewer places to watch - never fewer slots for the players.
+			*/
+
+			const auto match_spectator_places = [&]() {
+				const auto players = static_cast<int>(
 					match.open_team_size > 0 ?
 					2 * match.open_team_size :
 					match.team_a_player_ids.size() + match.team_b_player_ids.size() + match.spectator_player_ids.size()
-				;
+				);
 
-				this_config.server_start.slots = std::min(max_server_slots_v, static_cast<int>(players + in.config.spectator_places));
-			}
+				const auto places = std::clamp(max_server_slots_v - players, 0, static_cast<int>(in.config.spectator_places));
+				this_config.server_start.slots = std::min(max_server_slots_v, players + places);
+				return static_cast<uint32_t>(places);
+			}();
 
 			/*
 				Force overtime on tournament matches: the bracket has no machinery
@@ -1072,6 +1093,12 @@ work_result run_tournament(const run_tournament_input& in) {
 
 			roster.open_team_size = match.open_team_size;
 
+			/*
+				RCON's "reset to defaults" brings back the match's own settings - its arena, overtime, shutdown, cycle.
+			*/
+
+			auto canon_server_vars = this_config.server;
+
 			auto* match_ptr = &match;
 
 			/*
@@ -1097,7 +1124,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				open_places,
 				expected_players = in.config.open_players,
 				join_timeout_secs = in.config.join_timeout_secs,
-				spectator_places = in.config.spectator_places,
+				spectator_places = match_spectator_places,
 				&may_watch_others,
 				&claim_listed_nickname,
 				&avatars,
@@ -1203,7 +1230,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				};
 
 				server_ptr->on_listed_nickname_claimed = [match_ptr, &claim_listed_nickname](const std::string& placeholder, const std::string& account) {
-					claim_listed_nickname(*match_ptr, placeholder, account);
+					return claim_listed_nickname(*match_ptr, placeholder, account);
 				};
 				server_ptr->on_join_timeout = [match_ptr, commit](const faction_type came) {
 					auto outcome = tournament_match_outcome();
@@ -1437,7 +1464,7 @@ work_result run_tournament(const run_tournament_input& in) {
 	};
 
 	claim_listed_nickname = [&coordinator](tournament_match& m, const account_id_string& placeholder, const account_id_string& account) {
-		coordinator.claim_listed_nickname(m, placeholder, account);
+		return coordinator.claim_listed_nickname(m, placeholder, account);
 	};
 
 	/*

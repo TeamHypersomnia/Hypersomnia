@@ -67,7 +67,7 @@ process.exit(0);' $ID_A $STEAM_ID)
 
 cat > $T/server/user/conf.d/test.json <<J
 { "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": $PORT, "slots": 16 },
-  "server": { "server_name": "[PL] Corners test", "arena": "de_e2e_short", "game_mode": "bomb_defusal", "notified_server_list": "127.0.0.1:1",
+  "server": { "server_name": "[PL] Corners test", "map_cycle": [ "de_e2e_short" ], "game_mode": "bomb_defusal", "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "sync_all_external_arenas_on_startup": false,
               "ranked": { "countdown_time": 2 },
               "move_to_spectators_if_afk_for_secs": 999999, "kick_if_afk_for_secs": 999999,

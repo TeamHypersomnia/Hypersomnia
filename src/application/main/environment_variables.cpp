@@ -128,6 +128,23 @@ namespace {
 	}
 
 	/*
+		The server list: off, or its host:port - anything else (OFF, no, false) would quietly be taken for an address.
+	*/
+
+	void set_server_list(config_json_table& c, const std::string& value) {
+		if (value == "off") {
+			c.server.notified_server_list = std::string();
+			return;
+		}
+
+		if (value.find_first_of(".:") == std::string::npos) {
+			throw bad_value { "off, or the list's host:port, e.g. masterserver.hypersomnia.io:8430" };
+		}
+
+		c.server.notified_server_list = value;
+	}
+
+	/*
 		"fy_iceworld bomb_defusal" - the arena, then its game mode if not the default one.
 	*/
 
@@ -142,18 +159,18 @@ namespace {
 		mode = words.size() > 1 ? words[1] : std::string();
 	}
 
-	void set_arena(config_json_table& c, const std::string& value) {
+	void set_map(config_json_table& c, const std::string& value) {
 		std::string arena;
 		std::string mode;
 
 		::as_arena_and_mode(value, arena, mode);
 
-		c.server.arena = arena;
+		c.server.map = arena;
 		c.server.game_mode = mode;
 	}
 
 	/*
-		The arenas that follow each other: "de_silo,fy_iceworld bomb_defusal".
+		The arenas that follow each other: "de_silo,fy_iceworld bomb_defusal" - one alone stays; "*" - all on disk.
 	*/
 
 	void set_map_cycle(config_json_table& c, const std::string& value) {
@@ -163,15 +180,19 @@ namespace {
 			throw bad_value { "arenas separated by commas, e.g. de_cyberaqua,de_silo" };
 		}
 
-		c.server.cycle = arena_cycle_type::LIST;
-		c.server.cycle_list.clear();
+		c.server.map_cycle.clear();
+
+		if (entries.size() == 1 && entries[0] == "*") {
+			c.server.map_cycle.push_back("*");
+			return;
+		}
 
 		for (const auto& entry : entries) {
 			std::string arena;
 			std::string mode;
 
 			::as_arena_and_mode(entry, arena, mode);
-			c.server.cycle_list.push_back(mode.empty() ? arena : arena + " " + mode);
+			c.server.map_cycle.push_back(mode.empty() ? arena : arena + " " + mode);
 		}
 	}
 
@@ -268,9 +289,9 @@ namespace {
 
 	const auto config_variables = std::array {
 		environment_variable { "HYPERSOMNIA_SERVER_NAME", [](auto& c, const auto& v) { c.server.server_name = v; } },
-		environment_variable { "HYPERSOMNIA_ARENA", [](auto& c, const auto& v) { ::set_arena(c, v); } },
+		environment_variable { "HYPERSOMNIA_MAP", [](auto& c, const auto& v) { ::set_map(c, v); } },
 		environment_variable { "HYPERSOMNIA_MAP_CYCLE", [](auto& c, const auto& v) { ::set_map_cycle(c, v); } },
-		environment_variable { "HYPERSOMNIA_MAP_CYCLE_RANDOM", [](auto& c, const auto& v) { c.server.cycle_randomize_order = ::as_on_off(v); } },
+		environment_variable { "HYPERSOMNIA_MAP_CYCLE_RANDOM", [](auto& c, const auto& v) { c.server.map_cycle_random = ::as_on_off(v); } },
 		environment_variable { "HYPERSOMNIA_ADMINS", [](auto& c, const auto& v) { ::set_master_admins(c, v); } },
 		environment_variable { "HYPERSOMNIA_ALLOWED_ACCOUNTS", [](auto& c, const auto& v) { ::set_allowed_accounts(c, v); } },
 		environment_variable { "HYPERSOMNIA_PASSWORD", [](auto& c, const auto& v) { c.server_private.server_password = v; } },
@@ -279,12 +300,14 @@ namespace {
 		environment_variable { "HYPERSOMNIA_PORT", [](auto& c, const auto& v) { c.server_start.port = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_WEB_PORT", [](auto& c, const auto& v) { c.server.webrtc_port_range_begin = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_BROWSER_PLAYERS", [](auto& c, const auto& v) { c.server.allow_webrtc_clients = ::as_on_off(v); } },
-		environment_variable { "HYPERSOMNIA_SERVER_LIST", [](auto& c, const auto& v) { c.server.notified_server_list = v == "off" ? std::string() : v; } },
+		environment_variable { "HYPERSOMNIA_SERVER_LIST", [](auto& c, const auto& v) { ::set_server_list(c, v); } },
 		environment_variable { "HYPERSOMNIA_BOT_QUOTA", [](auto& c, const auto& v) { ::set_bot_quota(c, v); } },
 		environment_variable { "HYPERSOMNIA_BOT_DIFFICULTY", [](auto& c, const auto& v) { c.server.bot_difficulty = ::as_bot_difficulty(v); } },
 		environment_variable { "HYPERSOMNIA_DAILY_UPDATE", [](auto& c, const auto& v) { ::set_daily_update(c, v); } },
 		environment_variable { "HYPERSOMNIA_TIME_ZONE", [](auto& c, const auto& v) { c.server.time_zone = v; } },
 		environment_variable { "HYPERSOMNIA_DISCORD_WEBHOOK", [](auto& c, const auto& v) { c.server_private.discord_webhook_url = v; } },
+		environment_variable { "HYPERSOMNIA_TELEGRAM_BOT_TOKEN", [](auto& c, const auto& v) { c.server_private.telegram_webhook_url = "https://api.telegram.org/bot" + v; } },
+		environment_variable { "HYPERSOMNIA_TELEGRAM_CHANNEL", [](auto& c, const auto& v) { c.server_private.telegram_channel_id = v; } },
 		environment_variable { "HYPERSOMNIA_SPECTATOR", [](auto& c, const auto& v) { ::set_spectator_account(c, v); } },
 		environment_variable { "HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK", [](auto& c, const auto& v) { c.server_private.tournament_results_webhook_url = v; } }
 	};
@@ -374,6 +397,15 @@ std::vector<std::string> unknown_environment_variable_warnings() {
 		const auto name = line.substr(0, line.find('='));
 
 		if (name.rfind(prefix, 0) != 0 || std::find(known.begin(), known.end(), name) != known.end()) {
+			continue;
+		}
+
+		/*
+			Renamed: said what it is now - too far from the new name for a "did you mean".
+		*/
+
+		if (name == "HYPERSOMNIA_ARENA") {
+			warnings.push_back("HYPERSOMNIA_ARENA is no longer read - one map to play on: HYPERSOMNIA_MAP_CYCLE=<map>; the map to start on: HYPERSOMNIA_MAP.");
 			continue;
 		}
 

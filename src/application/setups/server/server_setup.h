@@ -172,6 +172,7 @@ class server_setup :
 
 	std::size_t arena_cycle_current_index = 0;
 	std::vector<std::size_t> shuffled_cycle_indices;
+	std::optional<std::size_t> map_cycle_position;
 	randomization cycle_rng = randomization::from_random_device();
 
 	augs::path_type current_arena_folder;
@@ -519,8 +520,8 @@ private:
 	);
 
 
-	template <class T>
-	void choose_next_map_from(const T&);
+	std::vector<arena_and_mode_identifier> get_map_cycle(const server_vars&) const;
+	server_vars with_map_chosen(server_vars);
 	void handle_changing_maps_on_idle();
 
 public:
@@ -590,7 +591,9 @@ public:
 	*/
 
 	std::optional<uint32_t> tournament_spectator_places;
-	bool may_play_here(const std::string& account) const;
+	bool may_play_here(const server_client_state&) const;
+	bool has_unclaimed_listed_nicknames() const;
+	bool has_own_place(const server_client_state&) const;
 	bool no_place_to_watch(client_id_type) const;
 
 	/*
@@ -598,9 +601,9 @@ public:
 		nickname takes it - told to the tournament, which keeps it. The nicknames taken so, to tell whoever comes later.
 	*/
 
-	std::function<void(const std::string& placeholder, const std::string& account)> on_listed_nickname_claimed;
+	std::function<bool(const std::string& placeholder, const std::string& account)> on_listed_nickname_claimed;
 	std::vector<std::string> claimed_nicknames;
-	bool claim_listed_nickname(const server_client_state&);
+	bool claim_listed_nickname(client_id_type, const server_client_state&);
 
 	/*
 		A tournament match's join timeout (server_join_timeout.hpp): this long after the round's first player came,

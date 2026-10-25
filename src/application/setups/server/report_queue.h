@@ -203,8 +203,8 @@ public:
 
 			/*
 				429 is the site's limits: retried, like a network error (and a 503 - e.g. the site not reading its list of
-				official servers for a moment), until the report is too old. So is a 401: the site may not know this
-				server's key yet (its official_servers.d behind the masterserver's). Other 4xx are final.
+				official servers for a moment), until the report is too old. A 401 (not an official server) is kept aside
+				to be counted by hand (keep_unsent), not retried. Other 4xx are final.
 			*/
 
 			if (status == 401) {
@@ -330,18 +330,25 @@ public:
 		std::string url;
 		std::string body;
 
+		auto lost = [&](const char* const why) {
+			LOG("ERROR: could not keep the unsent match report %x (%x) - it's lost.", file.filename(), why);
+		};
+
 		try {
 			if (!parse(augs::file_to_string(file), url, body)) {
+				lost("unreadable");
 				return;
 			}
 		}
 		catch (...) {
+			lost("unreadable");
 			return;
 		}
 
 		const auto signature = augs::ed25519_sign(server_key, std::string(signature_tag) + body);
 
 		if (!signature.has_value()) {
+			lost("not signed");
 			return;
 		}
 

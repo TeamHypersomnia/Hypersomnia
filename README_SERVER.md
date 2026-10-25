@@ -82,14 +82,16 @@ Later ones win:
 | Variable | What it sets | Example |
 |---|---|---|
 | `HYPERSOMNIA_SERVER_NAME` | The name on the server list | `My server` |
-| `HYPERSOMNIA_ARENA` | The first arena | `fy_iceworld bomb_defusal` |
-| `HYPERSOMNIA_MAP_CYCLE` | The arenas that follow each other | `de_silo,de_metro` |
+| `HYPERSOMNIA_MAP_CYCLE` | The maps that follow each other - one alone stays, `*` all on disk. Default: `de_cyberaqua,de_silo,fy_minilab` | `de_silo,fy_iceworld bomb_defusal` |
 | `HYPERSOMNIA_MAP_CYCLE_RANDOM` | `off`: the cycle in its order, not shuffled | `off` |
+| `HYPERSOMNIA_MAP` | The map to start on - then the cycle goes on from it. Restarted, the server goes on from the map it was on | `de_silo` |
 | `HYPERSOMNIA_ADMINS` | [Admins](#admins) with full rights | `steam_7656119...,0x8aed41f2...` |
+| `HYPERSOMNIA_TELEGRAM_BOT_TOKEN` | Telegram: who joins - short notices only; with `HYPERSOMNIA_TELEGRAM_CHANNEL` (the bot an admin of it) | `123456789:AAH...` |
+| `HYPERSOMNIA_TELEGRAM_CHANNEL` | The channel for the notices above | `@my_server_joins` |
 | `HYPERSOMNIA_PASSWORD` | Only players who know it can join | |
 | `HYPERSOMNIA_ALLOWED_ACCOUNTS` | Only these accounts get in, and the [admins](#admins) | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_SPECTATOR` | The [spectator account](#watching-a-match): always gets in, only to watch | `steam_7656119...` |
-| `HYPERSOMNIA_SLOTS` | Players per server, at most `57` | `10` |
+| `HYPERSOMNIA_SLOTS` | Players per server, at most `58` | `10` |
 | `HYPERSOMNIA_SERVER_INSTANCES` | How many servers | `3` |
 | `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports | `8500` |
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
@@ -123,7 +125,7 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 | `RCON` | Kick, ban, the arena, the game mode and the map cycle - not the server's settings |
 | `NONE` | Nothing - only the badge |
 
-Every admin, whatever their `rcon`, always gets in: without the password, past the per-network limit of ranked servers, and into a full server (2 places are kept for admins, not shown on the server list). Before a ranked match or a tournament's match starts, an admin plays as anyone; once it's played, only [watches](#watching-a-match).
+Every admin, whatever their `rcon`, always gets in: without the password, past the per-network limit of ranked servers, and into a full server (a place is kept for the admins, not shown on the server list - an admin never takes a player's slot). Before a ranked match or a tournament's match starts, an admin plays as anyone; once it's played, only [watches](#watching-a-match).
 
 `Timeout absent players` (administration panel, `Maintenance`) decides a tournament's match now: the team with more players present wins - equal numbers play as they are - nobody there: both teams are out.
 
@@ -199,8 +201,8 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 > **Back it up and keep it secret.** Without it a reinstalled server is a new server to the players; with it anyone can pose as yours.
 
 - Print the public key: `--print-server-key`. All servers of one machine share it.
-- Not on the server list? `--print-join-string` prints the line to publish: `203.0.113.7,My server,0x8aed...` (your public address as the server list sees it, your server's name, its key). Players who copy it get your server added to their favorites as soon as the game's main menu comes back into focus.
-- Moving the server to another machine: put the old `server.key` in place before the first start (`Server key` in the config generator's advanced options does it for you, from a file).
+- Not on the server list? `--print-join-string` prints the line to publish: `203.0.113.7,My server,0x8aed...` (your public address as `masterserver.hypersomnia.io` sees it - also off the list, your server's name, its key). Players who copy it get your server added to their favorites as soon as the game's main menu comes back into focus.
+- Moving the server to another machine: put the old `server.key` in place (`Advanced: Restore your server key` in the config generator: stop the server, put the file in, start it).
 - Docker keeps it on the volume (`/opt/hypersomnia/.keys/server.key`). Without a volume every new container is a new server - mount the key file, or pass it from your hosting platform's secret store in `HYPERSOMNIA_SERVER_PRIVATE_KEY` (never written in `compose.yaml`: an environment variable shows in `docker inspect`).
 - **Official servers**: send us the output of `--print-server-key` on [Discord](https://discord.gg/YC49E4G).
 

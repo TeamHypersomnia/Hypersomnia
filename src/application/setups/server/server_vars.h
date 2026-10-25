@@ -64,15 +64,6 @@ struct server_public_vars {
 	bool operator==(const server_public_vars&) const = default;
 };
 
-enum class arena_cycle_type {
-	// GEN INTROSPECTOR enum class arena_cycle_type
-	REPEAT_CURRENT,
-	LIST,
-	ALL_ON_DISK,
-
-	COUNT
-	// END GEN INTROSPECTOR
-};
 
 struct server_ranked_vars {
 	static constexpr bool force_read_field_by_field = true;
@@ -113,7 +104,7 @@ struct server_vars {
 	*/
 
 	// GEN INTROSPECTOR struct server_vars
-	arena_identifier arena;
+	arena_identifier map;
 	game_mode_name_type game_mode;
 
 	server_ranked_vars ranked;
@@ -133,10 +124,9 @@ struct server_vars {
 	bool allow_overtime = false;
 	augs::maybe<uint32_t> max_team_score;
 
-	arena_cycle_type cycle = arena_cycle_type::REPEAT_CURRENT;
-	std::vector<arena_and_mode_identifier> cycle_list;
-	game_mode_name_type cycle_always_game_mode;
-	bool cycle_randomize_order = false;
+	std::vector<arena_and_mode_identifier> map_cycle;
+	game_mode_name_type map_cycle_game_mode_always;
+	bool map_cycle_random = true;
 
 	std::optional<arena_playtesting_context> playtesting_context;
 

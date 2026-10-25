@@ -88,8 +88,18 @@ namespace net_messages {
 	) {
 		const auto result = read_standard_block_message(output);
 
-		if (!sanitization::arena_name_safe(output.arena)) {
+		if (!sanitization::arena_name_safe(output.map)) {
 			return false;
+		}
+
+		/*
+			The cycle's arenas are loaded from disk by name too - "*" is all of them.
+		*/
+
+		for (const auto& entry : output.map_cycle) {
+			if (entry != "*" && !sanitization::arena_name_safe(::get_first_word(entry))) {
+				return false;
+			}
 		}
 
 		return result;

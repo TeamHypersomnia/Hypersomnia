@@ -745,6 +745,10 @@ work_result work(
 					c->server_private.discord_webhook_url = "***";
 				}
 
+				if (!c->server_private.telegram_webhook_url.empty()) {
+					c->server_private.telegram_webhook_url = "***";
+				}
+
 				if (!c->server_private.tournament_results_webhook_url.empty()) {
 					c->server_private.tournament_results_webhook_url = "***";
 				}
@@ -1428,10 +1432,12 @@ work_result work(
 				named.push_back(arena);
 			};
 
-			name(config.server.arena);
+			name(config.server.map);
 
-			for (const auto& entry : config.server.cycle_list) {
-				name(entry);
+			for (const auto& entry : config.server.map_cycle) {
+				if (entry != "*") {
+					name(entry);
+				}
 			}
 
 			std::string tournament_arena;
@@ -1441,6 +1447,14 @@ work_result work(
 			*/
 
 			for (const auto c : params.tournament_arenas + ",") {
+				/*
+					A list written on Windows: its lines end with \r too.
+				*/
+
+				if (c == '\r') {
+					continue;
+				}
+
 				if (c == ',' || c == '\n') {
 					name(tournament_arena);
 					tournament_arena.clear();
@@ -1709,10 +1723,14 @@ work_result work(
 			auto write_or_not = type == RANKED ? std::function<void(const server_vars&)>(write_ranked_vars_to_disk) : std::function<void(const server_vars&)>(write_vars_to_disk);
 			bool should_suppress_webhook = params.suppress_server_webhook;
 			
+			/*
+				Each later instance on its own map of the cycle - started with none, it picks one at random (server_setup).
+			*/
+
 			const bool pick_random_map =
 				later_server &&
-				this_config.server.cycle_randomize_order &&
-				this_config.server.cycle != arena_cycle_type::REPEAT_CURRENT
+				this_config.server.map_cycle_random &&
+				(this_config.server.map_cycle.size() > 1 || found_in(this_config.server.map_cycle, arena_and_mode_identifier("*")))
 			;
 
 			if (later_server) {
@@ -1734,7 +1752,7 @@ work_result work(
 			}
 
 			if (pick_random_map) {
-				this_config.server.arena = "";
+				this_config.server.map = "";
 			}
 
 			auto server_ptr = std::make_unique<server_setup>(
@@ -1758,14 +1776,6 @@ work_result work(
 				this_instance_type,
 				index
 			);
-
-			/*
-				If the instance recovered a crashed match, it already loaded that match's
-				arena - don't override it with a random cycle pick.
-			*/
-			if (pick_random_map && !server_ptr->recovered_from_crash()) {
-				server_ptr->choose_next_map_from_cycle();
-			}
 
 			return dedicated_server_worker_input {
 				std::move(server_ptr),
@@ -4304,6 +4314,15 @@ work_result work(
 		if (launched_from_server_start_gui || server_start_requested) {
 			server_start_requested = false;
 
+			/*
+				Hosted from the game: the map chosen in the window, over and over.
+			*/
+
+			if (launched_from_server_start_gui) {
+				const auto mode = std::string(config.server.game_mode);
+				config.server.map_cycle = { std::string(config.server.map) + (mode.empty() ? std::string() : " " + mode) };
+			}
+
 			change_with_save(
 				[&](auto& cfg) {
 					cfg.server_start = config.server_start;
@@ -4448,7 +4467,7 @@ work_result work(
 		}
 
 		if (map_catalogue_gui.open_host_server_window.has_value()) {
-			config.server.arena = *map_catalogue_gui.open_host_server_window;
+			config.server.map = *map_catalogue_gui.open_host_server_window;
 			start_server_gui.open();
 
 			map_catalogue_gui.open_host_server_window = std::nullopt;
@@ -4927,7 +4946,8 @@ work_result work(
 						auto playtest_vars = config.server;
 						playtest_vars.server_name = "${MY_NICKNAME} is creating " + setup.get_arena_name();
 						playtest_vars.playtesting_context = setup.make_playtesting_context();
-						playtest_vars.arena = setup.get_arena_name();
+						playtest_vars.map = setup.get_arena_name();
+						playtest_vars.map_cycle = { setup.get_arena_name() };
 
 						background_setup = std::move(current_setup);
 

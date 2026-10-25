@@ -144,8 +144,13 @@ namespace server_join_string {
 		const auto port = config.server_start.port;
 		const auto port_suffix = port == DEFAULT_GAME_PORT_V ? std::string() : ":" + std::to_string(port);
 
-		const auto server_list = std::string(config.server.notified_server_list);
-		const auto public_address = server_list.empty() ? std::nullopt : ask_public_address(server_list);
+		/*
+			Off the list (no notified_server_list): the default one is asked anyway - it answers anyone who asks.
+		*/
+
+		const auto configured_list = std::string(config.server.notified_server_list);
+		const auto server_list = configured_list.empty() ? std::string("masterserver.hypersomnia.io:8430") : configured_list;
+		const auto public_address = ask_public_address(server_list);
 
 		auto ip = std::string();
 
@@ -156,7 +161,7 @@ namespace server_join_string {
 			ip = ip_of(*own);
 
 			if (::is_internal(*own)) {
-				std::cerr << "Couldn't learn the public address - the server list didn't answer. " << ip << " is this machine's address on its network: fine for a LAN; over the internet, put your public address instead." << std::endl;
+				std::cerr << "Couldn't learn the public address - " << server_list << " didn't answer. " << ip << " is this machine's address on its network: fine for a LAN; over the internet, put your public address instead." << std::endl;
 			}
 		}
 		else {

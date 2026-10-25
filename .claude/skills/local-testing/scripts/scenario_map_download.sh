@@ -14,7 +14,7 @@ cp -r $REPO/hypersomnia/user/downloads/arenas/$MAP $T/srv/user/downloads/arenas/
 
 cat > $T/srv/user/conf.d/test.json <<EOF
 { "server_start": { "ip": "127.0.0.1", "port": 12101, "slots": 8 },
-  "server": { "server_name": "dl test", "arena": "$MAP", "notified_server_list": "127.0.0.1:1",
+  "server": { "server_name": "dl test", "map_cycle": [ "$MAP" ], "notified_server_list": "127.0.0.1:1",
     "suppress_new_community_server_webhook": true, "allow_direct_arena_file_downloads": true,
     "external_arena_files_provider": "${EXT:-}" } }
 EOF

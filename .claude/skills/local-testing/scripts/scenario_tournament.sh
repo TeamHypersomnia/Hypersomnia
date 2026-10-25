@@ -48,6 +48,11 @@
 #                       ?nickname= isn't served; listed accounts: ?account=<her key_ id> and 0x... are hers
 #   page_json           --tournament-name, a results webhook (a local listener): the page's JSON (name, config, round states),
 #                       429 past 10 requests at once, one POST of the FINISHED results
+#   watch_limit_admins  "alice; bob", --tournament-spectators 1 (3 slots): carol (an admin) and dave (the spectator
+#                       account) come first - alice and bob still both get in, never "The server is full"
+#   claim_twice         "alice; bob; carol; dave": alice's key takes "alice", then the same key comes as "carol" to
+#                       carol-dave's server - refused (one account in two teams), "carol" stays unclaimed
+#   mixed_teams         a team per line with an empty line among them ("alice, bob" / "" / "carol, dave"): doesn't start
 #   admission_allowed   a persistent server with allowed_accounts [alice]: bob is refused, alice and carol (an admin) get in
 #   admission_full      a persistent server of 2 slots, full: dave is refused, carol (an admin) gets in
 #
@@ -59,7 +64,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full"
+ALL="watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -974,6 +979,44 @@ case_admission_full() {
 	check "carol (an admin) in on the full server" in_log "Adding carol to game state"
 	check "only dave refused" bash -c "[ \$(grep -c '(reason=The server is full' $SRV) = 1 ]"
 	finish_case
+}
+
+case_watch_limit_admins() {
+	new_case watch_limit_admins
+	player alice; player bob; player carol; player dave
+	server_extra "{ \"server_private\": { \"admin_profiles\": [ { \"account\": \"${ID[carol]}\", \"rcon\": \"MASTER_RCON\" } ] } }"
+	start_server HYPERSOMNIA_SPECTATOR=${ID[dave]} -- --tournament-teams "alice; bob" --tournament-spectators 1
+	check "the match's server: 2 players + 1 to watch" in_log "Starting yojimbo::Server with [0-9]* connections for 3 slots"
+	client carol $PORT; sleep 2; client dave $PORT
+	wait_count "Adding dave to game state" 1 60
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 1 90
+	check "alice and bob both in" bash -c "grep -q 'Adding alice to game state' $SRV && grep -q 'Adding bob to game state' $SRV"
+	check "nobody told the server is full" not_in_log "The server is full"
+	finish_case
+}
+
+case_claim_twice() {
+	new_case claim_twice
+	player alice; player bob; player carol; player dave
+	# alice's key under the nickname "carol" - a shared computer
+	player alice2 carol
+	cp $T/alice/user/.keys/account.key $T/alice2/user/.keys/account.key
+	start_server -- --tournament-teams "alice; bob; carol; dave"
+	client alice $PORT
+	wait_log "takes the listed nickname alice" 60
+	client alice2 $((PORT + 1))
+	wait_log "already plays in a team" 60
+	check "the same key refused as carol" in_log "already plays in a team - not taking the listed nickname carol"
+	check "carol not claimed" not_in_log "takes the listed nickname carol"
+	finish_case
+}
+
+case_mixed_teams() {
+	new_case mixed_teams
+	start_server -- --tournament-teams "$(printf 'alice, bob\n\ncarol, dave')"
+	check "a team per line and an empty line: doesn't start" in_log "not both"
+	stop_server
 }
 
 for c in $CASES; do

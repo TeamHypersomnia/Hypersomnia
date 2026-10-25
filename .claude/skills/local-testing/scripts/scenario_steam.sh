@@ -21,7 +21,7 @@ done
 mkdir -p $T/ranked/user/conf.d $T/steam/user/conf.d
 cat > $T/ranked/user/conf.d/test.json <<J
 { "instances": { "ranked": 1 }, "server_start": { "ip": "0.0.0.0", "port": 10042, "slots": 16 },
-  "server": { "server_name": "steam test ranked", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1",
+  "server": { "server_name": "steam test ranked", "map_cycle": [ "de_cyberaqua" ], "notified_server_list": "127.0.0.1:1",
               "suppress_new_community_server_webhook": true, "ranked": { },
               "webrtc_port_range_begin": 19500, "webrtc_port_range_end": 19505 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "report_ranked_match_url": "http://127.0.0.1:1/report_match" } }

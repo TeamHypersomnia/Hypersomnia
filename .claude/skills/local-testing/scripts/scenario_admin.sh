@@ -64,7 +64,7 @@ run_case() {
 	mkdir -p $D/user/conf.d
 	cat > $D/user/conf.d/test.json <<J
 { "instances": { "ranked": 0 }, "server_start": { "ip": "0.0.0.0", "port": $PORT, "slots": 8 },
-  "server": { "server_name": "admin $name", "arena": "de_cyberaqua", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
+  "server": { "server_name": "admin $name", "map_cycle": [ "de_cyberaqua" ], "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,
               "webrtc_port_range_begin": 19720, "webrtc_port_range_end": 19725 },
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "server_password": "secretpw", "admin_profiles": $profiles } }
 J

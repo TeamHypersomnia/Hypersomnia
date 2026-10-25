@@ -212,6 +212,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	bool clipboard_checked_once = false;
 	bool clipboard_at_start = false;
 	std::optional<std::string> added_favorite_note;
+	std::string added_favorite_address;
 	void draw_added_favorite_modal();
 
 	std::optional<std::string> requested_connection;
