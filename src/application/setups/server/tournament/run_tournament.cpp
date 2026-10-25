@@ -23,6 +23,7 @@
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/server_setup.h"
 #include "application/setups/server/server_assigned_teams.h"
+#include "application/setups/server/server_slots.h"
 #include "application/network/account_id.h"
 #if CRASH_RECOVERY
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
@@ -70,6 +71,96 @@ namespace {
 
 		flush();
 		return out;
+	}
+
+	/*
+		The teams as written: "alice, bob; carol, dave", or a team per line - or, with empty lines between the teams,
+		a player per line (no commas to type):
+
+			alice
+			bob
+
+			carol
+			dave
+	*/
+
+	std::vector<std::vector<std::string>> split_teams(const std::string& written) {
+		std::vector<std::string> raw_lines;
+
+		{
+			std::string current;
+
+			for (const auto c : written) {
+				if (c == '\n') {
+					raw_lines.push_back(current);
+					current.clear();
+				}
+				else {
+					current += c;
+				}
+			}
+
+			raw_lines.push_back(current);
+		}
+
+		/*
+			An empty line between two written ones: the teams are apart by empty lines.
+		*/
+
+		const bool by_empty_lines = [&]() {
+			bool seen_written = false;
+			bool empty_after_written = false;
+
+			for (const auto& line : raw_lines) {
+				const bool empty = ::trimmed(line).empty();
+
+				if (!empty && empty_after_written) {
+					return true;
+				}
+
+				if (empty && seen_written) {
+					empty_after_written = true;
+				}
+
+				seen_written = seen_written || !empty;
+			}
+
+			return false;
+		}();
+
+		std::vector<std::vector<std::string>> teams;
+
+		if (!by_empty_lines) {
+			for (const auto& line : ::split_list(written, ";\n")) {
+				teams.push_back(::split_list(line, ","));
+			}
+
+			return teams;
+		}
+
+		std::string block;
+
+		auto flush = [&]() {
+			for (const auto& team : ::split_list(block, ";")) {
+				if (auto players = ::split_list(team, ",\n"); !players.empty()) {
+					teams.push_back(std::move(players));
+				}
+			}
+
+			block.clear();
+		};
+
+		for (const auto& line : raw_lines) {
+			if (::trimmed(line).empty()) {
+				flush();
+			}
+			else {
+				block += line + "\n";
+			}
+		}
+
+		flush();
+		return teams;
 	}
 
 	std::optional<uint32_t> as_count(const std::string& value, const uint32_t min, const uint32_t max) {
@@ -121,11 +212,11 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 		std::vector<std::string> seen_names;
 		std::vector<std::string> seen_ids;
 
-		for (const auto& line : ::split_list(params.tournament_teams, ";\n")) {
+		for (const auto& written_team : ::split_teams(params.tournament_teams)) {
 			std::vector<std::string> ids;
 			std::vector<std::string> names;
 
-			for (const auto& entry : ::split_list(line, ",")) {
+			for (const auto& entry : written_team) {
 				++players;
 
 				const auto eq = entry.find('=');
@@ -243,14 +334,32 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 		}
 	}
 
-	out.name = params.tournament_name;
+	/*
+		--tournament-spectators <places per match> - 6 by default.
+	*/
+
+	if (!params.tournament_spectators.empty()) {
+		if (const auto places = ::as_count(params.tournament_spectators, 0, max_server_slots_v)) {
+			out.spectator_places = *places;
+		}
+		else {
+			error = typesafe_sprintf("--tournament-spectators: expected a number from 0 to %x, got \"%x\"", max_server_slots_v, params.tournament_spectators);
+			return out;
+		}
+	}
+
+	/*
+		Unnamed: "My Tournament" - on its page and in its results.
+	*/
+
+	out.name = params.tournament_name.empty() ? std::string("My Tournament") : params.tournament_name;
 
 	if (out.name.size() > 100) {
 		error = "--tournament-name: at most 100 characters";
 		return out;
 	}
 
-	out.arenas = ::split_list(params.tournament_arenas, ",");
+	out.arenas = ::split_list(params.tournament_arenas, ",\n");
 
 	if (out.arenas.empty()) {
 		/*
@@ -910,12 +1019,19 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
 			this_config.server.daily_autoupdate = false;
 
-			if (match.open_team_size > 0) {
-				/*
-					Full once the pair is there - with a few places for the admins watching.
-				*/
+			/*
+				Its players and the places to watch it (spectator_places): every slot takes RAM up front (server_slots.h).
+				The admins and the spectator account have places of their own.
+			*/
 
-				this_config.server_start.slots = static_cast<int>(2 * match.open_team_size + 4);
+			{
+				const auto players =
+					match.open_team_size > 0 ?
+					2 * match.open_team_size :
+					match.team_a_player_ids.size() + match.team_b_player_ids.size() + match.spectator_player_ids.size()
+				;
+
+				this_config.server_start.slots = std::min(max_server_slots_v, static_cast<int>(players + in.config.spectator_places));
 			}
 
 			/*
@@ -975,6 +1091,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				open_places,
 				expected_players = in.config.open_players,
 				join_timeout_secs = in.config.join_timeout_secs,
+				spectator_places = in.config.spectator_places,
 				&may_watch_others,
 				&claim_listed_nickname,
 				&avatars,
@@ -1062,6 +1179,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				*/
 
 				server_ptr->join_timeout_secs = join_timeout_secs;
+				server_ptr->tournament_spectator_places = spectator_places;
 				server_ptr->round_first_arrival = round_first_arrival;
 
 				/*

@@ -183,8 +183,12 @@ inline bool check_tournament_arenas(const std::string& tournament_arenas) {
 	auto entries = std::vector<std::string>();
 	auto current = std::string();
 
+	/*
+		Apart by commas or lines, as the tournament reads them.
+	*/
+
 	for (const auto c : tournament_arenas + ",") {
-		if (c != ',') {
+		if (c != ',' && c != '\n') {
 			current += c;
 			continue;
 		}

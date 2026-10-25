@@ -586,6 +586,14 @@ public:
 	std::function<bool(const std::string&)> may_spectate_tournament;
 
 	/*
+		A tournament's match: how many others may watch it at once (server_watchers.hpp) - its players always get in.
+	*/
+
+	std::optional<uint32_t> tournament_spectator_places;
+	bool may_play_here(const std::string& account) const;
+	bool no_place_to_watch(client_id_type) const;
+
+	/*
 		A tournament listed by nicknames only (tournament_nickname_claims.hpp): the first account to come with a listed
 		nickname takes it - told to the tournament, which keeps it. The nicknames taken so, to tell whoever comes later.
 	*/

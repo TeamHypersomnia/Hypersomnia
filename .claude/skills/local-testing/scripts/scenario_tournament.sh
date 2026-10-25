@@ -37,6 +37,8 @@
 #                       the match never freezes; mallory (nobody's) is refused while it's played
 #   watch_others        "alice; bob; carol; dave": carol-dave live, then alice beats bob - alice and bob (decided) watch
 #                       carol-dave while it's played
+#   watch_limit         "alice; bob; carol; dave", --tournament-spectators 1: carol-dave's server has 3 slots; alice
+#                       (decided) watches it, bob is refused - no more places; carol and dave play on
 #   quick_rejoin        alice vs bob by accounts, live: bob's game killed and started again at once - back in his
 #                       match before the server noticed the old connection gone, never "joined too late"
 #   walkover_b          "alice; bob; carol; dave", 1 minute: only bob of the first match comes, carol-dave play - the page
@@ -57,7 +59,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full"
+ALL="watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -155,8 +157,9 @@ client() {
 	(cd $REPO/hypersomnia && exec env LP_NUM_THREADS=2 timeout 300 xvfb-run -a -s "-screen 0 640x360x24" nice -n 10 $CLIENT_BIN --connect 127.0.0.1:$2 --appdata-dir $T/$1 $GAME_TEST_FLAGS > $T/$1.$2.$(date +%s%N).out 2>&1) &
 }
 
+# Only the game itself (as a crash) - xvfb-run then closes its Xvfb; killed with it, the Xvfb would stay behind
 kill_client() {
-	for pid in $(pgrep -f -- "--appdata-dir $T/$1 "); do kill -9 $pid 2>/dev/null; done
+	for pid in $(pgrep -f -- "^$CLIENT_BIN --connect .*--appdata-dir $T/$1 "); do kill -9 $pid 2>/dev/null; done
 }
 
 kill_all_clients() {
@@ -245,7 +248,7 @@ case_teams_bye() {
 	check "bob won" winner_is bob
 	check "round 2 on de_silo" in_log "Choosing arena: de_silo"
 	sleep 2
-	check "page: finished, one winner" page 'finished and len(t["winner_team"])==1 and all(r["state"]=="PLAYED" for r in t["rounds"])'
+	check "page: finished, one winner, unnamed: My Tournament" page 'finished and len(t["winner_team"])==1 and all(r["state"]=="PLAYED" for r in t["rounds"]) and t["name"]=="My Tournament"'
 	check "page: 2 rounds - the final on de_silo, alice's bye kept in round 1" page 'len(t["rounds"])==2 and t["rounds"][0]["name"]=="Final" and len(t["rounds"][0]["matches"])==1 and t["rounds"][0]["arena"]=="de_silo" and R(0)["name"]=="Semifinals" and R(0)["arena"]=="de_cyberaqua" and [N(b) for b in R(0)["byes"]]==[["alice"]]'
 	check "page: everyone by nickname" page "$all_named"
 	finish_case
@@ -730,6 +733,30 @@ case_watch_others() {
 	check "not turned away" not_in_log "connected to a match that's not theirs"
 	sleep 5
 	check "alice and bob in carol-dave's game, no team problem" bash -c "grep -q \"T$((PORT + 1))] Adding alice to game state\" $SRV && grep -q \"T$((PORT + 1))] Adding bob to game state\" $SRV && ! grep -q 'pre-assigning your team' $SRV"
+	finish_case
+}
+
+case_watch_limit() {
+	new_case watch_limit
+	player alice; player bob; player carol; player dave
+	start_server -- --tournament-teams "alice; bob; carol; dave" --tournament-spectators 1
+	check "carol-dave's server: 2 players + 1 to watch" in_log "T$((PORT + 1))] Starting yojimbo::Server with [0-9]* connections for 3 slots"
+	client carol $((PORT + 1)); sleep 2; client dave $((PORT + 1))
+	wait_count "Starting ranked" 1 90
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 2 90
+	sleep 5
+	kill_client bob
+	wait_log "abandoned by faction" 60
+	sleep 3
+	kill_client alice; sleep 2
+	client alice $((PORT + 1))
+	wait_count "watches the tournament's match as a spectator" 1 60
+	client bob $((PORT + 1))
+	wait_log "No more places to watch this match" 60
+	check "alice watches carol-dave" bash -c "grep -q \"T$((PORT + 1))] Adding alice to game state\" $SRV"
+	check "bob refused - no more places to watch" in_log "No more places to watch this match"
+	check "carol and dave still in their match" bash -c "! grep -E -q \"T$((PORT + 1))] .*(carol|dave) was kicked\" $SRV"
 	finish_case
 }
 

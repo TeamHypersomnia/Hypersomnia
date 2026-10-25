@@ -279,6 +279,7 @@ namespace {
 		environment_variable { "HYPERSOMNIA_PORT", [](auto& c, const auto& v) { c.server_start.port = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_WEB_PORT", [](auto& c, const auto& v) { c.server.webrtc_port_range_begin = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_BROWSER_PLAYERS", [](auto& c, const auto& v) { c.server.allow_webrtc_clients = ::as_on_off(v); } },
+		environment_variable { "HYPERSOMNIA_SERVER_LIST", [](auto& c, const auto& v) { c.server.notified_server_list = v == "off" ? std::string() : v; } },
 		environment_variable { "HYPERSOMNIA_BOT_QUOTA", [](auto& c, const auto& v) { ::set_bot_quota(c, v); } },
 		environment_variable { "HYPERSOMNIA_BOT_DIFFICULTY", [](auto& c, const auto& v) { c.server.bot_difficulty = ::as_bot_difficulty(v); } },
 		environment_variable { "HYPERSOMNIA_DAILY_UPDATE", [](auto& c, const auto& v) { ::set_daily_update(c, v); } },

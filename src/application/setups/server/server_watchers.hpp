@@ -112,6 +112,77 @@ bool server_setup::accept_while_match_refuses(const uint8_t* const binding, cons
 }
 
 /*
+	Who may play on this server: a player of its roster or of the match being played, anyone in an open match with places
+	left - and, while a roster by nicknames isn't all claimed, anyone (who it is is known only once the nickname comes).
+*/
+
+bool server_setup::may_play_here(const std::string& account) const {
+	if (::is_actual_faction(get_assigned_team(account)) || plays_running_match(account)) {
+		return true;
+	}
+
+	if (may_spectate_tournament && may_spectate_tournament(account)) {
+		return false;
+	}
+
+	if (is_open_match() && !is_ranked_live_or_starting()) {
+		std::size_t taken = 0;
+
+		for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+			(void)id;
+			taken += ::is_actual_faction(faction) ? 1 : 0;
+		}
+
+		if (taken < 2 * assigned_teams.open_team_size) {
+			return true;
+		}
+	}
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		if (begins_with(id, nickname_account_id_prefix_v)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*
+	A tournament's match: at most tournament_spectator_places others watch it at once - every connection takes RAM
+	and upload. Never its players, nor the admins and the spectator account (places of their own).
+*/
+
+bool server_setup::no_place_to_watch(const client_id_type id) const {
+	if (!tournament_spectator_places.has_value() || !has_assigned_teams()) {
+		return false;
+	}
+
+	auto watches = [&](const server_client_state& c) {
+		const bool own_place =
+			find_admin_profile_of(c.admin_account).has_value()
+			|| is_spectator_account(c.admin_account)
+			|| is_spectator_account(c.authenticated_id)
+		;
+
+		return !own_place && !may_play_here(c.authenticated_id);
+	};
+
+	if (!watches(clients[id])) {
+		return false;
+	}
+
+	uint32_t watching = 0;
+
+	for_each_id_and_client([&](const auto other_id, const auto& other) {
+		if (other_id != id && other.is_set() && !other.when_kicked.has_value() && watches(other)) {
+			++watching;
+		}
+	}, only_connected_v);
+
+	return watching >= *tournament_spectator_places;
+}
+
+/*
 	The spectators when a match starts may come and go while it's played; a new match starts the list anew.
 */
 

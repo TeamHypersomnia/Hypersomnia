@@ -1012,7 +1012,7 @@ server_setup::server_setup(
 
 		if (is_dedicated()) {
 			if (initial_vars_modified.server_name == default_name) {
-				initial_vars_modified.server_name = "Dedicated server";
+				initial_vars_modified.server_name = "My server";
 			}
 		}
 		else {
@@ -1547,6 +1547,11 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 			kick_now(id, typesafe_sprintf("At most %x players from one network can join a ranked server.", vars.max_ranked_players_per_ip));
 			return;
 		}
+	}
+
+	if (no_place_to_watch(id)) {
+		kick_now(id, "No more places to watch this match.");
+		return;
 	}
 
 	const auto capacity =

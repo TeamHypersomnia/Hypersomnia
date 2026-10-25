@@ -871,13 +871,12 @@
 	function render(t) {
 		root.innerHTML = '';
 
-		const size = t.config ? t.config.team_size : 1;
-		document.title = t.name ? `${t.name} - Hypersomnia` : `Hypersomnia ${size}v${size} tournament`;
+		document.title = `${t.name || 'My Tournament'} - Hypersomnia`;
 
 		const heading = document.getElementById('tournament-name');
 
 		if (heading) {
-			heading.textContent = t.name || `${size}v${size} tournament`;
+			heading.textContent = t.name || 'My Tournament';
 		}
 
 		const finished = t.state === 'FINISHED';

@@ -60,6 +60,14 @@ struct tournament_config {
 	uint32_t join_timeout_secs = 10 * 60;
 
 	/*
+		How many others may watch each match at once (--tournament-spectators) - the teams out or waiting. Every
+		connection takes RAM and upload on the server playing it. The match's players always get in, the admins and
+		the spectator account have their own places. Not part of the tournament's identity.
+	*/
+
+	uint32_t spectator_places = 6;
+
+	/*
 		The tournament's name (--tournament-name) - on its page and in its results. Part of its identity (compute_hash):
 		the same settings under a new name are a new tournament.
 	*/

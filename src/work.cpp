@@ -1423,8 +1423,12 @@ work_result work(
 
 			std::string tournament_arena;
 
+			/*
+				Apart by commas or lines, as the tournament reads them.
+			*/
+
 			for (const auto c : params.tournament_arenas + ",") {
-				if (c == ',') {
+				if (c == ',' || c == '\n') {
 					name(tournament_arena);
 					tournament_arena.clear();
 				}

@@ -93,6 +93,8 @@ Later ones win:
 | `HYPERSOMNIA_SERVER_INSTANCES` | How many servers | `3` |
 | `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports | `8500` |
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
+| `HYPERSOMNIA_SERVER_LIST` | `off`: not on the [server list](https://hypersomnia.io/servers) - browser players can't join; or the address of your own masterserver | `off` |
+| `HYPERSOMNIA_TOURNAMENT_SPECTATORS` | How many others may watch each tournament match (6 by default) - every place takes about 4.4 MB of RAM up front | `10` |
 | `HYPERSOMNIA_BOT_QUOTA` | How many bots, `0` for none - the arena's own number when not set | `6` |
 | `HYPERSOMNIA_BOT_DIFFICULTY` | `VERY_EASY`, `EASY`, `MEDIUM`, `HARD` or `PROGRESSIVE` (the default) | `HARD` |
 | `HYPERSOMNIA_DAILY_UPDATE` | When to update every day, or `off` | `05:00` |
@@ -100,8 +102,8 @@ Later ones win:
 | `HYPERSOMNIA_DISCORD_WEBHOOK` | Posts joins and match results to your Discord | |
 | `HYPERSOMNIA_TOURNAMENT` | A [tournament](#tournaments) for this many players | `16` |
 | `HYPERSOMNIA_TOURNAMENT_TEAM_SIZE` | `2` for 2v2 and so on | `2` |
-| `HYPERSOMNIA_TOURNAMENT_TEAMS` | Teams set up beforehand: one per line or `;`, players by `,` - with `=<account id>` to verify them | `alice=0x8aed..., bob=steam_7656...; carol=..., dave=...` |
-| `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last | `de_cyberaqua,de_silo` |
+| `HYPERSOMNIA_TOURNAMENT_TEAMS` | Teams set up beforehand: a player per line, the teams apart by an empty line (1v1: a player per line) - or a team per line, `;` between the teams, `,` between the players. `=<account id>` to verify them | `alice=0x8aed..., bob=steam_7656...; carol=..., dave=...` |
+| `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last - apart by `,` or lines | `de_cyberaqua,de_silo` |
 | `HYPERSOMNIA_TOURNAMENT_JOIN_TIMEOUT` | Minutes a match waits for its players, or `off` (10 by default) | `5` |
 | `HYPERSOMNIA_TOURNAMENT_PAGE` | The [live results page](#tournaments)'s TCP port, or `off` | `8080` |
 | `HYPERSOMNIA_TOURNAMENT_NAME` | On the live results page and in the results | `onFOSS November Cup 2026` |
@@ -144,7 +146,7 @@ Spectators are quiet: nobody's told they came or left, and what they write in th
 
 A knockout tournament: a server for every match, the winners go on round by round.
 
-**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: [`/tournament.json`](#the-results-as-json). A port below `1024` needs root; a port taken by something else: the tournament goes on without the page. `--tournament-name "onFOSS November Cup 2026"` titles it - without a name: `2v2 tournament`.
+**The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: [`/tournament.json`](#the-results-as-json). A port below `1024` needs root; a port taken by something else: the tournament goes on without the page. `--tournament-name "onFOSS November Cup 2026"` titles it - without a name: `My Tournament`.
 
 - Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8; at least two teams' worth of players); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
 - Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing. Any number of them from one address (a LAN party behind one router) - with anyone joining, at most `max_ranked_players_per_ip` (2), as in ranked.
@@ -155,6 +157,7 @@ A knockout tournament: a server for every match, the winners go on round by roun
 - **Join timeout** (10 minutes by default, `--tournament-join-timeout <minutes>` or `off`): a match still waiting for its players that long after the round's first player came (to any of its matches) is decided without them - so a tournament started long before the players come waits for them - the team with more players present wins by walkover, equal numbers play as they are, nobody came - both teams are out (in the final: the tournament ends without a winner). Round 1 with anyone joining: closes as `Close round 1` does. Matches being played aren't touched.
 - Byes fill the bracket up to 2, 4, 8... once - from round 2, counted from the teams that are left. They go to the strongest: the first lines, then by how fast they won; a walkover counts as the weakest. The final is always on the last arena.
 - Admins join any match: before it starts as anyone (a player in round 1 with anyone joining), once it's played as spectators.
+- The teams that are out or waiting watch the other matches - at most 6 others at once on each (`--tournament-spectators`): every place takes about 4.4 MB of RAM up front and upload while watched. A match's players always get in, the admins and the spectator account too.
 - A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, an arena or a game mode that doesn't exist. Other servers only warn.
 - After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew.
 - It never updates in the middle of it.
@@ -166,7 +169,7 @@ A knockout tournament: a server for every match, the winners go on round by roun
 
 Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key (what `--print-server-key` prints), `X-Hypersomnia-Signature` - Ed25519 of the body, in hex. Check that the key is your server's and the signature is right, and nobody could have made up the results.
 
-- `name` - only when set; `state` - `ONGOING` or `FINISHED`; `winner_team` - its players, empty until it's over.
+- `name` - `My Tournament` without `--tournament-name`; `state` - `ONGOING` or `FINISHED`; `winner_team` - its players, empty until it's over.
 - `rounds` - the final first: `name`, `state` (`PLAYED`, `PLAYING`, `COMING`), `arena`, `matches`, `byes` (the teams that went on without playing).
 - A match: `status` (`done`, `walkover`, `live`, `waiting`, `empty` - nobody came, `coming` - its teams not known yet), `winner` (`a` or `b` once decided, otherwise empty), `team_a`, `team_b` (in a played round the winner is `team_a`); `score_a`, `score_b` while it's played and after - none for a walkover; `server_name`, `port` while it's waited for or played. A match nobody came to is listed only while its round is played.
 - A player: `nickname` and `account` - empty for a listed nickname nobody has come with yet.
@@ -195,7 +198,8 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 > **Back it up and keep it secret.** Without it a reinstalled server is a new server to the players; with it anyone can pose as yours.
 
 - Print the public key: `--print-server-key`. All servers of one machine share it.
-- Docker without a volume: pass it in `HYPERSOMNIA_SERVER_PRIVATE_KEY`.
+- Moving the server to another machine: put the old `server.key` in place before the first start (`Server key` in the config generator's advanced options does it for you, from a file).
+- Docker keeps it on the volume (`/opt/hypersomnia/.keys/server.key`). Without a volume every new container is a new server - mount the key file, or pass it from your hosting platform's secret store in `HYPERSOMNIA_SERVER_PRIVATE_KEY` (never written in `compose.yaml`: an environment variable shows in `docker inspect`).
 - **Official servers**: send us the output of `--print-server-key` on [Discord](https://discord.gg/YC49E4G).
 
 # Command line flags
@@ -208,8 +212,9 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 | `--apply-config <file>` | One more config file, applied last |
 | `--tournament <players>` | A [tournament](#tournaments) for this many players |
 | `--tournament-team-size <n>` | `2` for 2v2 and so on |
-| `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"`, or verified by their accounts: `"alice=0x8aed..., bob=steam_7656...; ..."` |
-| `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` |
+| `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"`, or verified by their accounts: `"alice=0x8aed..., bob=steam_7656...; ..."` - or a player per line, the teams apart by an empty line |
+| `--tournament-spectators <places>` | How many others may watch each match at once, 6 by default (`HYPERSOMNIA_TOURNAMENT_SPECTATORS`) |
+| `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` - or one per line |
 | `--tournament-join-timeout <minutes>` | How long a match waits for its players (10 by default), or `off` |
 | `--tournament-page <port>` | The [live results page](#tournaments)'s TCP port (the first game port's number by default), or `off` |
 | `--tournament-name <name>` | On the live results page and in the results, e.g. `"onFOSS November Cup 2026"` |
