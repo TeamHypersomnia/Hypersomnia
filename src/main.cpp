@@ -9,6 +9,9 @@
 
 #include "application/main/verify_signature.h"
 #include "application/main/server_key.h"
+#if !PLATFORM_WEB
+#include "application/setups/server/server_join_string.h"
+#endif
 
 #include "cmd_line_params.h"
 #include "build_info.h"
@@ -284,6 +287,22 @@ int main(const int argc, const char* const * const argv) {
 		::KEYS_DIR = ::get_keys_dir(::USER_DIR, params.appdata_dir.empty());
 		return ::print_server_key();
 	}
+
+#if !PLATFORM_WEB
+	if (params.print_join_string_only) {
+		if (!HEADLESS && params.type != app_type::DEDICATED_SERVER) {
+			std::cerr << "ERROR: --print-join-string is a dedicated server's - run it with the Headless build or add --dedicated-server." << std::endl;
+			return EXIT_FAILURE;
+		}
+
+		/*
+			stdout only for the line (server_join_string.h) - the logs until then go to stderr.
+		*/
+
+		server_join_string::line_out = std::cout.rdbuf();
+		std::cout.rdbuf(std::cerr.rdbuf());
+	}
+#endif
 
 	const bool log_directory_existed = augs::exists(LOGS_DIR);
 

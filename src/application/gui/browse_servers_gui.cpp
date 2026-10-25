@@ -2181,8 +2181,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 					input_text_with_hint(buf, label, hint, value, ImGuiInputTextFlags_AutoSelectAll);
 				};
 
+				/*
+					As the line the server's admin publishes: the address, the name, the key.
+				*/
+
 				field("Address##add_server", "e.g. 154.12.226.211:8412", add_server.address, std::array<char, 260>());
 				add_server.address_active = ImGui::IsItemActive();
+				field("Server name (optional)##add_server", "", add_server.name, std::array<char, max_server_name_length_v + 1>());
 
 				if (std::exchange(add_server.focus_key_next, false)) {
 					ImGui::SetKeyboardFocusHere();
@@ -2190,7 +2195,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				field("Public key##add_server", "64 hex digits - from the server's admin", add_server.key, std::array<char, 67>());
 				add_server.key_active = ImGui::IsItemActive();
-				field("Server name (optional)##add_server", "", add_server.name, std::array<char, max_server_name_length_v + 1>());
 			}
 
 			/*
@@ -2223,7 +2227,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			add_server.status_line(
 				already_there ? std::make_optional(already_there_note) : std::nullopt,
 				!editing_unlisted.has_value(),
-				"\"ip,key,name\" in clipboard auto-fills these."
+				"\"address,name,0xkey\" in clipboard auto-fills these."
 			);
 
 			ImGui::Separator();
@@ -2268,6 +2272,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 		}
 	}
+#endif
+
+#if !PLATFORM_WEB
+	draw_added_favorite_modal();
 #endif
 
 	if (requested_connection.has_value()) {
@@ -3203,3 +3211,6 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 	}
 }
 
+#if !PLATFORM_WEB
+#include "application/gui/favorite_from_clipboard.hpp"
+#endif

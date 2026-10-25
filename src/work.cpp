@@ -167,6 +167,9 @@
 
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
 #include "application/setups/server/server_config_check.h"
+#if !PLATFORM_WEB
+#include "application/setups/server/server_join_string.h"
+#endif
 
 #include "application/masterserver/masterserver.h"
 #include "application/network/network_common.h"
@@ -907,6 +910,16 @@ work_result work(
 		report_rtc_errors,
 		verbose_rtc_log
 	);
+
+#if !PLATFORM_WEB
+	/*
+		The line for a server's players - with the network up, to ask the server list (server_join_string.h).
+	*/
+
+	if (params.print_join_string_only) {
+		return server_join_string::print(config) == EXIT_SUCCESS ? work_result::SUCCESS : work_result::FAILURE;
+	}
+#endif
 
 	/*
 		The protocol is the game's major.minor - a patch release (3.1.0, 3.1.1) never breaks it, so they play together;
@@ -5226,6 +5239,22 @@ work_result work(
 				*/
 
 				const bool changelog_shown = changelog_window.is_open();
+
+#if !PLATFORM_WEB
+				/*
+					In the main menu: a server's line copied while the game was away goes into the favorites
+					(favorite_from_clipboard.hpp) - the browser opens on it.
+				*/
+
+				if (!has_current_setup() && !changelog_shown && browse_servers_gui.clipboard_worth_reading(window.get_times_activated())) {
+					const auto* const clipboard = ImGui::GetClipboardText();
+
+					if (browse_servers_gui.take_favorite_from_clipboard(clipboard != nullptr ? clipboard : "", favorites)) {
+						menus_state.server_browser_tab = browser_tab::FAVORITES;
+						browse_servers_gui.open();
+					}
+				}
+#endif
 
 				if (const bool show_server_browser = (!has_current_setup() || ingame_menu.show) && !changelog_shown) {
 					perform_browse_servers();

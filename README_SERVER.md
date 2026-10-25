@@ -179,6 +179,7 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 
 - **Discord or Telegram:** `Discord webhook` in the config generator (`server_private.discord_webhook_url`; for Telegram `telegram_webhook_url` and `telegram_channel_id`) - who joined, duels, every match's result. More of them, e.g. filtered by a clan: `custom_webhook_urls`.
 - **A tournament:** its [live results page](#tournaments), the [results webhook](#the-results-as-json), `tournament_results.json` in the user folder (the same JSON); its whole state in `tournament.completed.<time>.state.json`.
+- **MMR:** every ranked and tournament match is reported to hypersomnia.io, signed by the [server key](#the-server-key) - it counts only from an official server. Not official, the report is sent once and kept in `user/unsent_reports/` (`<name>.json` and its `<name>.headers`): send both to us with your key (`--print-server-key`) and we can count it later.
 - **Anything else:** every match's start and end as a `SERVER_EVENT` line with JSON in the log - each player's nickname and account id, and the rest in [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json).
 
 # Several servers, ranked
@@ -198,6 +199,7 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 > **Back it up and keep it secret.** Without it a reinstalled server is a new server to the players; with it anyone can pose as yours.
 
 - Print the public key: `--print-server-key`. All servers of one machine share it.
+- Not on the server list? `--print-join-string` prints the line to publish: `203.0.113.7,My server,0x8aed...` (your public address as the server list sees it, your server's name, its key). Players who copy it get your server added to their favorites as soon as the game's main menu comes back into focus.
 - Moving the server to another machine: put the old `server.key` in place before the first start (`Server key` in the config generator's advanced options does it for you, from a file).
 - Docker keeps it on the volume (`/opt/hypersomnia/.keys/server.key`). Without a volume every new container is a new server - mount the key file, or pass it from your hosting platform's secret store in `HYPERSOMNIA_SERVER_PRIVATE_KEY` (never written in `compose.yaml`: an environment variable shows in `docker inspect`).
 - **Official servers**: send us the output of `--print-server-key` on [Discord](https://discord.gg/YC49E4G).
@@ -219,4 +221,5 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 | `--tournament-page <port>` | The [live results page](#tournaments)'s TCP port (the first game port's number by default), or `off` |
 | `--tournament-name <name>` | On the live results page and in the results, e.g. `"onFOSS November Cup 2026"` |
 | `--print-server-key` | Print the server's public key and quit |
+| `--print-join-string` | Print `<address>,<name>,0x<key>` - the line players copy to add your server to their favorites - and quit |
 | `--sync-external-arenas-and-quit` | Download all community arenas and quit |

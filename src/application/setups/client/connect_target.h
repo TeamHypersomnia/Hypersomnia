@@ -108,8 +108,9 @@ struct connect_target {
 	}
 
 	/*
-		What an unlisted server's admin publishes: "<address>,0x<key>" or "<address>,0x<key>,<name>" (the name may hold
-		commas; only its first line is taken) - see unlisted_server_fields.h for when it is taken.
+		What an unlisted server's admin publishes (--print-join-string): "<address>,<name>,0x<key>", or "<address>,0x<key>"
+		without a name. The name between them may hold commas; only the text's first line is taken - see
+		unlisted_server_fields.h for when it is taken.
 	*/
 
 	struct server_identifiers {
@@ -119,19 +120,21 @@ struct connect_target {
 	};
 
 	static std::optional<server_identifiers> find_server_identifiers(const std::string& text) {
-		const auto first = text.find(',');
+		const auto line = text.substr(0, text.find('\n'));
+		const auto first = line.find(',');
+		const auto last = line.rfind(',');
 
 		if (first == std::string::npos) {
 			return std::nullopt;
 		}
 
-		const auto second = text.find(',', first + 1);
-		const auto address = trimmed(text.substr(0, first));
+		const auto address = trimmed(line.substr(0, first));
+
 		/*
 			Only with "0x" - so that no other text with a comma in the clipboard is taken for one.
 		*/
 
-		const auto key_text = trimmed(text.substr(first + 1, second == std::string::npos ? std::string::npos : second - first - 1));
+		const auto key_text = trimmed(line.substr(last + 1));
 
 		if (key_text.rfind("0x", 0) != 0 && key_text.rfind("0X", 0) != 0) {
 			return std::nullopt;
@@ -139,15 +142,14 @@ struct connect_target {
 
 		const auto key = key_of(key_text);
 
-		if (address.empty() || !key.has_value() || address.find('\n') != std::string::npos) {
+		if (address.empty() || !key.has_value()) {
 			return std::nullopt;
 		}
 
 		auto out = server_identifiers();
 		out.address = address;
 		out.key = *key;
-		out.name = second == std::string::npos ? std::string() : trimmed(text.substr(second + 1));
-		out.name = trimmed(out.name.substr(0, out.name.find('\n')));
+		out.name = last > first ? trimmed(line.substr(first + 1, last - first - 1)) : std::string();
 		return out;
 	}
 

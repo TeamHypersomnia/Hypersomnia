@@ -9,7 +9,7 @@
 /*
 	An unlisted server's address, key and name as typed into Connect (its Unlisted server tab) or Add an unlisted server,
 	and the rules both take them from the clipboard by:
-	- auto-paste: "<address>,0x<key>[,<name>]" (see connect_target::find_server_identifiers) in the clipboard when the
+	- auto-paste: "<address>,<name>,0x<key>" (see connect_target::find_server_identifiers) in the clipboard when the
 	  window opens or gets the focus back - a clipboard taken once, so what the player changed since stays;
 	- a paste (Ctrl+V) taken whole before a field takes it, and the field left: the identifiers into any field fill them
 	  all; a key into the key's field; an address into the address's, then on to the key's while it has no good key.

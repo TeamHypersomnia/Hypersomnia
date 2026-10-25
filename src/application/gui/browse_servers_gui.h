@@ -202,6 +202,18 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	uint32_t times_window_activated = 0;
 
+	/*
+		A server's line from the clipboard, added to the favorites (favorite_from_clipboard.hpp): the clipboard last
+		looked at, the window's activations seen, and what the modal says.
+	*/
+
+	std::string last_clipboard_seen;
+	uint32_t clipboard_activations = 0;
+	bool clipboard_checked_once = false;
+	bool clipboard_at_start = false;
+	std::optional<std::string> added_favorite_note;
+	void draw_added_favorite_modal();
+
 	std::optional<std::string> requested_connection;
 	std::string displayed_connecting_server_name;
 
@@ -321,6 +333,14 @@ public:
 	bool refreshed_at_least_once() const;
 
 	void select_server(const server_list_entry&);
+
+	/*
+		In the main menu, as the game comes back into focus (and once at the start): a server's line in the clipboard
+		goes into the favorites - true when the browser should open on it (favorite_from_clipboard.hpp).
+	*/
+
+	bool clipboard_worth_reading(uint32_t times_activated);
+	bool take_favorite_from_clipboard(const std::string& clipboard, favorite_servers&);
 
 	bool refresh_in_progress() const;
 

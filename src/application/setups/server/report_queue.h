@@ -6,7 +6,6 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
@@ -25,7 +24,10 @@
 	server by its public key.
 
 	2xx and 409 (already have it) remove a report, so do the other 4xx (with an error in the log - retrying can not help),
-	and so does age past what the site still accepts. A network error or a 5xx is retried with a growing delay.
+	and so does age past what the site still accepts. A network error, a 429 or a 5xx is retried with a growing delay.
+
+	A 401 is a server the site doesn't know as official (e.g. a community tournament): tried once, then kept in
+	unsent_reports as it was sent - the body and its signature - for the site's admins to count it later, by hand.
 */
 
 class report_queue {
@@ -59,11 +61,7 @@ private:
 
 	std::unordered_map<std::string, endpoint_backoff> backoff_by_url;
 
-	/*
-		The reports a 401 was said loudly for - once each, not on every retry.
-	*/
-
-	std::unordered_set<std::string> told_unknown_key;
+	augs::path_type unsent_folder;
 
 	static uint64_t now_unix() {
 		return static_cast<uint64_t>(augs::date_time::secs_since_epoch());
@@ -137,6 +135,7 @@ public:
 
 	void init(const augs::path_type& user_dir, const std::string& instance_label, const augs::ed25519_seed_type& key) {
 		folder = user_dir / "report_queue" / instance_label;
+		unsent_folder = user_dir / "unsent_reports";
 		server_key = key;
 
 		if (const auto public_key = augs::ed25519_public_key(key)) {
@@ -208,7 +207,14 @@ public:
 				server's key yet (its official_servers.d behind the masterserver's). Other 4xx are final.
 			*/
 
-			const bool retryable = status == 429 || status == 401;
+			if (status == 401) {
+				keep_unsent(result.file);
+				remove(result.file);
+				next_attempt_at = now;
+				return;
+			}
+
+			const bool retryable = status == 429;
 
 			if (status >= 400 && status < 500 && !retryable) {
 				LOG("ERROR: hypersomnia.io refused the match report %x (HTTP %x). Dropping it.", result.file.filename(), status);
@@ -218,19 +224,6 @@ public:
 			}
 
 			auto& backoff = backoff_by_url[result.url];
-
-			/*
-				A 401 is a key the site does not know as official: said loudly once per report, with the key, or the ranked
-				matches of this server quietly never count.
-			*/
-
-			if (status == 401 && told_unknown_key.insert(result.file.filename().string()).second) {
-				LOG(
-					"ERROR: hypersomnia.io does not know this server's key %x - the match report %x counts once the key is in official_servers.d (--print-server-key prints it). Retrying for days.",
-					augs::bytes_to_hex(augs::ed25519_public_key(server_key).value_or(augs::ed25519_public_key_type())),
-					result.file.filename()
-				);
-			}
 
 			LOG("Match report %x not delivered (HTTP %x). Retrying its endpoint in %x seconds.", result.file.filename(), status, backoff.retry_delay);
 			backoff.next_attempt_at = now + backoff.retry_delay;
@@ -324,6 +317,54 @@ public:
 			}
 		);
 #endif
+	}
+
+	/*
+		A report the site refused as not from an official server: its body as it was sent (<name>.json) and its headers
+		(<name>.headers) - posted again unchanged, the signature still holds:
+			curl -H @<name>.headers -H 'Content-Type: application/json' --data-binary @<name>.json <url>
+		Named as in the queue (its time, match and endpoint) - none overwrites another.
+	*/
+
+	void keep_unsent(const augs::path_type& file) const {
+		std::string url;
+		std::string body;
+
+		try {
+			if (!parse(augs::file_to_string(file), url, body)) {
+				return;
+			}
+		}
+		catch (...) {
+			return;
+		}
+
+		const auto signature = augs::ed25519_sign(server_key, std::string(signature_tag) + body);
+
+		if (!signature.has_value()) {
+			return;
+		}
+
+		const auto stem = unsent_folder / file.stem();
+		const auto json_path = augs::path_type(stem.string() + ".json");
+		const auto headers_path = augs::path_type(stem.string() + ".headers");
+
+		try {
+			std::error_code ec;
+			std::filesystem::create_directories(unsent_folder, ec);
+			augs::save_as_text_atomic(json_path, body);
+			augs::save_as_text_atomic(headers_path, "X-Server-Key: " + server_public_key_hex + "\nX-Signature: " + augs::bytes_to_hex(*signature) + "\n");
+		}
+		catch (const std::exception& e) {
+			LOG("ERROR: could not keep the unsent match report at %x: %x", json_path, e.what());
+			return;
+		}
+
+		LOG(
+			"Not an official server - the match report isn't counted for MMR. Kept in %x (and its .headers): send both to hypersomnia.io's admins to count it, with this server's key %x (--print-server-key).",
+			json_path,
+			server_public_key_hex
+		);
 	}
 
 	void wait_for_in_flight() {

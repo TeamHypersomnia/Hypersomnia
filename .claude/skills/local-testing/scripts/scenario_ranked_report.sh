@@ -12,6 +12,8 @@
 # --connect - user/ranked_match.json must bring her back into the same match, and the report must still have her
 # (use a longer ROUND_TIME, e.g. 15).
 # AVATAR=<png>: both play with this avatar - the report carries it, the site keeps it for the accounts.
+# UNOFFICIAL=1: the site doesn't know the server - the report is refused (401) once and kept in user/unsent_reports
+# (.json + .headers); then the key goes into official_servers.d and the kept report is posted with curl - it must count.
 # Usage: [MAX_TEAM_SCORE=2] [ROUND_TIME=5] [STEAM_BOB=1] [ALICE_FROM_MENU=1] [REJOIN=1] [AVATAR=<png>] scenario_ranked_report.sh
 . "$(dirname "$0")/test_env.sh"
 umask 077
@@ -73,7 +75,7 @@ cd $REPO/hypersomnia
 
 # Official on the site by its key
 KEY=$($BIN --dedicated-server --print-server-key --appdata-dir $T/server 2>/dev/null | grep -E '^[0-9a-f]{64}$')
-echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
+[ -z "$UNOFFICIAL" ] && echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
 
 timeout 180 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
 sleep 8
@@ -132,7 +134,7 @@ if [ -n "$REJOIN" ]; then
 fi
 
 for i in $(seq 1 140); do
-	grep -q "delivered (HTTP\|not delivered\|refused the match report" $T/server.out && break
+	grep -q "delivered (HTTP\|not delivered\|refused the match report\|Not an official server" $T/server.out && break
 	sleep 1
 done
 
@@ -146,6 +148,17 @@ fi
 
 echo "=== server ($i s)"
 grep -hE "Authenticated|Starting ranked|Match report JSON|delivered|refused|ERROR" $T/server.out | sed 's/^\[[0-9:]*\] //; s/key_[0-9a-f]\{56\}/key_…/g' | cut -c1-160 | head -12
+if [ -n "$UNOFFICIAL" ]; then
+	echo "=== unsent (refused once, kept): $(ls $T/server/user/unsent_reports/ 2>/dev/null | tr '\n' ' ')"
+	sleep 20
+	echo "    retries after the 401 (0 expected): $(grep -c 'Report .*: HTTP 401' $T/server.out) request(s) in all"
+	echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
+	sleep 2
+	for f in $T/server/user/unsent_reports/*.json; do
+		echo "    posted by hand: HTTP $(curl -s -o /dev/null -w '%{http_code}' -H @${f%.json}.headers -H 'Content-Type: application/json' --data-binary @$f $BROKER_URL/report_match)"
+	done
+fi
+
 echo "=== site"
 "$HERE/broker.sh" sql "SELECT server_id, win_score, lose_score, report_id FROM matches ORDER BY match_id DESC LIMIT 1"
 "$HERE/broker.sh" sql "SELECT account_id, round(mmr,2) AS mmr, matches_won, matches_lost FROM mmr_team WHERE account_id IN ('$ID_A', '$ID_B') OR ('$ID_B' = 'steam' AND account_id LIKE 'steam_%')"
