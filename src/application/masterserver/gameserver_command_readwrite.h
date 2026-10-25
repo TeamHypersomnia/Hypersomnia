@@ -4,6 +4,14 @@
 #include "application/masterserver/gameserver_commands.h"
 
 inline std::optional<uint64_t> read_ping_response(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
+	/*
+		Exactly its size - a longer packet is a heartbeat (see heartbeat_on_ping.h).
+	*/
+
+	if (packet_bytes != sizeof(gameserver_ping_response)) {
+		return std::nullopt;
+	}
+
 	try {
 		const auto response = augs::from_bytes<gameserver_ping_response>(packet_buffer, packet_bytes);
 		return response.sequence;

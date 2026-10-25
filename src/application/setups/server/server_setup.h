@@ -8,6 +8,7 @@
 #include <optional>
 #include "application/masterserver/netcode_address_hash.h"
 #include "application/masterserver/server_heartbeat.h"
+#include "application/masterserver/heartbeat_on_ping_limiter.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/server/server_listen_input.h"
@@ -274,6 +275,7 @@ class server_setup :
 	hour_and_minute_str when_to_check_for_updates_last_var;
 
 	std::vector<std::byte> heartbeat_buffer;
+	heartbeat_on_ping_limiter heartbeat_on_ping;
 
 #if BUILD_NATIVE_SOCKETS
 	std::future<resolve_address_result> future_resolved_server_list_addr;
@@ -465,6 +467,7 @@ private:
 	void send_tell_me_my_address();
 	void send_tell_me_my_address_if_its_time();
 
+	server_heartbeat make_heartbeat() const;
 	void send_heartbeat_to_server_list();
 	void send_heartbeat_to_server_list_if_its_time();
 
@@ -643,6 +646,14 @@ public:
 	std::unordered_map<std::string, std::size_t> avatars_passed_on;
 	void publish_tournament_avatars();
 	uint16_t tournament_page_port = 0;
+
+	/*
+		The ports of all the instances launched together with this one - told to the local network's server browsers
+		(see heartbeat_on_ping.h). None set: its own port only.
+	*/
+
+	port_type lan_first_port = 0;
+	uint16_t lan_num_ports = 0;
 
 	/*
 		Who plays this match - an open match's roster grows as players join.

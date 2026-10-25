@@ -54,6 +54,7 @@
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
+#include "application/masterserver/heartbeat_on_ping.h"
 #include "application/detail_file_paths.h"
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/webhooks.h"
@@ -2873,6 +2874,33 @@ bool server_setup::handle_gameserver_command(
 
 			return true;
 		}
+		else if constexpr(std::is_same_v<T, gameserver_heartbeat_request>) {
+			if (packet_bytes < min_heartbeat_request_bytes_v) {
+				return true;
+			}
+
+			/*
+				Its own network address only to the local network.
+			*/
+
+			const bool from_local_network = ::is_internal(from);
+
+			if (heartbeat_on_ping.allow(from, server_time, from_local_network)) {
+				auto heartbeat = make_heartbeat();
+
+				if (!from_local_network) {
+					heartbeat.internal_network_address = std::nullopt;
+				}
+
+				const auto first_port = lan_first_port != 0 ? lan_first_port : last_start.port;
+				const auto num_ports = lan_num_ports != 0 ? lan_num_ports : uint16_t(1);
+
+				auto bytes = ::make_heartbeat_on_ping_bytes(typed_request.sequence, first_port, num_ports, std::move(heartbeat));
+				server->send_udp_packet(from, bytes.data(), bytes.size());
+			}
+
+			return true;
+		}
 		else if constexpr(std::is_same_v<T, masterserver_out::webrtc_signalling_payload>) {
 			/*
 				Signalling only from the masterserver (its address, any of its command ports) - anyone can send a packet to the game port.
@@ -3042,7 +3070,11 @@ bool server_setup::requires_authentication() const {
 	return is_ranked_server() && !vars.authenticate_with_nicknames;
 }
 
-void server_setup::send_heartbeat_to_server_list() {
+/*
+	Also without the server list (e.g. a network without the internet) - answered to pings (see heartbeat_on_ping.h).
+*/
+
+server_heartbeat server_setup::make_heartbeat() const {
 	const auto& arena = get_arena_handle();
 
 	server_heartbeat heartbeat;
@@ -3200,6 +3232,12 @@ void server_setup::send_heartbeat_to_server_list() {
 		heartbeat.secs_until_next_event = static_cast<int32_t>(augs::date_time::get_secs_until_next_weekend_evening(get_time_zone()));
 	}
 	heartbeat.validate();
+
+	return heartbeat;
+}
+
+void server_setup::send_heartbeat_to_server_list() {
+	auto heartbeat = make_heartbeat();
 
 	if (!heartbeat.is_valid()) {
 		LOG("THE SERVER HAS SENT AN INVALID HEARTBEAT!!!");
@@ -5806,6 +5844,14 @@ bool is_internal(const netcode_address_t& address) {
 			if (ip[1] == 168) {
 				return true;
 			}
+		}
+
+		/*
+			Link-local: a network with no DHCP (e.g. computers on a switch, addresses made up by the system).
+		*/
+
+		if (ip[0] == 169 && ip[1] == 254) {
+			return true;
 		}
 	}
 

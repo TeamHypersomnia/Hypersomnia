@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <cstdint>
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/masterserver/webrtc_signalling_payload.h"
@@ -14,10 +15,27 @@ struct gameserver_ping_response {
 	uint64_t sequence = -1;
 };
 
+/*
+	Sent next to a ping only to a server the server list does not have (a favorite added by hand, one on
+	the local network) - the server answers with its heartbeat, within its limits (see heartbeat_on_ping.h).
+*/
+
+struct gameserver_heartbeat_request {
+	uint64_t sequence = -1;
+};
+
+/*
+	The request is padded up to this many bytes and a shorter one is ignored - a heartbeat is then at most a few times
+	bigger than what asked for it, so a spoofed request is worth little for flooding someone.
+*/
+
+constexpr std::size_t min_heartbeat_request_bytes_v = 256;
+
 using gameserver_command = std::variant<
 	gameserver_ping_request,
 	int, // dummy for backwards compat
-	masterserver_out::webrtc_signalling_payload
+	masterserver_out::webrtc_signalling_payload,
+	gameserver_heartbeat_request
 >;
 
 struct gameserver_command_wrapper {

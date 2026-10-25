@@ -1129,6 +1129,8 @@ work_result run_tournament(const run_tournament_input& in) {
 				&claim_listed_nickname,
 				&avatars,
 				served_page_port,
+				base_port,
+				num_matches = static_cast<uint16_t>(matches.size()),
 				&page_lk,
 				&page_live,
 				&in
@@ -1205,6 +1207,13 @@ work_result run_tournament(const run_tournament_input& in) {
 				server_ptr->heartbeat_reported_tournament_stage = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
 
 				server_ptr->tournament_page_port = served_page_port;
+
+				/*
+					The stage's matches are on the consecutive ports from the base one.
+				*/
+
+				server_ptr->lan_first_port = base_port;
+				server_ptr->lan_num_ports = num_matches;
 
 				/*
 					The join timeout: a match of known teams decided by who came (server_join_timeout.hpp) -

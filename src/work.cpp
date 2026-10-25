@@ -1300,6 +1300,33 @@ work_result work(
 		const auto preferred_port = temporary_port.has_value() ? *temporary_port : chosen_server_port();
 		last_requested_local_port = preferred_port;
 
+		/*
+			No custom port: the first free of the default game ports - a game hosting from the menu is found
+			by the local network's server browsers. None free: any port, as the system picks.
+		*/
+
+		if (preferred_port == 0) {
+			for (port_type i = 0; i < NUM_LAN_GAME_PORTS_V; ++i) {
+				const auto port = static_cast<port_type>(DEFAULT_GAME_PORT_V + i);
+
+				try {
+					auxiliary_socket.emplace(port);
+
+					LOG("Bound the nat detection socket to a default game port: %x.", port);
+					return;
+				}
+				catch (const netcode_socket_raii_error&) {
+					LOG("The default game port %x is taken.", port);
+				}
+			}
+
+			auxiliary_socket.emplace();
+
+			LOG_NVPS(get_bound_local_port());
+			ensure(get_bound_local_port() != 0);
+			return;
+		}
+
 		try {
 			auxiliary_socket.emplace(preferred_port);
 
@@ -1658,6 +1685,11 @@ work_result work(
 			save_runtime_prefs();
 		};
 
+		const auto num_ranked = std::min(uint16_t(20u), config_pattern.instances.ranked);
+		const auto num_casual = std::min(uint16_t(20u), config_pattern.instances.casual);
+
+		const auto num_total = static_cast<uint16_t>(num_ranked + num_casual);
+
 		auto make_next_worker_input = [&](const uint16_t index, const instance_type type) {
 			const bool first_server = port_counter == original_port;
 			const bool later_server = !first_server;
@@ -1777,6 +1809,13 @@ work_result work(
 				index
 			);
 
+			/*
+				All the instances are on the consecutive ports from the first one.
+			*/
+
+			server_ptr->lan_first_port = original_port;
+			server_ptr->lan_num_ports = type == SINGLE ? 1 : num_total;
+
 			return dedicated_server_worker_input {
 				std::move(server_ptr),
 				params.appimage_path,
@@ -1838,11 +1877,6 @@ work_result work(
 			return ::run_tournament(runner_in);
 		}
 #endif
-
-		const auto num_ranked = std::min(uint16_t(20u), config_pattern.instances.ranked);
-		const auto num_casual = std::min(uint16_t(20u), config_pattern.instances.casual);
-
-		const auto num_total = num_ranked + num_casual;
 
 		if (num_total == 0) {
 			LOG("This is a single-instance dedicated server.");
@@ -5194,9 +5228,27 @@ work_result work(
 						return;
 					}
 
-					if (last_requested_local_port != chosen_server_port()) {
-						recreate_auxiliary_socket();
-						restart_nat_detection();
+					if (const auto chosen = chosen_server_port(); last_requested_local_port != chosen) {
+						/*
+							Already on the port now asked for (e.g. the custom port ticked is the default one it was on):
+							what was detected there holds.
+						*/
+
+						const auto bound = get_bound_local_port();
+
+						const bool already_there =
+							chosen == 0 ?
+							bound >= DEFAULT_GAME_PORT_V && bound < DEFAULT_GAME_PORT_V + NUM_LAN_GAME_PORTS_V :
+							bound == chosen
+						;
+
+						if (already_there) {
+							last_requested_local_port = chosen;
+						}
+						else {
+							recreate_auxiliary_socket();
+							restart_nat_detection();
+						}
 					}
 
 					if (nat_detection.has_value()) {

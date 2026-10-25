@@ -136,6 +136,7 @@ private:
 
 	augs::async_response_ptr request;
 	input requested_for;
+	double request_started_at = 0.0;
 
 	double next_attempt_at = 0.0;
 

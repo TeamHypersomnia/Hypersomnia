@@ -18,6 +18,13 @@
 */
 constexpr port_type DEFAULT_GAME_PORT_V = 8412;
 
+/*
+	The ports from DEFAULT_GAME_PORT_V the local network's server browsers broadcast to - and the ones a game hosting
+	from the menu (no custom port) tries first, so that it is found.
+*/
+
+constexpr port_type NUM_LAN_GAME_PORTS_V = 4;
+
 constexpr port_type DEFAULT_MASTERSERVER_PORT_V = 8430;
 constexpr const char* demo_address_preffix_v = "demo://";
 

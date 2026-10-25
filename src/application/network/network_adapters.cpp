@@ -709,6 +709,115 @@ std::optional<netcode_address_t> get_internal_network_address() {
 std::future<std::optional<netcode_address_t>> async_get_internal_network_address() {
 	return launch_async([]() { return get_internal_network_address(); });
 }
+
+bool enable_broadcast(netcode_socket_t& socket) {
+	int yes = 1;
+	return setsockopt(socket.handle, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<const char*>(&yes), sizeof(yes)) == 0;
+}
+
+std::vector<netcode_address_t> get_broadcast_addresses() {
+	auto out = std::vector<netcode_address_t>();
+
+	auto add = [&](const uint32_t host_order_ip) {
+		auto address = netcode_address_t();
+		address.type = NETCODE_ADDRESS_IPV4;
+		address.data.ipv4[0] = static_cast<uint8_t>(host_order_ip >> 24);
+		address.data.ipv4[1] = static_cast<uint8_t>(host_order_ip >> 16);
+		address.data.ipv4[2] = static_cast<uint8_t>(host_order_ip >> 8);
+		address.data.ipv4[3] = static_cast<uint8_t>(host_order_ip);
+
+		if (std::find(out.begin(), out.end(), address) == out.end()) {
+			out.push_back(address);
+		}
+	};
+
+	add(0xFFFFFFFFu);
+
+	/*
+		An interface's broadcast address: its address with all the host bits set.
+	*/
+
+	auto add_interface = [&](const uint32_t host_order_ip, const uint32_t host_order_mask) {
+		const bool loopback = (host_order_ip >> 24) == 127;
+
+		if (loopback || host_order_mask == 0xFFFFFFFFu) {
+			return;
+		}
+
+		add(host_order_ip | ~host_order_mask);
+	};
+
+#if NETCODE_PLATFORM == NETCODE_PLATFORM_WINDOWS
+	ULONG size = 16 * 1024;
+	auto buffer = std::vector<std::byte>();
+
+	for (int attempt = 0; attempt < 3; ++attempt) {
+		buffer.resize(size);
+
+		const auto flags = GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER;
+		const auto adapters = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data());
+		const auto result = GetAdaptersAddresses(AF_INET, flags, nullptr, adapters, &size);
+
+		if (result == ERROR_BUFFER_OVERFLOW) {
+			continue;
+		}
+
+		if (result != NO_ERROR) {
+			break;
+		}
+
+		for (auto adapter = adapters; adapter != nullptr; adapter = adapter->Next) {
+			if (adapter->OperStatus != IfOperStatusUp || adapter->IfType == IF_TYPE_SOFTWARE_LOOPBACK) {
+				continue;
+			}
+
+			for (auto unicast = adapter->FirstUnicastAddress; unicast != nullptr; unicast = unicast->Next) {
+				const auto sa = unicast->Address.lpSockaddr;
+
+				if (sa == nullptr || sa->sa_family != AF_INET) {
+					continue;
+				}
+
+				const auto prefix = static_cast<uint32_t>(unicast->OnLinkPrefixLength);
+
+				if (prefix == 0 || prefix > 32) {
+					continue;
+				}
+
+				const auto mask = prefix == 32 ? 0xFFFFFFFFu : ~(0xFFFFFFFFu >> prefix);
+				const auto ip = ntohl(reinterpret_cast<const sockaddr_in*>(sa)->sin_addr.s_addr);
+
+				add_interface(ip, mask);
+			}
+		}
+
+		break;
+	}
+#elif NETCODE_PLATFORM == NETCODE_PLATFORM_MAC || NETCODE_PLATFORM == NETCODE_PLATFORM_UNIX
+	ifaddrs* interfaces = nullptr;
+
+	if (getifaddrs(&interfaces) == 0) {
+		for (auto i = interfaces; i != nullptr; i = i->ifa_next) {
+			if (i->ifa_addr == nullptr || i->ifa_netmask == nullptr || i->ifa_addr->sa_family != AF_INET) {
+				continue;
+			}
+
+			if (!(i->ifa_flags & IFF_UP) || !(i->ifa_flags & IFF_BROADCAST) || (i->ifa_flags & IFF_LOOPBACK)) {
+				continue;
+			}
+
+			const auto ip = ntohl(reinterpret_cast<const sockaddr_in*>(i->ifa_addr)->sin_addr.s_addr);
+			const auto mask = ntohl(reinterpret_cast<const sockaddr_in*>(i->ifa_netmask)->sin_addr.s_addr);
+
+			add_interface(ip, mask);
+		}
+
+		freeifaddrs(interfaces);
+	}
+#endif
+
+	return out;
+}
 #endif
 
 void client_send_packet_override(void* context, netcode_address_t* to, NETCODE_CONST uint8_t* packet, int bytes) {

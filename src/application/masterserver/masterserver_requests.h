@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cstdint>
 #include "application/masterserver/masterserver.h"
 #include "augs/readwrite/memory_stream_declaration.h"
@@ -35,4 +36,11 @@ inline void ping_this_server(netcode_socket_t socket, netcode_address_t target_s
 
 	auto packet = make_ping_packet(target_server, sequence);
 	netcode_socket_send_packet(&socket, &packet.to, packet.bytes.data(), packet.bytes.size());
+}
+
+inline void request_heartbeat_on_ping(netcode_socket_t socket, netcode_address_t target_server, const uint64_t sequence) {
+	auto bytes = make_gameserver_command_bytes(gameserver_heartbeat_request { sequence });
+	bytes.resize(std::max(bytes.size(), min_heartbeat_request_bytes_v), std::byte(0));
+
+	netcode_socket_send_packet(&socket, &target_server, bytes.data(), static_cast<int>(bytes.size()));
 }

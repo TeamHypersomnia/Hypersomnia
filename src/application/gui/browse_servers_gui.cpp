@@ -23,6 +23,8 @@
 #include "application/nat/nat_detection_settings.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
+#include "application/masterserver/heartbeat_on_ping.h"
+#include "application/gui/lan_servers.h"
 #include "augs/misc/httplib_utils.h"
 #include "augs/misc/to_hex_str.h"
 #include "augs/string/typesafe_sscanf.h"
@@ -149,6 +151,7 @@ bool server_list_entry::is_set() const {
 struct browse_servers_gui_internal {
 	augs::async_response_ptr future_response;
 	netcode_socket_t socket;
+	lan_servers lan;
 };
 
 browse_servers_gui_state::~browse_servers_gui_state() = default;
@@ -405,6 +408,8 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	load_cached_list_once(in);
 
+	data->lan.discovery_pending = true;
+
 	if (refresh_in_progress()) {
 		return;
 	}
@@ -588,7 +593,23 @@ server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t&
 		}
 	}
 
+	for (auto& s : data->lan.list) {
+		if (s.address == address && s.progress.ping_sequence == ping_sequence) {
+			return &s;
+		}
+	}
+
 	return nullptr;
+}
+
+bool browse_servers_gui_state::on_server_list(const netcode_address_t& address) {
+	for (const auto& s : displayed_list()) {
+		if (s.address == address || s.heartbeat.internal_network_address == address) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(const netcode_address_t& address, const uint64_t ping_sequence) {
@@ -605,8 +626,43 @@ server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(cons
 
 bool is_internal(const netcode_address_t& address);
 
-bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
+bool browse_servers_gui_state::handle_gameserver_response(netcode_socket_t& socket, const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
 	const auto current_time = augs::steady_secs();
+
+	/*
+		A heartbeat to a ping - taken only by a server the list does not have.
+	*/
+
+	if (auto received = ::read_heartbeat_on_ping(packet_buffer, packet_bytes)) {
+		const auto sequence = received->header.sequence;
+
+		auto on_list = [this](const netcode_address_t& a) {
+			return on_server_list(a);
+		};
+
+		auto take_into = [&](auto& list) {
+			for (auto& s : list) {
+				if (s.address == from && s.progress.ping_sequence == sequence) {
+					if (s.lan) {
+						data->lan.take_heartbeat(s, std::move(*received), on_list);
+					}
+					else {
+						::take_heartbeat_on_ping(s, std::move(received->heartbeat));
+					}
+
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		if (!take_into(favorite_only_list) && !take_into(data->lan.list)) {
+			BRW_LOG("Received a heartbeat (seq=%x) from an UNKNOWN game server at: %x", sequence, ::ToString(from));
+		}
+
+		return true;
+	}
 
 	if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
 		const auto sequence = *maybe_sequence;
@@ -632,6 +688,11 @@ bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_
 			progress.state = server_entry_state::PING_MEASURED;
 			progress.found_on_internal_network = true;
 		}
+#if BUILD_NATIVE_SOCKETS
+		else if (data->lan.is_discovery_answer(sequence)) {
+			data->lan.on_found(socket, from, current_time, [this](const netcode_address_t& a) { return on_server_list(a); });
+		}
+#endif
 		else {
 			BRW_LOG("WARNING! Received a pingback (seq=%x) from an UNKNOWN game server at: %x", sequence, ::ToString(from));
 		}
@@ -639,13 +700,14 @@ bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_
 		return true;
 	}
 
+	(void)socket;
 	return false;
 }
 
 #if BUILD_NATIVE_SOCKETS
 void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& socket) {
 	auto packet_handler = [&](const auto& from, uint8_t* buffer, const int bytes_received) {
-		if (handle_gameserver_response(from, buffer, bytes_received)) {
+		if (handle_gameserver_response(socket, from, buffer, bytes_received)) {
 			return;
 		}
 	};
@@ -671,6 +733,14 @@ void browse_servers_gui_state::advance_ping_logic() {
 
 void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& socket) {
 	const auto current_time = augs::steady_secs();
+
+	/*
+		Only once the browser is seen - not at the game's start, when the list downloads.
+	*/
+
+	if (show && std::exchange(data->lan.discovery_pending, false)) {
+		data->lan.discover(socket, ping_sequence_counter++, current_time);
+	}
 
 	auto interval_passed = [current_time](const auto last, const auto interval) {
 		return current_time - last >= interval;
@@ -701,6 +771,15 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 			ping_this_server(socket, s.address, p.ping_sequence);
 			--packets_left;
+
+			/*
+				Never to a server the list has - the list tells its details.
+			*/
+
+			if ((s.favorite_only || s.lan) && !on_server_list(s.address)) {
+				::request_heartbeat_on_ping(socket, s.address, p.ping_sequence);
+				--packets_left;
+			}
 
 			const auto& internal_address = s.heartbeat.internal_network_address;
 			const bool maybe_reachable_internally = 
@@ -768,6 +847,10 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 	for (auto& s : favorite_only_list) {
 		ping_entry(s);
 	}
+
+	for (auto& s : data->lan.list) {
+		ping_entry(s);
+	}
 }
 #endif
 
@@ -831,7 +914,7 @@ void browse_servers_gui_state::show_server_list(
 			A favorite the list does not have knows no slots - never "full".
 		*/
 
-		const bool full = !s.favorite_only && d.is_full();
+		const bool full = s.details_known() && d.is_full();
 		const auto color = rgba(given_up || full ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
 
 		auto do_text = [&](const auto& t) {
@@ -1018,7 +1101,7 @@ void browse_servers_gui_state::show_server_list(
 			auto tool = scoped_tooltip();
 			text(is_favorite ? "Remove from favorites" : "Add to favorites");
 		}
-		else if (ImGui::IsItemHovered() && s.favorite_only) {
+		else if (ImGui::IsItemHovered() && !s.details_known()) {
 			auto tool = scoped_tooltip();
 
 			if (s.unlisted) {
@@ -1090,7 +1173,7 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		if (s.favorite_only) {
+		if (!s.details_known()) {
 			text_disabled("-");
 			next_columns(num_columns - 3);
 			continue;
@@ -1156,8 +1239,17 @@ void browse_servers_gui_state::show_server_list(
 		ImGui::NextColumn();
 
 #if !WEB_LOWEND
-		const auto secs_ago = augs::date_time::secs_since_epoch() - s.meta.time_hosted;
-		text_disabled(augs::date_time::format_countdown_letters(secs_ago));
+		/*
+			Only the list knows since when it is up.
+		*/
+
+		if (s.meta.time_hosted == 0) {
+			text_disabled("-");
+		}
+		else {
+			const auto secs_ago = augs::date_time::secs_since_epoch() - s.meta.time_hosted;
+			text_disabled(augs::date_time::format_countdown_letters(secs_ago));
+		}
 
 		ImGui::NextColumn();
 #endif
@@ -1275,7 +1367,16 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	*/
 
 	if (error_message.size() > 0) {
-		text_color(error_message, red);
+		/*
+			No list, but servers on the local network: likely a network without the internet - nothing alarming.
+		*/
+
+		if (data->lan.any_responding() && !fresh_list_arrived) {
+			text_disabled("Offline - showing LAN servers only.");
+		}
+		else {
+			text_color(error_message, red);
+		}
 	}
 
 	if (!std::exchange(tab_loaded, true)) {
@@ -1374,50 +1475,49 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	requested_connection = std::nullopt;
 
-	for (auto& s : displayed_list()) {
-		const auto& name = s.heartbeat.server_name;
-		const auto& arena = s.heartbeat.current_arena;
-		const auto effective_name = std::string(name) + " " + std::string(arena);
-
-		const bool is_internal = s.progress.found_on_internal_network;
-
-		auto push_if_passes = [&](auto& target_list) {
-			if (only_responding) {
-				if (!s.progress.responding()) {
-					return;
-				}
-			}
-
-			if (no_password) {
-				if (s.heartbeat.require_password || s.heartbeat.listed_players_only) {
-					return;
-				}
-			}
-
-			if (at_least_players.is_enabled) {
-				if (s.heartbeat.num_online_humans < at_least_players.value) {
-					return;
-				}
-			}
-
-			if (at_most_ping.is_enabled) {
-				if (s.progress.ping > at_most_ping.value) {
-					return;
-				}
-			}
-
-			if (!show_incompatible) {
-				if (!s.heartbeat.versions_compatible()) {
-					return;
-				}
-			}
-
-			if (!passes_filter(s, effective_name)) {
+	auto push_if_passes = [&](server_list_entry& s, auto& target_list) {
+		if (only_responding) {
+			if (!s.progress.responding()) {
 				return;
 			}
+		}
 
-			target_list.push_back(&s);
-		};
+		if (no_password) {
+			if (s.heartbeat.require_password || s.heartbeat.listed_players_only) {
+				return;
+			}
+		}
+
+		if (at_least_players.is_enabled) {
+			if (s.heartbeat.num_online_humans < at_least_players.value) {
+				return;
+			}
+		}
+
+		if (at_most_ping.is_enabled) {
+			if (s.progress.ping > at_most_ping.value) {
+				return;
+			}
+		}
+
+		if (!show_incompatible) {
+			if (!s.heartbeat.versions_compatible()) {
+				return;
+			}
+		}
+
+		const auto effective_name = std::string(s.heartbeat.server_name) + " " + std::string(s.heartbeat.current_arena);
+
+		if (!passes_filter(s, effective_name)) {
+			return;
+		}
+
+		target_list.push_back(&s);
+	};
+
+	for (auto& s : displayed_list()) {
+		const bool is_internal = s.progress.found_on_internal_network;
+
 
 		/*
 			A tournament on the local network (a LAN party) is shown as one too - on the public list
@@ -1427,27 +1527,47 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		if (is_internal && s.heartbeat.is_tournament_server()) {
 			has_tournament_servers = true;
 			has_lan_tournament_servers = true;
-			push_if_passes(tournament_server_list);
+			push_if_passes(s, tournament_server_list);
 		}
 		else if (is_internal) {
 			has_local_servers = true;
-			push_if_passes(local_server_list);
+			push_if_passes(s, local_server_list);
 		}
 		else {
 			if (const bool is_official = s.is_official_server()) {
 				if (s.heartbeat.is_tournament_server()) {
 					has_tournament_servers = true;
-					push_if_passes(tournament_server_list);
+					push_if_passes(s, tournament_server_list);
 				}
 				else {
 					has_official_servers = true;
-					push_if_passes(official_server_list);
+					push_if_passes(s, official_server_list);
 				}
 			}
 			else {
 				has_community_servers = true;
-				push_if_passes(community_server_list);
+				push_if_passes(s, community_server_list);
 			}
+		}
+	}
+
+	/*
+		Found on the local network - unless the list (come in meanwhile) has it.
+	*/
+
+	for (auto& s : data->lan.list) {
+		if (!lan_servers::shown(s) || on_server_list(s.address)) {
+			continue;
+		}
+
+		if (s.heartbeat.is_tournament_server()) {
+			has_tournament_servers = true;
+			has_lan_tournament_servers = true;
+			push_if_passes(s, tournament_server_list);
+		}
+		else {
+			has_local_servers = true;
+			push_if_passes(s, local_server_list);
 		}
 	}
 
@@ -2087,8 +2207,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			return false;
 		};
 
-		if (!selected_server.is_set() && !reselect(displayed_list())) {
-			reselect(favorite_only_list);
+		if (!selected_server.is_set() && !reselect(displayed_list()) && !reselect(favorite_only_list)) {
+			reselect(data->lan.list);
 		}
 
 		reselect_after_refresh.reset();
@@ -3080,6 +3200,8 @@ void browse_servers_gui_state::reping_all_servers() {
 	for (auto& s : favorite_only_list) {
 		s.progress = {};
 	}
+
+	data->lan.discovery_pending = true;
 }
 
 void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favorites) {
@@ -3129,7 +3251,13 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 		entry.meta.server_public_key = f.key;
 		entry.heartbeat.instance_label = f.label;
 		entry.favorite_address = f.address;
-		entry.heartbeat.server_name = f.name.empty() ? "0x" + augs::bytes_to_hex(f.key).substr(0, 8) + "..." : f.name;
+		/*
+			The name the server tells once it answers - but one added by hand keeps the player's own.
+		*/
+
+		if (!entry.heartbeat_from_ping || (f.manual && !f.name.empty())) {
+			entry.heartbeat.server_name = f.name.empty() ? "0x" + augs::bytes_to_hex(f.key).substr(0, 8) + "..." : f.name;
+		}
 
 #if BUILD_NATIVE_SOCKETS
 		/*

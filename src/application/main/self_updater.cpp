@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <future>
+#include <thread>
 #if PLATFORM_UNIX
 #include <csignal>
 #endif
@@ -117,34 +119,78 @@ self_update_result check_and_apply_updates(
 	{
 		LOG("Downloading version file at: %x", version_path);
 
-		const auto response = launch_download(*client, version_path); 
+		struct version_file_response {
+			bool arrived = false;
+			int status = -1;
+			std::string body;
+			std::string ssl_error;
+		};
+
+		/*
+			On its own thread, given up after 5 s (or the timeout set, if longer - e.g. a dedicated server's):
+			a DNS lookup in a network without the internet has no timeout of its own, and the game's window does not exist yet.
+			The abandoned download finishes on its own thread, with a client of its own.
+		*/
+
+		const auto io_timeout = http_settings.update_connection_timeout_secs;
+		const auto deadline_secs = std::max(5, io_timeout);
+
+		auto promised = std::make_shared<std::promise<version_file_response>>();
+		auto future_response = promised->get_future();
+
+		std::thread([promised, host_url, version_path, io_timeout]() {
+			auto version_client = httplib_utils::make_client(host_url, io_timeout);
+			const auto response = launch_download(*version_client, version_path);
+
+			auto out = version_file_response();
 
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-		if (response.ssl_backend_error()) {
-			LOG("verify error: %x", X509_verify_cert_error_string(response.ssl_backend_error()));
+			if (response.ssl_backend_error()) {
+				out.ssl_error = X509_verify_cert_error_string(response.ssl_backend_error());
+			}
+#endif
+
+			if (response != nullptr) {
+				out.arrived = true;
+				out.status = response->status;
+				out.body = response->body;
+			}
+
+			promised->set_value(std::move(out));
+		}).detach();
+
+		if (future_response.wait_for(std::chrono::seconds(deadline_secs)) != std::future_status::ready) {
+			LOG("The version file did not come within %x seconds - skipping the update.", deadline_secs);
 			result.type = R::FAILED;
 			return result;
 		}
-#endif
 
-		if (response == nullptr) {
+		const auto response = future_response.get();
+
+		if (!response.ssl_error.empty()) {
+			LOG("verify error: %x", response.ssl_error);
+			result.type = R::FAILED;
+			return result;
+		}
+
+		if (!response.arrived) {
 			LOG("Response was null!");
 			result.type = R::FAILED;
 			return result;
 		}
 
-		if (response->status == 404 || response->status == 403) {
+		if (response.status == 404 || response.status == 403) {
 			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
 			return result;
 		}
 
-		if (!successful(response->status)) {
-			LOG("Request failed with status: %x", response->status);
+		if (!successful(response.status)) {
+			LOG("Request failed with status: %x", response.status);
 			result.type = R::FAILED;
 			return result;
 		}
 
-		const auto& contents = response->body;
+		const auto& contents = response.body;
 
 		auto s = std::stringstream(contents);
 

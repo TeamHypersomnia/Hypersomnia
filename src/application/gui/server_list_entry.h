@@ -85,6 +85,29 @@ struct server_list_entry {
 
 	std::string other_server_at_address;
 
+	/*
+		Found on the local network by a broadcast, the server list not having it - joined at its address, no key expected.
+	*/
+
+	bool lan = false;
+
+	/*
+		The ports of the instances it was launched with, as it last told (see heartbeat_on_ping.h) - its own until it does.
+	*/
+
+	port_type lan_first_port = 0;
+	uint16_t lan_num_ports = 0;
+
+	/*
+		Its heartbeat came back to a ping (see heartbeat_on_ping.h) - a favorite the list does not have shows its details then.
+	*/
+
+	bool heartbeat_from_ping = false;
+
+	bool details_known() const {
+		return !favorite_only || heartbeat_from_ping;
+	}
+
 	bool is_community_server() const {
 		return meta.is_community_server();
 	}

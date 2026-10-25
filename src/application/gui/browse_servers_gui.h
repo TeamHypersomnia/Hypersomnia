@@ -165,6 +165,13 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void update_favorite_only_list(favorite_servers&);
 
 	/*
+		The server list has a server at this address (or answering at it inside this network) -
+		never asked for its heartbeat, the list has it.
+	*/
+
+	bool on_server_list(const netcode_address_t&);
+
+	/*
 		Remembered in gui_state.json. Local only while there are local servers (seen in the last frame).
 	*/
 
@@ -276,7 +283,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	server_list_entry* find_entry(const netcode_address_t&, uint64_t ping_sequence);
 	server_list_entry* find_entry_by_internal_address(const netcode_address_t&, uint64_t ping_sequence);
 
-	bool handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes);
+	bool handle_gameserver_response(netcode_socket_t&, const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes);
 
 	void animate_dot_column();
 #if BUILD_NATIVE_SOCKETS

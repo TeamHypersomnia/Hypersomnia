@@ -21,7 +21,8 @@
 static constexpr double cert_expiry_margin_secs = 120.0;
 static constexpr double first_retry_delay_secs = 30.0;
 static constexpr double max_retry_delay_secs = 300.0;
-static constexpr double steam_ticket_timeout_secs = 10.0;
+static constexpr double steam_ticket_timeout_secs = 5.0;
+static constexpr double request_timeout_secs = 5.0;
 static constexpr double key_recheck_delay_secs = 30.0;
 static double wall_now() {
 	return augs::date_time::secs_since_epoch();
@@ -395,6 +396,7 @@ void identity_session::start_request(const input& in, const double now, const st
 
 	request = augs::async_get(url->get_base_url(), ::location_prefix(*url) + *location, headers, nullptr, false);
 	requested_for = in;
+	request_started_at = now;
 }
 
 void identity_session::schedule_retry(const double now) {
@@ -488,11 +490,23 @@ void identity_session::advance(const input& in, const double now) {
 	}
 
 	if (request != nullptr) {
-		if (!request->is_ready()) {
+		/*
+			Never waited on for longer than 5 s - e.g. a DNS lookup in a network without the internet has no timeout of its own.
+			The abandoned request finishes on its own thread.
+		*/
+
+		const bool timed_out = !request->is_ready() && now - request_started_at > request_timeout_secs;
+
+		if (!request->is_ready() && !timed_out) {
 			return;
 		}
 
-		const auto response = augs::get_once(request);
+		if (timed_out) {
+			LOG("The identity cert request took over %x seconds - given up.", request_timeout_secs);
+			request.reset();
+		}
+
+		const auto response = timed_out ? augs::http_response() : augs::get_once(request);
 		const bool was_check = std::exchange(check_in_flight, false);
 		clear_steam_ticket();
 

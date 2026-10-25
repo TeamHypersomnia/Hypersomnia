@@ -1,6 +1,7 @@
 #pragma once
 #include <future>
 #include <optional>
+#include <vector>
 #include "3rdparty/yojimbo/netcode/netcode.h"
 #include "application/network/resolve_address_result.h"
 #include "augs/network/port_type.h"
@@ -12,6 +13,7 @@ namespace yojimbo {
 }
 
 struct host_with_default_port;
+struct netcode_socket_t;
 
 std::string add_ws_preffix(const std::string& websocket_url);
 bool is_internal_webrtc_address(const netcode_address_t& t);
@@ -42,4 +44,12 @@ std::future<resolve_address_result> async_resolve_address(const host_with_defaul
 
 std::optional<netcode_address_t> get_internal_network_address();
 std::future<std::optional<netcode_address_t>> async_get_internal_network_address();
+
+/*
+	Finding the servers on the local network (see browse_servers_gui.cpp): 255.255.255.255 and each IPv4 interface's own
+	broadcast address - the first alone may go out through one interface only, or nowhere without a default route.
+*/
+
+bool enable_broadcast(netcode_socket_t& socket);
+std::vector<netcode_address_t> get_broadcast_addresses();
 #endif
