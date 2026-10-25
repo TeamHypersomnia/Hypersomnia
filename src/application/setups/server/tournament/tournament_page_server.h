@@ -155,9 +155,7 @@ public:
 };
 
 /*
-	The page's own pictures, next to it in detail/web, read once: the default avatar for whoever has none
-	(the game's Metropolis head, scaled down beforehand with Lanczos to the page's two avatar sizes, 26 and 52)
-	and the game's logo. Only these names are served.
+	The page's own pictures, next to it in detail/web, read once: the game's logo. Only these names are served.
 */
 
 class tournament_page_pictures {
@@ -165,7 +163,7 @@ class tournament_page_pictures {
 
 public:
 	tournament_page_pictures() {
-		for (const auto name : { "default_avatar.png", "default_avatar_52.png", "logo.png", "logo@2x.png" }) {
+		for (const auto name : { "logo.png", "logo@2x.png" }) {
 			auto file = std::ifstream(augs::path_type(DETAIL_DIR) / "web" / name, std::ios::binary);
 			auto bytes = std::ostringstream();
 			bytes << file.rdbuf();

@@ -528,11 +528,12 @@
 		text-overflow: ellipsis;
 	}
 
-	/* the avatar's place is kept also without one - the nicknames start in one line */
+	/* the avatar's place is kept also without one - a faint square, the nicknames start in one line */
 	.avatar-slot {
 		flex: none;
 		width: 26px;
 		height: 26px;
+		background: rgba(0, 0, 0, 0.2);
 	}
 
 	.avatar {
@@ -670,7 +671,7 @@
 
 	/*
 		A team's players, one per line, each after their avatar - served by this server, by the account or,
-		where there are none, the nickname; the game's default one where a player has none.
+		where there are none, the nickname; a faint square where a player has none.
 	*/
 
 	function players(team) {
@@ -682,11 +683,8 @@
 			const avatar = el('img', 'avatar');
 			avatar.alt = '';
 			avatar.src = `avatar?id=${encodeURIComponent(p.account || p.nickname)}`;
-			// none of their own: the game's default one
-			avatar.onerror = () => {
-				avatar.onerror = () => avatar.remove();
-				avatar.src = avatar.closest('.tournament-winner') ? 'default_avatar_52.png' : 'default_avatar.png';
-			};
+			// none of their own: just its place, a faint square
+			avatar.onerror = () => avatar.remove();
 			slot.appendChild(avatar);
 			line.appendChild(slot);
 			const nickname = el('span', 'nickname', p.nickname);
