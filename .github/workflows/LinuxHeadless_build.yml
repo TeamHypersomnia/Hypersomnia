@@ -62,13 +62,18 @@ jobs:
     - name: Create release_notes.txt
       run: cmake/generate_archives.sh Linux
 
+    # What hypersomnia.io shows of this version (weapons, official arenas) - the release script uploads it.
+    - name: Export site data
+      continue-on-error: true
+      run: python3 cmake/export_site_data.py --weapon-stats weapon_stats --release-notes hypersomnia/release_notes.txt --out site_data
+
     - uses: actions/upload-artifact@v4
       with:
         name: LinuxHeadless-binaries
         path: |
           Hypersomnia-Headless.AppImage
           hypersomnia/release_notes.txt
-          weapon_stats/*.json
+          site_data/**
 
     - uses: actions/upload-artifact@v4
       with:
