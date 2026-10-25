@@ -339,7 +339,7 @@ case_teams_2v2() {
 	wait_count "Starting ranked" 1 120
 	check "each nickname claimed by its account" bash -c "[ \$(grep -c 'takes the listed nickname' $SRV) = 4 ] && grep -q '${ID[dave]} takes the listed nickname dave' $SRV"
 	sleep 5
-	check "page: [alice, bob] vs [carol, dave]" page 'sorted(N(R(0)["matches"][0]["team_a"]))==["alice","bob"] and sorted(N(R(0)["matches"][0]["team_b"]))==["carol","dave"] and t["config"]["who_participates"]=="roster by nicknames" and t["config"]["team_size"]==2'
+	check "page: [alice, bob] vs [carol, dave]" page 'sorted(N(R(0)["matches"][0]["team_a"]))==["alice","bob"] and sorted(N(R(0)["matches"][0]["team_b"]))==["carol","dave"] and t["config"]["who_participates"]=="rosters by nicknames" and t["config"]["team_size"]==2'
 	kill_client carol; kill_client dave
 	wait_log "Tournament WINNER" 120
 	check "alice and bob won" in_log "Tournament WINNER: \[${ID[alice]}, ${ID[bob]}\]"
@@ -402,7 +402,7 @@ case_teams_accounts() {
 	client bob $PORT; sleep 2; client carol $PORT
 	wait_count "Starting ranked" 1 90
 	sleep 3
-	check "page: bob vs carol, as listed" page 'sorted(N(R(0)["matches"][0]["team_a"]+R(0)["matches"][0]["team_b"]))==["bob","carol"] and t["config"]["who_participates"]=="roster by accounts"'
+	check "page: bob vs carol, as listed" page 'sorted(N(R(0)["matches"][0]["team_a"]+R(0)["matches"][0]["team_b"]))==["bob","carol"] and t["config"]["who_participates"]=="rosters by accounts"'
 	kill_client carol
 	wait_log "Tournament stage 1: running" 120
 	check "round 2 named by the list: alice and bob" in_log "Match: \[alice\] vs \[bob\]\|Match: \[bob\] vs \[alice\]"
@@ -861,7 +861,7 @@ PY
 	local listener=$!
 	sleep 1
 	start_server HYPERSOMNIA_TOURNAMENT_NAME="Test Cup" HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK=http://127.0.0.1:18602/results -- --tournament-teams "alice; bob; carol"
-	check "page: name, ONGOING, config" page 't["name"]=="Test Cup" and t["state"]=="ONGOING" and t["winner_team"]==[] and {k: v for k, v in t["config"].items() if k!="arenas"}=={"who_participates":"roster by nicknames","team_size":1,"teams":3,"join_timeout_minutes":10}'
+	check "page: name, ONGOING, config" page 't["name"]=="Test Cup" and t["state"]=="ONGOING" and t["winner_team"]==[] and {k: v for k, v in t["config"].items() if k!="arenas"}=={"who_participates":"rosters by nicknames","team_size":1,"teams":3,"join_timeout_minutes":10}'
 	check "page: the final first, COMING; round 1 PLAYING" page 't["rounds"][0]["name"]=="Final" and t["rounds"][0]["state"]=="COMING" and R(0)["state"]=="PLAYING" and "score_a" not in R(0)["matches"][0]'
 	check "page: a waiting match has its server" page 'R(0)["matches"][0]["status"]=="waiting" and R(0)["matches"][0]["port"]>0'
 	check "the page itself served" curl -sf --max-time 3 http://127.0.0.1:$PORT/

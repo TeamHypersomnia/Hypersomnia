@@ -488,7 +488,7 @@ namespace {
 			}
 		}
 
-		page.config.who_participates = cfg.is_open() ? "anyone" : cfg.team_nicknames.empty() ? "roster by nicknames" : "roster by accounts";
+		page.config.who_participates = cfg.is_open() ? "anyone" : cfg.team_nicknames.empty() ? "rosters by nicknames" : "rosters by accounts";
 		page.config.team_size = cfg.is_open() ? cfg.open_team_size : static_cast<uint32_t>(cfg.teams.empty() ? 1 : cfg.teams.front().size());
 		page.config.teams = cfg.num_teams();
 		page.config.arenas = cfg.arenas;
