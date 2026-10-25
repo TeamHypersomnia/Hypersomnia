@@ -88,7 +88,7 @@ Later ones win:
 | `HYPERSOMNIA_ADMINS` | [Admins](#admins) with full rights | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_TELEGRAM_BOT_TOKEN` | Telegram: who joins - short notices only; with `HYPERSOMNIA_TELEGRAM_CHANNEL` (the bot an admin of it) | `123456789:AAH...` |
 | `HYPERSOMNIA_TELEGRAM_CHANNEL` | The channel for the notices above | `@my_server_joins` |
-| `HYPERSOMNIA_PASSWORD` | Only players who know it can join | |
+| `HYPERSOMNIA_PASSWORD` | Only players who know it can join - a tournament's participants only in round 1, then the server knows their accounts | |
 | `HYPERSOMNIA_ALLOWED_ACCOUNTS` | Only these accounts get in, and the [admins](#admins) | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_SPECTATOR` | The [spectator account](#watching-a-match): always gets in, only to watch | `steam_7656119...` |
 | `HYPERSOMNIA_SLOTS` | Players per server, at most `58` | `10` |

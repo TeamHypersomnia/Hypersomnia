@@ -5961,8 +5961,16 @@ bool server_setup::is_authorized_for_access(const client_id_type& id) const {
 	}
 
 	/*
-		An admin needs no password, nor the spectator account.
+		An admin needs no password, nor the spectator account - nor a tournament's participant known by account: this
+		match's player (listed accounts, or claimed in an earlier round) or a team whose match is decided, watching.
+		Who isn't known yet - a listed nickname not claimed, round 1 open to anyone - and an outsider type it.
 	*/
+
+	const auto& account = c.authenticated_id;
+
+	if (::is_actual_faction(get_assigned_team(account)) || (may_spectate_tournament && may_spectate_tournament(account))) {
+		return true;
+	}
 
 	return find_admin_profile_of(c.admin_account).has_value() || is_spectator_account(c.admin_account);
 }

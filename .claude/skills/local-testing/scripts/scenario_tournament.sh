@@ -52,6 +52,9 @@
 #                       account) come first - alice and bob still both get in, never "The server is full"
 #   claim_twice         "alice; bob; carol; dave": alice's key takes "alice", then the same key comes as "carol" to
 #                       carol-dave's server - refused (one account in two teams), "carol" stays unclaimed
+#   password_known      a join password, "alice=<id>; bob=<id>; carol=<id>; dave=<id>": mallory (nobody's) is told it's
+#                       wrong; the players get in without it (their accounts are on the roster), bob - out after his
+#                       match - watches carol-dave without it too
 #   mixed_teams         a team per line with an empty line among them ("alice, bob" / "" / "carol, dave"): doesn't start
 #   admission_allowed   a persistent server with allowed_accounts [alice]: bob is refused, alice and carol (an admin) get in
 #   admission_full      a persistent server of 2 slots, full: dave is refused, carol (an admin) gets in
@@ -64,7 +67,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams"
+ALL="watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams password_known"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -1009,6 +1012,30 @@ case_claim_twice() {
 	wait_log "already plays in a team" 60
 	check "the same key refused as carol" in_log "already plays in a team - not taking the listed nickname carol"
 	check "carol not claimed" not_in_log "takes the listed nickname carol"
+	finish_case
+}
+
+case_password_known() {
+	new_case password_known
+	player alice; player bob; player carol; player dave; player mallory
+	start_server HYPERSOMNIA_PASSWORD=secret -- --tournament-teams "alice=${ID[alice]}; bob=${ID[bob]}; carol=${ID[carol]}; dave=${ID[dave]}"
+	# before any match runs - a running one refuses outsiders already at the handshake, before the password
+	client mallory $((PORT + 1))
+	wait_log "Wrong password" 60
+	check "mallory (nobody's) told the password is wrong" in_log "Wrong password"
+	kill_client mallory
+	client carol $((PORT + 1)); sleep 2; client dave $((PORT + 1))
+	wait_count "Starting ranked" 1 90
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 2 90
+	check "the players in without the password" bash -c "[ \$(grep -c 'Wrong password' $SRV) = 1 ]"
+	sleep 5
+	kill_client bob
+	wait_log "abandoned by faction" 60
+	sleep 3
+	client bob $((PORT + 1))
+	wait_count "watches the tournament's match as a spectator" 1 60
+	check "bob (out) watches carol-dave without the password" bash -c "grep -q \"T$((PORT + 1))] Adding bob to game state\" $SRV && [ \$(grep -c 'Wrong password' $SRV) = 1 ]"
 	finish_case
 }
 
