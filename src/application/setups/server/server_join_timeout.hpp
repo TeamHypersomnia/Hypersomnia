@@ -1,8 +1,8 @@
 #pragma once
 
 /*
-	A tournament match's join timeout - join_timeout_secs after the server started, a match still waiting
-	for its players is decided without them:
+	A tournament match's join timeout - join_timeout_secs after the round's first player came (to any of its
+	matches), a match still waiting for its players is decided without them:
 
 	- an open match of round 1 closes as if Close round 1 were clicked (close_open_match_if_requested):
 	  whoever waits goes on;
@@ -13,7 +13,11 @@
 */
 
 /*
-	Counted from this match server's first tick - server_time is the process's clock, not this server's.
+	Counted from the moment the first player with a team in this round came to any of its matches (round_first_arrival,
+	shared by the round's servers) - not from the servers' start: a tournament's server may be started long before
+	the players come (installed as a service), and its matches must not run out with nobody there yet.
+	server_time is the process's clock, the same for all the round's servers. Without a round to share it with,
+	from this server's first tick.
 */
 
 bool server_setup::join_timeout_due() const {
@@ -31,7 +35,31 @@ bool server_setup::join_timeout_due() const {
 
 void server_setup::check_join_timeout() {
 	if (!join_timeout_since.has_value()) {
-		join_timeout_since = server_time;
+		if (round_first_arrival == nullptr) {
+			join_timeout_since = server_time;
+		}
+		else {
+			auto a_player_is_here = [&]() {
+				bool here = false;
+
+				for_each_id_and_client([&](auto, const auto& c) {
+					if (c.is_authenticated() && ::is_actual_faction(get_assigned_team(c.authenticated_id))) {
+						here = true;
+					}
+				}, only_connected_v);
+
+				return here;
+			};
+
+			if (round_first_arrival->load() < 0.0 && a_player_is_here()) {
+				auto none = -1.0;
+				round_first_arrival->compare_exchange_strong(none, server_time);
+			}
+
+			if (const auto came_at = round_first_arrival->load(); came_at >= 0.0) {
+				join_timeout_since = came_at;
+			}
+		}
 	}
 
 	if (join_timeout_passed || !join_timeout_due() || is_open_match()) {
@@ -68,11 +96,15 @@ bool server_setup::timeout_absent_players_now() {
 }
 
 void server_setup::decide_by_present_players() {
-	std::size_t resistance = 0;
-	std::size_t metropolis = 0;
+	auto resistance = std::size_t(0);
+	auto metropolis = std::size_t(0);
+
+	/*
+		Present: connected and known - also one still downloading the arena.
+	*/
 
 	for_each_id_and_client([&](auto, const auto& c) {
-		if (c.state != client_state_type::IN_GAME) {
+		if (!c.is_authenticated()) {
 			return;
 		}
 

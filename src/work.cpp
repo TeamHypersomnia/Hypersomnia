@@ -741,6 +741,10 @@ work_result work(
 				if (!c->server_private.discord_webhook_url.empty()) {
 					c->server_private.discord_webhook_url = "***";
 				}
+
+				if (!c->server_private.tournament_results_webhook_url.empty()) {
+					c->server_private.tournament_results_webhook_url = "***";
+				}
 			}
 
 			auto log_changed = [](const auto& section, const auto& now, const auto& before) {

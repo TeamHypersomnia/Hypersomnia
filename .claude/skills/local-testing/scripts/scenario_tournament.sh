@@ -9,7 +9,10 @@
 #                       C alone on #2 - all came, round 1 closes by itself, C's walkover, then the final
 #   open_leave          TOURNAMENT=4: C leaves #2 before D comes - the place is free, nothing closes (3 of 4 here);
 #                       C comes back, #2 fills, both matches play - no walkover
-#   teams_2v2           --tournament-teams "alice, bob; carol, dave": 2v2 by nicknames
+#   teams_2v2           --tournament-teams "alice, bob; carol, dave": 2v2 by nicknames - each claimed by its account
+#   nick_claim          "alice; bob": alice comes - her account takes the nickname; mallory as alice later: taken;
+#                       alice back under another nickname - in by her key, still alice on the page; she wins by her key
+#   open_nick_taken     TOURNAMENT=4: alice as "Player" on #1 - bob as "Player" on #2 is told it's taken, no place
 #   teams_accounts      --tournament-teams "alice=<id>; bob=<id>; carol=<id>" (Listed accounts): mallory, playing as "bob",
 #                       is turned away; the real bob gets in under another name in the game; the servers, the page and
 #                       the next round named by the listed nicknames; a list with an id missing doesn't start
@@ -34,8 +37,13 @@
 #                       the match never freezes; mallory (nobody's) is refused while it's played
 #   watch_others        "alice; bob; carol; dave": carol-dave live, then alice beats bob - alice and bob (decided) watch
 #                       carol-dave while it's played
-#   avatars             alice joins with an avatar, bob without - by nicknames: /avatar?id=alice is her PNG, bob and
-#                       nick_alice are 404; by accounts: /avatar?id=<her key_ id> and the same as 0x... are hers
+#   quick_rejoin        alice vs bob by accounts, live: bob's game killed and started again at once - back in his
+#                       match before the server noticed the old connection gone, never "joined too late"
+#   walkover_b          "alice; bob; carol; dave", 1 minute: only bob of the first match comes, carol-dave play - the page
+#                       has bob's walkover (team b) while the round goes on
+#   open_after_played   TOURNAMENT=4: alice beats bob on #1 - both only watch #2, neither takes a place there
+#   avatars             alice joins with an avatar, bob without - listed nicknames: by her account (claimed), bob 404,
+#                       ?nickname= isn't served; listed accounts: ?account=<her key_ id> and 0x... are hers
 #   page_json           --tournament-name, a results webhook (a local listener): the page's JSON (name, config, round states),
 #                       429 past 10 requests at once, one POST of the FINISHED results
 #   admission_allowed   a persistent server with allowed_accounts [alice]: bob is refused, alice and carol (an admin) get in
@@ -49,7 +57,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="spectator_live watch_others avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full"
+ALL="nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full"
 CASES=${CASES:-$ALL}
 PORT=18500
 SUITE=$S/tournament_suite_$(date +%s)
@@ -238,13 +246,14 @@ case_teams_bye() {
 	check "round 2 on de_silo" in_log "Choosing arena: de_silo"
 	sleep 2
 	check "page: finished, one winner" page 'finished and len(t["winner_team"])==1 and all(r["state"]=="PLAYED" for r in t["rounds"])'
+	check "page: 2 rounds - the final on de_silo, alice's bye kept in round 1" page 'len(t["rounds"])==2 and t["rounds"][0]["name"]=="Final" and len(t["rounds"][0]["matches"])==1 and t["rounds"][0]["arena"]=="de_silo" and R(0)["name"]=="Semifinals" and R(0)["arena"]=="de_cyberaqua" and [N(b) for b in R(0)["byes"]]==[["alice"]]'
 	check "page: everyone by nickname" page "$all_named"
 	finish_case
 
 	start_server -- "${flags[@]}"
 	check "not started again" in_log "played to the end already"
 	sleep 2
-	check "page after the restart: finished" page 'finished and len(t["winner_team"])==1'
+	check "page after the restart: finished, 2 rounds" page 'finished and len(t["winner_team"])==1 and len(t["rounds"])==2'
 	finish_case
 }
 
@@ -315,14 +324,52 @@ case_teams_2v2() {
 	new_case teams_2v2
 	player alice; player bob; player carol; player dave
 	start_server -- --tournament-teams "alice, bob; carol, dave" --tournament-team-size 2
-	check "by nicknames" in_log "authenticates players by nickname"
 	client alice $PORT; sleep 2; client bob $PORT; sleep 2; client carol $PORT; sleep 2; client dave $PORT
 	wait_count "Starting ranked" 1 120
+	check "each nickname claimed by its account" bash -c "[ \$(grep -c 'takes the listed nickname' $SRV) = 4 ] && grep -q '${ID[dave]} takes the listed nickname dave' $SRV"
 	sleep 5
 	check "page: [alice, bob] vs [carol, dave]" page 'sorted(N(R(0)["matches"][0]["team_a"]))==["alice","bob"] and sorted(N(R(0)["matches"][0]["team_b"]))==["carol","dave"] and t["config"]["who_gets_in"]=="listed nicknames" and t["config"]["team_size"]==2'
 	kill_client carol; kill_client dave
 	wait_log "Tournament WINNER" 120
-	check "alice and bob won" in_log "Tournament WINNER: \[alice, bob\]"
+	check "alice and bob won" in_log "Tournament WINNER: \[${ID[alice]}, ${ID[bob]}\]"
+	finish_case
+}
+
+case_nick_claim() {
+	new_case nick_claim
+	player alice; player bob; player mallory alice
+	start_server -- --tournament-teams "alice; bob"
+	client alice $PORT
+	wait_log "takes the listed nickname alice" 60
+	check "alice's nickname taken by her account" in_log "${ID[alice]} takes the listed nickname alice"
+	kill_client alice; sleep 3
+	client mallory $PORT
+	wait_log "already taken in this tournament" 60
+	check "mallory as alice later: taken" in_log "already taken in this tournament"
+	check "mallory took no place" not_in_log "${ID[mallory]} takes the listed nickname"
+	kill_client mallory
+	sed -i 's/"nickname": "alice"/"nickname": "alice_renamed"/' $T/alice/user/conf.d/test.json
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 1 90
+	sleep 5
+	check "alice back under another nickname - in by her key" in_log "alice_renamed"
+	check "page: alice and bob as listed, by their accounts" page 'sorted((p["nickname"], p["account"]) for p in R(0)["matches"][0]["team_a"]+R(0)["matches"][0]["team_b"])==[("alice","'${ID[alice]}'"),("bob","'${ID[bob]}'")] and "alice_renamed" not in str(t)'
+	kill_client bob
+	wait_log "Tournament WINNER" 120
+	check "alice won - her account" winner_is alice
+	finish_case
+}
+
+case_open_nick_taken() {
+	new_case open_nick_taken
+	player alice Player; player bob Player
+	start_server HYPERSOMNIA_TOURNAMENT=4 --
+	client alice $PORT
+	wait_count "takes a place" 1 60
+	client bob $((PORT + 1))
+	wait_log "taken by another player" 60
+	check "bob as Player on #2: told it's taken" in_log "already taken in this tournament"
+	check "no second place" bash -c "[ \$(grep -c 'takes a place' $SRV) = 1 ]"
 	finish_case
 }
 
@@ -336,7 +383,6 @@ case_teams_accounts() {
 	stop_server
 
 	start_server -- "${flags[@]}"
-	check "by account" in_log "authenticates players by account"
 	check "round 1 named by the list: [bob] vs [carol]" in_log "Match: \[bob\] vs \[carol\]"
 	client mallory $PORT
 	wait_log "connected to a match that's not theirs" 60
@@ -450,14 +496,13 @@ case_crash_open() {
 	check "resumed with #1 decided" in_log "resuming stage 0 with 2 ongoing"
 	check "#2 open again" in_log "Match #2 (any pair)"
 	client carol $((PORT + 1)); sleep 3; client dave $((PORT + 1))
-	wait_log "Open match is full" 60
-	wait_count "Starting ranked" 1 90
+	wait_count "comes back to the recovered match" 2 90
 	sleep 3
 	kill_client dave
 	wait_log "Tournament stage 1: running" 120
 	kill_client carol; sleep 2
 	client alice $PORT; sleep 2; client carol $PORT
-	wait_count "Starting ranked" 2 90
+	wait_count "Starting ranked" 1 90
 	sleep 5
 	kill_client carol
 	wait_log "Tournament WINNER" 120
@@ -532,13 +577,17 @@ case_join_timeout_listed() {
 	new_case join_timeout_listed
 	player alice; player bob; player carol; player dave
 	start_server -- --tournament-teams "alice; bob; carol; dave" --tournament-join-timeout 1
+
+	# nobody here yet: the minute doesn't run - it counts from the round's first player
+	sleep 75
+	check "nobody yet: nothing timed out after the minute" not_in_log "Join timeout"
 	client alice $PORT
 	wait_log "Join timeout" 100
 	wait_count "Join timeout: " 4 30
 	check "alice wins hers by walkover" in_log "the team that came wins by walkover"
 	check "nobody came to carol-dave" in_log "nobody came - both teams are out"
 	wait_log "Tournament WINNER\|Tournament over" 60
-	check "alice the winner" in_log "Tournament WINNER: \[alice\]"
+	check "alice the winner" winner_is alice
 	sleep 2
 	check "page: alice's walkover" page 'any(m["status"]=="walkover" and N(m["team_a"])==["alice"] for m in R(0)["matches"]) and t["config"]["join_timeout_minutes"]==1'
 	finish_case
@@ -556,7 +605,7 @@ case_join_timeout_equal() {
 	sleep 5
 	kill_client carol
 	wait_log "Tournament WINNER" 200
-	check "alice and bob won" in_log "Tournament WINNER: \[alice, bob\]"
+	check "alice and bob won - bob never came: still his listed nickname" in_log "Tournament WINNER: \[${ID[alice]}, nick_bob\]"
 	finish_case
 }
 
@@ -630,7 +679,7 @@ case_admin_live() {
 	check "the match goes on" not_in_log "Tournament WINNER"
 	kill_client bob
 	wait_log "Tournament WINNER" 200
-	check "alice won with carol watching" in_log "Tournament WINNER: \[alice\]"
+	check "alice won with carol watching" winner_is alice
 	finish_case
 }
 
@@ -658,7 +707,7 @@ case_spectator_live() {
 	check "the match goes on" not_in_log "Tournament WINNER"
 	kill_client bob
 	wait_log "Tournament WINNER" 200
-	check "alice won with dave watching" in_log "Tournament WINNER: \[alice\]"
+	check "alice won with dave watching" winner_is alice
 	finish_case
 }
 
@@ -684,6 +733,52 @@ case_watch_others() {
 	finish_case
 }
 
+case_quick_rejoin() {
+	new_case quick_rejoin
+	player alice; player bob
+	start_server -- --tournament-teams "alice=${ID[alice]}; bob=${ID[bob]}"
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 1 90
+	sleep 8
+	kill_client bob
+	client bob $PORT
+	wait_count "Adding bob to game state" 2 60
+	check "bob back in his match" bash -c "[ \$(grep -c 'Adding bob to game state' $SRV) -ge 2 ]"
+	check "never joined too late" not_in_log "Joined too late"
+	check "his game never told \"only its players can rejoin\"" bash -c "! grep -q 'only its players can rejoin' $T/bob.*.out"
+	finish_case
+}
+
+case_walkover_b() {
+	new_case walkover_b
+	player alice; player bob; player carol; player dave
+	start_server -- --tournament-teams "alice; bob; carol; dave" --tournament-join-timeout 1
+	client bob $PORT; sleep 2
+	client carol $((PORT + 1)); sleep 2; client dave $((PORT + 1))
+	wait_count "Starting ranked" 1 90
+	wait_log "the team that came wins by walkover" 100
+	check "page: bob's walkover, as team b, while carol-dave play" page 'any(m["status"]=="walkover" and m["winner"]=="b" and N(m["team_b"])==["bob"] for m in R(0)["matches"]) and R(0)["state"]=="PLAYING"'
+	finish_case
+}
+
+case_open_after_played() {
+	new_case open_after_played
+	player alice; player bob
+	start_server HYPERSOMNIA_TOURNAMENT=4 --
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "Starting ranked" 1 90
+	sleep 5
+	kill_client bob
+	wait_log "abandoned by faction" 60
+	sleep 3
+	kill_client alice; sleep 2
+	client alice $((PORT + 1)); sleep 2; client bob $((PORT + 1))
+	wait_count "watches the tournament's match as a spectator" 2 60
+	check "alice (won) and bob (out) only watch #2" bash -c "[ \$(grep -c \"watches the tournament's match as a spectator\" $SRV) -ge 2 ]"
+	check "neither takes a place there" bash -c "[ \$(grep -c 'takes a place' $SRV) = 2 ]"
+	finish_case
+}
+
 case_avatars() {
 	new_case avatars
 	player alice; player bob
@@ -695,11 +790,11 @@ case_avatars() {
 	client alice $PORT; sleep 2; client bob $PORT
 	wait_count "Starting ranked" 1 90
 	sleep 5
-	curl -s -o $T/a.png -w '%{http_code}' "http://127.0.0.1:$PORT/avatar?id=alice" > $T/a.code
-	check "by nicknames: alice's avatar served, $size" bash -c "[ \$(cat $T/a.code) = 200 ] && [ \$(identify -format '%wx%h' $T/a.png) = $size ]"
-	check "by nicknames: kept in tournament_avatars" bash -c "[ \$(ls $T/server/user/tournament_avatars/*.png | wc -l) = 1 ]"
-	check "by nicknames: bob has none - 404" bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?id=bob') = 404 ]"
-	check "by nicknames: nick_alice isn't how the page asks - 404" bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?id=nick_alice') = 404 ]"
+	curl -s -o $T/a.png -w '%{http_code}' "http://127.0.0.1:$PORT/avatar?account=${ID[alice]}" > $T/a.code
+	check "listed nicknames: alice's avatar by her account, $size" bash -c "[ \$(cat $T/a.code) = 200 ] && [ \$(identify -format '%wx%h' $T/a.png) = $size ]"
+	check "listed nicknames: kept in tournament_avatars" bash -c "[ \$(ls $T/server/user/tournament_avatars/*.png | wc -l) = 1 ]"
+	check "listed nicknames: bob has none - 404" bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?account=${ID[bob]}') = 404 ]"
+	check "?nickname= isn't served - 404" bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?nickname=alice') = 404 ]"
 	kill_all_clients
 	stop_server
 
@@ -707,8 +802,8 @@ case_avatars() {
 	client alice $PORT; sleep 2; client bob $PORT
 	wait_count "Starting ranked" 1 90
 	sleep 5
-	check "by accounts: alice's avatar by her key_ id" bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?id=${ID[alice]}') = 200 ]"
-	check "by accounts: the same by 0x..." bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?id=0x${ID[alice]#key_}') = 200 ]"
+	check "by accounts: alice's avatar by her key_ id" bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?account=${ID[alice]}') = 200 ]"
+	check "by accounts: the same by 0x..." bash -c "[ \$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:$PORT/avatar?account=0x${ID[alice]#key_}') = 200 ]"
 	check "by accounts: the page names her account" page 'any(p["account"]=="'${ID[alice]}'" for r in t["rounds"] for m in r["matches"] for p in m["team_a"]+m["team_b"])'
 	finish_case
 }
@@ -764,11 +859,19 @@ PY
 	check "the endpoint signed by the server's key" verify_signed $T/endpoint.body $T/endpoint.key $T/endpoint.sig $key
 	check "a changed body fails the check" bash -c "echo ' ' >> $T/endpoint.body; ! verify_signed $T/endpoint.body $T/endpoint.key $T/endpoint.sig $key"
 	check "tournament_results.json: the webhook's very bytes" cmp $T/server/user/tournament_results.json $T/webhook.json.body
-	kill $listener 2>/dev/null
+	local codes=$(for i in $(seq 1 25); do curl -s -o /dev/null -w '%{http_code}\n' "http://127.0.0.1:$PORT/avatar?account=player$i"; done | sort -u | tr '\n' ' ')
+	check "25 avatars at once: none limited ($codes)" bash -c "! echo '$codes' | grep -q 429"
 	kill_all_clients
 	stop_server
-	start_server HYPERSOMNIA_TOURNAMENT_NAME="Test Cup" -- --tournament-teams "alice; bob; carol"
+
+	# started again, over already: the results saved anew (a stale file overwritten) and posted again
+	echo stale > $T/server/user/tournament_results.json
+	start_server HYPERSOMNIA_TOURNAMENT_NAME="Test Cup" HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK=http://127.0.0.1:18602/results -- --tournament-teams "alice; bob; carol"
 	check "the same name again: played already" in_log "played to the end already"
+	wait_log "results were sent to the webhook" 30
+	check "over already: posted again" bash -c "[ \$(wc -l < $T/webhook.json) = 2 ]"
+	check "over already: tournament_results.json saved anew" cmp $T/server/user/tournament_results.json $T/webhook.json.body
+	kill $listener 2>/dev/null
 	stop_server
 	start_server HYPERSOMNIA_TOURNAMENT_NAME="Test Cup 2" -- --tournament-teams "alice; bob; carol"
 	check "a new name: a new tournament" bash -c "grep -q 'server listening on' $SRV && ! grep -q 'played to the end already' $SRV"
@@ -824,6 +927,11 @@ case_admission_allowed() {
 	check "a padlock on the list, no password" python3 -c "import json,sys; l=json.load(open('$T/list.json')); sys.exit(0 if l and all(e.get('listed_players_only') and not e.get('require_password') for e in l) else 1)"
 	for pid in $(pgrep -f -- "--appdata-dir $T/ms "); do kill $pid 2>/dev/null; done
 	finish_case
+
+	# listed accounts where only nicknames are known: the list could never be checked - the server doesn't start
+	start_persistent "{ \"server\": { \"bot_quota\": [0], \"authenticate_with_nicknames\": true }, \"server_private\": { \"allowed_accounts\": [ \"${ID[alice]}\" ] } }"
+	check "allowed_accounts with nicknames: not started" in_log "allowed_accounts with authenticate_with_nicknames"
+	stop_server
 }
 
 case_admission_full() {

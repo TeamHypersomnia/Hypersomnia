@@ -4,6 +4,7 @@
 #include "application/setups/server/tournament/tournament_coordinator.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "application/network/account_id.h"
+#include "application/setups/server/server_nickname_auth.h"
 #include "augs/log.h"
 #include "augs/misc/randomization.h"
 #include "augs/misc/date_time.h"
@@ -107,6 +108,38 @@ bool tournament_coordinator::may_watch_others(const std::function<bool(const std
 	return false;
 }
 
+void tournament_coordinator::claim_listed_nickname(
+	tournament_match& m,
+	const account_id_string& placeholder,
+	const account_id_string& account
+) {
+	std::scoped_lock lk(state_lk);
+
+	auto claim_in = [&](std::vector<account_id_string>& ids) {
+		for (auto& id : ids) {
+			if (id == placeholder) {
+				id = account;
+			}
+		}
+	};
+
+	claim_in(m.team_a_player_ids);
+	claim_in(m.team_b_player_ids);
+	claim_in(m.spectator_player_ids);
+
+	for (auto& t : state.teams) {
+		claim_in(t.player_ids);
+	}
+
+	for (auto& h : state.match_history) {
+		claim_in(h.winner_player_ids);
+		claim_in(h.loser_player_ids);
+	}
+
+	LOG("Tournament: %x is %x from now on.", ::account_id_to_nickname(placeholder), account);
+	persist();
+}
+
 bool tournament_coordinator::finished() const {
 	/*
 		The open first round has no teams yet - they come from its matches.
@@ -195,17 +228,21 @@ void tournament_coordinator::initialize_state_if_fresh() {
 		tournament_team_state ts;
 
 		/*
-			A key copied from the game is "0x<hex>" - written so, it would not count as an account id
-			and the whole match would fall back to nickname auth.
+			Listed with account ids: shown by the nicknames written next to them (a key copied from the game is "0x<hex>" -
+			the same as key_<hex>). A bare account id: named by the match it plays. A bare nickname: nick_<nickname>
+			until the first account to come with it claims it (claim_listed_nickname).
 		*/
 
-		for (const auto& written : cfg.teams[team_idx]) {
-			ts.player_ids.push_back(::normalize_account_id(written));
+		const auto& written_ids = cfg.teams[team_idx];
+		const bool all_accounts = std::all_of(written_ids.begin(), written_ids.end(), ::is_valid_account_id);
+
+		for (const auto& written : written_ids) {
+			ts.player_ids.push_back(::is_valid_account_id(written) ? ::normalize_account_id(written) : ::nickname_to_account_id(written));
+
+			if (!all_accounts) {
+				ts.nicknames.push_back(::is_valid_account_id(written) ? std::string() : written);
+			}
 		}
-
-		/*
-			Listed with account ids: shown by the nicknames written next to them.
-		*/
 
 		if (team_idx < cfg.team_nicknames.size()) {
 			ts.nicknames = cfg.team_nicknames[team_idx];

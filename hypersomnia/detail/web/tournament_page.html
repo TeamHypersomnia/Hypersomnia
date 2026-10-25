@@ -35,18 +35,15 @@
 		background: #0a0806;
 	}
 
+	/* a column: the footer at the window's bottom also when the page is short */
 	body {
+		display: flex;
+		flex-direction: column;
 		margin: 0;
 		min-height: 100vh;
 		color: rgba(255, 255, 255, 0.85);
 		font-family: var(--font);
 		background: #0a0806;
-	}
-
-	/* the footer at the window's bottom also when the page is short */
-	body {
-		display: flex;
-		flex-direction: column;
 	}
 
 	/* across the whole page - the rounds' panel too, like the bars above and below it */
@@ -189,12 +186,9 @@
 		background: none;
 	}
 
-	.tournament-winner .team-card.won .player {
-		padding: 8px 22px;
-	}
-
 	/* the winners: no boxes - their names in gold, glowing */
 	.tournament-winner .team-card.won .player {
+		padding: 8px 22px;
 		min-height: 64px;
 		gap: 16px;
 		color: rgb(var(--gold));
@@ -219,6 +213,7 @@
 	.site-footer {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: center;
 		justify-content: space-between;
 		gap: 0.6em 2em;
 		padding: 1.8em 2em;
@@ -235,10 +230,6 @@
 
 	.site-footer a:hover {
 		text-decoration: underline;
-	}
-
-	.site-footer {
-		align-items: center;
 	}
 
 	.footer-logo img {
@@ -260,7 +251,6 @@
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		background: rgba(0, 0, 0, 0.32);
 	}
-
 
 	/* the box's header: the round, then its arena - a thin line under them, so the arena's name has its ground */
 	.stage-head {
@@ -611,6 +601,15 @@
 			font-size: 1.6rem;
 		}
 
+		/* the frame's room smaller, a long name kept inside it */
+		.winner-button {
+			padding: 30px 30px 36px 26px;
+		}
+
+		.tournament-winner .team-card.won .players {
+			max-width: 100%;
+		}
+
 		.tournament-winner .avatar-slot,
 		.tournament-winner .avatar {
 			width: 36px;
@@ -670,8 +669,8 @@
 	const pad2 = n => String(n).padStart(2, '\u2007');
 
 	/*
-		A team's players, one per line, each after their avatar - served by this server, by the account or,
-		where there are none, the nickname; a faint square where a player has none.
+		A team's players, one per line, each after their avatar - served by this server, by the account;
+		a faint square where a player has none (or hasn't come yet).
 	*/
 
 	function players(team) {
@@ -682,10 +681,13 @@
 			const slot = el('span', 'avatar-slot');
 			const avatar = el('img', 'avatar');
 			avatar.alt = '';
-			avatar.src = `avatar?id=${encodeURIComponent(p.account || p.nickname)}`;
 			// none of their own: just its place, a faint square
 			avatar.onerror = () => avatar.remove();
-			slot.appendChild(avatar);
+
+			if (p.account) {
+				avatar.src = `avatar?account=${encodeURIComponent(p.account)}`;
+				slot.appendChild(avatar);
+			}
 			line.appendChild(slot);
 			const nickname = el('span', 'nickname', p.nickname);
 			nickname.title = p.nickname;
@@ -796,11 +798,6 @@
 	}
 
 	/*
-		As on hypersomnia.io/tournament: a decided match with its winner on the left, the loser struck through
-		on the right, the score between them - a match being played with its live score there.
-	*/
-
-	/*
 		A team that goes on without playing - by a walkover, or a bye: in its place on the left, the reason where
 		the score goes, nobody on the right.
 	*/
@@ -816,13 +813,38 @@
 		return pair;
 	}
 
+	/*
+		A match nobody came to: both teams out, struck through, FORFEIT where the score goes.
+	*/
+
+	function forfeitPair(m) {
+		const pair = el('div', 'match-pair');
+		const box = el('div', 'match-connector');
+		box.appendChild(el('span', 'match-score reason', 'FORFEIT'));
+
+		pair.appendChild(teamCard(m.team_a, 'lost', '?'));
+		pair.appendChild(box);
+		pair.appendChild(teamCard(m.team_b, 'lost', '?'));
+		return pair;
+	}
+
+	/*
+		As on hypersomnia.io/tournament: a decided match with its winner on the left, the loser struck through
+		on the right, the score between them - a match being played with its live score there.
+	*/
+
 	function matchPair(m) {
-		if (m.status === 'empty' || m.status === 'coming') {
+		if (m.status === 'coming') {
 			return null;
 		}
 
+		if (m.status === 'empty') {
+			return forfeitPair(m);
+		}
+
+		// whichever team came: in a round being played the teams are as paired, the winner either one
 		if (m.status === 'walkover') {
-			return alonePair(m.team_a, 'WALKOVER');
+			return alonePair(m.winner === 'b' ? m.team_b : m.team_a, 'WALKOVER');
 		}
 
 		const pair = el('div', 'match-pair');
@@ -991,8 +1013,6 @@
 	}
 
 	window.addEventListener('resize', align_arena_names);
-
-
 
 	/*
 		Drawn anew only when something changed - and then every animation is put back on one clock,

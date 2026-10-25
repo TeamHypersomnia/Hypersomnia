@@ -18,8 +18,7 @@ bool server_setup::is_spectator_account(const std::string& account) const {
 }
 
 /*
-	admin_account is what the cert proves - known on connecting, also where the nicknames are the identities
-	and account is known only once the nickname comes.
+	admin_account is what the cert proves of an administrator (admin_account_of) - besides the account it plays as.
 */
 
 bool server_setup::may_watch_running_match(const std::string& account, const std::string& admin_account) const {
@@ -49,10 +48,43 @@ bool server_setup::may_watch_running_match(const std::string& account, const std
 }
 
 /*
+	A player of the match being played - in a team, connected or suspended. Comes back also before the server noticed
+	the old connection gone: the newer connection then replaces it (apply_authentication).
+*/
+
+bool server_setup::plays_running_match(const std::string& account) const {
+	if (account.empty()) {
+		return false;
+	}
+
+	if (is_currently_suspended(account)) {
+		return true;
+	}
+
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			using M = std::remove_cvref_t<decltype(mode)>;
+
+			auto found = false;
+
+			if constexpr(std::is_same_v<M, arena_mode>) {
+				for (const auto faction : { faction_type::RESISTANCE, faction_type::METROPOLIS }) {
+					mode.for_each_player_in(faction, [&](const auto, const auto& player) {
+						if (player.server_ranked_account_id == account) {
+							found = true;
+						}
+					});
+				}
+			}
+
+			return found;
+		}
+	);
+}
+
+/*
 	The handshake of a client while the match refuses new ones: its identity checked as on connecting
 	(verify_client_identity), then whether it may come in - a player of the match back, or one who watches.
-	Where the nicknames are the identities (a tournament by nicknames), only the connection says who it is:
-	taken in, decided once its nickname is known.
 */
 
 bool server_setup::accept_while_match_refuses(const uint8_t* const binding, const uint8_t* const session_signature, const uint8_t* const user_data) const {
@@ -75,12 +107,8 @@ bool server_setup::accept_while_match_refuses(const uint8_t* const binding, cons
 		return false;
 	}
 
-	if (vars.authenticate_with_nicknames) {
-		return true;
-	}
-
 	const auto& account = verified->account;
-	return is_currently_suspended(account) || may_watch_running_match(account, ::admin_account_of(*blob->identity));
+	return plays_running_match(account) || may_watch_running_match(account, ::admin_account_of(*blob->identity));
 }
 
 /*

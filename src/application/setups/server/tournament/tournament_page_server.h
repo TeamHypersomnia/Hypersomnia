@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -107,42 +108,41 @@ public:
 
 /*
 	The players' avatars, kept for the page in their own folder (user/tournament_avatars) - so they're there after
-	a restart too. A file per player, named by a hash of the player (an account or a nickname): what a request asks
-	for is only ever hashed, never a path.
+	a restart too. A file per player, named by a hash of the account (normalized - 0x... is key_...): what a request
+	asks for is only ever hashed, never a path.
 */
 
 class tournament_avatars {
 	augs::path_type dir;
 	std::mutex lk;
 
-	augs::path_type file_of(const std::string& player) const {
-		const auto key = ::is_valid_account_id(player) ? ::normalize_account_id(player) : player;
-		return dir / (augs::bytes_to_hex(augs::secure_hash(key)).substr(0, 32) + ".png");
+	augs::path_type file_of(const std::string& account) const {
+		return dir / (augs::bytes_to_hex(augs::secure_hash(::normalize_account_id(account))).substr(0, 32) + ".png");
 	}
 
 public:
 	explicit tournament_avatars(augs::path_type dir) : dir(std::move(dir)) {}
 
-	void save(const std::string& player, const std::vector<std::byte>& png) {
+	void save(const std::string& account, const std::vector<std::byte>& png) {
 		std::scoped_lock guard(lk);
 
 		try {
 			augs::create_directories(dir);
-			augs::save_as_text_atomic(file_of(player), std::string(reinterpret_cast<const char*>(png.data()), png.size()));
+			augs::save_as_text_atomic(file_of(account), std::string(reinterpret_cast<const char*>(png.data()), png.size()));
 		}
 		catch (const std::exception& err) {
 			LOG("Tournament: could not save an avatar to %x: %x", dir.string(), err.what());
 		}
 	}
 
-	std::optional<std::string> find(const std::string& player) {
-		if (player.empty() || player.size() > 200) {
+	std::optional<std::string> find(const std::string& account) {
+		if (account.empty() || account.size() > 200) {
 			return std::nullopt;
 		}
 
 		std::scoped_lock guard(lk);
 
-		auto file = std::ifstream(file_of(player), std::ios::binary);
+		auto file = std::ifstream(file_of(account), std::ios::binary);
 
 		if (!file) {
 			return std::nullopt;
@@ -220,6 +220,7 @@ class tournament_page_rate_limit {
 
 	std::mutex lk;
 	std::unordered_map<std::string, augs::token_bucket> by_address;
+	double when_forgotten = 0.0;
 
 public:
 	bool allow(const std::string& address) {
@@ -228,10 +229,13 @@ public:
 		const auto now = ::tournament_page_now_secs();
 
 		/*
-			Who hasn't asked for a while has a full bucket again - the same as no bucket, so forgotten.
+			Who hasn't asked for a while has a full bucket again - the same as no bucket, so forgotten;
+			looked through at most once a second, not on every request.
 		*/
 
-		if (by_address.size() > 4096) {
+		if (by_address.size() > 4096 && now - when_forgotten >= 1.0) {
+			when_forgotten = now;
+
 			std::erase_if(by_address, [now](const auto& entry) {
 				return now - entry.second.when_last > burst / per_sec;
 			});
@@ -281,13 +285,13 @@ inline void post_tournament_results(
 	const auto parsed = parsed_url(url);
 
 	if (!parsed.valid()) {
-		LOG("Tournament: the results webhook \"%x\" is not a URL - not sent.", url);
+		LOG("Tournament: the results webhook is not a URL - not sent.");
 		return;
 	}
 
 	const auto location = (parsed.location.empty() ? std::string("/") : parsed.location) + (parsed.query.empty() ? std::string() : "?" + parsed.query);
 
-	for (int attempt = 1; attempt <= 3; ++attempt) {
+	for (auto attempt = 1; attempt <= 3; ++attempt) {
 		auto client = httplib_utils::make_client(parsed, 10);
 		const auto response = client->Post(location.c_str(), *headers, json, "application/json");
 
@@ -303,7 +307,7 @@ inline void post_tournament_results(
 			LOG("Tournament: the results webhook did not answer (attempt %x of 3).", attempt);
 		}
 
-		for (int i = 0; i < 50 && attempt < 3; ++i) {
+		for (auto i = 0; i < 50 && attempt < 3; ++i) {
 			if (interrupted && interrupted()) {
 				return;
 			}

@@ -438,6 +438,7 @@ private:
 
 	bool is_spectator_account(const std::string& account) const;
 	bool may_watch_running_match(const std::string& account, const std::string& admin_account) const;
+	bool plays_running_match(const std::string& account) const;
 	bool accept_while_match_refuses(const uint8_t* binding, const uint8_t* session_signature, const uint8_t* user_data) const;
 	void track_match_start_spectators();
 	total_client_entropy without_spectator_account_team_choice(mode_player_id, const total_client_entropy&) const;
@@ -549,6 +550,13 @@ public:
 	*/
 
 	std::shared_ptr<std::atomic<bool>> close_open_round;
+
+	/*
+		When the round's first player came to any of its matches (server_time; below 0: nobody yet) - the join timeout
+		counts from it (server_join_timeout.hpp). Shared by the round's servers.
+	*/
+
+	std::shared_ptr<std::atomic<double>> round_first_arrival;
 	std::function<void(const server_assigned_teams&)> on_open_match_closed;
 
 	/*
@@ -569,12 +577,6 @@ public:
 	std::string open_match_server_name;
 
 	/*
-		A tournament match's join timeout (server_join_timeout.hpp): this long after the server started,
-		a match still waiting for its players is decided - on_join_timeout with the team that came
-		(faction_type::COUNT: nobody), or it starts with the equal numbers present. 0: no timeout.
-	*/
-
-	/*
 		The spectators of the match being played when it started (server_watchers.hpp) - and, from a tournament,
 		whether an account's team has no match of its own to play now, so it may watch this one.
 	*/
@@ -582,6 +584,21 @@ public:
 	std::vector<std::string> match_start_spectators;
 	bool match_was_running = false;
 	std::function<bool(const std::string&)> may_spectate_tournament;
+
+	/*
+		A tournament listed by nicknames only (tournament_nickname_claims.hpp): the first account to come with a listed
+		nickname takes it - told to the tournament, which keeps it. The nicknames taken so, to tell whoever comes later.
+	*/
+
+	std::function<void(const std::string& placeholder, const std::string& account)> on_listed_nickname_claimed;
+	std::vector<std::string> claimed_nicknames;
+	bool claim_listed_nickname(const server_client_state&);
+
+	/*
+		A tournament match's join timeout (server_join_timeout.hpp): this long after the round's first player came,
+		a match still waiting for its players is decided - on_join_timeout with the team that came
+		(faction_type::COUNT: nobody), or it starts with the equal numbers present. 0: no timeout.
+	*/
 
 	uint32_t join_timeout_secs = 0;
 	std::optional<net_time_t> join_timeout_since;
@@ -608,11 +625,10 @@ public:
 	std::function<void(const live_match_state&)> on_live_state;
 
 	/*
-		The players' avatars for a tournament's page (tournament_avatars.hpp): each new one passed on once, by the player
-		as the page knows them - the account, or the nickname where the nicknames are the identities.
+		The players' avatars for a tournament's page (tournament_avatars.hpp): each new one passed on once, by the account.
 	*/
 
-	std::function<void(const std::string& player, const std::vector<std::byte>& png)> on_player_avatar;
+	std::function<void(const std::string& account, const std::vector<std::byte>& png)> on_player_avatar;
 	std::unordered_map<std::string, std::size_t> avatars_passed_on;
 	void publish_tournament_avatars();
 	uint16_t tournament_page_port = 0;

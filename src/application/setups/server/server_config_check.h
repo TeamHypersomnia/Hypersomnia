@@ -87,12 +87,22 @@ inline bool check_server_config(
 		}
 	}
 
+	/*
+		Where the nicknames are the identities, nobody proves an account - a list of accounts would let in anyone
+		under a padlock. Never started so, also outside a tournament.
+	*/
+
+	if (!config.server_private.allowed_accounts.empty() && config.server.authenticate_with_nicknames) {
+		LOG("ERROR: allowed_accounts with authenticate_with_nicknames: the players are known only by their nicknames, so the list can't be checked - remove one of them.");
+		any_error = true;
+	}
+
 	if (const auto& spectator = config.server_private.spectator_account; !spectator.empty() && !::is_valid_account_id(spectator)) {
 		settled_problems.push_back(typesafe_sprintf("spectator_account: \"%x\" is not an account id (steam_..., 0x... or key_...)", spectator));
 	}
 
 	if (const auto& url = config.server_private.tournament_results_webhook_url; !url.empty() && !(parsed_url(url).valid() && (url.rfind("http://", 0) == 0 || url.rfind("https://", 0) == 0))) {
-		settled_problems.push_back(typesafe_sprintf("tournament_results_webhook_url: \"%x\" is not a URL (https://...)", url));
+		settled_problems.push_back("tournament_results_webhook_url is not a URL (https://...)");
 	}
 
 	if (config.server_start.slots > max_server_slots_v) {

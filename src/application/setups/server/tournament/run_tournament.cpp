@@ -10,6 +10,7 @@
 #include "augs/string/string_templates.h"
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"
+#include "augs/templates/container_templates.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/misc/secure_hash.h"
 
@@ -22,7 +23,6 @@
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/server_setup.h"
 #include "application/setups/server/server_assigned_teams.h"
-#include "application/setups/server/server_nickname_auth.h"
 #include "application/network/account_id.h"
 #if CRASH_RECOVERY
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
@@ -375,8 +375,12 @@ namespace {
 		*/
 
 		const auto rounds = [&]() {
+			/*
+				Over: the coordinator moved past the final already - stage_index is how many rounds were played.
+			*/
+
 			if (finished) {
-				return state.stage_index + 1;
+				return std::max(1u, state.stage_index);
 			}
 
 			if (cfg.is_open() && state.stage_index == 0) {
@@ -391,7 +395,7 @@ namespace {
 			round.name = round_name(r, rounds);
 			round.arena = cfg.arenas.empty() ? std::string() : cfg.arena_for_rounds_left(rounds - r);
 
-			const bool played = r < state.stage_index || (finished && r <= state.stage_index);
+			const bool played = r < state.stage_index;
 			const bool playing = r == state.stage_index && !finished;
 
 			round.state = played ? "PLAYED" : playing ? "PLAYING" : "COMING";
@@ -417,6 +421,30 @@ namespace {
 					}
 
 					round.matches.push_back(std::move(m));
+				}
+
+				/*
+					Its byes, from the history alone: a team that plays later on (or is still in it) but had no match here
+					went on without playing.
+				*/
+
+				auto played_in = [&](const tournament_team_state& t, const auto in_stage) {
+					return std::any_of(state.match_history.begin(), state.match_history.end(), [&](const auto& h) {
+						return in_stage(h.played_in_stage) && (found_in(h.winner_player_ids, t.player_ids.front()) || found_in(h.loser_player_ids, t.player_ids.front()));
+					});
+				};
+
+				for (const auto& t : state.teams) {
+					if (t.player_ids.empty()) {
+						continue;
+					}
+
+					const bool here = played_in(t, [r](const auto stage) { return stage == r; });
+					const bool later = (!finished && !t.eliminated) || played_in(t, [r](const auto stage) { return stage > r; });
+
+					if (later && !here) {
+						round.byes.push_back(team(t.player_ids));
+					}
 				}
 			}
 			else if (playing) {
@@ -622,29 +650,11 @@ work_result run_tournament(const run_tournament_input& in) {
 
 		page_server = std::make_unique<httplib::Server>();
 
-		auto too_many = [&page_rate_limit](const httplib::Request& req, httplib::Response& res) {
-			if (page_rate_limit.allow(req.remote_addr)) {
-				return false;
-			}
-
-			res.status = 429;
-			res.set_header("Retry-After", "1");
-			return true;
-		};
-
-		page_server->Get("/", [page_html, too_many](const httplib::Request& req, httplib::Response& res) {
-			if (too_many(req, res)) {
-				return;
-			}
-
+		page_server->Get("/", [page_html](const httplib::Request&, httplib::Response& res) {
 			res.set_content(page_html, "text/html; charset=utf-8");
 		});
 
-		page_server->Get(R"(/miniature/([A-Za-z0-9_\-]+)\.png)", [miniatures = std::make_shared<tournament_arena_miniatures>(page_cfg.arenas), too_many](const httplib::Request& req, httplib::Response& res) {
-			if (too_many(req, res)) {
-				return;
-			}
-
+		page_server->Get(R"(/miniature/([A-Za-z0-9_\-]+)\.png)", [miniatures = std::make_shared<tournament_arena_miniatures>(page_cfg.arenas)](const httplib::Request& req, httplib::Response& res) {
 			if (const auto png = miniatures->find(req.matches[1].str())) {
 				res.set_header("Cache-Control", "max-age=3600");
 				res.set_content(*png, "image/png");
@@ -654,13 +664,14 @@ work_result run_tournament(const run_tournament_input& in) {
 			}
 		});
 
-		page_server->Get("/avatar", [&avatars, too_many](const httplib::Request& req, httplib::Response& res) {
-			if (too_many(req, res)) {
-				return;
-			}
+		page_server->Get("/avatar", [&avatars](const httplib::Request& req, httplib::Response& res) {
+			/*
+				Also "none" kept a minute by the browser - not asked again with every redraw of the page.
+			*/
 
-			if (const auto png = avatars.find(req.get_param_value("id"))) {
-				res.set_header("Cache-Control", "max-age=60");
+			res.set_header("Cache-Control", "max-age=60");
+
+			if (const auto png = avatars.find(req.get_param_value("account"))) {
 				res.set_content(*png, "image/png");
 			}
 			else {
@@ -668,11 +679,7 @@ work_result run_tournament(const run_tournament_input& in) {
 			}
 		});
 
-		page_server->Get(R"(/([a-z_0-9@]+\.png))", [pictures = std::make_shared<tournament_page_pictures>(), too_many](const httplib::Request& req, httplib::Response& res) {
-			if (too_many(req, res)) {
-				return;
-			}
-
+		page_server->Get(R"(/([a-z_0-9@]+\.png))", [pictures = std::make_shared<tournament_page_pictures>()](const httplib::Request& req, httplib::Response& res) {
 			if (const auto png = pictures->find(req.matches[1].str())) {
 				res.set_header("Cache-Control", "max-age=3600");
 				res.set_content(*png, "image/png");
@@ -682,8 +689,14 @@ work_result run_tournament(const run_tournament_input& in) {
 			}
 		});
 
-		page_server->Get("/tournament.json", [&page_cache, &page_signer, &make_page_json, too_many](const httplib::Request& req, httplib::Response& res) {
-			if (too_many(req, res)) {
+		/*
+			Only the JSON is limited per address - making it is what costs; the pictures are served as they are.
+		*/
+
+		page_server->Get("/tournament.json", [&page_cache, &page_signer, &make_page_json, &page_rate_limit](const httplib::Request& req, httplib::Response& res) {
+			if (!page_rate_limit.allow(req.remote_addr)) {
+				res.status = 429;
+				res.set_header("Retry-After", "1");
 				return;
 			}
 
@@ -782,6 +795,7 @@ work_result run_tournament(const run_tournament_input& in) {
 	*/
 
 	std::function<bool(const std::function<bool(const std::string&)>&)> may_watch_others;
+	std::function<void(tournament_match&, const account_id_string&, const account_id_string&)> claim_listed_nickname;
 
 	deps.run_stage = [&](
 		std::vector<tournament_match>& matches,
@@ -818,6 +832,12 @@ work_result run_tournament(const run_tournament_input& in) {
 		*/
 
 		const auto close_open_round = std::make_shared<std::atomic<bool>>(false);
+
+		/*
+			The join timeout of every match of this round counts from the round's first player coming.
+		*/
+
+		const auto round_first_arrival = std::make_shared<std::atomic<double>>(-1.0);
 
 		/*
 			Started again after a crash: the players of the matches decided before it came already - counted,
@@ -909,81 +929,18 @@ work_result run_tournament(const run_tournament_input& in) {
 			server_assigned_teams roster;
 
 			/*
-				Rosters of account ids (steam_..., key_..., crazygames_...) are matched against the players' certs.
-				Rosters of plain nicknames fall back to nickname auth, so LAN tournaments work out of the box -
-				operators don't have to remember to also flip authenticate_with_nicknames in the dedicated-server config.
+				The players are always told apart by their accounts. A roster listed by nicknames only holds nick_<nickname>
+				for whoever hasn't come yet - the first account to come with that nickname takes it (claim_listed_nickname).
 			*/
 
-			{
-				auto is_account_id = [](const account_id_string& id) {
-					for (const auto prefix : { "steam_", "key_", "crazygames_" }) {
-						if (id.rfind(prefix, 0) == 0) {
-							return true;
-						}
-					}
-
-					return false;
-				};
-
-				auto all_account_ids = [&](const std::vector<account_id_string>& ids) {
-					return std::all_of(ids.begin(), ids.end(), is_account_id);
-				};
-
-				const bool rosters_are_accounts =
-					all_account_ids(match.team_a_player_ids)
-					&& all_account_ids(match.team_b_player_ids)
-					&& all_account_ids(match.spectator_player_ids)
-				;
-
-				if (!rosters_are_accounts) {
-					this_config.server.authenticate_with_nicknames = true;
-
-					auto any_account_id = [&](const std::vector<account_id_string>& ids) {
-						return std::any_of(ids.begin(), ids.end(), is_account_id);
-					};
-
-					const bool mixed =
-						any_account_id(match.team_a_player_ids)
-						|| any_account_id(match.team_b_player_ids)
-						|| any_account_id(match.spectator_player_ids)
-					;
-
-					if (mixed) {
-						LOG("WARNING! Tournament match on port %x mixes account ids with nicknames - all are treated as nicknames.", match.port);
-					}
-				}
-				else if (this_config.server.authenticate_with_nicknames) {
-					/*
-						Nickname auth would make the players "nick_..." - no account id in the roster could match.
-					*/
-
-					LOG("Tournament match on port %x: the roster is account ids - authenticate_with_nicknames turned off.", match.port);
-					this_config.server.authenticate_with_nicknames = false;
-				}
-
-				LOG(
-					"Tournament match on port %x authenticates players by %x.",
-					match.port,
-					this_config.server.authenticate_with_nicknames ? "nickname" : "account"
-				);
+			if (this_config.server.authenticate_with_nicknames) {
+				LOG("Tournament match on port %x: authenticate_with_nicknames turned off - the players are their accounts.", match.port);
+				this_config.server.authenticate_with_nicknames = false;
 			}
 
-			/*
-				The tournament JSON holds raw nicknames ("alice"), but when
-				authenticate_with_nicknames is set the server authenticates clients
-				as "nick_alice". Roster keys and summary matching must use that same
-				authenticated form or every client is kicked as "wrong match".
-			*/
-
-			const bool nickname_auth = this_config.server.authenticate_with_nicknames;
-
-			auto to_auth_id = [nickname_auth](const account_id_string& id) {
-				return nickname_auth ? nickname_to_account_id(id) : id;
-			};
-
-			auto fill_faction = [&roster, &to_auth_id](const std::vector<account_id_string>& ids, const faction_type f) {
+			auto fill_faction = [&roster](const std::vector<account_id_string>& ids, const faction_type f) {
 				for (const auto& id : ids) {
-					roster.id_to_faction[to_auth_id(id)] = f;
+					roster.id_to_faction[id] = f;
 				}
 			};
 
@@ -1009,16 +966,17 @@ work_result run_tournament(const run_tournament_input& in) {
 				this_config = std::move(this_config),
 				canon_server_vars = std::move(canon_server_vars),
 				roster = std::move(roster),
-				nickname_auth,
 				stage_should_interrupt,
 				on_instance_exit,
 				commit,
 				close_open_round,
+				round_first_arrival,
 				open_round_players,
 				open_places,
 				expected_players = in.config.open_players,
 				join_timeout_secs = in.config.join_timeout_secs,
 				&may_watch_others,
+				&claim_listed_nickname,
 				&avatars,
 				served_page_port,
 				&page_lk,
@@ -1104,20 +1062,24 @@ work_result run_tournament(const run_tournament_input& in) {
 				*/
 
 				server_ptr->join_timeout_secs = join_timeout_secs;
+				server_ptr->round_first_arrival = round_first_arrival;
 
 				/*
-					A team with no match of its own to play now watches any match - by its account,
-					or its nickname where the nicknames are the identities.
+					A team with no match of its own to play now watches any match.
 				*/
 
-				server_ptr->may_spectate_tournament = [&may_watch_others, nickname_auth](const std::string& account) {
+				server_ptr->may_spectate_tournament = [&may_watch_others](const std::string& account) {
 					if (!may_watch_others) {
 						return false;
 					}
 
 					return may_watch_others([&](const std::string& player_id) {
-						return (nickname_auth ? nickname_to_account_id(player_id) : ::normalize_account_id(player_id)) == account;
+						return ::normalize_account_id(player_id) == account;
 					});
+				};
+
+				server_ptr->on_listed_nickname_claimed = [match_ptr, &claim_listed_nickname](const std::string& placeholder, const std::string& account) {
+					claim_listed_nickname(*match_ptr, placeholder, account);
 				};
 				server_ptr->on_join_timeout = [match_ptr, commit](const faction_type came) {
 					auto outcome = tournament_match_outcome();
@@ -1173,10 +1135,10 @@ work_result run_tournament(const run_tournament_input& in) {
 					/*
 						Closed before its pair was there: whoever waited advances without playing - as one team of at most
 						the team size, whichever side they took: the fuller side, filled up from the other one.
-						Who doesn't fit is out. Nobody: an empty server, gone.
+						Who doesn't fit is out of this match, its place freed. Nobody: an empty server, gone.
 					*/
 
-					server_ptr->on_open_match_closed = [match_ptr, commit, take_open_teams](const server_assigned_teams& roster) {
+					server_ptr->on_open_match_closed = [match_ptr, commit, take_open_teams, open_places](const server_assigned_teams& roster) {
 						auto outcome = tournament_match_outcome();
 						outcome.walkover = true;
 
@@ -1195,7 +1157,15 @@ work_result run_tournament(const run_tournament_input& in) {
 								outcome.open_names_a.push_back(outcome.open_names_b[i]);
 							}
 							else {
+								/*
+									Its place freed: it played nothing - another open match still waiting may take it.
+								*/
+
 								LOG("Tournament: %x (%x) didn't fit into a team of %x - out.", outcome.open_names_b[i], outcome.open_team_b[i], team_size);
+
+								if (open_places != nullptr) {
+									open_places->free(outcome.open_team_b[i], match_ptr->server_name);
+								}
 							}
 						}
 
@@ -1206,7 +1176,7 @@ work_result run_tournament(const run_tournament_input& in) {
 					};
 				}
 
-				server_ptr->on_match_summary = [match_ptr, commit, nickname_auth, server_raw, take_open_teams](const messages::match_summary_message& s) {
+				server_ptr->on_match_summary = [match_ptr, commit, server_raw, take_open_teams](const messages::match_summary_message& s) {
 					auto outcome = tournament_match_outcome();
 
 					if (match_ptr->open_team_size > 0 && match_ptr->team_a_index == no_tournament_team_v) {
@@ -1219,11 +1189,11 @@ work_result run_tournament(const run_tournament_input& in) {
 					// a listed team's nicknames, as they played - in its order
 					if (match_ptr->open_team_size == 0) {
 						for (const auto& id : team_a_ids) {
-							outcome.open_names_a.push_back(server_raw->find_nickname_of_account(nickname_auth ? nickname_to_account_id(id) : id));
+							outcome.open_names_a.push_back(server_raw->find_nickname_of_account(id));
 						}
 
 						for (const auto& id : team_b_ids) {
-							outcome.open_names_b.push_back(server_raw->find_nickname_of_account(nickname_auth ? nickname_to_account_id(id) : id));
+							outcome.open_names_b.push_back(server_raw->find_nickname_of_account(id));
 						}
 					}
 
@@ -1240,16 +1210,8 @@ work_result run_tournament(const run_tournament_input& in) {
 						sole occupant of first_faction and is detected as a normal win.
 					*/
 
-					const auto roster_contains = [nickname_auth](const std::vector<account_id_string>& roster, const std::string& id) {
-						for (const auto& r : roster) {
-							const auto auth_r = nickname_auth ? nickname_to_account_id(r) : r;
-
-							if (auth_r == id) {
-								return true;
-							}
-						}
-
-						return false;
+					const auto roster_contains = [](const std::vector<account_id_string>& roster, const std::string& id) {
+						return found_in(roster, id);
 					};
 
 					const bool team_a_in_first = [&]() {
@@ -1350,10 +1312,32 @@ work_result run_tournament(const run_tournament_input& in) {
 		return coordinator.may_watch_others(is_player);
 	};
 
+	claim_listed_nickname = [&coordinator](tournament_match& m, const account_id_string& placeholder, const account_id_string& account) {
+		coordinator.claim_listed_nickname(m, placeholder, account);
+	};
+
+	/*
+		Its results saved as tournament_results.json and POSTed to the webhook - when it's over, and again whenever
+		a tournament over already is started (after a stop right at its end, a webhook that didn't answer):
+		the receiver drops a second copy.
+	*/
+
+	auto publish_results = [&]() {
+		page_finished = true;
+
+		const auto results_json = make_page_json();
+		::save_tournament_results(in.state_file_path.parent_path() / "tournament_results.json", results_json);
+		::post_tournament_results(in.config_pattern.server_private.tournament_results_webhook_url, results_json, page_signer, in.handle_sigint);
+	};
+
 	if (!coordinator.run()) {
 		if (const auto played = tournament_state::load(coordinator.completed_archive)) {
-			std::scoped_lock lk(page_lk);
-			page_state = *played;
+			{
+				std::scoped_lock lk(page_lk);
+				page_state = *played;
+			}
+
+			publish_results();
 		}
 
 		page_finished = true;
@@ -1377,11 +1361,7 @@ work_result run_tournament(const run_tournament_input& in) {
 		return work_result::FAILURE;
 	}
 	else if (!(in.handle_sigint && in.handle_sigint())) {
-		page_finished = true;
-
-		const auto results_json = make_page_json();
-		::save_tournament_results(in.state_file_path.parent_path() / "tournament_results.json", results_json);
-		::post_tournament_results(in.config_pattern.server_private.tournament_results_webhook_url, results_json, page_signer, in.handle_sigint);
+		publish_results();
 		LOG("Tournament: over - the live page shows the results. Ctrl+C (or stopping the service) to quit.");
 		idle_until_interrupted();
 	}

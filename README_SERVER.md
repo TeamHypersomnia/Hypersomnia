@@ -59,7 +59,7 @@ Several servers take the next ports: `8412-8414`, `9000-9002` for three.
 The user folder: `~/.config/Hypersomnia/user/` (AppImage), `/opt/hypersomnia/user/` (AppImage as a separate user), `/opt/hypersomnia/` (Docker).
 
 - `conf.d/*.json` - your config, in alphabetical order. The server never changes them.
-- `conf.d/private.json` - `server_private`: passwords, the Discord webhook, admins. Kept apart so the rest can be shown to others; `chmod 600`. Docker compose keeps the password and the webhook in a `.env` next to `compose.yaml` instead.
+- `conf.d/private.json` - `server_private`: the password, admins, the spectator account, the listed accounts, the Discord and tournament results webhooks. Kept apart so the rest can be shown to others; `chmod 600`. Docker compose keeps the password and both webhooks in a `.env` next to `compose.yaml` instead.
 - `runtime_prefs.json` - what was changed from the administration panel.
 - `server_bans.json` - the bans.
 
@@ -147,12 +147,12 @@ A knockout tournament: a server for every match, the winners go on round by roun
 **The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: [`/tournament.json`](#the-results-as-json). A port below `1024` needs root; a port taken by something else: the tournament goes on without the page. `--tournament-name "onFOSS November Cup 2026"` titles it - without a name: `2v2 tournament`.
 
 - Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8; at least two teams' worth of players); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
-- Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing.
-  - **Listed nicknames** (`alice, bob; carol, dave`): players set those exact nicknames to be let in - insecure, but enough for a LAN.
+- Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing. Any number of them from one address (a LAN party behind one router) - with anyone joining, at most `max_ranked_players_per_ip` (2), as in ranked.
+  - **Listed nicknames** (`alice, bob; carol, dave`): the first one to come with a listed nickname takes it - from then on that player is their account (the game's key), the nickname is only a label, and anyone else with it is told it's taken. Enough for a LAN: whoever comes first as `alice` is alice, and a player who changes computers mid-tournament doesn't get back in.
   - **Listed accounts** (`alice=0x8aed..., bob=steam_7656...; ...`): let in by their account (`Settings → Account → Copy account id` in the game), shown by the nickname written here - they play under any name. Every player needs one; a list with one missing doesn't start.
 - Once all the players it's for came, round 1 closes by itself: whoever waits alone advances without playing, the empty servers close. Fewer came? `Close round 1` (administration panel, `Maintenance`) does the same - or the join timeout.
-- One place per account in round 1: a player with a place on one server who joins another is sent back to theirs.
-- **Join timeout** (10 minutes by default, `--tournament-join-timeout <minutes>` or `off`): a match still waiting for its players that long after its round started is decided without them - the team with more players present wins by walkover, equal numbers play as they are, nobody came - both teams are out (in the final: the tournament ends without a winner). Round 1 with anyone joining: closes as `Close round 1` does. Matches being played aren't touched.
+- One place per account in round 1: a player with a place on one server who joins another is sent back to theirs. And one player per nickname: whoever comes with a nickname another player took (say, two who didn't set theirs) is told to change it.
+- **Join timeout** (10 minutes by default, `--tournament-join-timeout <minutes>` or `off`): a match still waiting for its players that long after the round's first player came (to any of its matches) is decided without them - so a tournament started long before the players come waits for them - the team with more players present wins by walkover, equal numbers play as they are, nobody came - both teams are out (in the final: the tournament ends without a winner). Round 1 with anyone joining: closes as `Close round 1` does. Matches being played aren't touched.
 - Byes fill the bracket up to 2, 4, 8... once - from round 2, counted from the teams that are left. They go to the strongest: the first lines, then by how fast they won; a walkover counts as the weakest. The final is always on the last arena.
 - Admins join any match: before it starts as anyone (a player in round 1 with anyone joining), once it's played as spectators.
 - A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, an arena or a game mode that doesn't exist. Other servers only warn.
@@ -162,20 +162,20 @@ A knockout tournament: a server for every match, the winners go on round by roun
 
 ## The results as JSON
 
-`http://<your server>:8412/tournament.json` while it's played (at most 5 requests a second from one address, made anew once a second), and one `POST` of the same to `server_private.tournament_results_webhook_url` (`HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK`) when it's over - tried 3 times until answered with a `2xx`. The very same JSON is saved to `tournament_results.json` in the user folder once it's over. `Show example payload` in the config generator shows a whole one.
+`http://<your server>:8412/tournament.json` while it's played (at most 5 requests a second from one address, made anew once a second), and one `POST` of the same to `server_private.tournament_results_webhook_url` (`HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK`) when it's over - tried 3 times until answered with a `2xx`, and again every time the server is started after that. The very same JSON is saved to `tournament_results.json` in the user folder. The receiver takes only `"state": "FINISHED"` and drops a copy it already has (the same `name` and `winner_team`). `Show example payload` in the config generator shows a whole one.
 
 Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key (what `--print-server-key` prints), `X-Hypersomnia-Signature` - Ed25519 of the body, in hex. Check that the key is your server's and the signature is right, and nobody could have made up the results.
 
 - `name` - only when set; `state` - `ONGOING` or `FINISHED`; `winner_team` - its players, empty until it's over.
-- `rounds` - the final first: `name`, `state` (`PLAYED`, `PLAYING`, `COMING`), `arena`, `matches`, `byes` (the teams that go on without playing).
-- A match: `status` (`done`, `walkover`, `live`, `waiting`, `empty` - nobody came, `coming` - its teams not known yet), `winner` (`a` or `b`), `team_a`, `team_b`; `score_a`, `score_b` once it's played; `server_name`, `port` while it's waited for or played.
-- A player: `nickname` and `account` - empty where the nicknames are the players' identities.
+- `rounds` - the final first: `name`, `state` (`PLAYED`, `PLAYING`, `COMING`), `arena`, `matches`, `byes` (the teams that went on without playing).
+- A match: `status` (`done`, `walkover`, `live`, `waiting`, `empty` - nobody came, `coming` - its teams not known yet), `winner` (`a` or `b` once decided, otherwise empty), `team_a`, `team_b` (in a played round the winner is `team_a`); `score_a`, `score_b` while it's played and after - none for a walkover; `server_name`, `port` while it's waited for or played. A match nobody came to is listed only while its round is played.
+- A player: `nickname` and `account` - empty for a listed nickname nobody has come with yet.
 - `config` - `who_gets_in` (`anyone`, `listed nicknames`, `listed accounts`), `team_size`, `teams`, `arenas`, `join_timeout_minutes` (`0`: off).
 
 # Match results
 
 - **Discord or Telegram:** `Discord webhook` in the config generator (`server_private.discord_webhook_url`; for Telegram `telegram_webhook_url` and `telegram_channel_id`) - who joined, duels, every match's result. More of them, e.g. filtered by a clan: `custom_webhook_urls`.
-- **A tournament:** its [live results page](#tournaments), the [results webhook](#the-results-as-json); the final results in `tournament.completed.<time>.state.json` in the user folder.
+- **A tournament:** its [live results page](#tournaments), the [results webhook](#the-results-as-json), `tournament_results.json` in the user folder (the same JSON); its whole state in `tournament.completed.<time>.state.json`.
 - **Anything else:** every match's start and end as a `SERVER_EVENT` line with JSON in the log - each player's nickname and account id, and the rest in [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json).
 
 # Several servers, ranked

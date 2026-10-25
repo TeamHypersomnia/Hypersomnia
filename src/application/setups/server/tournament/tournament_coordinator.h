@@ -138,6 +138,13 @@ public:
 
 	bool may_watch_others(const std::function<bool(const std::string&)>& is_player) const;
 
+	/*
+		A listed nickname taken by the first account to come with it (placeholder: nick_<nickname>) - from now on that
+		player is that account, in this match, its team and the history. Called from the match servers' threads.
+	*/
+
+	void claim_listed_nickname(tournament_match&, const account_id_string& placeholder, const account_id_string& account);
+
 private:
 	bool finished() const;
 	void initialize_state_if_fresh();

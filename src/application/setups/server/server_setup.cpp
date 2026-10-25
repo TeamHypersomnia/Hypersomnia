@@ -1411,7 +1411,11 @@ void server_setup::verify_client_identity(const client_id_type id) {
 				The account is anyone's text - logged escaped, and at most every 10 seconds.
 			*/
 
-			static uint64_t last_logged_ms = 0;
+			/*
+				Per thread: several servers of one process (instances, a tournament's matches) each limit their own.
+			*/
+
+			thread_local uint64_t last_logged_ms = 0;
 
 			if (::official_log_allowed(last_logged_ms)) {
 				const auto& cert = *blob->identity;
@@ -1509,6 +1513,7 @@ uint32_t server_setup::get_game_capacity() const {
 	and a troll is for the admins to ban.
 
 	On a ranked server at most max_ranked_players_per_ip from one address: two at home, never a team of one's own accounts.
+	Not on a tournament's match of listed teams: its roster decides who plays - a LAN party behind one address too.
 
 	An admin always gets in: past the per-address limit, and into the places kept for admins on a full server
 	(server_slots.h) - a server being played on, ranked or a tournament's, takes them only as spectators.
@@ -1531,7 +1536,9 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}, only_connected_v);
 
-	if (requires_authentication() && !ip.empty() && !admin && !spectator_account) {
+	const bool roster_decides = has_assigned_teams() && !is_open_match();
+
+	if (requires_authentication() && !ip.empty() && !admin && !spectator_account && !roster_decides) {
 		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
 			return get_client_ip_for_bans(other_id) == ip;
 		});
@@ -4225,21 +4232,25 @@ void server_setup::advance_clients_state() {
 					(server_watchers.hpp).
 				*/
 
-				const bool watcher = may_watch_running_match(c.authenticated_id, c.admin_account);
-
 				/*
-					Where the nicknames are the identities, who it is is known once the nickname comes -
-					a team watching the others is decided then.
+					A player of this match coming back (also before its old connection is gone) or one who may watch it.
 				*/
 
-				const bool who_known = c.is_authenticated() || !vars.authenticate_with_nicknames;
+				const bool watcher = plays_running_match(c.authenticated_id) || may_watch_running_match(c.authenticated_id, c.admin_account);
 
-				if (!is_joinable() && !watcher && who_known) {
+				if (!is_joinable() && !watcher) {
 					/* Joined too late. */
 					kick_now(client_id, std::string(rejoin_too_late_reason_v));
 				}
 
-				if (c.is_authenticated()) {
+				/*
+					A tournament's roster may name the players by their nicknames (claim_listed_nickname) -
+					decided once the nickname came, with the welcome.
+				*/
+
+				const bool nickname_known = c.state != S::PENDING_WELCOME;
+
+				if (c.is_authenticated() && nickname_known) {
 					const auto this_id = c.authenticated_id;
 
 					take_into_open_match(client_id, c);
@@ -4263,7 +4274,15 @@ void server_setup::advance_clients_state() {
 							c.authenticated_id
 						);
 
-						kick_now(client_id, is_open_match() ? std::string("This match is full - join another one.") : std::string(rejoin_wrong_match_reason_v));
+						const auto reason = [&]() {
+							if (found_in(claimed_nicknames, c.get_nickname())) {
+								return typesafe_sprintf("Your nickname: '%x'\nis already taken in this tournament!", c.get_nickname());
+							}
+
+							return is_open_match() ? std::string("This match is full - join another one.") : std::string(rejoin_wrong_match_reason_v);
+						}();
+
+						kick_now(client_id, reason);
 					}
 				}
 			}
@@ -7204,6 +7223,10 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 		return;
 	}
 
+	if (claim_listed_nickname(c)) {
+		return;
+	}
+
 	/*
 		An admin gets in anywhere: where there's no place for them (a match of listed teams, one being played,
 		a full one, or they have their place in another one) - as a spectator. Otherwise they play, as anyone.
@@ -7260,7 +7283,7 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 			LOG("Open match: %x comes back to the recovered match, in %x.", id, suspended_faction);
 
 			if (open_places != nullptr) {
-				open_places->take(id, open_match_server_name);
+				open_places->take(id, open_match_server_name, c.get_nickname());
 			}
 
 			/*
@@ -7299,6 +7322,18 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 
 			return;
 		}
+
+		if (open_places->nickname_taken(c.get_nickname(), id)) {
+			if (admin) {
+				as_spectator();
+			}
+			else {
+				LOG("Open match: %x came with the nickname %x, taken by another player.", id, c.get_nickname());
+				kick_now(client_id, typesafe_sprintf("Your nickname: '%x'\nis already taken in this tournament!", c.get_nickname()));
+			}
+
+			return;
+		}
 	}
 
 	auto num_in = [&](const faction_type f) {
@@ -7333,7 +7368,7 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 	LOG("Open match: %x takes a place in %x.", id, faction);
 
 	if (open_places != nullptr) {
-		open_places->take(id, open_match_server_name);
+		open_places->take(id, open_match_server_name, c.get_nickname());
 	}
 
 	if (open_round_players != nullptr) {
@@ -7612,6 +7647,7 @@ bool server_client_state::is_webrtc_client() const {
 
 #include "application/setups/server/server_watchers.hpp"
 #include "application/setups/server/tournament/tournament_avatars.hpp"
+#include "application/setups/server/tournament/tournament_nickname_claims.hpp"
 
 #undef BUILD_UNIT_TESTS
 #if BUILD_UNIT_TESTS
