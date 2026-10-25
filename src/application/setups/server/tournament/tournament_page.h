@@ -44,7 +44,7 @@ struct tournament_page_round {
 
 struct tournament_page_config {
 	// GEN INTROSPECTOR struct tournament_page_config
-	std::string who_gets_in;
+	std::string who_participates;
 	uint32_t team_size = 1;
 	uint32_t teams = 0;
 	std::vector<std::string> arenas;
