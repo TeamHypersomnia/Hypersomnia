@@ -53,6 +53,7 @@ struct arena_ai_result {
 /*
 	This also tracks time spent on the same cell for stuck detection.
 	When stuck on a cell for 2+ seconds, rotate crosshair offset by 90 degrees.
+	stuck_pos: where the bot stood when the time started - walking away from it is progress, not being stuck.
 */
 
 struct ai_path_navigation_state {
@@ -64,6 +65,7 @@ struct ai_path_navigation_state {
 	cell_on_navmesh target_cell_id;
 
 	vec2u stuck_cell = vec2u::zero;
+	vec2 stuck_pos = vec2::zero;
 	float stuck_time = 0.0f;
 	float stuck_rotation = 0.0f;
 	bool exact_destination = false;

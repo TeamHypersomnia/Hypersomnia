@@ -27,9 +27,11 @@ static constexpr real32 covering_ray_length = 450.0f;
 
 /*
 	A defenders' patrol faces at most this far from where the attackers come - so never with its back to them.
+	With only a wall close ahead within it, up to the side cone (behind starts past it, see rate_patrol_facing).
 */
 
 static constexpr real32 attackers_cone_degrees = 60.0f;
+static constexpr real32 attackers_side_cone_degrees = 112.5f;
 
 /*
 	Whether a waypoint of one faction counts for another - ANY on either side matches both.
@@ -450,6 +452,12 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	std::vector<uint32_t> from_site(num_cells, unreachable);
 	std::vector<marker_letter_type> nearest_site(num_cells, marker_letter_type::A);
 
+	/*
+		Each bombsite's own distances too - every one of them has its routes from the spawns (see calc_route_weight).
+	*/
+
+	std::vector<std::vector<uint32_t>> from_each_site;
+
 	for (const auto& site : in.bombsites) {
 		auto site_cells = cells.find_free_within(site.first);
 
@@ -460,7 +468,7 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 		}
 
 		if (!site_cells.empty()) {
-			const auto site_distances = cells.distances_from(site_cells);
+			auto site_distances = cells.distances_from(site_cells);
 
 			for (std::size_t c = 0; c < num_cells; ++c) {
 				if (site_distances[c] < from_site[c]) {
@@ -468,6 +476,8 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 					nearest_site[c] = site.second;
 				}
 			}
+
+			from_each_site.push_back(std::move(site_distances));
 		}
 	}
 
@@ -546,8 +556,10 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 	};
 
 	/*
-		How close a cell lies to a main route - from a spawn to a bombsite, or between the spawns:
+		How close a cell lies to a main route - from a spawn to each of the bombsites, or between the spawns:
 		the detour of passing through it over the shortest such path, 1000 on a route, less the more it costs to come by.
+		Every bombsite has its own routes - with only those to the nearest one, the way to a farther bombsite
+		counted as a detour from them and was left without waypoints (de_hotline: the attackers' whole way to A).
 	*/
 
 	auto shortest_through = [&](const std::vector<uint32_t>& a, const std::vector<uint32_t>& b) {
@@ -562,8 +574,20 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 		return best;
 	};
 
-	const auto route_res_site = shortest_through(from_resistance, from_site);
-	const auto route_met_site = shortest_through(from_metropolis, from_site);
+	struct site_routes {
+		uint32_t from_resistance = augs::grid_distance_unreachable_v;
+		uint32_t from_metropolis = augs::grid_distance_unreachable_v;
+	};
+
+	std::vector<site_routes> routes_to_each_site;
+
+	for (const auto& site_distances : from_each_site) {
+		routes_to_each_site.push_back({
+			shortest_through(from_resistance, site_distances),
+			shortest_through(from_metropolis, site_distances)
+		});
+	}
+
 	const auto route_res_met = shortest_through(from_resistance, from_metropolis);
 
 	const auto detour_scale = static_cast<uint64_t>(spacing);
@@ -577,8 +601,11 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 			}
 		};
 
-		consider(from_resistance, from_site, route_res_site);
-		consider(from_metropolis, from_site, route_met_site);
+		for (std::size_t i = 0; i < from_each_site.size(); ++i) {
+			consider(from_resistance, from_each_site[i], routes_to_each_site[i].from_resistance);
+			consider(from_metropolis, from_each_site[i], routes_to_each_site[i].from_metropolis);
+		}
+
 		consider(from_resistance, from_metropolis, route_res_met);
 
 		if (detour == unreachable) {
@@ -944,7 +971,19 @@ std::vector<random_waypoint> generate_random_waypoints(const random_waypoints_in
 				switch (entry.facing) {
 					case patrol_facing::TOWARDS_ATTACKERS:
 						if (entry.attackers_from.has_value()) {
-							return ::find_longest_ray_within(lengths, *entry.attackers_from, attackers_cone_degrees);
+							/*
+								With only a wall close ahead within the cone (the attackers come round a corner),
+								the side views too - still never the back to them.
+							*/
+
+							const auto in_cone = ::find_longest_ray_within(lengths, *entry.attackers_from, attackers_cone_degrees);
+
+							if (lengths[in_cone] >= covering_ray_length) {
+								return in_cone;
+							}
+
+							const auto sideways = ::find_longest_ray_within(lengths, *entry.attackers_from, attackers_side_cone_degrees);
+							return lengths[sideways] > lengths[in_cone] ? sideways : in_cone;
 						}
 
 						return ::find_longest_ray_within(lengths, 0.0f, 180.0f);

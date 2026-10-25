@@ -1,4 +1,7 @@
 #pragma once
+#include "game/cosmos/cosmos.h"
+#include "game/enums/filters.h"
+#include "game/inferred_caches/physics_world_cache.h"
 #include "game/modes/ai/behaviors/ai_behavior_patrol.hpp"
 #include "game/modes/ai/behaviors/ai_behavior_process_ctx.hpp"
 #include "game/modes/ai/arena_mode_ai_structs.h"
@@ -15,13 +18,18 @@
 	regardless of the current phase.
 	
 	At the start of each twitch phase, a new random target direction is chosen.
+
+	A twitch that took the bot round a corner of its spot - its look direction now right into a wall -
+	keeps stepping back to the center instead of a break staring at the wall (view_blocked says so).
 */
 
+template <class ViewBlocked>
 inline void update_camp_twitch(
 	ai_behavior_patrol& patrol,
 	const vec2 bot_pos,
 	const real32 dt,
-	randomization& rng
+	randomization& rng,
+	ViewBlocked&& view_blocked
 ) {
 	constexpr float TWITCH_RADIUS = 40.0f;
 	
@@ -61,6 +69,15 @@ inline void update_camp_twitch(
 		patrol.twitch_move_timer -= dt;
 		
 		if (patrol.twitch_move_timer <= 0.0f) {
+			constexpr float BACK_TO_CENTER_MIN_DIST = 8.0f;
+
+			if (dist_from_center > BACK_TO_CENTER_MIN_DIST && view_blocked()) {
+				patrol.camp_twitch_target = (patrol.camp_center - bot_pos).normalize();
+				patrol.twitch_move_timer = TWITCH_MOVE_MIN_SECS;
+				set_twitch_direction(patrol.camp_twitch_target);
+				return;
+			}
+
 			/* Twitch move phase ended - start still phase. */
 			patrol.twitch_is_moving = false;
 			patrol.twitch_still_duration = rng.randval(TWITCH_STILL_MIN_SECS, TWITCH_STILL_MAX_SECS);
@@ -170,7 +187,20 @@ inline void ai_behavior_patrol::process(ai_behavior_process_ctx& ctx) {
 		If camping, update twitch movement.
 	*/
 	if (is_camping()) {
-		::update_camp_twitch(*this, character_pos, dt_secs, rng);
+		/*
+			Closer than this ahead is a wall right in the face.
+		*/
+
+		constexpr real32 blocked_view_px = 150.0f;
+
+		auto view_blocked = [&]() {
+			const auto& physics = cosm.get_solvable_inferred().physics;
+			const auto look_end = character_pos + camp_look_direction * blocked_view_px;
+
+			return physics.ray_cast_px(cosm.get_si(), character_pos, look_end, predefined_queries::line_of_sight()).hit;
+		};
+
+		::update_camp_twitch(*this, character_pos, dt_secs, rng, view_blocked);
 	}
 
 	/*

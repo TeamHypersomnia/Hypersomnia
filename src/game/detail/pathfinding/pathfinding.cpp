@@ -191,13 +191,14 @@ std::optional<std::size_t> find_best_portal_from_to(
 
 std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	const cosmos_navmesh_island& island,
-	const vec2u start_cell,
+	const vec2 start_pos,
 	const vec2 target_pos,
 	const std::optional<std::size_t> target_portal_index,
 	const physics_path_hints* physics_hints,
 	pathfinding_context* ctx
 ) {
 	const auto size = island.get_size_in_cells();
+	const auto start_cell = ::world_to_cell(island, start_pos);
 
 	if (size.x == 0 || size.y == 0) {
 		return std::nullopt;
@@ -303,8 +304,7 @@ std::optional<std::vector<pathfinding_node>> find_path_within_island(
 	vec2u actual_start = start_cell;
 
 	if (!is_walkable(start_cell)) {
-		const auto start_world = ::cell_to_world(island, start_cell);
-		const auto walkable_result = ::find_closest_walkable_cell(island, start_cell, start_world, physics_hints, ctx);
+		const auto walkable_result = ::find_closest_walkable_cell(island, start_cell, start_pos, physics_hints, ctx);
 
 		if (!walkable_result.has_value()) {
 			return std::nullopt;
@@ -431,14 +431,13 @@ std::optional<pathfinding_path> find_path_across_islands_direct(
 	*/
 	const auto portal_center = portal.in_cell_pos;
 	const auto portal_center_world = ::cell_to_world(source_island, portal_center);
-	const auto start_cell = ::world_to_cell(source_island, source_pos);
 
 	/*
 		Find path to portal center.
 	*/
 	auto path_nodes = ::find_path_within_island(
 		source_island,
-		start_cell,
+		source_pos,
 		portal_center_world,
 		best_portal,
 		physics_hints,
@@ -492,7 +491,6 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 	*/
 	if (source_island == target_island) {
 		const auto& island = navmesh.islands[source_island];
-		const auto start_cell = ::world_to_cell(island, source_pos);
 
 		/*
 			Check for same-island portals that might provide a shortcut OR a way
@@ -519,7 +517,7 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 
 			auto path_nodes = ::find_path_within_island(
 				island,
-				start_cell,
+				source_pos,
 				portal_center_world,
 				best_same_island_portal,
 				physics_hints,
@@ -544,7 +542,7 @@ std::optional<pathfinding_path> find_path_across_islands_many(
 		auto try_direct = [&]() -> std::optional<pathfinding_path> {
 			auto path_nodes = ::find_path_within_island(
 				island,
-				start_cell,
+				source_pos,
 				target_pos,
 				std::nullopt,
 				physics_hints,

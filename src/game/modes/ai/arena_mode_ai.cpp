@@ -304,18 +304,28 @@ void update_arena_mode_ai_team(
 	}
 
 	/*
-		Metropolis: when the bomb is first planted, read the bombsite letter from the fuse
-		and steer all living Metropolis bots to patrol that site.
+		When the bomb is first planted, read the bombsite letter from the fuse
+		and steer all living bots of the team to patrol that site: Metropolis to defuse it,
+		Resistance to guard it - whoever planted it, also a human on another site than the bots' chosen one
+		(they kept walking to their own site, the bomb elsewhere).
 		Only done once per round (guarded by bomb_plant_handled).
 	*/
-	if (faction == faction_type::METROPOLIS && bomb_planted && !team_state.bomb_plant_handled) {
+	if (bomb_planted && !team_state.bomb_plant_handled) {
 		if (const auto bomb_handle = cosm[bomb_entity]) {
 			if (const auto* fuse = bomb_handle.find<components::hand_fuse>()) {
 				if (fuse->bombsite_letter != static_cast<uint8_t>(-1)) {
 					const auto planted_letter = static_cast<marker_letter_type>(fuse->bombsite_letter);
 
+					/*
+						Resistance bots follow the team's site (see the per-bot sync in update_arena_mode_ai).
+					*/
+
+					if (faction == faction_type::RESISTANCE) {
+						team_state.chosen_bombsite = planted_letter;
+					}
+
 					for (auto& bot : only_bot(players)) {
-						if (bot.second.get_faction() != faction_type::METROPOLIS) {
+						if (bot.second.get_faction() != faction) {
 							continue;
 						}
 

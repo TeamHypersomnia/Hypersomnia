@@ -260,8 +260,17 @@ inline navigation_direction_result get_navigation_movement_direction(
 	*/
 	if (path.island_index < navmesh.islands.size() && active_progress.node_index < path.nodes.size()) {
 		const auto current_cell_xy = path.nodes[active_progress.node_index].cell_xy;
+		const auto stuck_progress_px = static_cast<float>(navmesh.islands[path.island_index].cell_size) / 2;
 
-		if (current_cell_xy == navigation.stuck_cell) {
+		/*
+			A bot still walking towards the same cell is not stuck - only one that stays in place.
+			Otherwise a bot not reaching its cell within a second (pushed aside, a cell it went past)
+			turned its crosshair sideways while walking, often into a wall.
+		*/
+
+		const bool making_progress = (bot_pos - navigation.stuck_pos).length() > stuck_progress_px;
+
+		if (current_cell_xy == navigation.stuck_cell && !making_progress) {
 			/*
 				Still on the same cell - accumulate time.
 			*/
@@ -284,10 +293,11 @@ inline navigation_direction_result get_navigation_movement_direction(
 		}
 		else {
 			/*
-				Changed cells - reset stuck timer.
+				Changed cells or moved on - reset stuck timer.
 			*/
 			navigation.stuck_rotation = 0.0f;
 			navigation.stuck_cell = current_cell_xy;
+			navigation.stuck_pos = bot_pos;
 			navigation.stuck_time = 0.0f;
 		}
 	}
