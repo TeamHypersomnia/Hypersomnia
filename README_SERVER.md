@@ -97,6 +97,11 @@ Later ones win:
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
 | `HYPERSOMNIA_SERVER_LIST` | `off`: not on the [server list](https://hypersomnia.io/servers) - browser players can't join; or the address of your own masterserver | `off` |
 | `HYPERSOMNIA_TOURNAMENT_SPECTATORS` | How many others may watch each tournament match (6 by default) - every place takes about 4.4 MB of RAM up front | `10` |
+| `HYPERSOMNIA_GAME_SPEED` | The whole game's speed, `0.5`-`1.5` (default `0.75`; `1` - the original Hypersomnia) | `1` |
+| `HYPERSOMNIA_BULLET_SPEED` | The bullets' own speed, `0.5`-`1.5` - without it, as the game speed | `0.9` |
+| `HYPERSOMNIA_ZOOM` | The camera zoom for everyone, `0.5`-`1.5` - without it, the map's own | `0.7` |
+| `HYPERSOMNIA_FRIENDLY_FIRE` | `on`: teammates hurt each other | `on` |
+| `HYPERSOMNIA_FREEZE_TIME` | `off`: rounds start right away | `off` |
 | `HYPERSOMNIA_BOT_QUOTA` | How many bots, `0` for none - the arena's own number when not set | `6` |
 | `HYPERSOMNIA_BOT_DIFFICULTY` | `VERY_EASY`, `EASY`, `MEDIUM`, `HARD` or `PROGRESSIVE` (the default) | `HARD` |
 | `HYPERSOMNIA_DAILY_UPDATE` | When to update every day, or `off` | `05:00` |

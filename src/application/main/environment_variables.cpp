@@ -5,6 +5,8 @@
 #include <regex>
 #include "augs/string/typesafe_sprintf.h"
 #include "game/modes/difficulty_type.h"
+#include "game/modes/logic_speed.h"
+#include "game/modes/zoom_override.h"
 #include "application/network/account_id.h"
 #include "application/config_json_table.h"
 #include "application/main/environment_variables.h"
@@ -72,6 +74,28 @@ namespace {
 
 		if (n < min || n > max) {
 			throw bad_value { typesafe_sprintf("a number from %x to %x", min, max) };
+		}
+
+		return n;
+	}
+
+	/*
+		A speed or a zoom: "0.75" - a dot, digits on both sides or none after it.
+	*/
+
+	real32 as_decimal(const std::string& value, const real32 min, const real32 max) {
+		static const auto decimal = std::regex("[0-9]{1,3}(\\.[0-9]{1,4})?");
+
+		const auto expected = typesafe_sprintf("a number from %2f to %2f, e.g. %2f", min, max, min);
+
+		if (!std::regex_match(value, decimal)) {
+			throw bad_value { expected };
+		}
+
+		const auto n = static_cast<real32>(std::atof(value.c_str()));
+
+		if (n < min || n > max) {
+			throw bad_value { expected };
 		}
 
 		return n;
@@ -301,6 +325,11 @@ namespace {
 		environment_variable { "HYPERSOMNIA_WEB_PORT", [](auto& c, const auto& v) { c.server.webrtc_port_range_begin = ::as_number(v, 1, 65535); } },
 		environment_variable { "HYPERSOMNIA_BROWSER_PLAYERS", [](auto& c, const auto& v) { c.server.allow_webrtc_clients = ::as_on_off(v); } },
 		environment_variable { "HYPERSOMNIA_SERVER_LIST", [](auto& c, const auto& v) { ::set_server_list(c, v); } },
+		environment_variable { "HYPERSOMNIA_GAME_SPEED", [](auto& c, const auto& v) { c.server.game_speed = ::as_decimal(v, min_logic_speed_v, max_logic_speed_v); } },
+		environment_variable { "HYPERSOMNIA_BULLET_SPEED", [](auto& c, const auto& v) { c.server.bullet_speed = augs::maybe<real32>::enabled(::as_decimal(v, min_logic_speed_v, max_logic_speed_v)); } },
+		environment_variable { "HYPERSOMNIA_ZOOM", [](auto& c, const auto& v) { c.server.zoom_override = augs::maybe<real32>::enabled(::as_decimal(v, min_zoom_override_v, max_zoom_override_v)); } },
+		environment_variable { "HYPERSOMNIA_FRIENDLY_FIRE", [](auto& c, const auto& v) { c.server.friendly_fire = ::as_on_off(v); } },
+		environment_variable { "HYPERSOMNIA_FREEZE_TIME", [](auto& c, const auto& v) { c.server.freeze_time = ::as_on_off(v); } },
 		environment_variable { "HYPERSOMNIA_BOT_QUOTA", [](auto& c, const auto& v) { ::set_bot_quota(c, v); } },
 		environment_variable { "HYPERSOMNIA_BOT_DIFFICULTY", [](auto& c, const auto& v) { c.server.bot_difficulty = ::as_bot_difficulty(v); } },
 		environment_variable { "HYPERSOMNIA_DAILY_UPDATE", [](auto& c, const auto& v) { ::set_daily_update(c, v); } },
