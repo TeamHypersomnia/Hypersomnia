@@ -282,6 +282,22 @@ void perform_rcon_gui(
 						ImGui::Separator();
 					}
 
+					/*
+						A tournament's match still waiting for its players: decided now, as its join timeout would.
+					*/
+
+					if (runtime_info && runtime_info->can_timeout_absent_players) {
+						if (do_command_button("Timeout absent players", RS::TIMEOUT_ABSENT_PLAYERS)) {
+							LOG("Requesting the match to time out its absent players");
+						}
+
+						if (ImGui::IsItemHovered()) {
+							ImGui::SetTooltip("Decides this match now: the team with more players present wins - equal numbers play as they are - nobody here: both teams out.");
+						}
+
+						ImGui::Separator();
+					}
+
 					if (has_maintenance_tab) {
 						if (do_command_button("Refresh map list", RS::REQUEST_RUNTIME_INFO)) {
 							LOG("Requesting the server refresh the map list.");

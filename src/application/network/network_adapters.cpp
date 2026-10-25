@@ -47,6 +47,14 @@ bool GameAdapter::AllowHandshake(const yojimbo::Address& from) {
 	return true;
 }
 
+bool GameAdapter::AcceptWhileRefusing(const yojimbo::Address& from, const uint8_t* binding, const uint8_t* session_signature, const uint8_t* user_data) {
+	if (m_server != nullptr && m_server->accept_while_refusing) {
+		return m_server->accept_while_refusing(to_netcode_addr(from), binding, session_signature, user_data);
+	}
+
+	return false;
+}
+
 void server_adapter::stop() {
 	server.Stop();
 }
@@ -286,7 +294,7 @@ server_adapter::server_adapter(
 		and a full server answers why instead of netcode saying nothing. And the admins' places (server_slots.h).
 	*/
 
-	const auto netcode_slots = std::min(std::max(1, slots) + spare_connections_v + reserved_admin_places_v, static_cast<int>(yojimbo::MaxClients));
+	const auto netcode_slots = std::min(std::max(1, slots) + spare_connections_v + reserved_admin_places_v + reserved_spectator_places_v, static_cast<int>(yojimbo::MaxClients));
 
 	LOG("Starting yojimbo::Server with %x connections for %x slots.", netcode_slots, std::max(1, slots));
 	server.Start(netcode_slots);

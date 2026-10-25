@@ -5,6 +5,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/string/string_templates.h"
+#include "augs/string/parse_url.h"
 #include "augs/templates/algorithm_templates.h"
 #include "all_paths.h"
 #include "application/config_json_table.h"
@@ -84,6 +85,14 @@ inline bool check_server_config(
 		if (!::is_valid_account_id(account)) {
 			settled_problems.push_back(typesafe_sprintf("allowed_accounts: \"%x\" is not an account id (steam_..., 0x... or key_...)", account));
 		}
+	}
+
+	if (const auto& spectator = config.server_private.spectator_account; !spectator.empty() && !::is_valid_account_id(spectator)) {
+		settled_problems.push_back(typesafe_sprintf("spectator_account: \"%x\" is not an account id (steam_..., 0x... or key_...)", spectator));
+	}
+
+	if (const auto& url = config.server_private.tournament_results_webhook_url; !url.empty() && !(parsed_url(url).valid() && (url.rfind("http://", 0) == 0 || url.rfind("https://", 0) == 0))) {
+		settled_problems.push_back(typesafe_sprintf("tournament_results_webhook_url: \"%x\" is not a URL (https://...)", url));
 	}
 
 	if (config.server_start.slots > max_server_slots_v) {

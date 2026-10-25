@@ -12,6 +12,7 @@ enum class server_maintenance_command : unsigned char {
 	DOWNLOAD_LOGS,
 	CLEAR_RUNTIME_PREFS,
 	CLOSE_ROUND_1,
+	TIMEOUT_ABSENT_PLAYERS,
 
 	COUNT
 };

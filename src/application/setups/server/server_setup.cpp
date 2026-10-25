@@ -58,6 +58,7 @@
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/webhooks.h"
 #include "application/setups/server/ranked_webhooks.h"
+#include "application/setups/server/avatar_png.h"
 #include "game/messages/hud_message.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/readwrite/json_readwrite_errors.h"
@@ -982,6 +983,14 @@ server_setup::server_setup(
 {
 	yojimbo_random_bytes(reinterpret_cast<uint8_t*>(&tell_me_my_address_stamp), sizeof(tell_me_my_address_stamp));
 
+	/*
+		While a match refuses new clients: who watches it comes in anyway, by who they are (server_watchers.hpp).
+	*/
+
+	server->accept_while_refusing = [this](const netcode_address_t&, const uint8_t* binding, const uint8_t* session_signature, const uint8_t* user_data) {
+		return accept_while_match_refuses(binding, session_signature, user_data);
+	};
+
 #if BUILD_WEBRTC
 	/* 
 		Always. Native servers should also support web traffic.
@@ -1468,7 +1477,7 @@ void server_setup::verify_client_identity(const client_id_type id) {
 			A server for its listed players only (allowed_accounts) - its admins always get in.
 		*/
 
-		if (!c.when_kicked.has_value() && !::is_allowed_account(private_vars.allowed_accounts, c.authenticated_id) && !find_admin_profile_of(c.admin_account).has_value()) {
+		if (!c.when_kicked.has_value() && !::is_allowed_account(private_vars.allowed_accounts, c.authenticated_id) && !find_admin_profile_of(c.admin_account).has_value() && !is_spectator_account(c.admin_account)) {
 			LOG("%x is not among the listed players - refused.", c.authenticated_id);
 			kick_now(id, "This server lets in only its listed players.");
 		}
@@ -1508,6 +1517,7 @@ uint32_t server_setup::get_game_capacity() const {
 void server_setup::admit_or_refuse(const client_id_type id) {
 	const auto ip = get_client_ip_for_bans(id);
 	const bool admin = find_admin_profile_of(clients[id].admin_account).has_value();
+	const bool spectator_account = is_spectator_account(clients[id].admin_account) || is_spectator_account(clients[id].authenticated_id);
 
 	auto is_counted = [&](const auto other_id, const auto& other) {
 		return other_id != id && other.is_set() && !other.when_kicked.has_value();
@@ -1521,7 +1531,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}, only_connected_v);
 
-	if (requires_authentication() && !ip.empty() && !admin) {
+	if (requires_authentication() && !ip.empty() && !admin && !spectator_account) {
 		const auto from_this_ip = std::count_if(admitted.begin(), admitted.end(), [&](const auto other_id) {
 			return get_client_ip_for_bans(other_id) == ip;
 		});
@@ -1532,7 +1542,11 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		}
 	}
 
-	const auto capacity = get_game_capacity() + (admin ? static_cast<uint32_t>(reserved_admin_places_v) : 0u);
+	const auto capacity =
+		get_game_capacity()
+		+ (admin ? static_cast<uint32_t>(reserved_admin_places_v) : 0u)
+		+ (spectator_account ? static_cast<uint32_t>(reserved_spectator_places_v) : 0u)
+	;
 
 	if (admitted.size() < capacity) {
 		return;
@@ -2202,21 +2216,7 @@ void server_setup::push_report_match_webhook(const messages::match_summary_messa
 
 	auto get_avatar_of = [this](const mode_player_id id) -> std::vector<std::byte> {
 		if (auto c = find_client_state(id)) {
-			const auto& bytes = c->meta.avatar.image_bytes;
-
-			if (!bytes.empty()) {
-				try {
-					auto image = augs::image();
-					image.from_bytes_stbi(bytes, "report avatar");
-
-					if (image.get_size().x <= max_avatar_side_v && image.get_size().y <= max_avatar_side_v) {
-						return image.to_png_bytes();
-					}
-				}
-				catch (...) {
-
-				}
-			}
+			return ::reencoded_avatar_png(c->meta.avatar.image_bytes);
 		}
 
 		return {};
@@ -4042,8 +4042,10 @@ void server_setup::accept_entropy_of_client(
 	const mode_player_id mode_id,
 	const total_client_entropy& entropy
 ) {
-	if (!entropy.empty()) {
-		step_collected += { mode_id, entropy };
+	const auto accepted = without_spectator_account_team_choice(mode_id, entropy);
+
+	if (!accepted.empty()) {
+		step_collected += { mode_id, accepted };
 	}
 }
 
@@ -4219,12 +4221,20 @@ void server_setup::advance_clients_state() {
 				*/
 
 				/*
-					An admin gets in also to a match being played - as a spectator, without a word in the chat.
+					Who watches gets in also to a match being played - as a spectator, without a word in the chat
+					(server_watchers.hpp).
 				*/
 
-				const bool admin = find_admin_profile_of(c.admin_account).has_value();
+				const bool watcher = may_watch_running_match(c.authenticated_id, c.admin_account);
 
-				if (!is_joinable() && !admin) {
+				/*
+					Where the nicknames are the identities, who it is is known once the nickname comes -
+					a team watching the others is decided then.
+				*/
+
+				const bool who_known = c.is_authenticated() || !vars.authenticate_with_nicknames;
+
+				if (!is_joinable() && !watcher && who_known) {
 					/* Joined too late. */
 					kick_now(client_id, std::string(rejoin_too_late_reason_v));
 				}
@@ -4239,7 +4249,7 @@ void server_setup::advance_clients_state() {
 					}
 
 					const bool not_among_suspended = 
-						has_suspended_players() && !is_currently_suspended(this_id) && !admin
+						has_suspended_players() && !is_currently_suspended(this_id) && !watcher
 					;
 
 					const bool not_among_assigned = 
@@ -4526,11 +4536,27 @@ void server_setup::advance_clients_state() {
 					const bool auth_requirement_fulfilled = [&]() {
 						if (is_ranked_live()) {
 							/* 
-								Only add if it's one of the disconnected players.
+								Only add if it's one of the disconnected players - or one who watches (server_watchers.hpp),
+								added as a spectator.
 								If id is empty, this client will be kicked eventually.
 							*/
 
-							return is_currently_suspended(c.authenticated_id); 
+							if (is_currently_suspended(c.authenticated_id)) {
+								return true;
+							}
+
+							/*
+								A watcher once it's known who it is - and, where the teams are assigned, once it has its place
+								there (take_into_open_match).
+							*/
+
+							const bool watcher_ready =
+								c.is_authenticated()
+								&& may_watch_running_match(c.authenticated_id, c.admin_account)
+								&& (!has_assigned_teams() || get_assigned_team(c.authenticated_id) != faction_type::COUNT)
+							;
+
+							return watcher_ready;
 						}
 
 						if (has_assigned_teams()) {
@@ -4840,6 +4866,13 @@ message_handler_result server_setup::handle_rcon_payload(
 				if (close_open_round != nullptr) {
 					close_open_round->store(true);
 					notification("closed round 1 of the tournament");
+				}
+
+				return continue_v;
+
+			case command::TIMEOUT_ABSENT_PLAYERS:
+				if (timeout_absent_players_now()) {
+					notification("timed out the absent players - the match is decided");
 				}
 
 				return continue_v;
@@ -5769,10 +5802,10 @@ bool server_setup::is_authorized_for_access(const client_id_type& id) const {
 	}
 
 	/*
-		An admin needs no password.
+		An admin needs no password, nor the spectator account.
 	*/
 
-	return find_admin_profile_of(c.admin_account).has_value();
+	return find_admin_profile_of(c.admin_account).has_value() || is_spectator_account(c.admin_account);
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {
@@ -5810,23 +5843,37 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		return result;
 	}();
 
+	/*
+		A match being played: its spectators are unheard by the players - what a spectator writes reaches only
+		the other spectators, who read everything, the teams' own chat too. A message without an author (the server's)
+		reaches everyone.
+	*/
+
+	const bool watched_match = is_ranked_live_or_starting() && !sender_player_nickname.empty();
+
 	auto send_it = [&](const auto recipient_client_id, auto&) {
 		if (except.has_value() && *except == recipient_client_id) {
 			return;
 		}
 
-		if (payload.target == chat_target_type::TEAM_ONLY) {
-			const auto recipient_player_faction = get_arena_handle().on_mode(
-				[&](const auto& typed_mode) {
-					if (const auto entry = typed_mode.find(to_mode_player_id(recipient_client_id))) {
-						return entry->get_faction();
-					}
-
-					return faction_type::SPECTATOR;
+		const auto recipient_player_faction = get_arena_handle().on_mode(
+			[&](const auto& typed_mode) {
+				if (const auto entry = typed_mode.find(to_mode_player_id(recipient_client_id))) {
+					return entry->get_faction();
 				}
-			);
 
-			if (sender_player_faction != recipient_player_faction) {
+				return faction_type::SPECTATOR;
+			}
+		);
+
+		const bool recipient_watches = watched_match && recipient_player_faction == faction_type::SPECTATOR;
+
+		if (watched_match && sender_player_faction == faction_type::SPECTATOR && !recipient_watches) {
+			return;
+		}
+
+		if (payload.target == chat_target_type::TEAM_ONLY) {
+			if (sender_player_faction != recipient_player_faction && !recipient_watches) {
 				return;
 			}
 		}
@@ -6464,6 +6511,7 @@ const netcode_socket_t* server_setup::find_underlying_socket() const {
 void server_setup::rescan_runtime_prefs() {
 	runtime_info.runtime_prefs = augs::to_json_diff_string(vars, canon_with_confd_vars);
 	runtime_info.can_close_round_1 = is_open_match() && close_open_round != nullptr && !close_open_round->load();
+	runtime_info.can_timeout_absent_players = has_assigned_teams() && !is_ranked_live_or_starting() && !join_timeout_passed && !open_match_closed;
 }
 
 void server_setup::rescan_arenas_on_disk() {
@@ -7159,14 +7207,32 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 	/*
 		An admin gets in anywhere: where there's no place for them (a match of listed teams, one being played,
 		a full one, or they have their place in another one) - as a spectator. Otherwise they play, as anyone.
+		So does the spectator account (always as a spectator), and a tournament's team with no match of its own
+		to play now (server_watchers.hpp).
 	*/
+
+	/*
+		Who may only watch never takes a place: the spectator account, and a tournament's team whose own match is decided -
+		it played round 1 already, so it never plays another open match of it.
+	*/
+
+	const bool watches_only =
+		is_spectator_account(c.admin_account)
+		|| is_spectator_account(id)
+		|| (may_spectate_tournament && may_spectate_tournament(id))
+	;
 
 	const bool admin = find_admin_profile_of(c.admin_account).has_value() || find_admin_profile_of(id).has_value();
 
 	auto as_spectator = [&]() {
-		LOG("%x is an admin - watches the tournament's match as a spectator.", c.get_nickname());
+		LOG("%x watches the tournament's match as a spectator.", c.get_nickname());
 		assigned_teams.id_to_faction[id] = faction_type::SPECTATOR;
 	};
+
+	if (watches_only) {
+		as_spectator();
+		return;
+	}
 
 	/*
 		A match recovered after a crash: its players come back as suspended ones - into the places they had.
@@ -7368,17 +7434,20 @@ void server_setup::publish_live_state_if_its_time() {
 	state.started = is_ranked_live_or_starting();
 
 	get_arena_handle().on_mode_with_input(
-		[&state](const auto& mode, const auto&) {
-			auto names_in = [&](const faction_type faction, auto& out) {
-				mode.for_each_player_in(faction, [&](const auto, const auto& player) {
+		[&](const auto& mode, const auto&) {
+			auto names_in = [&](const faction_type faction, auto& out, auto& accounts) {
+				mode.for_each_player_in(faction, [&](const auto id, const auto& player) {
 					if (!player.is_bot) {
 						out.push_back(player.get_nickname());
+
+						const auto c = find_client_state(id);
+						accounts.push_back(c != nullptr ? c->authenticated_id : std::string());
 					}
 				});
 			};
 
-			names_in(faction_type::RESISTANCE, state.resistance);
-			names_in(faction_type::METROPOLIS, state.metropolis);
+			names_in(faction_type::RESISTANCE, state.resistance, state.resistance_accounts);
+			names_in(faction_type::METROPOLIS, state.metropolis, state.metropolis_accounts);
 
 			state.score_resistance = mode.get_faction_score(faction_type::RESISTANCE);
 			state.score_metropolis = mode.get_faction_score(faction_type::METROPOLIS);
@@ -7386,6 +7455,7 @@ void server_setup::publish_live_state_if_its_time() {
 	);
 
 	on_live_state(state);
+	publish_tournament_avatars();
 }
 
 void server_setup::close_open_match_if_requested() {
@@ -7539,6 +7609,9 @@ bool server_client_state::is_webrtc_client() const {
 #include "augs/readwrite/to_bytes.h"
 
 // TODO: rewrite unit tests to use streams since we're no longer using preserialized_message 
+
+#include "application/setups/server/server_watchers.hpp"
+#include "application/setups/server/tournament/tournament_avatars.hpp"
 
 #undef BUILD_UNIT_TESTS
 #if BUILD_UNIT_TESTS

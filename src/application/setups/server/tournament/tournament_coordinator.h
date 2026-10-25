@@ -130,6 +130,14 @@ public:
 
 	bool aborted = false;
 
+	/*
+		Whether a player of the tournament (is_player tells by its id as written in the state) has no match of its own
+		to play now - out, waiting on a bye, or its match of this round decided - so may watch the others.
+		Called from the match servers' threads.
+	*/
+
+	bool may_watch_others(const std::function<bool(const std::string&)>& is_player) const;
+
 private:
 	bool finished() const;
 	void initialize_state_if_fresh();

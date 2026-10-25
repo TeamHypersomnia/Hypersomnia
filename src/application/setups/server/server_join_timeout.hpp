@@ -17,6 +17,10 @@
 */
 
 bool server_setup::join_timeout_due() const {
+	if (timeout_requested) {
+		return true;
+	}
+
 	return
 		join_timeout_secs > 0
 		&& has_assigned_teams()
@@ -40,6 +44,30 @@ void server_setup::check_join_timeout() {
 		return;
 	}
 
+	decide_by_present_players();
+}
+
+/*
+	"Timeout absent players" (the administration panel): what the join timeout would do, now - an open match
+	closes as by Close round 1 (close_open_match_if_requested reads timeout_requested), one of known teams is decided.
+*/
+
+bool server_setup::timeout_absent_players_now() {
+	if (!has_assigned_teams() || is_ranked_live_or_starting() || join_timeout_passed || open_match_closed) {
+		return false;
+	}
+
+	timeout_requested = true;
+
+	if (!is_open_match()) {
+		join_timeout_passed = true;
+		decide_by_present_players();
+	}
+
+	return true;
+}
+
+void server_setup::decide_by_present_players() {
 	std::size_t resistance = 0;
 	std::size_t metropolis = 0;
 

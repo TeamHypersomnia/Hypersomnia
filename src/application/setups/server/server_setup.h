@@ -429,6 +429,18 @@ private:
 	void close_open_match_if_requested();
 	void check_join_timeout();
 	bool join_timeout_due() const;
+	void decide_by_present_players();
+	bool timeout_absent_players_now();
+
+	/*
+		Who watches a match being played - see server_watchers.hpp.
+	*/
+
+	bool is_spectator_account(const std::string& account) const;
+	bool may_watch_running_match(const std::string& account, const std::string& admin_account) const;
+	bool accept_while_match_refuses(const uint8_t* binding, const uint8_t* session_signature, const uint8_t* user_data) const;
+	void track_match_start_spectators();
+	total_client_entropy without_spectator_account_team_choice(mode_player_id, const total_client_entropy&) const;
 	void publish_live_state_if_its_time();
 	double when_last_published_live_state = -1.0;
 
@@ -562,9 +574,19 @@ public:
 		(faction_type::COUNT: nobody), or it starts with the equal numbers present. 0: no timeout.
 	*/
 
+	/*
+		The spectators of the match being played when it started (server_watchers.hpp) - and, from a tournament,
+		whether an account's team has no match of its own to play now, so it may watch this one.
+	*/
+
+	std::vector<std::string> match_start_spectators;
+	bool match_was_running = false;
+	std::function<bool(const std::string&)> may_spectate_tournament;
+
 	uint32_t join_timeout_secs = 0;
 	std::optional<net_time_t> join_timeout_since;
 	bool join_timeout_passed = false;
+	bool timeout_requested = false;
 	bool join_timeout_relaxed = false;
 	std::function<void(faction_type)> on_join_timeout;
 
@@ -576,12 +598,23 @@ public:
 	struct live_match_state {
 		std::vector<std::string> resistance;
 		std::vector<std::string> metropolis;
+		std::vector<std::string> resistance_accounts;
+		std::vector<std::string> metropolis_accounts;
 		int score_resistance = 0;
 		int score_metropolis = 0;
 		bool started = false;
 	};
 
 	std::function<void(const live_match_state&)> on_live_state;
+
+	/*
+		The players' avatars for a tournament's page (tournament_avatars.hpp): each new one passed on once, by the player
+		as the page knows them - the account, or the nickname where the nicknames are the identities.
+	*/
+
+	std::function<void(const std::string& player, const std::vector<std::byte>& png)> on_player_avatar;
+	std::unordered_map<std::string, std::size_t> avatars_passed_on;
+	void publish_tournament_avatars();
 	uint16_t tournament_page_port = 0;
 
 	/*
@@ -724,6 +757,7 @@ public:
 
 			close_open_match_if_requested();
 			check_join_timeout();
+			track_match_start_spectators();
 			publish_live_state_if_its_time();
 
 			{

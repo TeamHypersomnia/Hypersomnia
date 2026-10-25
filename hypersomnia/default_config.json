@@ -509,7 +509,14 @@
         "admin_profiles": [],
 
         // Only these accounts get in (a clan's server) - empty: anyone. Admins always do. E.g. ["steam_76561198000000000", "0x8aed41f2..."]
-        "allowed_accounts": []
+        "allowed_accounts": [],
+
+        // One account that always gets in, only to watch - a caster, a bot streaming the matches: a place kept for it
+        // on a full server, no password, never on a team, into a ranked match or a tournament's match being played too.
+        "spectator_account": "",
+
+        // A tournament's results, POSTed once when it's over: the JSON of its live page's /tournament.json, "state": "FINISHED".
+        "tournament_results_webhook_url": ""
     },
 
     "dedicated_server": {

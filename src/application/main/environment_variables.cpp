@@ -224,6 +224,18 @@ namespace {
 	}
 
 	/*
+		The account that only watches: "steam_765..." (server_private.spectator_account).
+	*/
+
+	void set_spectator_account(config_json_table& c, const std::string& value) {
+		if (!::is_valid_account_id(value)) {
+			throw bad_value { "an account id (steam_..., 0x... or key_...)" };
+		}
+
+		c.server_private.spectator_account = ::normalize_account_id(value);
+	}
+
+	/*
 		"off", or the hour of the daily update: "05:00", "19:30".
 	*/
 
@@ -271,7 +283,9 @@ namespace {
 		environment_variable { "HYPERSOMNIA_BOT_DIFFICULTY", [](auto& c, const auto& v) { c.server.bot_difficulty = ::as_bot_difficulty(v); } },
 		environment_variable { "HYPERSOMNIA_DAILY_UPDATE", [](auto& c, const auto& v) { ::set_daily_update(c, v); } },
 		environment_variable { "HYPERSOMNIA_TIME_ZONE", [](auto& c, const auto& v) { c.server.time_zone = v; } },
-		environment_variable { "HYPERSOMNIA_DISCORD_WEBHOOK", [](auto& c, const auto& v) { c.server_private.discord_webhook_url = v; } }
+		environment_variable { "HYPERSOMNIA_DISCORD_WEBHOOK", [](auto& c, const auto& v) { c.server_private.discord_webhook_url = v; } },
+		environment_variable { "HYPERSOMNIA_SPECTATOR", [](auto& c, const auto& v) { ::set_spectator_account(c, v); } },
+		environment_variable { "HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK", [](auto& c, const auto& v) { c.server_private.tournament_results_webhook_url = v; } }
 	};
 
 	/*

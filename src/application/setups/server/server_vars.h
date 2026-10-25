@@ -41,6 +41,7 @@ struct server_runtime_info {
 	std::vector<arena_identifier> arenas_on_disk;
 	std::string runtime_prefs;
 	bool can_close_round_1 = false;
+	bool can_timeout_absent_players = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -280,6 +281,9 @@ struct server_private_vars {
 	admin_profiles_type admin_profiles;
 
 	std::vector<std::string> allowed_accounts;
+
+	std::string spectator_account;
+	std::string tournament_results_webhook_url;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_private_vars& b) const = default;

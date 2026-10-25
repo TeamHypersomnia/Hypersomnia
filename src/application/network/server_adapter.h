@@ -18,6 +18,13 @@ using send_packet_override_type = std::function<bool (const netcode_address_t&,c
 using receive_packet_override_type = std::function<int (netcode_address_t&,std::byte*,int)>;
 using allow_handshake_type = std::function<bool (const netcode_address_t&)>;
 
+/*
+	While the server refuses new clients (a ranked match being played): whether this one is taken in anyway,
+	by what proves who it is - the connection's binding, the session signature, the handshake's user data.
+*/
+
+using accept_while_refusing_type = std::function<bool (const netcode_address_t&, const uint8_t* binding, const uint8_t* session_signature, const uint8_t* user_data)>;
+
 class server_adapter {
 	friend class GameAdapter;
 	friend bool auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes);
@@ -57,6 +64,8 @@ class server_adapter {
 	auto create_message(const client_id_type&);
 
 public:
+	accept_while_refusing_type accept_while_refusing;
+
 	server_adapter(
 		const augs::server_listen_input&,
 		bool is_integrated,

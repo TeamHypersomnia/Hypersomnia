@@ -83,6 +83,30 @@ tournament_coordinator::tournament_coordinator(
 	state.config_hash = current_hash;
 }
 
+bool tournament_coordinator::may_watch_others(const std::function<bool(const std::string&)>& is_player) const {
+	std::scoped_lock lk(state_lk);
+
+	for (uint32_t t = 0; t < state.teams.size(); ++t) {
+		const auto& team = state.teams[t];
+
+		if (std::none_of(team.player_ids.begin(), team.player_ids.end(), is_player)) {
+			continue;
+		}
+
+		if (team.eliminated) {
+			return true;
+		}
+
+		const bool undecided_match = std::any_of(state.current_stage_matches.begin(), state.current_stage_matches.end(), [&](const auto& m) {
+			return !m.result.has_value() && !m.closed_empty && (m.team_a_index == t || m.team_b_index == t);
+		});
+
+		return !undecided_match;
+	}
+
+	return false;
+}
+
 bool tournament_coordinator::finished() const {
 	/*
 		The open first round has no teams yet - they come from its matches.
