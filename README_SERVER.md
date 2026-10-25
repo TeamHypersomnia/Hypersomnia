@@ -165,7 +165,7 @@ A knockout tournament: a server for every match, the winners go on round by roun
 
 ## The results as JSON
 
-`http://<your server>:8412/tournament.json` while it's played (at most 5 requests a second from one address, made anew once a second), and one `POST` of the same to `server_private.tournament_results_webhook_url` (`HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK`) when it's over - tried 3 times until answered with a `2xx`, and again every time the server is started after that. The very same JSON is saved to `tournament_results.json` in the user folder. The receiver takes only `"state": "FINISHED"` and drops a copy it already has (the same `name` and `winner_team`). `Show example payload` in the config generator shows a whole one.
+`http://<your server>:8412/tournament.json` while it's played (at most 5 requests a second from one address, made anew once a second), and one `POST` of the same to `server_private.tournament_results_webhook_url` (`HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK`) when it's over - tried 3 times until answered with a `2xx`, and again every time the server is started after that. The very same JSON is saved to `tournament_results.json` in the user folder. The receiver takes only `"state": "FINISHED"` and deduplicates by the tournament's `name`. `Show example payload` in the config generator shows a whole one.
 
 Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key (what `--print-server-key` prints), `X-Hypersomnia-Signature` - Ed25519 of the body, in hex. Check that the key is your server's and the signature is right, and nobody could have made up the results.
 
