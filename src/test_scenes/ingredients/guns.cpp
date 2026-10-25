@@ -4498,7 +4498,7 @@ namespace test_flavours {
 			gun_def.bot_aim_radius_to_shoot = 8.0f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {10500.f, 10500.f};
+			gun_def.muzzle_velocity = {9500.f, 9500.f};
 			gun_def.shot_cooldown_ms = 600.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.gunshot_decal_scale = 4.f;
@@ -4558,7 +4558,7 @@ namespace test_flavours {
 			gun_def.bot_aim_radius_to_shoot = 8.0f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {9500.f, 9500.f};
+			gun_def.muzzle_velocity = {8500.f, 9500.f};
 			gun_def.shot_cooldown_ms = 400.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HUNTER_CHAMBERING);
@@ -4750,7 +4750,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1800.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 8500.0f, 8500.0f };
+			gun_def.muzzle_velocity = { 7000.0f, 7000.0f };
 			gun_def.shot_cooldown_ms = 290.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
