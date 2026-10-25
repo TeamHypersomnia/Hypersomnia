@@ -7591,3 +7591,5 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 - moze jakby te enemy corpse wybuchy ciagnely wzdluz a nie naprzeciw
 - ./Hypersomnia-Headless.AppImage --print-server-key powinien dzialac jak version ze tylko to pokazuje i nara
 
+- balance snipers somehow with slower bullets now
+

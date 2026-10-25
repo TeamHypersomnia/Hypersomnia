@@ -6,7 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- balance snipers somehow with slower bullets now
+- audyt wszystkich skilli
+- jakis knowledge graph se zrobic jak co dziala
+
+- autoskalowanie instancji: opcja tez on-demand gdy sloty w jednej juz zajete >=75% np.
+
+- gore: odpadajace nogi bedzie latwo zrobic i nie wymaga kombinacji
+- utrzymanie graczy: jakby mapki czesciej zmienial np. w tym trybie do expienia albo trzeba bylo sie przenosic miedzy mapkami faktycznie
 
 - kiedys dashe takie obrotowe animacje zamiast dmuchniecia
 - kiedys te flagi poprawne ogarnac w browserze, serwer sam moze wysylac w jakim kraju jest
