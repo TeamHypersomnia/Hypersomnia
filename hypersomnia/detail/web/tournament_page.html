@@ -193,7 +193,7 @@
 		padding: 8px 22px;
 	}
 
-	/* the winners: no boxes - their names in gold, glowing; each avatar glows in its own average color (avatar_glow) */
+	/* the winners: no boxes - their names in gold, glowing */
 	.tournament-winner .team-card.won .player {
 		min-height: 64px;
 		gap: 16px;
@@ -756,32 +756,6 @@
 		}
 	}
 
-	/*
-		A glow under an avatar in its average color: the picture shrunk to one pixel. Served by this server,
-		so the canvas may read it.
-	*/
-
-	function avatar_glow(avatar) {
-		const glow = () => {
-			try {
-				const canvas = document.createElement('canvas');
-				canvas.width = canvas.height = 1;
-				const context = canvas.getContext('2d');
-				context.drawImage(avatar, 0, 0, 1, 1);
-				const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
-				avatar.style.filter = `drop-shadow(0 0 14px rgba(${r}, ${g}, ${b}, 0.85))`;
-			}
-			catch (e) {}
-		};
-
-		if (avatar.complete && avatar.naturalWidth) {
-			glow();
-		}
-		else {
-			avatar.addEventListener('load', glow);
-		}
-	}
-
 	function card(cls, team) {
 		const c = el('div', 'team-card' + (cls ? ' ' + cls : ''));
 		c.appendChild(players(team));
@@ -893,7 +867,6 @@
 			const button = el('div', 'winner-button');
 			button.appendChild(el('h2', 'tournament-winner-label', t.winner_team.length > 1 ? 'WINNERS' : 'WINNER'));
 			button.appendChild(card('won', t.winner_team));
-			button.querySelectorAll('.avatar').forEach(avatar_glow);
 			winner.appendChild(button);
 			root.appendChild(winner);
 			game_button_frame(button);
