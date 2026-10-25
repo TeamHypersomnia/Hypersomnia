@@ -133,12 +133,47 @@ static rgba get_heading_color(const std::string& heading) {
 	return white;
 }
 
-static void draw_token(const std::string& token, const augs::markdown_span_style style, const rgba base_col) {
+static void draw_token(const std::string& token, const augs::markdown_span& span, const rgba base_col) {
 	using namespace augs::imgui;
 
 	auto draw_list = ImGui::GetWindowDrawList();
 
-	switch (style) {
+	switch (span.style) {
+		case augs::markdown_span_style::LINK: {
+			/*
+				Underlined, a hand over it - a click opens it in the browser.
+				On CrazyGames only its color: no links out of the game there.
+			*/
+
+			const auto link_col = rgba(130, 190, 255, 255);
+			const auto pos = vec2(ImGui::GetCursorScreenPos());
+
+			{
+				auto sc = scoped_text_color(link_col);
+				ImGui::TextUnformatted(token.c_str());
+			}
+
+#if !WEB_CRAZYGAMES
+			const auto size = vec2(ImGui::CalcTextSize(token.c_str()));
+			const auto underline_y = pos.y + size.y;
+			draw_list->AddLine(ImVec2(pos.x, underline_y), ImVec2(pos.x + size.x, underline_y), ImGui::GetColorU32(link_col));
+
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+				ImGui::SetTooltip("%s", span.url.c_str());
+			}
+
+			if (ImGui::IsItemClicked()) {
+				augs::open_url(span.url);
+			}
+#else
+			(void)pos;
+			(void)draw_list;
+#endif
+
+			break;
+		}
+
 		case augs::markdown_span_style::BOLD: {
 			/*
 				No bold font is loaded, so the text is drawn twice, 1px apart.
@@ -244,7 +279,7 @@ static void draw_spans(const std::vector<augs::markdown_span>& spans, const rgba
 				}
 			}
 
-			::draw_token(token, span.style, base_col);
+			::draw_token(token, span, base_col);
 			line_empty = false;
 		}
 	}

@@ -49,7 +49,7 @@ Rules:
    So: a bold headline, and its explanation as nested points (`- **Game speeds.**` + `\t- Servers run at 0.75x by default.`).
    Short items stay on one line without nesting (`- **Changelog.** You're reading it.`).
 5. Inline: `**bold**`, `*italic*` / `_italic_`, `` `code` ``. Bold is the main emphasis - use it for headline features and `**Balance:**`-style prefixes.
-   Links `[text](url)` show only the text. Images `![..](..)` on their own line are dropped.
+   Links `[text](url)` are clickable: underlined, the url in a tooltip, a click opens it in the browser. Images `![..](..)` on their own line are dropped.
 6. Tables: `| a | b |` rows, `|---|---|` under the header row (drawn dimmer). Indent the rows with a tab under a bullet
    so they expand with it, like its nested points. Put an empty line before the header row - without it GitHub
    glues a table that follows a nested point into that point's text (the game skips empty lines, so both render).

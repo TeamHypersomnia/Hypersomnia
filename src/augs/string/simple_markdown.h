@@ -17,7 +17,7 @@
 
 	Inline:
 		**bold** __bold__ *italic* _italic_ `code` [text](url)
-	Links keep only the text. Unbalanced markers stay literal.
+	A link is its text with the url beside it (LINK); an image ![..](..) is dropped. Unbalanced markers stay literal.
 */
 
 namespace augs {
@@ -25,12 +25,19 @@ namespace augs {
 		NORMAL,
 		BOLD,
 		ITALIC,
-		CODE
+		CODE,
+		LINK
 	};
 
 	struct markdown_span {
 		markdown_span_style style = markdown_span_style::NORMAL;
 		std::string text;
+
+		/*
+			Only for LINK.
+		*/
+
+		std::string url = "";
 
 		bool operator==(const markdown_span&) const = default;
 	};

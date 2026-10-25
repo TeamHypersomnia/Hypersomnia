@@ -56,7 +56,7 @@ std::vector<augs::markdown_span> augs::parse_markdown_inline(const std::string& 
 			return;
 		}
 
-		if (!result.empty() && result.back().style == style) {
+		if (!result.empty() && result.back().style == style && style != S::LINK) {
 			result.back().text += s;
 			return;
 		}
@@ -165,8 +165,12 @@ std::vector<augs::markdown_span> augs::parse_markdown_inline(const std::string& 
 		else if (c == '[') {
 			if (const auto end = find_link_end(i); end != npos) {
 				const auto label_end = text.find("](", i + 1);
+				const auto label = text.substr(i + 1, label_end - i - 1);
 
-				add(S::NORMAL, text.substr(i + 1, label_end - i - 1));
+				if (!label.empty()) {
+					result.push_back({ S::LINK, label, text.substr(label_end + 2, end - 1 - (label_end + 2)) });
+				}
+
 				i = end;
 				continue;
 			}
@@ -371,7 +375,9 @@ TEST_CASE("SimpleMarkdownInline", "[markdown]") {
 	});
 
 	REQUIRE(parse_markdown_inline("go to [the site](https://hypersomnia.io).") == V {
-		{ S::NORMAL, "go to the site." }
+		{ S::NORMAL, "go to " },
+		{ S::LINK, "the site", "https://hypersomnia.io" },
+		{ S::NORMAL, "." }
 	});
 
 	REQUIRE(parse_markdown_inline("a ![img](x.png) b") == V { { S::NORMAL, "a  b" } });

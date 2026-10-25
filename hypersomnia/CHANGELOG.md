@@ -4,6 +4,34 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [4.3.0] - 2026-10-25
+
+### Added
+
+- **LAN parties without the internet.**
+	- Servers on your local network **show in the browser**.
+- **Easy server config generator** at [hypersomnia.io/generator](https://hypersomnia.io/generator).
+	- One-shot script to orchestrate **entire tournaments**.
+	- Environment variable support for Docker.
+- **Docker image** of the server with every release.
+
+### Changed
+
+- **Balance (nerf):** sniper bullets are slower again.
+
+	| Weapon | Before | After |
+	|---|---|---|
+	| Awka | 10500 | **9500** |
+	| Hunter | 9500 | **8500-9500** |
+	| BullDup 2000 | 8500 | **7000** |
+
+### Fixed
+
+- **Metropolis bots** correctly go to the bombsite under attack (broken in `4.2.0`).
+- **Bots on de_hotline** no longer walk into walls or stare at them.
+	- Every bombsite gets its correct waypoints.
+- The game no longer hangs on a network without the internet - every wait is at most 5 s.
+
 ## [4.2.0] - 2026-10-22
 
 ### Added
