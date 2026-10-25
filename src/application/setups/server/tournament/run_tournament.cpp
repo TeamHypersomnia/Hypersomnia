@@ -1014,6 +1014,12 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.server_name = match.server_name;
 			this_config.server.shutdown_after_one_match = true;
 
+			/*
+				The round's arena only - the default cycle would change it while the server waits for its players.
+			*/
+
+			this_config.server.cycle = arena_cycle_type::REPEAT_CURRENT;
+
 			auto canon_server_vars = in.canon_config_with_confd.server;
 			this_config.server.webrtc_udp_mux = true;
 			this_config.server.webrtc_port_range_begin = webrtc_port_counter++;
