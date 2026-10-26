@@ -29,6 +29,11 @@
 	| Weapon | Before | After |
 	|---|---|---|
 	| Hunter | $2400 | **$2700** |
+- **Balance (buff):** Covert bullets are faster.
+
+	| Weapon | Before | After |
+	|---|---|---|
+	| Covert | 4600 | **4800** |
 
 ### Fixed
 
