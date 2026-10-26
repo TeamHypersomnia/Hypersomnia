@@ -241,9 +241,10 @@ void arena_mode::init_spawned(
 				sentience->learnt_spells = transferred->saved_spells;
 			}
 
-			std::vector<entity_id> created_items;
+			std::vector<entity_id> created_items(eq.items.size());
 
-			for (const auto& i : eq.items) {
+			auto restore_item = [&](const std::size_t item_index) {
+				const auto& i = eq.items[item_index];
 				const auto& idx = i.container_index;
 				const auto target_container_id = 
 					idx < created_items.size() ? 
@@ -256,7 +257,6 @@ void arena_mode::init_spawned(
 
 				auto skip_creation = [&]() {
 					changed_identities.changes[i.source_entity_id] = entity_id();
-					created_items.push_back(entity_id());
 				};
 
 				{
@@ -270,7 +270,7 @@ void arena_mode::init_spawned(
 					if (in.rules.refill_all_mags_on_round_start) {
 						if (::is_magazine_like(target_container)) {
 							skip_creation();
-							continue;
+							return;
 						}
 					}
 
@@ -280,7 +280,7 @@ void arena_mode::init_spawned(
 							|| target_slot_id.type == slot_function::GUN_CHAMBER_MAGAZINE
 						) {
 							skip_creation();
-							continue;
+							return;
 						}
 					}
 				}
@@ -316,7 +316,7 @@ void arena_mode::init_spawned(
 						const auto new_id = new_item.get_id();
 						changed_identities.changes[i.source_entity_id] = new_id;
 
-						created_items.push_back(new_id);
+						created_items[item_index] = new_id;
 					}
 
 					auto fill_or_refill = [&cosm, &step, &typed_handle, access](const auto slot) {
@@ -374,6 +374,29 @@ void arena_mode::init_spawned(
 				}
 				else {
 					skip_creation();
+				}
+			};
+
+			/*
+				The backpack goes on first. It only enlarges the personal deposit,
+				which comes earlier in the slot order - restored before the backpack,
+				what fit only with the backpack was left lying at the map origin
+				(a stack went in partly, the rest stayed there).
+			*/
+
+			auto is_worn_backpack = [&](const auto& i) {
+				return i.container_index == static_cast<std::size_t>(-1) && i.slot_type == slot_function::BACK;
+			};
+
+			for (std::size_t item_index = 0; item_index < eq.items.size(); ++item_index) {
+				if (is_worn_backpack(eq.items[item_index])) {
+					restore_item(item_index);
+				}
+			}
+
+			for (std::size_t item_index = 0; item_index < eq.items.size(); ++item_index) {
+				if (!is_worn_backpack(eq.items[item_index])) {
+					restore_item(item_index);
 				}
 			}
 
