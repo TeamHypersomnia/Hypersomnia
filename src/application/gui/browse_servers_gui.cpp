@@ -748,7 +748,15 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 	*/
 
 	if (show && std::exchange(data->lan.discovery_pending, false)) {
-		data->lan.discover(socket, ping_sequence_counter++, current_time);
+		auto local_favorites = std::vector<netcode_address_t>();
+
+		for (const auto& s : favorite_only_list) {
+			if (s.address.type != NETCODE_ADDRESS_NONE && ::is_internal(s.address)) {
+				local_favorites.push_back(s.address);
+			}
+		}
+
+		data->lan.discover(socket, ping_sequence_counter++, current_time, local_favorites);
 	}
 
 	auto interval_passed = [current_time](const auto last, const auto interval) {
@@ -1385,6 +1393,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 		else {
 			text_color(error_message, red);
+#if BUILD_NATIVE_SOCKETS
+			text_disabled("At a LAN party without internet?\nAdd the local server to Favorites.");
+#endif
 		}
 	}
 

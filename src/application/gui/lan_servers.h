@@ -97,6 +97,10 @@ struct lan_servers {
 
 		const auto end_port = static_cast<uint32_t>(first_port) + num_ports;
 
+		if (num_ports > 1) {
+			LOG("%x on the local network has %x ports: %x-%x.", ::ToString(teller), num_ports, first_port, end_port - 1);
+		}
+
 		auto in_range = [&](const port_type port) {
 			return port >= first_port && static_cast<uint32_t>(port) < end_port;
 		};
@@ -187,13 +191,17 @@ struct lan_servers {
 		::request_heartbeat_on_ping(socket, from, discovery_sequence);
 	}
 
-	void discover(netcode_socket_t& socket, const uint64_t sequence, const net_time_t now) {
+	/*
+		also_these: the favorites on the local network, asked directly too - a network that blocks broadcast (a LAN
+		party's router) still shows them here, with all their ports (a tournament's matches), as if broadcast found them.
+	*/
+
+	void discover(netcode_socket_t& socket, const uint64_t sequence, const net_time_t now, const std::vector<netcode_address_t>& also_these) {
 		if (!broadcast_enabled) {
 			broadcast_enabled = ::enable_broadcast(socket);
 
 			if (!broadcast_enabled) {
-				LOG("Could not enable broadcast on the server browser's socket - no local servers will be found.");
-				return;
+				LOG("Could not enable broadcast on the server browser's socket - only the favorites on the local network are asked.");
 			}
 		}
 
@@ -222,17 +230,30 @@ struct lan_servers {
 			s.progress.found_on_internal_network = true;
 		}
 
-		for (const auto& broadcast : broadcast_addresses) {
-			for (port_type i = 0; i < NUM_LAN_GAME_PORTS_V; ++i) {
-				auto target = broadcast;
-				target.port = static_cast<port_type>(DEFAULT_GAME_PORT_V + i);
+		auto send = [&](const netcode_address_t& target) {
+			auto packet = ::make_ping_packet(target, discovery_sequence);
+			netcode_socket_send_packet(&socket, &packet.to, packet.bytes.data(), packet.bytes.size());
+		};
 
-				auto packet = ::make_ping_packet(target, discovery_sequence);
-				netcode_socket_send_packet(&socket, &packet.to, packet.bytes.data(), packet.bytes.size());
+		if (broadcast_enabled) {
+			for (const auto& broadcast : broadcast_addresses) {
+				for (port_type i = 0; i < NUM_LAN_GAME_PORTS_V; ++i) {
+					auto target = broadcast;
+					target.port = static_cast<port_type>(DEFAULT_GAME_PORT_V + i);
+					send(target);
+				}
 			}
+
+			LOG("Broadcast to %x addresses for the servers on the local network.", broadcast_addresses.size());
 		}
 
-		LOG("Broadcast to %x addresses for the servers on the local network.", broadcast_addresses.size());
+		for (const auto& favorite : also_these) {
+			send(favorite);
+		}
+
+		if (!also_these.empty()) {
+			LOG("Asked %x favorites on the local network directly.", also_these.size());
+		}
 	}
 
 	bool is_discovery_answer(const uint64_t sequence) const {
