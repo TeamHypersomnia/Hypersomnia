@@ -6,7 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- do audytow zeby dodawalo slad po audycie zeby wiedzeic ktore commity przepatrzone
 - audyt wszystkich skilli
+- turniejowy live results page jako combo: Off / Default / I will host my own - wlasny frontend do tournament.json (juz podpisany i z CORS), na tej samej maszynie; heartbeat nadal daje pucharek Results obok nazwy na liscie serwerow
 - jakis knowledge graph se zrobic jak co dziala
 
 - autoskalowanie instancji: opcja tez on-demand gdy sloty w jednej juz zajete >=75% np.
