@@ -62,9 +62,6 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 #if PLATFORM_WEB
 		using key_type = augs::event::keys::key;
 
-		/* Point to HTTPS one */
-		result.server_list_provider = "https://hypersomnia.io/server_list";
-
 		result.window.fullscreen = false;
 		result.window.border = false;
 		result.sound.max_short_sounds = 32;

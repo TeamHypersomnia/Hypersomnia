@@ -276,6 +276,17 @@ inline void post_tournament_results(
 		return;
 	}
 
+#if PLATFORM_WEB
+	/*
+		A server in the browser has no blocking HTTP client - its tournament's results stay on the live page and in
+		tournament_results.json.
+	*/
+
+	(void)json;
+	(void)signer;
+	(void)interrupted;
+	LOG("Tournament: a server in the browser sends no results webhook.");
+#else
 	const auto headers = signer.headers_for(json);
 
 	if (!headers.has_value()) {
@@ -318,4 +329,5 @@ inline void post_tournament_results(
 	}
 
 	LOG("Tournament: the results were not sent to the webhook.");
+#endif
 }
