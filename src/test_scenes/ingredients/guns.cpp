@@ -2443,6 +2443,7 @@ namespace test_flavours {
 			make_shell(test_remnant_bodies::RIFLE_CASING, test_scene_image_id::RIFLE_CASING, shell_set, 1.0f, 1.2f);
 			make_shell(test_remnant_bodies::BATTLE_RIFLE_CASING, test_scene_image_id::BATTLE_RIFLE_CASING, shell_set, 0.94f, 1.4f);
 			make_shell(test_remnant_bodies::SNIPER_CASING, test_scene_image_id::SNIPER_CASING, shell_set, 0.86f, 1.8f);
+			make_shell(test_remnant_bodies::ACP_CASING, test_scene_image_id::ACP_CASING, small_shell_set, 0.98f, 1.1f);
 
 			make_shell(test_remnant_bodies::SHOTGUN_RED_SHELL, test_scene_image_id::SHOTGUN_RED_SHELL, shotgun_shell_set, 1.0f, 1.5f);
 			make_shell(test_remnant_bodies::GRADOBICIE_SHELL, test_scene_image_id::GRADOBICIE_SHELL, shell_set, 1.0f, 1.5f);
@@ -2537,7 +2538,7 @@ namespace test_flavours {
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::PISTOL_CASING);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::ACP_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::COVERT_CYAN_ROUND);
 
 				meta.set(cartridge);
@@ -2667,7 +2668,7 @@ namespace test_flavours {
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::ACP_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
 
 				meta.set(cartridge);
@@ -2843,7 +2844,7 @@ namespace test_flavours {
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_SMOKE);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SMG_CASING);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::ACP_CASING);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::ORANGE_ROUND);
 
 				meta.set(cartridge);
