@@ -44,7 +44,7 @@ done
 for c in $A $B; do
 	mkdir -p $E/client_$c/user/conf.d
 	cat > $E/client_$c/user/conf.d/test.json <<J
-{ "server_list_provider": "http://$ARENAUS_IP:18420", "identity_broker_url": "http://$ARENAUS_IP:13000",
+{ "server_list_provider": "http://$ARENAUS_IP:18420/server_list", "identity_broker_url": "http://$ARENAUS_IP:13000",
   "webrtc_signalling_server_url": "ws://$ARENAUS_IP:18000", "website_url": "http://$ARENAUS_IP:13000", "client": { "nickname": "$c" } }
 J
 done

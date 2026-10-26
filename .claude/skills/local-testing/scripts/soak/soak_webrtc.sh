@@ -25,7 +25,7 @@ mk srv <<J
               "webrtc_port_range_begin": 19300, "webrtc_port_range_end": 19310 } }
 J
 mk client <<J
-{ "server_list_provider": "http://127.0.0.1:18420", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
+{ "server_list_provider": "http://127.0.0.1:18420/server_list", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
   "identity_broker_url": "http://127.0.0.1:1", "client": { "nickname": "rtc_soak" } }
 J
 

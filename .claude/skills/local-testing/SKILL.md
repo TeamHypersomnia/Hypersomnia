@@ -221,7 +221,7 @@ or `ID_A`/`ID_B` to override the ids); `db.sh show|sql` reads or changes the sit
   (list key) or "another key than the one you chose" - no Connect anyway anywhere. `remote_e2e/community.sh start` - a
   community server on 9005 with a new key each start, listed on the test master; `crash` then `start silent` - a server whose
   list entry (60 s) keeps the previous key. Never `kill -9` the pid file's pid (it is `timeout`'s). A client with
-  `"server_list_provider": "http://<arenaus>:18420"` and `"last_activity": "MAIN_MENU"` joins from Browse servers.
+  `"server_list_provider": "http://<arenaus>:18420/server_list"` and `"last_activity": "MAIN_MENU"` joins from Browse servers.
 - **Server browser and invites:** the list is cached at `<appdata>/cache/server_list.bin` (shown in the browser only, until a fresh one comes - joins, quick play and invites never use it) and downloaded at every start in the
   background (even with `--connect`); favorites are `user/favorite_servers.json` (`key`, `label`, `address`, `name`, `manual` - a
   manual one is Add an unlisted server: shown under Unlisted, never matched with the list), passwords

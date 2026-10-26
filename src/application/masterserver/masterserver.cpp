@@ -1007,7 +1007,11 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	};
 
 	auto define_http_server = [&](auto& server) {
-		server.Get("/server_list_binary", [&](const Request&, Response& res) {
+		/*
+			/server_list - the list as the game reads it; /server_list_binary - the same, for games before 4.3.0.
+		*/
+
+		auto send_binary_list = [&](const Request&, Response& res) {
 			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
 
 			set_cors(res);
@@ -1021,7 +1025,10 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 					make_list_streamer_lambda()
 				);
 			}
-		});
+		};
+
+		server.Get("/server_list", send_binary_list);
+		server.Get("/server_list_binary", send_binary_list);
 
 		server.Get("/server_list_json", [&](const Request&, Response& res) {
 			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
@@ -1039,10 +1046,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 			}
 		});
 
-		server.Options("/server_list_binary", [](const httplib::Request&, httplib::Response& res) {
-			set_cors(res);
-			res.status = 204;
-		});
+		for (const auto path : { "/server_list", "/server_list_binary" }) {
+			server.Options(path, [](const httplib::Request&, httplib::Response& res) {
+				set_cors(res);
+				res.status = 204;
+			});
+		}
 
 		server.Options("/server_list_json", [](const httplib::Request&, httplib::Response& res) {
 			set_cors(res);

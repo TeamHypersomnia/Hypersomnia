@@ -63,7 +63,7 @@ ssh arena 'SECS=900 timeout 30 bash ~/yojimbo-test/e2e/community.sh start > /dev
 sleep 14
 T=$S/web_relay_$(date +%s)
 mkdir -p $T/uf/conf.d $T/profile
-echo "{ \"server_list_provider\": \"http://$ARENAUS_IP:18420\", \"identity_broker_url\": \"http://$ARENAUS_IP:13000\", \"webrtc_signalling_server_url\": \"ws://$ARENAUS_IP:18000\", \"client\": { \"nickname\": \"webrelay\" } }" > $T/uf/conf.d/test.json
+echo "{ \"server_list_provider\": \"http://$ARENAUS_IP:18420/server_list\", \"identity_broker_url\": \"http://$ARENAUS_IP:13000\", \"webrtc_signalling_server_url\": \"ws://$ARENAUS_IP:18000\", \"client\": { \"nickname\": \"webrelay\" } }" > $T/uf/conf.d/test.json
 USER_FILES=$T/uf $SCRIPTS/prepare_web.sh $REPO/build/Release-Web-clang-claude-web $T/web > /dev/null
 cat > $T/profile/user.js <<J
 user_pref("browser.shell.checkDefaultBrowser", false);

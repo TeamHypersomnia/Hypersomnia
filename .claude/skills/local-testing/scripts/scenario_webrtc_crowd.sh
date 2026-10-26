@@ -44,7 +44,7 @@ done
 
 for i in $(seq 1 $N); do
 	mk c$i <<J
-{ "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:18420", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
+{ "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:18420/server_list", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
   "client": { "nickname": "crowd$i" } }
 J
 	timeout 90 xvfb-run -a $BIN --connect rtc:$ID --appdata-dir $T/c$i $GAME_TEST_FLAGS --mute > $T/c$i.out 2>&1 &

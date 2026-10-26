@@ -60,7 +60,7 @@ import sys
 p = sys.argv[1]
 d = bytearray(open(p, 'rb').read())
 replacements = [
-	(b'"server_list_provider": "https://masterserver.hypersomnia.io:8420",', b'"server_list_provider": "http://127.0.0.1:18420",'),
+	(b'"server_list_provider": "https://hypersomnia.io/server_list",', b'"server_list_provider": "http://localhost:18420/server_list",'),
 	(b'"webrtc_signalling_server_url": "wss://masterserver.hypersomnia.io:8000",', b'"webrtc_signalling_server_url": "ws://127.0.0.1:18000",'),
 	(b'"identity_broker_url": "https://hypersomnia.io",', b'"identity_broker_url": "http://127.0.0.1:13500",'),
 	(b'"website_url": "https://hypersomnia.io",', b'"website_url": "http://127.0.0.1:13500",'),

@@ -44,7 +44,7 @@ EOF
 mkconf c_rtc <<EOF
 {
   "identity_broker_url": "${BROKER_URL:-http://127.0.0.1:1}",
-  "server_list_provider": "http://127.0.0.1:18420",
+  "server_list_provider": "http://127.0.0.1:18420/server_list",
   "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
   "window": { "fullscreen": false, "size": [1280, 720] },
   "client": { "nickname": "c_rtc" }

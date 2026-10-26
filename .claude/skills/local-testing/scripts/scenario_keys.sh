@@ -62,7 +62,7 @@ client_conf() {
 mkconf $1 <<EOF
 {
   "identity_broker_url": "${BROKER_URL:-http://127.0.0.1:1}",
-  "server_list_provider": "http://127.0.0.1:18420",
+  "server_list_provider": "http://127.0.0.1:18420/server_list",
   "window": { "fullscreen": false, "size": [1280, 720] },
   "client": { "nickname": "$1" }
 }

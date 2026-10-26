@@ -12,7 +12,7 @@
     // "log_timestamp_format": "[%d-%m-%y %H:%M:%S] ",
     // "log_timestamp_format": "",
 
-    "server_list_provider": "https://masterserver.hypersomnia.io:8420",
+    "server_list_provider": "https://hypersomnia.io/server_list",
     // Where the game gets the cert that says which account it plays on (Steam, CrazyGames or an account key).
     "identity_broker_url": "https://hypersomnia.io",
     // Where the account settings link an identity key to a Steam account and open profiles.

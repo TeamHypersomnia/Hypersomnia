@@ -63,7 +63,7 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		using key_type = augs::event::keys::key;
 
 		/* Point to HTTPS one */
-		result.server_list_provider = "https://masterserver.hypersomnia.io:8420";
+		result.server_list_provider = "https://hypersomnia.io/server_list";
 
 		result.window.fullscreen = false;
 		result.window.border = false;

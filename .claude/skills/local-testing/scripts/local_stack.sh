@@ -87,7 +87,7 @@ Running for $HOURS h. Logs: $T/{ms,ranked,casual}.out
   Web, casual:   http://localhost:8765/game/de
   Web, list:     http://localhost:8765/
   Broker:        $BROKER_URL (key $BROKER_PUBLIC_KEY)
-  Native:        add to a conf.d:  "server_list_provider": "http://127.0.0.1:18420",
+  Native:        add to a conf.d:  "server_list_provider": "http://127.0.0.1:18420/server_list",
                  "identity_broker_url": "$BROKER_URL", "website_url": "$BROKER_URL",
                  "webrtc_signalling_server_url": "ws://127.0.0.1:18000"
                  then connect to 127.0.0.1:10002 (ranked) or 127.0.0.1:10004 (casual)

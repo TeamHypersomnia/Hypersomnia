@@ -28,6 +28,7 @@
 #include "augs/misc/httplib_utils.h"
 #include "augs/misc/to_hex_str.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "augs/string/parse_url.h"
 #include "hypersomnia_version.h"
 
 #include "application/network/address_utils.h"
@@ -256,7 +257,7 @@ static std::vector<server_list_entry> to_server_list(const augs::http_response& 
 }
 
 /*
-	The cached list: the bytes of /server_list_binary as they came.
+	The cached list: the bytes of the server list as they came.
 */
 
 static void save_cached_list(const augs::path_type& path, const std::string& bytes) {
@@ -437,9 +438,17 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	LOG("Launching future_response");
 
+	/*
+		The whole link to the list - without a scheme, https (as typed in a browser).
+	*/
+
+	const auto& provider = in.server_list_provider;
+	const auto list_url = parsed_url(provider.find("://") == std::string::npos ? "https://" + provider : provider);
+	const auto list_path = (list_url.location.empty() ? std::string("/") : list_url.location) + (list_url.query.empty() ? "" : "?" + list_url.query);
+
 	data->future_response = augs::async_get(
-		in.server_list_provider,
-		"/server_list_binary"
+		list_url.get_base_url(),
+		list_path
 	);
 
 	LOG("refresh_server_list returns.");
