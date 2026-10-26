@@ -60,7 +60,7 @@ EOF
 	cd $E/hypersomnia
 	# Tournament mode puts the two accounts on the teams: --tournament-teams
 	setsid nohup timeout 600 $E/Hypersomnia --dedicated-server --appdata-dir $E/server --no-update-on-launch --no-open-logs \
-		--tournament-teams "$2; $3" --tournament-arenas "de_cyberaqua bomb_defusal" > $E/server.out 2>&1 < /dev/null &
+		--tournament-teams "$2; $3" --tournament-maps "de_cyberaqua bomb_defusal" > $E/server.out 2>&1 < /dev/null &
 	echo $! > $E/server.pid
 	sleep 6
 	grep -hE "Tournament|listening|heartbeat through UDP" $E/server.out | head -4

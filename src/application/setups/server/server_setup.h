@@ -53,7 +53,7 @@
 #include "application/network/resolve_address_result.h"
 #include "application/setups/server/server_bans.h"
 #include "application/setups/server/report_queue.h"
-#include "application/setups/server/tournament/open_round_places.h"
+#include "application/setups/server/tournament/open_bracket_round_places.h"
 #include "application/masterserver/server_request_signature.h"
 
 struct netcode_socket_t;
@@ -426,14 +426,18 @@ private:
 	void advance_clients_state();
 
 	bool is_open_match() const;
+	bool open_match_full() const;
 	void take_into_open_match(const client_id_type, const server_client_state&);
+	void sync_open_match_teams();
+	void send_away_left_out_spectators();
+	void take_open_match_place(const std::string& authenticated_id, const std::string& nickname);
+	void free_open_match_place(const std::string& authenticated_id);
 	void leave_open_match(const std::string& authenticated_id);
 	void name_open_match();
 	void close_open_match_if_requested();
 	void check_join_timeout();
 	bool join_timeout_due() const;
 	void decide_by_present_players();
-	bool timeout_absent_players_now();
 
 	/*
 		Who watches a match being played - see server_watchers.hpp.
@@ -545,39 +549,34 @@ public:
 		ranked/casual state. Used by tournament servers to show BYES / TOURNAMENT /
 		SEMIFINALS / FINALS in the server browser.
 	*/
-	std::optional<ranked_server_type> heartbeat_reported_tournament_stage;
+	std::optional<ranked_server_type> heartbeat_reported_bracket_round_type;
 
 	/*
-		A tournament's open first round: Close round 1 from the administration panel of any of its servers
-		sets this flag shared by all of them. Each one that hasn't started its match yet then calls
-		on_open_match_closed with whoever waits on it (nobody: an empty server) and shuts down.
+		A tournament's round: Close the round from the administration panel of any of its servers sets this flag shared
+		by all of them - as if the round's time to enter ran out now (join_timeout_due). An open match of round 1 not
+		started yet calls on_open_match_closed with whoever waits on it (nobody: an empty server) and shuts down; one
+		of known teams is decided by who is here (server_join_timeout.hpp).
 	*/
 
-	std::shared_ptr<std::atomic<bool>> close_open_round;
+	std::shared_ptr<std::atomic<bool>> close_bracket_round;
 
-	/*
-		When the round's first player came to any of its matches (server_time; below 0: nobody yet) - the join timeout
-		counts from it (server_join_timeout.hpp). Shared by the round's servers.
-	*/
-
-	std::shared_ptr<std::atomic<double>> round_first_arrival;
 	std::function<void(const server_assigned_teams&)> on_open_match_closed;
 
 	/*
 		The players that took a place in any open match of round 1, shared by them too. Once all the players
-		the tournament is for came (open_round_expected_players), the round closes by itself - nobody else
+		the tournament is for came (open_bracket_round_expected_players), the round closes by itself - nobody else
 		is coming to pair with whoever waits alone.
 	*/
 
-	std::shared_ptr<std::atomic<uint32_t>> open_round_players;
-	uint32_t open_round_expected_players = 0;
+	std::shared_ptr<std::atomic<uint32_t>> open_bracket_round_players;
+	uint32_t open_bracket_round_expected_players = 0;
 
 	/*
 		Which open match each player has their place in - one place per account in round 1.
 		open_match_server_name: this server's own name in it, "Match #2 (any pair)".
 	*/
 
-	std::shared_ptr<open_round_places> open_places;
+	std::shared_ptr<open_bracket_round_places> open_places;
 	std::string open_match_server_name;
 
 	/*
@@ -609,16 +608,13 @@ public:
 	bool claim_listed_nickname(client_id_type, const server_client_state&);
 
 	/*
-		A tournament match's join timeout (server_join_timeout.hpp): this long after the round's first player came,
+		A tournament round's timeout (server_join_timeout.hpp): from bracket_round_deadline (seconds since the epoch, 0: none)
 		a match still waiting for its players is decided - on_join_timeout with the team that came
-		(faction_type::COUNT: nobody), or it starts with the equal numbers present. 0: no timeout.
+		(faction_type::COUNT: nobody), or both teams here play with whoever is here.
 	*/
 
-	uint32_t join_timeout_secs = 0;
-	std::optional<net_time_t> join_timeout_since;
-	bool join_timeout_passed = false;
-	bool timeout_requested = false;
-	bool join_timeout_relaxed = false;
+	int64_t bracket_round_deadline = 0;
+	bool plays_with_whoever_came = false;
 	std::function<void(faction_type)> on_join_timeout;
 
 	/*
@@ -634,6 +630,14 @@ public:
 		int score_resistance = 0;
 		int score_metropolis = 0;
 		bool started = false;
+
+		/*
+			For the live page: being played (not starting), both teams complete (STARTING there), and the round's deadline.
+		*/
+
+		bool live = false;
+		bool teams_full = false;
+		int64_t round_deadline = 0;
 	};
 
 	std::function<void(const live_match_state&)> on_live_state;

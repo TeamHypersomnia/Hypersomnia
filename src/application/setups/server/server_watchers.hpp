@@ -153,17 +153,8 @@ bool server_setup::may_play_here(const server_client_state& c) const {
 		return false;
 	}
 
-	if (is_open_match() && !is_ranked_live_or_starting()) {
-		std::size_t taken = 0;
-
-		for (const auto& [id, faction] : assigned_teams.id_to_faction) {
-			(void)id;
-			taken += ::is_actual_faction(faction) ? 1 : 0;
-		}
-
-		if (taken < 2 * assigned_teams.open_team_size) {
-			return true;
-		}
+	if (is_open_match() && !is_ranked_live_or_starting() && !open_match_full()) {
+		return true;
 	}
 
 	if (c.state == client_state_type::PENDING_WELCOME) {
@@ -227,17 +218,44 @@ void server_setup::track_match_start_spectators() {
 }
 
 /*
-	The spectator account never takes a team - its team choices are dropped.
+	The spectator account never takes a team - its team choices are dropped. So are, in an open match of a tournament,
+	the choices of a team whoever may only watch it (take_into_open_match) or has a place in another match.
 */
 
 total_client_entropy server_setup::without_spectator_account_team_choice(const mode_player_id mode_id, const total_client_entropy& entropy) const {
-	if (!std::holds_alternative<mode_commands::team_choice>(entropy.mode)) {
+	const auto choice = std::get_if<mode_commands::team_choice>(std::addressof(entropy.mode));
+
+	if (choice == nullptr) {
 		return entropy;
 	}
 
 	const auto c = find_client_state(mode_id);
 
-	if (c == nullptr || !(is_spectator_account(c->authenticated_id) || is_spectator_account(c->admin_account))) {
+	if (c == nullptr) {
+		return entropy;
+	}
+
+	auto may_choose = [&]() {
+		if (is_spectator_account(c->authenticated_id) || is_spectator_account(c->admin_account)) {
+			return false;
+		}
+
+		if (!is_open_match() || *choice == faction_type::SPECTATOR) {
+			return true;
+		}
+
+		if (may_spectate_tournament && may_spectate_tournament(c->authenticated_id)) {
+			return false;
+		}
+
+		if (open_places != nullptr && open_places->elsewhere(c->authenticated_id, open_match_server_name)) {
+			return false;
+		}
+
+		return found_in(assigned_teams.id_to_faction, c->authenticated_id);
+	};
+
+	if (may_choose()) {
 		return entropy;
 	}
 

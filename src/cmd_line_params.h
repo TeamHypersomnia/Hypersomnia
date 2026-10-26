@@ -13,6 +13,12 @@ struct cmd_line_params {
 	std::string complete_command_line;
 	std::string parsed_as;
 
+	/*
+		A HYPERSOMNIA_* flag variable with a value that's neither on nor off - the start stops with it.
+	*/
+
+	std::string environment_error;
+
 	std::string live_log_path;
 
 	std::optional<augs::path_type> calling_cwd;
@@ -53,6 +59,7 @@ struct cmd_line_params {
 	bool only_check_update_availability_and_quit = false;
 	bool sync_external_arenas = false;
 	bool sync_external_arenas_and_quit = false;
+	bool download_maps_and_quit = false;
 	std::optional<int> autoupdate_delay;
 
 	augs::path_type apply_config;
@@ -60,22 +67,29 @@ struct cmd_line_params {
 	/*
 		A tournament, as given - read and checked by tournament_config::from_params (run_tournament.cpp):
 		--tournament <players> (open first round), or --tournament-teams "alice, bob; carol, dave";
-		--tournament-team-size <n>, --tournament-arenas <a,b,...>. Also the HYPERSOMNIA_TOURNAMENT* variables.
+		--tournament-team-size <n>, --tournament-maps <a,b,...>. Also the HYPERSOMNIA_TOURNAMENT* variables.
 	*/
 
 	std::string tournament_players;
 	std::string tournament_team_size;
 	std::string tournament_teams;
-	std::string tournament_arenas;
+	std::string tournament_maps;
 
 	/*
 		"off": no live page, or its TCP port - by default the first game port's number: http://<server>:8412/.
 	*/
 
 	std::string tournament_page;
-	std::string tournament_join_timeout;
-	std::string tournament_spectators;
+	std::string tournament_round_1_max_wait;
+	std::string tournament_next_rounds_max_wait;
+	std::string tournament_spectator_slots;
 	std::string tournament_name;
+
+	/*
+		A tournament's flag under its old name: what it's called now - the tournament doesn't start with it.
+	*/
+
+	std::string renamed_tournament_flag;
 
 	augs::path_type export_weapon_stats;
 
@@ -287,20 +301,27 @@ struct cmd_line_params {
 			else if (a == "--tournament-teams") {
 				tournament_teams = get_next();
 			}
-			else if (a == "--tournament-arenas") {
-				tournament_arenas = get_next();
+			else if (a == "--tournament-maps") {
+				tournament_maps = get_next();
 			}
 			else if (a == "--tournament-page") {
 				tournament_page = get_next();
 			}
-			else if (a == "--tournament-join-timeout") {
-				tournament_join_timeout = get_next();
+			else if (a == "--tournament-round-1-max-wait") {
+				tournament_round_1_max_wait = get_next();
 			}
-			else if (a == "--tournament-spectators") {
-				tournament_spectators = get_next();
+			else if (a == "--tournament-next-rounds-max-wait") {
+				tournament_next_rounds_max_wait = get_next();
+			}
+			else if (a == "--tournament-spectator-slots") {
+				tournament_spectator_slots = get_next();
 			}
 			else if (a == "--tournament-name") {
 				tournament_name = get_next();
+			}
+			else if (const auto now = ::renamed_tournament_setting(a); !now.empty()) {
+				renamed_tournament_flag = a + " is no longer read - it's " + now + " now.";
+				get_next();
 			}
 			else if (a == "--export-weapon-stats") {
 				export_weapon_stats = get_next();
@@ -349,6 +370,15 @@ struct cmd_line_params {
 			else if (a == "--sync-external-arenas-and-quit") {
 				sync_external_arenas_and_quit = true;
 			}
+			else if (a == "--download-maps-and-quit") {
+				/*
+					The setup's step: the community maps the server is set to play, downloaded now - a LAN without
+					the internet has them later. A dedicated server's run, so its config and flags name them.
+				*/
+
+				download_maps_and_quit = true;
+				type = app_type::DEDICATED_SERVER;
+			}
 			else if (a == "--appdata-dir") {
 				appdata_dir = get_next();
 			}
@@ -379,7 +409,22 @@ struct cmd_line_params {
 				return std::string(arg) == f.flag;
 			});
 
-			if (!given) {
+			if (given) {
+				continue;
+			}
+
+			if (f.without_value) {
+				const auto v = std::string(value);
+
+				if (v == "1" || v == "on" || v == "true" || v == "yes") {
+					const char* const as_flag[] = { "", f.flag };
+					parse(2, as_flag, 1);
+				}
+				else if (!(v == "" || v == "0" || v == "off" || v == "false" || v == "no")) {
+					environment_error += typesafe_sprintf("%x=\"%x\": use 1 (on) or 0 (off). ", f.variable, v);
+				}
+			}
+			else {
 				const char* const as_flag[] = { "", f.flag, value };
 				parse(3, as_flag, 1);
 			}

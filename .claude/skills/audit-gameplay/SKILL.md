@@ -67,7 +67,7 @@ description: Audit/review a Hypersomnia feature or system (recently added gamepl
     headers with names after the original feature they implement.
     Example: checking a dedicated server's config at start (unknown keys, wrong types, bad admin profiles, a tournament's
     arenas and game modes) first went into `work.cpp` as about 120 lines in two places. Now it is all in
-    `src/application/setups/server/server_config_check.h` (`check_server_config`, `check_tournament_arenas`), and
+    `src/application/setups/server/server_config_check.h` (`check_server_config`, `check_tournament_maps`), and
     `work.cpp` keeps only two calls that pass in the config layers, the default config path, the admins and the flags.
 
 ## Report format

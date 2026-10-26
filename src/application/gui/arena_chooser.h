@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 #include <optional>
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -56,6 +57,12 @@ class arena_chooser : keyboard_acquiring_popup {
 	std::vector<entry> downloaded_paths;
 	std::vector<entry> user_projects_paths;
 
+	/*
+		A dedicated server's custom maps (custom/maps): apart, under a header of their own.
+	*/
+
+	std::vector<entry> custom_paths;
+
 	std::vector<entry> other_paths;
 
 	path_tree_settings tree_settings;
@@ -84,9 +91,11 @@ public:
 
 				if (info) {
 					other_paths.clear();
+					custom_paths.clear();
 
 					for (auto& a : info->arenas_on_disk) {
-						other_paths.push_back({ a.operator std::string() });
+						const bool custom = std::find(info->custom_arenas_on_disk.begin(), info->custom_arenas_on_disk.end(), a) != info->custom_arenas_on_disk.end();
+						(custom ? custom_paths : other_paths).push_back({ a.operator std::string() });
 					}
 				}
 				else {
@@ -309,6 +318,17 @@ public:
 
 			if (info) {
 				perform_paths(other_paths, "Arena on server");
+
+				if (!custom_paths.empty()) {
+					ImGui::TableNextRow(ImGuiTableRowFlags_None, row_height);
+					darken_miniature_column();
+					ImGui::TableSetColumnIndex(1);
+					centered_vertically();
+					indent_name();
+					text_disabled("Custom maps");
+
+					perform_paths(custom_paths, "Custom map");
+				}
 			}
 			else if (filtering) {
 				perform_paths(official_paths, "Official");

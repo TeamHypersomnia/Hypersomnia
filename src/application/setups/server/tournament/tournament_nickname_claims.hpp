@@ -20,8 +20,8 @@ bool server_setup::claim_listed_nickname(const client_id_type client_id, const s
 	}
 
 	if (on_listed_nickname_claimed && !on_listed_nickname_claimed(placeholder, c.authenticated_id)) {
-		LOG("Tournament: %x already plays in a team - not taking the listed nickname %x.", c.authenticated_id, nickname);
-		kick_now(client_id, "This computer's account already plays in this tournament\nunder another nickname.");
+		LOG("Tournament: %x may not take the listed nickname %x - taken, or the account plays under another one.", c.authenticated_id, nickname);
+		kick_now(client_id, "This nickname is taken in this tournament -\nor this computer's account plays under another one.");
 		return true;
 	}
 

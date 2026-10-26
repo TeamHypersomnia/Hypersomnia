@@ -269,12 +269,13 @@ namespace sanitization {
 		/*
 			Dirs are as follows:
 
-			user/downloads/arenas
+			user/downloads/maps
 			user/projects
+			user/custom/maps (a dedicated server's)
 			content/arenas
 
 			The arena in question could be in any of these folders,
-			but it's enough to sanitize against the user/downloads/arenas folder as it's the longest path.
+			but it's enough to sanitize against the user/downloads/maps folder as it's the longest path.
 		*/
 
 		return std::get_if<augs::path_type>(&sanitized_1) != nullptr;

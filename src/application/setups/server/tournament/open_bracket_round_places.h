@@ -12,7 +12,7 @@
 	who forgot to set theirs aren't both "Player" on the page.
 */
 
-class open_round_places {
+class open_bracket_round_places {
 	std::mutex lk;
 	std::unordered_map<std::string, std::string> server_of;
 	std::unordered_map<std::string, std::string> account_of_nickname;

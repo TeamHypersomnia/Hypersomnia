@@ -2,15 +2,15 @@
 # A client without the server's map downloads it - directly from the server (UDP), or from an HTTP provider (EXT=<url>).
 # LATENCY/LOSS: the client's network simulator. KILL_AT=<s>: the server is SIGKILLed that long after the client starts.
 # Prints the client's download progress, its disconnect reason and whether it got into the game.
-# Usage: MAP=<arena in hypersomnia/user/downloads/arenas> [EXT=..] [LATENCY=..] [LOSS=..] [KILL_AT=..] scenario_map_download.sh <out dir>
+# Usage: MAP=<arena in hypersomnia/user/downloads/maps> [EXT=..] [LATENCY=..] [LOSS=..] [KILL_AT=..] scenario_map_download.sh <out dir>
 # A long download: EXT=http://127.0.0.1:12180/arenas with slow_http.py <dir with arenas/> 12180 50000 (the provider is the arenas folder).
 . "$(dirname "$0")/test_env.sh"
 REPO=$HOME/Hypersomnia
 BIN=$REPO/build/Debug-x64-clang-claude/Hypersomnia
 T=$1
 MAP=${MAP:-hyperactive_space_station}
-mkdir -p $T/srv/user/conf.d $T/srv/user/downloads/arenas $T/cli/user/conf.d
-cp -r $REPO/hypersomnia/user/downloads/arenas/$MAP $T/srv/user/downloads/arenas/
+mkdir -p $T/srv/user/conf.d $T/srv/user/downloads/maps $T/cli/user/conf.d
+cp -r $REPO/hypersomnia/user/downloads/maps/$MAP $T/srv/user/downloads/maps/
 
 cat > $T/srv/user/conf.d/test.json <<EOF
 { "server_start": { "ip": "127.0.0.1", "port": 12101, "slots": 8 },

@@ -26,10 +26,10 @@ BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 [ -n "$BROKER_URL" ] && [ -n "$BROKER_PUBLIC_KEY" ] || { echo "start broker.sh and export BROKER_URL, BROKER_PUBLIC_KEY"; exit 1; }
 if ss -tuln | grep -q ":10060 "; then echo "port 10060 busy, abort"; exit 1; fi
 
-mkdir -p $T/server/user/conf.d $T/server/user/downloads/arenas
+mkdir -p $T/server/user/conf.d $T/server/user/downloads/maps
 
 # The test map: a copy of de_cyberaqua with tiny rules
-A=$T/server/user/downloads/arenas/de_e2e_short
+A=$T/server/user/downloads/maps/de_e2e_short
 cp -r $REPO/hypersomnia/content/arenas/de_cyberaqua $A
 mv $A/de_cyberaqua.json $A/de_e2e_short.json
 rm -f $A/last_saved.json $A/editor_view.json

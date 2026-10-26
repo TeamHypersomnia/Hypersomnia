@@ -63,9 +63,11 @@ The user folder: `~/.config/Hypersomnia/user/` (AppImage), `/opt/hypersomnia/use
 - `runtime_prefs.json` - what was changed from the administration panel.
 - `server_bans.json` - the bans.
 
-All settings, with comments: [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json). The sections for a server: `server_start` (port, slots), `server` (name, arenas, map cycle, bots, rules, updates), `server_private` (never sent to players), `instances` (how many servers).
+All settings, with comments: [`default_config.json`](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/hypersomnia/default_config.json). The sections for a server: `server_start` (port, slots), `server` (name, map, map cycle, bots, rules, updates), `server_private` (never sent to players), `instances` (how many servers).
 
-An arena is `"name"` (its default game mode) or `"name game_mode"`, e.g. `"fy_iceworld bomb_defusal"`. Community arenas ([hypersomnia.io/arenas](https://hypersomnia.io/arenas)) are downloaded the first time they're needed.
+An arena is `"name"` (its default game mode) or `"name game_mode"`, e.g. `"fy_iceworld bomb_defusal"`. Community maps ([hypersomnia.io/arenas](https://hypersomnia.io/arenas)) the server plays (its map cycle, a tournament's maps) are downloaded at every start, missing or outdated ones only - an author's update reaches the server by its next restart; the others never (`"*"` downloads none). Without the internet the server starts anyway, at most 5 seconds later, with the maps it has - only a tournament missing one of its maps waits until it's downloaded (asking again every 3 seconds).
+
+**Custom maps**: a dedicated server always has a `custom/maps/` folder in its user folder (`~/.config/Hypersomnia/user/custom/maps/`, in Docker `/opt/hypersomnia/custom/maps/`). Put a map's folder there: the server plays it by `/map`, the administration panel and a tournament's `--tournament-maps`, and players download it from the server as they join. A name an official, project or downloaded map has already: the custom one is ignored. To add every one of them to the map cycle (after the listed ones - a new one is in by the next map change): `"map_cycle_add_custom_maps": true` in the `server` section, or `HYPERSOMNIA_MAP_CYCLE_ADD_CUSTOM_MAPS=on`.
 
 ### The order
 
@@ -84,7 +86,8 @@ Later ones win:
 | `HYPERSOMNIA_SERVER_NAME` | The name on the server list | `My server` |
 | `HYPERSOMNIA_MAP_CYCLE` | The maps that follow each other - one alone stays, `*` all on disk. Default: `de_cyberaqua,de_silo,fy_minilab` | `de_silo,fy_iceworld bomb_defusal` |
 | `HYPERSOMNIA_MAP_CYCLE_RANDOM` | `off`: the cycle in its order, not shuffled | `off` |
-| `HYPERSOMNIA_MAP` | The map to start on - then the cycle goes on from it. Restarted, the server goes on from the map it was on | `de_silo` |
+| `HYPERSOMNIA_MAP_CYCLE_ADD_CUSTOM_MAPS` | `on`: every map in the server's `custom/maps/` folder is added to the map cycle (`off` by default) | `on` |
+| `HYPERSOMNIA_MAP` | The map to start on - then the cycle goes on from it. Restarted, the server goes on from the map it was on, if the cycle still has it | `de_silo` |
 | `HYPERSOMNIA_ADMINS` | [Admins](#admins) with full rights | `steam_7656119...,0x8aed41f2...` |
 | `HYPERSOMNIA_TELEGRAM_BOT_TOKEN` | Telegram: who joins - short notices only; with `HYPERSOMNIA_TELEGRAM_CHANNEL` (the bot an admin of it) | `123456789:AAH...` |
 | `HYPERSOMNIA_TELEGRAM_CHANNEL` | The channel for the notices above | `@my_server_joins` |
@@ -96,7 +99,7 @@ Later ones win:
 | `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports | `8500` |
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
 | `HYPERSOMNIA_SERVER_LIST` | `off`: not on the [server list](https://hypersomnia.io/servers) - browser players can't join; or the address of your own masterserver | `off` |
-| `HYPERSOMNIA_TOURNAMENT_SPECTATORS` | How many others may watch each tournament match (6 by default) - every place takes about 4.4 MB of RAM up front | `10` |
+| `HYPERSOMNIA_TOURNAMENT_SPECTATOR_SLOTS` | How many others may watch each tournament match (6 by default) - every place takes about 4.4 MB of RAM up front | `10` |
 | `HYPERSOMNIA_GAME_SPEED` | The whole game's speed, `0.5`-`1.5` (default `0.75`; `1` - the original Hypersomnia) | `1` |
 | `HYPERSOMNIA_BULLET_SPEED` | The bullets' own speed, `0.5`-`1.5` - without it, as the game speed | `0.9` |
 | `HYPERSOMNIA_ZOOM` | The camera zoom for everyone, `0.5`-`1.5` - without it, the map's own | `0.7` |
@@ -110,11 +113,13 @@ Later ones win:
 | `HYPERSOMNIA_TOURNAMENT` | A [tournament](#tournaments) for this many players | `16` |
 | `HYPERSOMNIA_TOURNAMENT_TEAM_SIZE` | `2` for 2v2 and so on | `2` |
 | `HYPERSOMNIA_TOURNAMENT_TEAMS` | Teams set up beforehand: a player per line, the teams apart by an empty line (1v1: a player per line) - or a team per line, `;` between the teams, `,` between the players. `=<account id>` to verify them | `alice=0x8aed..., bob=steam_7656...; carol=..., dave=...` |
-| `HYPERSOMNIA_TOURNAMENT_ARENAS` | An arena per bracket round, the final last - apart by `,` or lines | `de_cyberaqua,de_silo` |
-| `HYPERSOMNIA_TOURNAMENT_JOIN_TIMEOUT` | Minutes a match waits for its players, or `off` (10 by default) | `5` |
+| `HYPERSOMNIA_TOURNAMENT_MAPS` | A map per round, the final last - apart by `,` or lines (always played as bomb defusal) | `de_cyberaqua,de_silo` |
+| `HYPERSOMNIA_TOURNAMENT_ROUND_1_MAX_WAIT` | Time to enter round 1: minutes it waits for its players after the tournament starts, or `off` (30 by default) | `600` |
+| `HYPERSOMNIA_TOURNAMENT_NEXT_ROUNDS_MAX_WAIT` | Time to enter next round: minutes it waits once the last match of a round ends, or `off` (15 by default) | `10` |
 | `HYPERSOMNIA_TOURNAMENT_PAGE` | The [live results page](#tournaments)'s TCP port, or `off` | `8080` |
 | `HYPERSOMNIA_TOURNAMENT_NAME` | On the live results page and in the results | `onFOSS November Cup 2026` |
 | `HYPERSOMNIA_TOURNAMENT_RESULTS_WEBHOOK` | Gets the [results](#the-results-as-json) in one `POST` when the tournament is over | `https://example.com/results` |
+| `HYPERSOMNIA_DOWNLOAD_MAPS_AND_QUIT` | `1`: download the community maps the server is set to play, then quit (`--download-maps-and-quit`) - the setup's one-off container, never in compose.yaml | `1` |
 | `HYPERSOMNIA_CONFIG` | Anything else - JSON, like a file in `conf.d/` | |
 | `HYPERSOMNIA_SERVER_PRIVATE_KEY` | The [server key](#the-server-key), instead of the file | |
 
@@ -132,7 +137,7 @@ The generator makes full admins. Others go into `admin_profiles` by hand, e.g. `
 
 Every admin, whatever their `rcon`, always gets in: without the password, past the per-network limit of ranked servers, and into a full server (a place is kept for the admins, not shown on the server list - an admin never takes a player's slot). Before a ranked match or a tournament's match starts, an admin plays as anyone; once it's played, only [watches](#watching-a-match).
 
-`Timeout absent players` (administration panel, `Maintenance`) decides a tournament's match now: the team with more players present wins - equal numbers play as they are - nobody there: both teams are out.
+`Close the round` (administration panel, `Maintenance`, on any of the round's servers) ends a tournament round's time to enter now, on all its servers: in each match still waiting, a team with nobody there is out, both teams there play with whoever came, nobody - both out. Round 1 open to anyone: whoever waits alone advances. Matches being played go on.
 
 ## Watching a match
 
@@ -155,18 +160,24 @@ A knockout tournament: a server for every match, the winners go on round by roun
 
 **The live results page** - the bracket with every match's score as it's played - is served by the server itself at `http://<your server>:8412/` (TCP, the first game port's number by default - `--tournament-page <port>` for another), and linked from the [server list](https://hypersomnia.io/servers). Its data: [`/tournament.json`](#the-results-as-json). A port below `1024` needs root; a port taken by something else: the tournament goes on without the page. `--tournament-name "onFOSS November Cup 2026"` titles it - without a name: `My Tournament`.
 
-- Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8; at least two teams' worth of players); players join any of them, the first ones there make the match - named by them once full, e.g. `[alice] vs [bob]`.
+- Always bomb defusal - also on an arena whose own default is another mode.
+- Open first round: a `Match #N (any pair)` server per pair of the bracket (16 players 1v1: 8; at least two teams' worth of players); no bots on a tournament's servers; players join any of them as spectators and choose their teams in the faction window, as on ranked - a team holds the team size; the first ones in the teams make the match - named by them once full, e.g. `[alice] vs [bob]`. Both teams full: the ranked countdown (`countdown_time`), or at once when every player types `/go`. From then on the teams are fixed - a player who drops comes back to their team; before it, leaving or spectating again frees the place. Whoever still spectates when it starts is told to join another match (admins, the spectator account and teams already out stay).
 - Listed teams: lines 1 and 2 play each other, 3 and 4... Teams short of 2, 4, 8, 16...: the first lines advance without playing. Any number of them from one address (a LAN party behind one router) - with anyone joining, at most `max_ranked_players_per_ip` (2), as in ranked.
   - **Rosters by nicknames** (`alice, bob; carol, dave`): the first one to come with a listed nickname takes it - from then on that player is their account (the game's key), the nickname is only a label, and anyone else with it is told it's taken. Enough for a LAN: whoever comes first as `alice` is alice, and a player who changes computers mid-tournament doesn't get back in.
   - **Rosters by accounts** (`alice=0x8aed..., bob=steam_7656...; ...`): let in by their account (`Settings → Account → Copy account id` in the game), shown by the nickname written here - they play under any name. Every player needs one; a list with one missing doesn't start.
-- Once all the players it's for came, round 1 closes by itself: whoever waits alone advances without playing, the empty servers close. Fewer came? `Close round 1` (administration panel, `Maintenance`) does the same - or the join timeout.
+- Once all the players it's for came, round 1 closes by itself: whoever waits alone advances without playing, the empty servers close. Fewer came? `Close the round` (administration panel, `Maintenance`) does the same - or the time to enter round 1 running out.
 - One place per account in round 1: a player with a place on one server who joins another is sent back to theirs. And one player per nickname: whoever comes with a nickname another player took (say, two who didn't set theirs) is told to change it.
-- **Join timeout** (10 minutes by default, `--tournament-join-timeout <minutes>` or `off`): a match still waiting for its players that long after the round's first player came (to any of its matches) is decided without them - so a tournament started long before the players come waits for them - the team with more players present wins by walkover, equal numbers play as they are, nobody came - both teams are out (in the final: the tournament ends without a winner). Round 1 with anyone joining: closes as `Close round 1` does. Matches being played aren't touched.
+- **Time to enter** - how long a round waits for its players (as the config generator names it):
+  - **Time to enter round 1** (30 minutes by default, `--tournament-round-1-max-wait <minutes>` or `off`): counts from the tournament's start - a restart (a crash) counts it again from the restart. Starting it hours early, e.g. overnight? Set it longer.
+  - **Time to enter next round** (15 minutes by default, `--tournament-next-rounds-max-wait <minutes>` or `off`): counts once the last match of a round ends, or from a restart. A match starts as soon as both its teams are in - nobody has to wait it out.
+  - Both get 2 minutes of grace on top - a player coming at the very minute still gets in. The live results page counts it down on each match waiting for its players.
+  - Then, in each match still waiting: a team with nobody on its server is out (by walkover), both teams with someone there play with whoever came, nobody - both out (in the final: the tournament ends without a winner). Round 1 with anyone joining: closes as `Close the round` does. Matches being played aren't touched.
+  - A round never moves on early: it waits for all its matches, or its time to enter. Both teams in when it runs out: the match's countdown goes on to its start. `off`: if players don't come, it waits indefinitely - until an admin closes it in the game (`Close the round`).
 - Byes fill the bracket up to 2, 4, 8... once - from round 2, counted from the teams that are left. They go to the strongest: the first lines, then by how fast they won; a walkover counts as the weakest. The final is always on the last arena.
 - Admins join any match: before it starts as anyone (a player in round 1 with anyone joining), once it's played as spectators.
-- The teams that are out or waiting watch the other matches - at most 6 others at once on each (`--tournament-spectators`): every place takes about 4.4 MB of RAM up front and upload while watched. A match's players always get in, the admins and the spectator account too.
-- A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, an arena or a game mode that doesn't exist. Other servers only warn.
-- After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew.
+- The teams that are out or waiting watch the other matches - at most 6 others at once on each (`--tournament-spectator-slots`): every place takes about 4.4 MB of RAM up front and upload while watched. A match's players always get in, the admins and the spectator account too.
+- A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, a map that doesn't exist. Other servers only warn.
+- After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew - and so it does after any change to the teams, their size or the maps (a fixed typo in a nickname too); the old state stays in `tournament.config-changed.<time>.json`.
 - It never updates in the middle of it.
 - On a LAN everyone sees the matches together under `Ongoing Tournament`; on the public list only official servers' tournaments show so.
 
@@ -177,10 +188,11 @@ A knockout tournament: a server for every match, the winners go on round by roun
 Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key (what `--print-server-key` prints), `X-Hypersomnia-Signature` - Ed25519 of the body, in hex. Check that the key is your server's and the signature is right, and nobody could have made up the results.
 
 - `name` - `My Tournament` without `--tournament-name`; `state` - `ONGOING` or `FINISHED`; `winner_team` - its players, empty until it's over.
-- `rounds` - the final first: `name`, `state` (`PLAYED`, `PLAYING`, `COMING`), `arena`, `matches`, `byes` (the teams that went on without playing).
-- A match: `status` (`done`, `walkover`, `live`, `waiting`, `empty` - nobody came, `coming` - its teams not known yet), `winner` (`a` or `b` once decided, otherwise empty), `team_a`, `team_b` (in a played round the winner is `team_a`); `score_a`, `score_b` while it's played and after - none for a walkover; `server_name`, `port` while it's waited for or played. A match nobody came to is listed only while its round is played.
+- `now` - the server's time (seconds since 1970), for counting down `deadline` by the server's clock.
+- `rounds` - the final first: `name`, `state` (`PLAYED`, `PLAYING`, `COMING`), `map`, `matches`, `byes` (the teams that went on without playing); the round being played also `deadline` (seconds since 1970: its time to enter ends - grace included) and `grace_secs`, unless its time to enter is off.
+- A match: `status` (`done`, `walkover`, `live`, `starting` - both teams complete, its countdown on, `waiting`, `empty` - nobody came, `coming` - its teams not known yet), `winner` (`a` or `b` once decided, otherwise empty), `team_a`, `team_b` (in a played round the winner is `team_a`); `score_a`, `score_b` while it's played and after - none for a walkover; `server_name`, `port` while it's waited for or played. A match nobody came to is listed only while its round is played.
 - A player: `nickname` and `account` - empty for a listed nickname nobody has come with yet.
-- `config` - `who_participates` (`anyone`, `rosters by nicknames`, `rosters by accounts`), `team_size`, `teams`, `arenas`, `join_timeout_minutes` (`0`: off).
+- `config` - `who_participates` (`anyone`, `rosters by nicknames`, `rosters by accounts`), `team_size`, `teams`, `maps`, `round_1_max_wait_minutes`, `next_rounds_max_wait_minutes` (`0`: off).
 
 # Match results
 
@@ -222,11 +234,13 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 | `--tournament <players>` | A [tournament](#tournaments) for this many players |
 | `--tournament-team-size <n>` | `2` for 2v2 and so on |
 | `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"`, or verified by their accounts: `"alice=0x8aed..., bob=steam_7656...; ..."` - or a player per line, the teams apart by an empty line |
-| `--tournament-spectators <places>` | How many others may watch each match at once, 6 by default (`HYPERSOMNIA_TOURNAMENT_SPECTATORS`) |
-| `--tournament-arenas <arenas>` | An arena per bracket round, e.g. `de_cyberaqua,de_silo` - or one per line |
-| `--tournament-join-timeout <minutes>` | How long a match waits for its players (10 by default), or `off` |
+| `--tournament-spectator-slots <places>` | How many others may watch each match at once, 6 by default (`HYPERSOMNIA_TOURNAMENT_SPECTATOR_SLOTS`) |
+| `--tournament-maps <maps>` | A map per round, e.g. `de_cyberaqua,de_silo` - or one per line |
+| `--tournament-round-1-max-wait <minutes>` | Time to enter round 1: how long it waits for its players after the tournament starts (30 by default), or `off` |
+| `--tournament-next-rounds-max-wait <minutes>` | Time to enter next round: how long it waits once the last match of a round ends (15 by default), or `off` |
 | `--tournament-page <port>` | The [live results page](#tournaments)'s TCP port (the first game port's number by default), or `off` |
 | `--tournament-name <name>` | On the live results page and in the results, e.g. `"onFOSS November Cup 2026"` |
 | `--print-server-key` | Print the server's public key and quit |
 | `--print-join-string` | Print `<address>,<name>,0x<key>` - the line players copy to add your server to their favorites - and quit |
 | `--sync-external-arenas-and-quit` | Download all community arenas and quit |
+| `--download-maps-and-quit` | Download the community maps the server is set to play (its map cycle, `--tournament-maps`) - missing or outdated ones only - and quit, as every start does before it plays. The config generator's setup runs it |

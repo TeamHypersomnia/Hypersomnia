@@ -129,6 +129,7 @@
 #include "application/gui/ingame_menu_gui.h"
 #include "application/gui/arena_miniatures.h"
 #include "application/setups/editor/editor_paths.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
@@ -613,6 +614,38 @@ work_result work(
 	setup_float_flags();
 
 	{
+		/*
+			Downloaded maps were in downloads/arenas until 4.3.0 - moved to downloads/maps once, before anything reads
+			or makes it. Every platform (the web's /user included) starts here.
+		*/
+
+		const auto legacy_downloaded_arenas_dir = USER_DOWNLOADS_DIR / "arenas";
+
+		auto empty_folder = [](const augs::path_type& p) {
+			std::error_code ec;
+			return std::filesystem::is_directory(p, ec) && std::filesystem::is_empty(p, ec);
+		};
+
+		/*
+			An empty downloads/maps (made before - e.g. by the site's deployment) is no reason to keep the maps where
+			nothing reads them.
+		*/
+
+		if (augs::exists(legacy_downloaded_arenas_dir) && empty_folder(DOWNLOADED_ARENAS_DIR)) {
+			std::error_code ec;
+			std::filesystem::remove(DOWNLOADED_ARENAS_DIR, ec);
+		}
+
+		if (augs::exists(legacy_downloaded_arenas_dir) && !augs::exists(DOWNLOADED_ARENAS_DIR)) {
+			try {
+				std::filesystem::rename(legacy_downloaded_arenas_dir, DOWNLOADED_ARENAS_DIR);
+				LOG("Moved the downloaded maps: %x -> %x", legacy_downloaded_arenas_dir, DOWNLOADED_ARENAS_DIR);
+			}
+			catch (const std::exception& err) {
+				LOG("Could not move the downloaded maps from %x to %x: %x", legacy_downloaded_arenas_dir, DOWNLOADED_ARENAS_DIR, err.what());
+			}
+		}
+
 		const auto all_created_directories = std::vector<augs::path_type> {
 			CACHE_DIR,
 			USER_DIR,
@@ -815,6 +848,11 @@ work_result work(
 	*/
 
 	if (params.type == app_type::DEDICATED_SERVER) {
+		if (!params.environment_error.empty()) {
+			LOG("ERROR: %x", params.environment_error);
+			return work_result::FAILURE;
+		}
+
 		auto sources = std::vector<server_config_source>();
 
 		for (std::size_t i = 1; i < config_layers.size(); ++i) {
@@ -1427,36 +1465,52 @@ work_result work(
 	{
 		bool sync = false;
 		bool quit_after_sync = false;
+		bool sync_failed = false;
 
 		/*
-			The community arenas the server is set to play (its arena, the map cycle, a tournament's arenas)
-			that aren't on disk yet - downloaded before it starts, from the same catalogue the players get them from.
+			The community maps the server is set to play (its map, the map cycle, a tournament's maps) - missing or
+			outdated ones downloaded before it starts, from the same catalogue the players get them from.
+			--download-maps-and-quit: the same, then it quits.
 		*/
 
-		const auto missing_arenas = [&]() {
+		/*
+			A tournament's own among them - what it can't start without.
+		*/
+
+		std::vector<std::string> tournament_community_maps;
+
+		const auto named_community_maps = [&]() {
 			std::vector<std::string> named;
 
 			if (params.type != app_type::DEDICATED_SERVER) {
 				return named;
 			}
 
-			auto name = [&](const std::string& arena_and_mode) {
+			auto name = [&](const std::string& map_and_mode) -> std::string {
 				/*
 					"de_cyberaqua, de_silo": the space after the comma isn't the arena's first word.
 				*/
 
-				const auto first = arena_and_mode.find_first_not_of(" \t");
-				const auto arena = first == std::string::npos ? std::string() : ::get_first_word(arena_and_mode.substr(first));
+				const auto first = map_and_mode.find_first_not_of(" \t");
+				const auto arena = first == std::string::npos ? std::string() : ::get_first_word(map_and_mode.substr(first));
 
-				if (arena.empty() || found_in(named, arena)) {
-					return;
+				if (arena.empty()) {
+					return {};
 				}
 
-				if (augs::exists(OFFICIAL_ARENAS_DIR / arena) || augs::exists(DOWNLOADED_ARENAS_DIR / arena)) {
-					return;
+				/*
+					An official one, a project or one of the admin's own (custom/maps): nothing to download.
+				*/
+
+				if (const auto folder = ::server_arena_folder_of(arena, true); !folder.empty() && folder != DOWNLOADED_ARENAS_DIR) {
+					return {};
 				}
 
-				named.push_back(arena);
+				if (!found_in(named, arena)) {
+					named.push_back(arena);
+				}
+
+				return arena;
 			};
 
 			name(config.server.map);
@@ -1473,7 +1527,7 @@ work_result work(
 				Apart by commas or lines, as the tournament reads them.
 			*/
 
-			for (const auto c : params.tournament_arenas + ",") {
+			for (const auto c : params.tournament_maps + ",") {
 				/*
 					A list written on Windows: its lines end with \r too.
 				*/
@@ -1483,7 +1537,10 @@ work_result work(
 				}
 
 				if (c == ',' || c == '\n') {
-					name(tournament_arena);
+					if (const auto arena = name(tournament_arena); !arena.empty() && !found_in(tournament_community_maps, arena)) {
+						tournament_community_maps.push_back(arena);
+					}
+
 					tournament_arena.clear();
 				}
 				else {
@@ -1494,18 +1551,39 @@ work_result work(
 			return named;
 		}();
 
-		if (params.type == app_type::DEDICATED_SERVER && config.server.sync_all_external_arenas_on_startup) {
-			LOG("sync_all_external_arenas_on_startup specified.");
-			sync = true;
-		}
-		else if (!missing_arenas.empty()) {
+		if (params.download_maps_and_quit) {
+			if (named_community_maps.empty()) {
+				LOG("--download-maps-and-quit: the server plays no community maps - nothing to download.");
+				return work_result::SUCCESS;
+			}
+
 			std::string names;
 
-			for (const auto& arena : missing_arenas) {
+			for (const auto& arena : named_community_maps) {
 				names += (names.empty() ? "" : ", ") + arena;
 			}
 
-			LOG("Arenas to play that aren't on disk yet: %x - downloading them.", names);
+			LOG("--download-maps-and-quit: %x - downloading the ones missing or outdated.", names);
+			sync = true;
+			quit_after_sync = true;
+		}
+		else if (params.type == app_type::DEDICATED_SERVER && config.server.sync_all_external_arenas_on_startup) {
+			LOG("sync_all_external_arenas_on_startup specified.");
+			sync = true;
+		}
+		else if (!named_community_maps.empty()) {
+			/*
+				Every start: the community maps it plays, missing or outdated - an author's update reaches the server
+				by its next restart (or daily update). Only these - the other community maps never.
+			*/
+
+			std::string names;
+
+			for (const auto& arena : named_community_maps) {
+				names += (names.empty() ? "" : ", ") + arena;
+			}
+
+			LOG("Community maps to play: %x - downloading the missing or outdated ones.", names);
 			sync = true;
 		}
 		else if (params.sync_external_arenas) {
@@ -1524,12 +1602,106 @@ work_result work(
 			if (parsed_url(provider).valid()) {
 				LOG("External arena provider: %x", provider);
 
-				headless_map_catalogue headless;
+				/*
+					The catalogue - the maps' versions, all it takes to know what to download - gets 5 seconds in all,
+					DNS too (no network, or one that drops the packets): then the server starts without downloading.
+					The request still hanging finishes on its own detached thread (async_get) - nothing waits for it.
+					Until they're all here instead - asked again every 3 seconds, the catalogue and every map that
+					failed (a stall of 5 s in a file) - the setup's step (--download-maps-and-quit), which has nothing
+					else to do, and a tournament missing one of its maps, which can't be played without it. The admin
+					sees it waiting, Ctrl+C stops it.
+				*/
 
+				const auto catalogue_deadline_secs = 5.0;
+
+				/*
+					What it can't do without: the step - every map it names; a tournament - its own (not a casual
+					cycle's in the same config).
+				*/
+
+				const auto& needed_maps = params.download_maps_and_quit ? named_community_maps : tournament_community_maps;
+
+				/*
+					Looked for as the server's start looks for them - in every folder: a custom map copied in while it
+					waits ends the wait too.
+				*/
+
+				auto missing = [](const std::string& arena) {
+					return ::server_arena_folder_of(arena, true).empty();
+				};
+
+				auto needed_missing = [&]() {
+					return std::any_of(needed_maps.begin(), needed_maps.end(), missing);
+				};
+
+				const bool tournament_map_missing =
+					params.type == app_type::DEDICATED_SERVER
+					&& params.is_tournament()
+					&& !params.download_maps_and_quit
+					&& needed_missing()
+				;
+
+				const bool until_received = params.download_maps_and_quit || tournament_map_missing;
+
+				/*
+					Started without the setup's step - or with a custom map not copied yet: the admin has to see it.
+				*/
+
+				if (tournament_map_missing) {
+					const auto provider_host = parsed_url(provider).host;
+
+					for (const auto& arena : needed_maps) {
+						if (missing(arena)) {
+							LOG_HIGHLIGHTED("Missing map: %x. Is this a custom map? Trying to fetch it from %x...", arena, provider_host);
+						}
+					}
+				}
+				auto catalogue = std::make_optional<headless_map_catalogue>();
+				bool catalogue_received = false;
+
+				/*
+					Asked again from the catalogue on: maps already downloaded are up to date then - only the rest.
+				*/
+
+				/*
+					Stopped while it waits (Ctrl+C, systemctl stop, docker stop): a failure only for the setup's step -
+					the script must not go on as if the maps were here; a server's stop is an ordinary one.
+				*/
+
+				const auto stopped_result = quit_after_sync ? work_result::FAILURE : work_result::SUCCESS;
+
+				/*
+					The maps launched from the catalogue - asked again only while one it needs among them is missing:
+					one the catalogue doesn't have never comes (a typo) - the start's check names it.
+				*/
+
+				std::vector<std::string> launched;
+
+				auto needed_launched_missing = [&]() {
+					return std::any_of(needed_maps.begin(), needed_maps.end(), [&](const auto& arena) {
+						return found_in(launched, arena) && missing(arena);
+					});
+				};
+
+				auto ask_again_in_3_secs = [&]() {
+					for (int i = 0; i < 300; ++i) {
+						if (handle_sigint()) {
+							return false;
+						}
+
+						augs::sleep(1.0 / 100);
+					}
+
+					catalogue.emplace();
+					catalogue_received = false;
+					return true;
+				};
+
+				augs::timer since_start;
 				augs::timer last_report;
 
 				auto report_progress = [&]() {
-					if (const auto& dl = headless.get_downloading()) {
+					if (const auto& dl = catalogue->get_downloading()) {
 						if (const auto current = dl->get_current_map_name()) {
 							const auto i = dl->get_current_map_index();
 							const auto total = dl->get_total_maps();
@@ -1545,16 +1717,49 @@ work_result work(
 				};
 
 				while (true) {
-					if (headless.advance({ provider }) == headless_catalogue_result::LIST_REFRESH_COMPLETE) {
-						const auto last_error = headless.get_list_catalogue_error();
+					if (!catalogue_received && !until_received && since_start.get<std::chrono::seconds>() > catalogue_deadline_secs) {
+						LOG("No map catalogue from %x in %x seconds - %x.", provider, catalogue_deadline_secs, quit_after_sync ? "nothing downloaded" : "starting without downloading");
+						sync_failed = true;
+						break;
+					}
+
+					if (catalogue->advance({ provider }) == headless_catalogue_result::LIST_REFRESH_COMPLETE) {
+						const auto last_error = catalogue->get_list_catalogue_error();
+
+						if (last_error.size() > 0 && until_received) {
+							if (!needed_missing()) {
+								LOG("No map catalogue from %x (%x) - every map needed is on disk now.", provider, last_error);
+								sync_failed = true;
+								break;
+							}
+
+							LOG("No map catalogue from %x yet (%x) - asking again in 3 seconds. Ctrl+C to stop.", provider, last_error);
+
+							if (!ask_again_in_3_secs()) {
+								return stopped_result;
+							}
+
+							continue;
+						}
+
+						catalogue_received = true;
 
 						if (last_error.size() > 0) {
 							LOG("Failed to download the catalogue. Reason:\n%x", last_error);
+							sync_failed = true;
 							break;
 						}
 						else {
-							const bool only_missing = !config.server.sync_all_external_arenas_on_startup && !params.sync_external_arenas && !params.sync_external_arenas_and_quit;
-							const auto all = headless.launch_download_all({ provider }, only_missing ? missing_arenas : std::vector<std::string>());
+							const bool every_map = config.server.sync_all_external_arenas_on_startup || params.sync_external_arenas || params.sync_external_arenas_and_quit;
+							const auto only_these = every_map && !params.download_maps_and_quit ? std::vector<std::string>() : named_community_maps;
+
+							const auto all = catalogue->launch_download_all({ provider }, only_these);
+
+							launched.clear();
+
+							for (const auto& a : all) {
+								launched.push_back(a.name);
+							}
 
 							if (all.empty()) {
 								LOG("All arenas are up to date. There's nothing to sync.");
@@ -1579,15 +1784,47 @@ work_result work(
 					if (last_report.get<std::chrono::seconds>() > 0.5) {
 						last_report.reset();
 						report_progress();
+
+						/*
+							Still waiting for the catalogue (a LAN without internet): copied in meanwhile, it's enough.
+						*/
+
+						if (until_received && !catalogue_received && !needed_missing()) {
+							LOG("Every map needed is on disk now - not waiting for the catalogue.");
+							sync_failed = true;
+							break;
+						}
 					}
 
-					if (headless.finalize_download()) {
+					if (catalogue->finalize_download()) {
+						const bool failed = catalogue->download_failed_popup.has_value();
+
+						/*
+							Asked again only while a map it needs, one the catalogue has, is still missing - not over
+							another one that failed (sync_all_external_arenas_on_startup).
+						*/
+
+						if (failed && until_received && needed_launched_missing()) {
+							LOG("Some maps weren't downloaded - asking again in 3 seconds. Ctrl+C to stop.");
+
+							if (!ask_again_in_3_secs()) {
+								return stopped_result;
+							}
+
+							continue;
+						}
+
 						LOG("Finished syncing all arenas.");
+						sync_failed = sync_failed || failed;
 						break;
 					}
 
+					/*
+						Stopped in the setup's step: not done - the script must not go on as if the maps were here.
+					*/
+
 					if (handle_sigint()) {
-						return work_result::SUCCESS;
+						return stopped_result;
 					}
 
 					augs::sleep(1.0 / 1000);
@@ -1595,11 +1832,27 @@ work_result work(
 			}
 			else {
 				LOG("Couldn't parse arena provider URL: \"%x\". Aborting sync.", provider);
+				sync_failed = true;
 			}
 
+			/*
+				The setup's step: a map not downloaded fails it - the script stops there, not later at a LAN without one.
+			*/
+
 			if (quit_after_sync) {
-				LOG("Quitting after map sync finished.");
-				return work_result::SUCCESS;
+				/*
+					Every map it named on disk now - one hypersomnia.io doesn't have (a typo) fails the step too.
+				*/
+
+				for (const auto& arena : named_community_maps) {
+					if (!augs::exists(DOWNLOADED_ARENAS_DIR / arena)) {
+						LOG("ERROR: no map \"%x\" - neither in the game nor among the community maps (hypersomnia.io/arenas).", arena);
+						sync_failed = true;
+					}
+				}
+
+				LOG("Quitting after map sync finished%x.", sync_failed ? " - some maps weren't downloaded" : "");
+				return sync_failed ? work_result::FAILURE : work_result::SUCCESS;
 			}
 			else {
 				LOG("Map sync finished.");
@@ -1610,7 +1863,7 @@ work_result work(
 			A tournament's arenas, after the download: on disk, with their game modes (server_config_check.h).
 		*/
 
-		if (params.type == app_type::DEDICATED_SERVER && params.is_tournament() && !::check_tournament_arenas(params.tournament_arenas)) {
+		if (params.type == app_type::DEDICATED_SERVER && params.is_tournament() && !::check_tournament_maps(params.tournament_maps)) {
 			return work_result::FAILURE;
 		}
 	}

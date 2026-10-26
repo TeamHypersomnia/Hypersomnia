@@ -11,6 +11,7 @@
 #include "application/config_json_table.h"
 #include "application/setups/server/admin_profiles.h"
 #include "application/setups/server/server_slots.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 
 /*
 	A dedicated server's config checked at start - what loading it passes over without a word:
@@ -149,35 +150,12 @@ inline bool check_server_config(
 }
 
 /*
-	The game modes an arena has - the keys of "game_modes" in its <arena>.json.
-*/
-
-inline std::vector<std::string> game_modes_of_arena(const augs::path_type& arena_dir, const std::string& arena) {
-	std::vector<std::string> names;
-
-	try {
-		constexpr auto flags = rapidjson::kParseDefaultFlags | rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag;
-		const auto doc = augs::json_document_from<flags>(augs::file_to_string(arena_dir / (arena + ".json")));
-
-		if (doc.HasMember("game_modes") && doc["game_modes"].IsObject()) {
-			for (const auto& it : doc["game_modes"].GetObject()) {
-				names.push_back(it.name.GetString());
-			}
-		}
-	}
-	catch (...) {
-	}
-
-	return names;
-}
-
-/*
-	A tournament's arenas, after the download: each one on disk, with the game mode it's given -
-	a typo stops the start instead of a match on another arena, or none, in the middle of the tournament.
+	A tournament's maps, after the download: each one on disk - a typo stops the start instead of a match on another
+	map, or none, in the middle of the tournament.
 	False: it mustn't start - the reasons are in the log.
 */
 
-inline bool check_tournament_arenas(const std::string& tournament_arenas) {
+inline bool check_tournament_maps(const std::string& tournament_maps) {
 	auto any_error = false;
 
 	auto entries = std::vector<std::string>();
@@ -187,7 +165,7 @@ inline bool check_tournament_arenas(const std::string& tournament_arenas) {
 		Apart by commas or lines, as the tournament reads them.
 	*/
 
-	for (const auto c : tournament_arenas + ",") {
+	for (const auto c : tournament_maps + ",") {
 		/*
 			A list written on Windows: its lines end with \r too.
 		*/
@@ -210,42 +188,21 @@ inline bool check_tournament_arenas(const std::string& tournament_arenas) {
 
 	for (const auto& entry : entries) {
 		const auto arena = ::get_first_word(entry);
-		const auto mode = ::get_second_word(entry);
 
-		const auto dir = [&]() {
-			if (augs::exists(OFFICIAL_ARENAS_DIR / arena)) {
-				return OFFICIAL_ARENAS_DIR / arena;
-			}
+		/*
+			Found as the match servers will find it - official, a project, downloaded or custom/maps; "..", never.
+		*/
 
-			if (augs::exists(DOWNLOADED_ARENAS_DIR / arena)) {
-				return DOWNLOADED_ARENAS_DIR / arena;
-			}
-
-			return augs::path_type();
-		}();
-
-		if (dir.empty()) {
-			LOG("ERROR: --tournament-arenas: no arena \"%x\" - neither in the game nor among the community arenas (hypersomnia.io/arenas).", arena);
+		if (::server_arena_folder_of(arena, true).empty()) {
+			LOG("ERROR: --tournament-maps: no map \"%x\" - neither in the game, nor among the community maps (hypersomnia.io/arenas), nor in custom/maps.", arena);
 			any_error = true;
 			continue;
 		}
 
-		if (mode.empty()) {
-			continue;
-		}
-
-		const auto modes = ::game_modes_of_arena(dir, arena);
-
-		if (!found_in(modes, mode)) {
-			std::string listed;
-
-			for (const auto& m : modes) {
-				listed += (listed.empty() ? "" : ", ") + m;
-			}
-
-			LOG("ERROR: --tournament-arenas: %x has no game mode \"%x\" - it has: %x", arena, mode, listed);
-			any_error = true;
-		}
+		/*
+			No check of the mode: a tournament plays bomb defusal, and every map has every mode - those it doesn't
+			list in its JSON are the defaults (create_all_missing_modes).
+		*/
 	}
 
 	return !any_error;

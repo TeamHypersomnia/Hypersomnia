@@ -162,18 +162,18 @@ std::optional<unsigned long> get_trailing_number(const std::string& s) {
 	return std::nullopt;
 }
 
-std::string get_first_word(const std::string& arena_and_mode) {
+std::string get_first_word(const std::string& map_and_mode) {
 	try {
-		return arena_and_mode.substr(0, arena_and_mode.find(" "));
+		return map_and_mode.substr(0, map_and_mode.find(" "));
 	}
 	catch (const std::out_of_range&) {
 		return "";
 	}
 }
 
-std::string get_second_word(const std::string& arena_and_mode) {
+std::string get_second_word(const std::string& map_and_mode) {
 	try {
-		return get_first_word(arena_and_mode.substr(arena_and_mode.find_first_not_of(" ", arena_and_mode.find_first_of(" "))));
+		return get_first_word(map_and_mode.substr(map_and_mode.find_first_not_of(" ", map_and_mode.find_first_of(" "))));
 	}
 	catch (const std::out_of_range&) {
 		return "";

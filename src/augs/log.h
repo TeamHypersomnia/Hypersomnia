@@ -16,10 +16,9 @@ class program_log {
 	static program_log global_instance;
 	unsigned max_all_entries;
 
-	void push_entry(const log_entry&);
-	friend void LOG_NOFORMAT(const std::string& f);
-
 public:
+	void push_entry(const log_entry&);
+
 	static auto& get_current() {
 		return global_instance;
 	}
@@ -39,6 +38,17 @@ public:
 template <class... A>
 FORCE_NOINLINE void LOG(const std::string& f, A&&... a) {
 	LOG_NOFORMAT(typesafe_sprintf(f, std::forward<A>(a)...));
+}
+
+/*
+	What an admin must not miss: bold yellow in a terminal - the log files and the in-game log get the plain text.
+*/
+
+void LOG_HIGHLIGHTED_NOFORMAT(const std::string& f);
+
+template <class... A>
+FORCE_NOINLINE void LOG_HIGHLIGHTED(const std::string& f, A&&... a) {
+	LOG_HIGHLIGHTED_NOFORMAT(typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
 #define LOG_NVPS(...) { \

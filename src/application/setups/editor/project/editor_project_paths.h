@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "augs/filesystem/path.h"
 #include "application/arena/intercosm_paths.h"
 #include "augs/misc/secure_hash.h"
@@ -60,5 +61,18 @@ client_find_arena_result client_find_arena(
 	const augs::secure_hash_type& required_hash
 );
 
-augs::path_type server_choose_arena_file_by(const std::string& name);
+/*
+	The folders a server takes its arenas from - the first one with a name wins: official, the user's projects,
+	downloaded, and a dedicated server's custom/maps last. Every place a server
+	finds or lists its arenas goes through it.
+*/
+
+std::vector<augs::path_type> server_arena_folders(bool with_custom_maps);
+
+/*
+	The folder of server_arena_folders the arena is found in first - empty if in none (or its name isn't safe).
+*/
+
+augs::path_type server_arena_folder_of(const std::string& name, bool with_custom_maps);
+augs::path_type server_choose_arena_file_by(const std::string& name, bool with_custom_maps = false);
 

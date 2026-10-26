@@ -32,13 +32,15 @@ struct tournament_page_match {
 	// END GEN INTROSPECTOR
 };
 
-struct tournament_page_round {
-	// GEN INTROSPECTOR struct tournament_page_round
+struct tournament_page_bracket_round {
+	// GEN INTROSPECTOR struct tournament_page_bracket_round
 	std::string name;
 	std::string state;
-	std::string arena;
+	std::string map;
 	std::vector<tournament_page_match> matches;
 	std::vector<tournament_page_team> byes;
+	std::optional<uint64_t> deadline;
+	std::optional<uint32_t> grace_secs;
 	// END GEN INTROSPECTOR
 };
 
@@ -47,17 +49,19 @@ struct tournament_page_config {
 	std::string who_participates;
 	uint32_t team_size = 1;
 	uint32_t teams = 0;
-	std::vector<std::string> arenas;
-	uint32_t join_timeout_minutes = 0;
+	std::vector<std::string> maps;
+	uint32_t round_1_max_wait_minutes = 0;
+	uint32_t next_rounds_max_wait_minutes = 0;
 	// END GEN INTROSPECTOR
 };
 
 struct tournament_page_state {
 	// GEN INTROSPECTOR struct tournament_page_state
 	std::optional<std::string> name;
+	uint64_t now = 0;
 	std::string state;
 	tournament_page_team winner_team;
-	std::vector<tournament_page_round> rounds;
+	std::vector<tournament_page_bracket_round> rounds;
 	tournament_page_config config;
 	// END GEN INTROSPECTOR
 };

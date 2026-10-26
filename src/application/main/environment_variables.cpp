@@ -200,11 +200,15 @@ namespace {
 	void set_map_cycle(config_json_table& c, const std::string& value) {
 		const auto entries = ::split_list(value, ",");
 
-		if (entries.empty()) {
-			throw bad_value { "arenas separated by commas, e.g. de_cyberaqua,de_silo" };
-		}
+		/*
+			Empty: no maps listed - with HYPERSOMNIA_MAP_CYCLE_ADD_CUSTOM_MAPS=on, only the custom ones.
+		*/
 
 		c.server.map_cycle.clear();
+
+		if (entries.empty()) {
+			return;
+		}
 
 		if (entries.size() == 1 && entries[0] == "*") {
 			c.server.map_cycle.push_back("*");
@@ -316,6 +320,7 @@ namespace {
 		environment_variable { "HYPERSOMNIA_MAP", [](auto& c, const auto& v) { ::set_map(c, v); } },
 		environment_variable { "HYPERSOMNIA_MAP_CYCLE", [](auto& c, const auto& v) { ::set_map_cycle(c, v); } },
 		environment_variable { "HYPERSOMNIA_MAP_CYCLE_RANDOM", [](auto& c, const auto& v) { c.server.map_cycle_random = ::as_on_off(v); } },
+		environment_variable { "HYPERSOMNIA_MAP_CYCLE_ADD_CUSTOM_MAPS", [](auto& c, const auto& v) { c.server.map_cycle_add_custom_maps = ::as_on_off(v); } },
 		environment_variable { "HYPERSOMNIA_ADMINS", [](auto& c, const auto& v) { ::set_master_admins(c, v); } },
 		environment_variable { "HYPERSOMNIA_ALLOWED_ACCOUNTS", [](auto& c, const auto& v) { ::set_allowed_accounts(c, v); } },
 		environment_variable { "HYPERSOMNIA_PASSWORD", [](auto& c, const auto& v) { c.server_private.server_password = v; } },
@@ -435,6 +440,11 @@ std::vector<std::string> unknown_environment_variable_warnings() {
 
 		if (name == "HYPERSOMNIA_ARENA") {
 			warnings.push_back("HYPERSOMNIA_ARENA is no longer read - one map to play on: HYPERSOMNIA_MAP_CYCLE=<map>; the map to start on: HYPERSOMNIA_MAP.");
+			continue;
+		}
+
+		if (const auto now = ::renamed_tournament_setting(name); !now.empty()) {
+			warnings.push_back(name + " is no longer read - it's " + now + " now.");
 			continue;
 		}
 

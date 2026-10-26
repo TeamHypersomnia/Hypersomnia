@@ -112,14 +112,17 @@ Options:
                                 lines 1 and 2 play each other, 3 and 4... Nicknames, or nickname=account id for every player
                                 (e.g. "alice=0x8aed..., bob=steam_7656...") - let in by their accounts.
     --tournament-team-size [N]  2 for 2v2 and so on.
-    --tournament-arenas [LIST]  An arena per bracket round, the final last, e.g. de_cyberaqua,de_silo.
+    --tournament-maps [LIST]  An arena per bracket round, the final last, e.g. de_cyberaqua,de_silo.
     --tournament-page [PORT]    The tournament's live results page's TCP port - by default the first game port's number,
                                 http://<server>:8412/. Or "off": no page.
-    --tournament-join-timeout [MINUTES]  How long a match waits for all its players (10 by default), or "off".
-                                Then the team with more players present wins; equal numbers start the match;
-                                nobody came - both teams are out. Round 1 with anyone joining: whoever waits alone goes on.
+    --tournament-round-1-max-wait [MINUTES]
+                                How long round 1 waits for its players after the tournament starts (30 by default), or "off".
+    --tournament-next-rounds-max-wait [MINUTES]
+                                The break: how long a round waits after the previous one ends (15 by default), or "off".
+                                Then a team with nobody on its server is out; both teams there play with whoever came.
+                                Round 1 with anyone joining: whoever waits goes on. Off: the round waits for an admin.
     --tournament-name [NAME]    Shown on the live results page and sent with the results, e.g. "onFOSS November Cup 2026".
-                                Each of these seven is also a HYPERSOMNIA_TOURNAMENT* environment variable - see README_SERVER.md.
+                                Each of these eight is also a HYPERSOMNIA_TOURNAMENT* environment variable - see README_SERVER.md.
 
 If debugger_file_path is supplied and it is a directory,
 the game will automatically launch the editor to try and open the project inside it, if there is one.)"

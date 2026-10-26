@@ -8,11 +8,14 @@ PAGE=${PAGE:?set PAGE to the site repo (Hypersomnia-homepage)}
 
 names() { grep -ohE 'HYPERSOMNIA_[A-Z_]+[A-Z]' "$@" | sort -u; }
 
-GAME=$(names $REPO/src/application/main/environment_variables.h $REPO/src/application/main/environment_variables.cpp)
+# Old names the game only points to their new ones (renamed_tournament_setting, HYPERSOMNIA_ARENA) - read by no one
+OLD_NAMES='^HYPERSOMNIA_(ARENA|TOURNAMENT_ARENAS|TOURNAMENT_SPECTATORS|TOURNAMENT_JOIN_TIMEOUT)$'
+GAME=$(names $REPO/src/application/main/environment_variables.h $REPO/src/application/main/environment_variables.cpp | grep -vE "$OLD_NAMES")
 # The README's table rows only - the prose names a few in passing
 README=$(grep -E '^\| `HYPERSOMNIA_' $REPO/README_SERVER.md | names -)
-# The generator writes only what it has a field for: not HYPERSOMNIA_CONFIG nor the server key
-NOT_GENERATED='^HYPERSOMNIA_(CONFIG|SERVER_PRIVATE_KEY)$'
+# The generator writes only what it has a field for: not HYPERSOMNIA_CONFIG nor the server key, nor the map to start
+# on (it writes the map cycle - the server starts on its first)
+NOT_GENERATED='^HYPERSOMNIA_(CONFIG|SERVER_PRIVATE_KEY|MAP)$'
 GENERATOR=$(names $PAGE/public/assets/scripts/generator.js | grep -vE "$NOT_GENERATED")
 
 ok=1

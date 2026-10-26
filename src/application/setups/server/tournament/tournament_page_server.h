@@ -21,6 +21,7 @@
 #include "application/main/server_key.h"
 #include "application/network/account_id.h"
 #include "all_paths.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 
 /*
 	What the tournament's live page serves and sends - /tournament.json made at most once a second whoever asks,
@@ -77,7 +78,7 @@ public:
 				continue;
 			}
 
-			for (const auto& dir : { augs::path_type(OFFICIAL_ARENAS_DIR), augs::path_type(DOWNLOADED_ARENAS_DIR) }) {
+			for (const auto& dir : ::server_arena_folders(true)) {
 				const auto path = dir / name / "miniature.png";
 
 				if (!augs::exists(path)) {

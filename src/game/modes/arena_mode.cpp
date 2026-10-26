@@ -3064,7 +3064,32 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 
 					const auto previous_faction = player_data->get_faction();
 
-					const auto requested_faction = typed_command;
+					const auto open_team_size = in.dynamic_vars.open_team_size;
+
+					/*
+						A tournament's open match: its teams are always Resistance and Metropolis (run_tournament.cpp),
+						whichever factions the arena has - Auto-assign joins the smaller one.
+					*/
+
+					const auto requested_faction = [&]() {
+						if (open_team_size > 0) {
+							if (typed_command == faction_type::DEFAULT) {
+								const auto resistance = num_players_in(faction_type::RESISTANCE);
+								const auto metropolis = num_players_in(faction_type::METROPOLIS);
+
+								return resistance <= metropolis ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+							}
+
+							if (::is_actual_faction(typed_command)
+								&& typed_command != faction_type::RESISTANCE
+								&& typed_command != faction_type::METROPOLIS
+							) {
+								return faction_type::COUNT;
+							}
+						}
+
+						return typed_command;
+					}();
 
 					if (requested_faction == faction_type::COUNT) {
 						return;
@@ -3124,8 +3149,7 @@ void arena_mode::execute_player_commands(const input_type in, const mode_entropy
 							/* This is a serious choice */
 
 							{
-								const auto& team_limit = in.rules.max_players_per_team;
-
+								const auto team_limit = open_team_size > 0 ? open_team_size : in.rules.max_players_per_team;
 								if (team_limit && num_players_in(requested_faction) >= team_limit) {
 									return faction_choice_result::TEAM_IS_FULL;
 								}
@@ -5458,7 +5482,11 @@ bool arena_mode::team_choice_allowed(const const_input_type in) const {
 	}
 
 	if (in.dynamic_vars.preassigned_factions) {
-		return false;
+		/*
+			A tournament's open match of round 1: the players choose their teams until it starts, as on ranked.
+		*/
+
+		return in.dynamic_vars.open_team_size > 0 && ranked_state == ranked_state_type::NONE;
 	}
 
 	return true;

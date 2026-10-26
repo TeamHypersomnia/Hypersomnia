@@ -41,7 +41,7 @@ One run with alternating phases cancels out scene, thermal and clock differences
   - A frame "saved" by the user reaches `editor_view.json` only when their editor quits - ask them to quit it first,
     and check that the camera lies within the map (the min/max of the nodes' `pos` in the map json).
     `Num visible entities: 0` and ~1200 FPS in the profile mean an empty camera, not a fast scene.
-  - Downloaded maps: `hypersomnia/user/downloads/arenas` may be a symlink (to `~/poprawionemapy` in Oct 2026) - resolve it
+  - Downloaded maps: `hypersomnia/user/downloads/maps` may be a symlink (to `~/poprawionemapy` in Oct 2026) - resolve it
     with `readlink -f` before deciding which copy the user edits. `~/.config/Hypersomnia/...` holds older copies.
   - Editor playtests run the map's `playtesting.mode`. `quick_test` spawns no bots even with `spawn_bots` -
     set `"mode": "bomb_defusal"` in the scratch copy to measure bots.

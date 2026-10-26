@@ -1,7 +1,7 @@
 #!/bin/bash
 # A dedicated server on any map, optionally with bots and a client - the base for every in-game test.
 #
-#   MAP          arena name (content/arenas, user/downloads/arenas) - default de_cyberaqua
+#   MAP          arena name (content/arenas, user/downloads/maps) - default de_cyberaqua
 #   MAP_DIR      any arena folder instead (e.g. made by map_copy.py) - its folder name must be MAP
 #   BOTS=1       fill with bots (they play only while a human client is connected)
 #   CLIENT       spectator (default: joins under xvfb-run, stays a spectator) | display (on $DISPLAY, e.g. Xvfb :78 for
@@ -26,16 +26,16 @@ T=$S/map_${MAP}_$(date +%s)
 
 if ss -tuln | grep -q ":$PORT "; then echo "port $PORT busy, abort"; exit 1; fi
 
-mkdir -p $T/srv/user/conf.d $T/srv/user/downloads/arenas $T/c/user/conf.d $T/c/user/downloads/arenas
+mkdir -p $T/srv/user/conf.d $T/srv/user/downloads/maps $T/c/user/conf.d $T/c/user/downloads/maps
 
-if [ -z "$MAP_DIR" ] && [ -d "$REPO/hypersomnia/user/downloads/arenas/$MAP" ]; then
-	MAP_DIR="$REPO/hypersomnia/user/downloads/arenas/$MAP"
+if [ -z "$MAP_DIR" ] && [ -d "$REPO/hypersomnia/user/downloads/maps/$MAP" ]; then
+	MAP_DIR="$REPO/hypersomnia/user/downloads/maps/$MAP"
 fi
 
 if [ -n "$MAP_DIR" ]; then
 	# Copied, not symlinked - the arena scan skips symlinks ("Failed to load arena").
-	cp -r "$MAP_DIR" $T/srv/user/downloads/arenas/$MAP
-	cp -r "$MAP_DIR" $T/c/user/downloads/arenas/$MAP
+	cp -r "$MAP_DIR" $T/srv/user/downloads/maps/$MAP
+	cp -r "$MAP_DIR" $T/c/user/downloads/maps/$MAP
 fi
 
 cat > $T/srv/user/conf.d/test.json <<J

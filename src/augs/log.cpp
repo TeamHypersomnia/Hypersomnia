@@ -28,6 +28,10 @@
 #include <iostream>
 #endif
 
+#if PLATFORM_UNIX
+#include <unistd.h>
+#endif
+
 augs::mutex log_mutex;
 
 bool log_to_live_file = false;
@@ -108,7 +112,16 @@ bool& LOG_THREAD_MUTED() {
 	return muted;
 }
 
-void LOG_NOFORMAT(const std::string& s) {
+static bool stdout_is_terminal() {
+#if PLATFORM_UNIX
+	static const bool terminal = ::isatty(STDOUT_FILENO) != 0;
+	return terminal;
+#else
+	return false;
+#endif
+}
+
+static void log_entry_now(const std::string& s, const bool highlighted) {
 #if ENABLE_LOG 
 	if (LOG_THREAD_MUTED()) {
 		return;
@@ -119,7 +132,12 @@ void LOG_NOFORMAT(const std::string& s) {
 	auto lg = [&](const auto& f) {
 		program_log::get_current().push_entry({ f });
 #if OUTPUT_TO_STDOUT
-		std::cout << f << std::endl;
+		if (highlighted && stdout_is_terminal()) {
+			std::cout << "\x1b[1;33m" << f << "\x1b[0m" << std::endl;
+		}
+		else {
+			std::cout << f << std::endl;
+		}
 #endif
 
 		if (log_to_live_file) {
@@ -136,5 +154,14 @@ void LOG_NOFORMAT(const std::string& s) {
 	}
 #else
 	(void)s;
+	(void)highlighted;
 #endif
+}
+
+void LOG_NOFORMAT(const std::string& s) {
+	log_entry_now(s, false);
+}
+
+void LOG_HIGHLIGHTED_NOFORMAT(const std::string& s) {
+	log_entry_now(s, true);
 }

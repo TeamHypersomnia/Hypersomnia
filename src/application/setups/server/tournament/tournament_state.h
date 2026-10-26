@@ -48,7 +48,7 @@ struct tournament_match {
 	std::vector<account_id_string> spectator_player_ids;
 	uint16_t port = 0;
 	std::string server_name;
-	std::string arena_and_mode;
+	std::string map_and_mode;
 
 	std::optional<tournament_match_result> result;
 	uint8_t heartbeat_ranked_type = 0;
@@ -57,7 +57,7 @@ struct tournament_match {
 
 struct tournament_match_history_entry {
 	// GEN INTROSPECTOR struct tournament_match_history_entry
-	uint32_t played_in_stage = 0;
+	uint32_t played_in_bracket_round = 0;
 	std::vector<account_id_string> winner_player_ids;
 	std::vector<account_id_string> loser_player_ids;
 	float duration_secs = 0.f;
@@ -69,9 +69,9 @@ struct tournament_match_history_entry {
 
 struct tournament_state {
 	// GEN INTROSPECTOR struct tournament_state
-	uint32_t stage_index = 0;
+	uint32_t bracket_round_index = 0;
 	std::vector<tournament_team_state> teams;
-	std::vector<tournament_match> current_stage_matches;
+	std::vector<tournament_match> current_bracket_round_matches;
 	std::vector<tournament_match_history_entry> match_history;
 	bool initialized = false;
 	std::string config_hash;

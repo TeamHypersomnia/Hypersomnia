@@ -102,6 +102,7 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 #include "application/setups/server/server_nickname_auth.h"
 #include "application/setups/server/server_handle_payload.hpp"
 #include "application/setups/server/server_join_timeout.hpp"
+#include "application/setups/server/tournament/match_server_name.h"
 #include "application/platform_settings.h"
 
 #if BUILD_WEBRTC
@@ -1022,6 +1023,31 @@ server_setup::server_setup(
 			initial_vars_modified.server_name = source_server_name;
 		}
 
+		/*
+			The map kept from the last run (runtime_prefs.json - not the config's own "map"): the cycle changed since
+			and doesn't have it any more - the cycle chooses, as with no map. A crash's recovery below still wins.
+		*/
+
+		{
+			const auto kept = std::string(initial_vars_modified.map);
+			const bool from_last_run = !kept.empty() && kept != std::string(canon_with_confd_vars.map);
+
+			if (from_last_run) {
+				rescan_arenas_on_disk();
+
+				const auto cycle = get_map_cycle(initial_vars_modified);
+
+				const bool in_cycle = std::any_of(cycle.begin(), cycle.end(), [&](const auto& entry) {
+					return ::get_first_word(entry) == kept;
+				});
+
+				if (!cycle.empty() && !in_cycle) {
+					LOG("The map of the last run (%x) isn't in the map cycle any more - the cycle chooses.", kept);
+					initial_vars_modified.map = arena_identifier();
+				}
+			}
+		}
+
 #if CRASH_RECOVERY
 		/*
 			Crash-recovery flow. The recovery file is authoritative about which arena/mode
@@ -1041,8 +1067,8 @@ server_setup::server_setup(
 		const auto target = crash_recovery.load(
 			last_start.port,
 			recovery_enabled,
-			[](const arena_identifier& name) {
-				return !::server_choose_arena_file_by(std::string(name)).empty();
+			[with_custom = is_dedicated()](const arena_identifier& name) {
+				return !::server_choose_arena_file_by(std::string(name), with_custom).empty();
 			}
 		);
 
@@ -1858,6 +1884,10 @@ void server_setup::announce_ranked_abandons(const const_logic_step step) {
 std::vector<arena_and_mode_identifier> server_setup::get_map_cycle(const server_vars& of) const {
 	auto out = std::vector<arena_and_mode_identifier>();
 
+	auto has = [&](const std::string& arena) {
+		return std::any_of(out.begin(), out.end(), [&](const auto& e) { return ::get_first_word(e) == arena; });
+	};
+
 	for (const auto& entry : of.map_cycle) {
 		if (entry == "*") {
 			for (const auto& arena : runtime_info.arenas_on_disk) {
@@ -1866,6 +1896,19 @@ std::vector<arena_and_mode_identifier> server_setup::get_map_cycle(const server_
 		}
 		else {
 			out.push_back(entry);
+		}
+	}
+
+	/*
+		map_cycle_add_custom_maps: every map of custom/maps after the listed ones - no names in the config, a new one
+		is in by the next map change (rescanned there).
+	*/
+
+	if (of.map_cycle_add_custom_maps) {
+		for (const auto& arena : runtime_info.custom_arenas_on_disk) {
+			if (!has(std::string(arena))) {
+				out.emplace_back(arena);
+			}
 		}
 	}
 
@@ -1879,6 +1922,10 @@ std::vector<arena_and_mode_identifier> server_setup::get_map_cycle(const server_
 */
 
 void server_setup::choose_next_map_from_cycle() {
+	if (vars.map_cycle_add_custom_maps) {
+		rescan_arenas_on_disk();
+	}
+
 	const auto cycle = get_map_cycle(vars);
 
 	if (cycle.size() < 2) {
@@ -3099,8 +3146,8 @@ server_heartbeat server_setup::make_heartbeat() const {
 	}
 
 
-	if (heartbeat_reported_tournament_stage.has_value()) {
-		heartbeat.set_ranked_type(*heartbeat_reported_tournament_stage);
+	if (heartbeat_reported_bracket_round_type.has_value()) {
+		heartbeat.set_ranked_type(*heartbeat_reported_bracket_round_type);
 	}
 	else if (is_ranked_server()) {
 		heartbeat.set_ranked_type(
@@ -3672,14 +3719,27 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	synced_dynamic_vars out;
 
 	out.preassigned_factions = has_assigned_teams();
+	out.open_team_size = is_open_match() && !open_match_closed ? assigned_teams.open_team_size : 0;
 
 	if (has_assigned_teams()) {
 		const auto [playing_in_game, expected_playing] = count_assigned_players_present();
+
 		/*
-			After the join timeout with equal numbers on both sides: they're enough.
+			Past the round's timeout, both teams with someone here: they're enough - while each side has someone in the game.
 		*/
 
-		out.all_assigned_present = playing_in_game == expected_playing || (join_timeout_relaxed && playing_in_game > 0);
+		auto in_game_on = [&](const faction_type faction) {
+			std::size_t n = 0;
+
+			for_each_id_and_client([&](auto, const auto& c) {
+				n += c.state == client_state_type::IN_GAME && get_assigned_team(c.authenticated_id) == faction ? 1 : 0;
+			}, connected_and_integrated_v);
+
+			return n;
+		};
+
+		const bool both_sides_here = in_game_on(faction_type::RESISTANCE) > 0 && in_game_on(faction_type::METROPOLIS) > 0;
+		out.all_assigned_present = playing_in_game == expected_playing || (plays_with_whoever_came && both_sides_here);
 	}
 
 	out.all_authenticated = all_authenticated || !requires_authentication();
@@ -3717,6 +3777,15 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 		out.bots_override = overrides.bots;
 	}
 
+	/*
+		A tournament's match never has bots - empty while its players come, whatever the config or an override says.
+	*/
+
+	if (has_assigned_teams()) {
+		out.bots_override.requester = mode_player_id::machine_admin();
+		out.bots_override.quota = { 0u, 0u };
+	}
+
 	if (overrides.bot_difficulty.is_set()) {
 		out.bot_override_difficulty = overrides.bot_difficulty.difficulty;
 	}
@@ -3749,9 +3818,17 @@ server_public_vars server_setup::make_public_vars() const {
 	pub.arena_rng_offset = current_arena_rng_offset;
 	pub.playtesting_context = vars.playtesting_context;
 
-	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
+	/*
+		A project or one of the admin's own (custom/maps): only this server has it - never asked from the provider
+		(a 404, or a community map of the same name downloaded in its place).
+	*/
 
-	if (is_user_project) {
+	const bool only_here =
+		::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string())
+		|| ::begins_with(current_arena_folder.string(), CUSTOM_ARENAS_DIR.string())
+	;
+
+	if (only_here) {
 		pub.external_arena_files_provider.clear();
 	}
 	else {
@@ -3792,7 +3869,11 @@ server_vars server_setup::with_map_chosen(server_vars v) {
 		return v;
 	}
 
-	if (runtime_info.arenas_on_disk.empty()) {
+	/*
+		The custom maps as they are now - with the setting the vars are about to have.
+	*/
+
+	if (runtime_info.arenas_on_disk.empty() || v.map_cycle_add_custom_maps) {
 		rescan_arenas_on_disk();
 	}
 
@@ -4050,7 +4131,8 @@ void server_setup::rechoose_arena() {
 			vars.playtesting_context,
 			std::addressof(*last_loaded_project),
 			nullptr,
-			current_arena_rng_offset
+			current_arena_rng_offset,
+			is_dedicated()
 		});
 
 		current_arena_folder = result.arena_folder_path;
@@ -4941,6 +5023,17 @@ message_handler_result server_setup::handle_rcon_payload(
 		return continue_v;
 	}
 	else if constexpr(std::is_same_v<P, match_command>) {
+		/*
+			A tournament's match: only Restart match. Swapping or scrambling would put players - watchers too - where
+			their roster isn't; skipping the warmup starts it without them; the test announcement posts a summary the
+			tournament takes as the match's result.
+		*/
+
+		if (has_assigned_teams() && typed_payload != match_command::RESTART_MATCH) {
+			LOG("RCON: %x refused on a tournament's match.", typed_payload);
+			return continue_v;
+		}
+
 		local_collected.mode_general.special_command = typed_payload;
 
 		switch (typed_payload) {
@@ -4987,6 +5080,22 @@ message_handler_result server_setup::handle_rcon_payload(
 			}
 		}
 
+		/*
+			A tournament's match ends only with its result: stopped by hand, it would leave its round waiting -
+			and the tournament ending as failed. Close the round is the tool there.
+		*/
+
+		const bool stops_server =
+			typed_payload == command::CHECK_FOR_UPDATES_NOW
+			|| typed_payload == command::SHUTDOWN
+			|| typed_payload == command::RESTART
+		;
+
+		if (stops_server && instance_type == server_instance_type::TOURNAMENT) {
+			LOG("RCON: %x refused on a tournament's match.", typed_payload);
+			return continue_v;
+		}
+
 		LOG("Performing a RCON command: %x", typed_payload);
 
 		switch (typed_payload) {
@@ -5014,17 +5123,9 @@ message_handler_result server_setup::handle_rcon_payload(
 
 				return continue_v;
 
-			case command::CLOSE_ROUND_1:
-				if (close_open_round != nullptr) {
-					close_open_round->store(true);
-					notification("closed round 1 of the tournament");
-				}
-
-				return continue_v;
-
-			case command::TIMEOUT_ABSENT_PLAYERS:
-				if (timeout_absent_players_now()) {
-					notification("timed out the absent players - the match is decided");
+			case command::CLOSE_ROUND:
+				if (close_bracket_round != nullptr && !close_bracket_round->exchange(true)) {
+					notification("closed the round of the tournament");
 				}
 
 				return continue_v;
@@ -6677,23 +6778,54 @@ const netcode_socket_t* server_setup::find_underlying_socket() const {
 
 void server_setup::rescan_runtime_prefs() {
 	runtime_info.runtime_prefs = augs::to_json_diff_string(vars, canon_with_confd_vars);
-	runtime_info.can_close_round_1 = is_open_match() && close_open_round != nullptr && !close_open_round->load();
-	runtime_info.can_timeout_absent_players = has_assigned_teams() && !is_ranked_live_or_starting() && !join_timeout_passed && !open_match_closed;
+	runtime_info.can_close_bracket_round = has_assigned_teams() && close_bracket_round != nullptr && !close_bracket_round->load();
 }
 
 void server_setup::rescan_arenas_on_disk() {
 	auto& out_entries = runtime_info.arenas_on_disk;
+	auto& custom_entries = runtime_info.custom_arenas_on_disk;
 	out_entries.clear();
+	custom_entries.clear();
 
-	auto add_from = [&](const auto& root) {
+	/*
+		A dedicated server's custom/maps - always there, made here for the admin to put the maps in.
+	*/
+
+	const bool with_custom = is_dedicated();
+
+	if (with_custom) {
+		augs::create_directories(CUSTOM_ARENAS_DIR);
+	}
+
+	for (const auto& root : ::server_arena_folders(with_custom)) {
+		const bool custom = root == CUSTOM_ARENAS_DIR;
+
 		try {
 			augs::for_each_in_directory(
 				root,
 				[&](const auto& p) {
 					const auto arena_name = std::filesystem::relative(p, root).string();
 
-					if (sanitization::arena_name_safe(arena_name)) {
-						out_entries.push_back({ arena_name });
+					if (!sanitization::arena_name_safe(arena_name)) {
+						return callback_result::CONTINUE;
+					}
+
+					/*
+						A name an earlier folder has already: that one is played - the custom one never replaces it.
+					*/
+
+					if (found_in(out_entries, arena_identifier(arena_name))) {
+						if (custom) {
+							LOG("Custom map \"%x\" ignored: an official, project or downloaded map has this name.", arena_name);
+						}
+
+						return callback_result::CONTINUE;
+					}
+
+					out_entries.push_back({ arena_name });
+
+					if (custom) {
+						custom_entries.push_back({ arena_name });
 					}
 
 					return callback_result::CONTINUE;
@@ -6704,15 +6836,12 @@ void server_setup::rescan_arenas_on_disk() {
 		catch (...) {
 
 		}
-	};
+	}
 
-	add_from(OFFICIAL_ARENAS_DIR);
-	add_from(DOWNLOADED_ARENAS_DIR);
-	add_from(EDITOR_PROJECTS_DIR);
-
-	LOG("Rescanned arenas on disk: %x", out_entries.size());
+	LOG("Rescanned arenas on disk: %x (custom: %x)", out_entries.size(), custom_entries.size());
 
 	sort_range(out_entries, augs::natural_order);
+	sort_range(custom_entries, augs::natural_order);
 }
 
 void server_setup::broadcast_runtime_info_for_rcon() {
@@ -7322,7 +7451,11 @@ void server_setup::handle_client_chat_command(
 				}
 			}
 			else {
-				if (found_in(runtime_info.arenas_on_disk, arena)) {
+				/*
+					On disk now - one copied into custom/maps while it runs too.
+				*/
+
+				if (!::server_choose_arena_file_by(std::string(arena), is_dedicated()).empty()) {
 					perform_if_can_already();
 				}
 				else {
@@ -7361,9 +7494,24 @@ bool server_setup::is_open_match() const {
 	return assigned_teams.open_team_size > 0;
 }
 
+bool server_setup::open_match_full() const {
+	if (!is_open_match()) {
+		return false;
+	}
+
+	std::size_t taken = 0;
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		(void)id;
+		taken += ::is_actual_faction(faction) ? 1 : 0;
+	}
+
+	return taken >= 2 * assigned_teams.open_team_size;
+}
+
 /*
 	A tournament's server: an admin watches any match (and closes round 1 from it); an open match of round 1
-	takes the first players to join, by turns into the two teams, until it has its 2 * team size.
+	lets players in as spectators - they choose their teams as on ranked (sync_open_match_teams), until it has its 2 * team size.
 */
 
 void server_setup::take_into_open_match(const client_id_type client_id, const server_client_state& c) {
@@ -7444,19 +7592,7 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 		if (::is_actual_faction(suspended_faction)) {
 			assigned_teams.id_to_faction[id] = suspended_faction;
 			LOG("Open match: %x comes back to the recovered match, in %x.", id, suspended_faction);
-
-			if (open_places != nullptr) {
-				open_places->take(id, open_match_server_name, c.get_nickname());
-			}
-
-			/*
-				Came to round 1 - counted for its closing by itself, as anyone taking a place.
-			*/
-
-			if (open_round_players != nullptr) {
-				open_round_players->fetch_add(1);
-			}
-
+			take_open_match_place(id, c.get_nickname());
 			return;
 		}
 	}
@@ -7499,21 +7635,7 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 		}
 	}
 
-	auto num_in = [&](const faction_type f) {
-		std::size_t n = 0;
-
-		for (const auto& [roster_id, faction] : assigned_teams.id_to_faction) {
-			(void)roster_id;
-			n += faction == f ? 1 : 0;
-		}
-
-		return n;
-	};
-
-	const auto resistance = num_in(faction_type::RESISTANCE);
-	const auto metropolis = num_in(faction_type::METROPOLIS);
-
-	if (resistance + metropolis >= 2 * assigned_teams.open_team_size) {
+	if (open_match_full()) {
 		if (admin) {
 			as_spectator();
 		}
@@ -7525,24 +7647,150 @@ void server_setup::take_into_open_match(const client_id_type client_id, const se
 		open_match_name = vars.server_name;
 	}
 
-	const auto faction = resistance <= metropolis ? faction_type::RESISTANCE : faction_type::METROPOLIS;
-	assigned_teams.id_to_faction[id] = faction;
+	/*
+		A spectator first - a place is taken once a team is chosen (sync_open_match_teams).
+	*/
 
-	LOG("Open match: %x takes a place in %x.", id, faction);
+	assigned_teams.id_to_faction[id] = faction_type::SPECTATOR;
+	LOG("Open match: %x comes in as a spectator, to choose a team.", id);
+}
 
-	if (open_places != nullptr) {
-		open_places->take(id, open_match_server_name, c.get_nickname());
+/*
+	The teams chosen in the open match are its roster: a team chosen takes a place in the round, spectating again frees it.
+	Frozen once the match starts - whoever comes back after a drop comes back to their team.
+*/
+
+void server_setup::sync_open_match_teams() {
+	if (!is_open_match() || open_match_closed) {
+		return;
 	}
 
-	if (open_round_players != nullptr) {
-		open_round_players->fetch_add(1);
+	/*
+		Once live - anyone leaving in the seconds before it (STARTING) restarts the match, a spectator too.
+	*/
+
+	if (is_ranked_live_or_starting()) {
+		if (is_ranked_live()) {
+			send_away_left_out_spectators();
+		}
+
+		return;
+	}
+
+	for_each_id_and_client([&](const auto client_id, const auto& c) {
+		const auto it = assigned_teams.id_to_faction.find(c.authenticated_id);
+
+		if (c.authenticated_id.empty() || it == assigned_teams.id_to_faction.end()) {
+			return;
+		}
+
+		const auto chosen = get_assigned_faction(to_mode_player_id(client_id));
+		const auto before = it->second;
+
+		if (chosen == before || (!::is_actual_faction(chosen) && chosen != faction_type::SPECTATOR)) {
+			return;
+		}
+
+		/*
+			One player per nickname, as when coming in (take_into_open_match): two who came with the same one
+			as spectators - the second to choose a team is told to change it.
+		*/
+
+		const bool takes_place = !::is_actual_faction(before) && ::is_actual_faction(chosen);
+
+		if (takes_place && open_places != nullptr && open_places->nickname_taken(c.get_nickname(), c.authenticated_id)) {
+			LOG("Open match: %x chose a team with the nickname %x, taken by another player.", c.authenticated_id, c.get_nickname());
+			kick_now(client_id, typesafe_sprintf("Your nickname: '%x'\nis already taken in this tournament!", c.get_nickname()));
+			return;
+		}
+
+		it->second = chosen;
+
+		if (::is_actual_faction(before) == ::is_actual_faction(chosen)) {
+			LOG("Open match: %x moves to %x.", c.authenticated_id, chosen);
+			open_match_named = false;
+			return;
+		}
+
+		if (::is_actual_faction(chosen)) {
+			LOG("Open match: %x takes a place in %x.", c.authenticated_id, chosen);
+			take_open_match_place(c.authenticated_id, c.get_nickname());
+		}
+		else {
+			LOG("Open match: %x spectates again - the place is free.", c.authenticated_id);
+			free_open_match_place(c.authenticated_id);
+		}
+	}, connected_and_integrated_v);
+}
+
+/*
+	The match started without them: whoever came to play and still spectates goes to find another one.
+	Admins, the spectator account and the teams out (or waiting for their next match) only watch - they stay.
+*/
+
+void server_setup::send_away_left_out_spectators() {
+	for_each_id_and_client([&](const auto client_id, const auto& c) {
+		if (c.when_kicked.has_value() || c.authenticated_id.empty()) {
+			return;
+		}
+
+		const auto it = assigned_teams.id_to_faction.find(c.authenticated_id);
+
+		if (it == assigned_teams.id_to_faction.end() || it->second != faction_type::SPECTATOR) {
+			return;
+		}
+
+		const bool only_watches =
+			has_own_place(c)
+			|| find_admin_profile_of(c.authenticated_id).has_value()
+			|| (may_spectate_tournament && may_spectate_tournament(c.authenticated_id))
+		;
+
+		if (only_watches) {
+			return;
+		}
+
+		LOG("Open match: %x still spectating when it started - sent to another one.", c.authenticated_id);
+		kick_now(client_id, "This match started without you - join another one.");
+	}, only_connected_v);
+}
+
+void server_setup::take_open_match_place(const std::string& authenticated_id, const std::string& nickname) {
+	if (open_places != nullptr) {
+		open_places->take(authenticated_id, open_match_server_name, nickname);
+	}
+
+	/*
+		Came to round 1 - counted for its closing by itself.
+	*/
+
+	if (open_bracket_round_players != nullptr) {
+		open_bracket_round_players->fetch_add(1);
 	}
 
 	open_match_named = false;
 }
 
+void server_setup::free_open_match_place(const std::string& authenticated_id) {
+	if (open_places != nullptr) {
+		open_places->free(authenticated_id, open_match_server_name);
+	}
+
+	if (open_bracket_round_players != nullptr) {
+		open_bracket_round_players->fetch_sub(1);
+	}
+
+	open_match_named = false;
+
+	if (!open_match_name.empty() && vars.server_name != open_match_name) {
+		vars.server_name = open_match_name;
+		request_immediate_heartbeat();
+	}
+}
+
 /*
-	Before its match starts, whoever leaves an open match frees the place.
+	Before its match is live, whoever leaves an open match frees the place - a leave in the last seconds before it
+	(STARTING) restarts the match, so the place is free again too.
 */
 
 void server_setup::leave_open_match(const std::string& authenticated_id) {
@@ -7550,7 +7798,7 @@ void server_setup::leave_open_match(const std::string& authenticated_id) {
 		Closed: whoever waited went on already - leaving the server that shuts down isn't leaving the round.
 	*/
 
-	if (!is_open_match() || open_match_closed || is_ranked_live_or_starting() || authenticated_id.empty()) {
+	if (!is_open_match() || open_match_closed || is_ranked_live() || authenticated_id.empty()) {
 		return;
 	}
 
@@ -7562,21 +7810,7 @@ void server_setup::leave_open_match(const std::string& authenticated_id) {
 
 	assigned_teams.id_to_faction.erase(it);
 	LOG("Open match: %x left before the match - the place is free again.", authenticated_id);
-
-	if (open_places != nullptr) {
-		open_places->free(authenticated_id, open_match_server_name);
-	}
-
-	open_match_named = false;
-
-	if (open_round_players != nullptr) {
-		open_round_players->fetch_sub(1);
-	}
-
-	if (!open_match_name.empty() && vars.server_name != open_match_name) {
-		vars.server_name = open_match_name;
-		request_immediate_heartbeat();
-	}
+	free_open_match_place(authenticated_id);
 }
 
 /*
@@ -7589,8 +7823,8 @@ void server_setup::name_open_match() {
 		return;
 	}
 
-	std::string resistance;
-	std::string metropolis;
+	std::vector<std::string> resistance;
+	std::vector<std::string> metropolis;
 	std::size_t named = 0;
 
 	for_each_id_and_client([&](auto, const auto& c) {
@@ -7601,7 +7835,7 @@ void server_setup::name_open_match() {
 		}
 
 		auto& names = faction == faction_type::RESISTANCE ? resistance : metropolis;
-		names += (names.empty() ? "" : ", ") + c.get_nickname();
+		names.push_back(c.get_nickname());
 		++named;
 	}, only_connected_v);
 
@@ -7610,7 +7844,7 @@ void server_setup::name_open_match() {
 	}
 
 	open_match_named = true;
-	vars.server_name = "[" + resistance + "] vs [" + metropolis + "]";
+	vars.server_name = ::match_server_name(resistance, metropolis);
 	LOG("Open match is full: %x", vars.server_name);
 	request_immediate_heartbeat();
 }
@@ -7630,6 +7864,17 @@ void server_setup::publish_live_state_if_its_time() {
 
 	auto state = live_match_state();
 	state.started = is_ranked_live_or_starting();
+	state.round_deadline = bracket_round_deadline;
+
+	if (has_assigned_teams()) {
+		/*
+			Complete: every player of both teams in the game - in an open match, once all its places are taken.
+			2 vs 1 in a 2v2 (past the deadline, playing with whoever came) isn't - the missing one may still join.
+		*/
+
+		const auto [in_game, expected] = count_assigned_players_present();
+		state.teams_full = expected > 0 && in_game == expected && (!is_open_match() || open_match_full());
+	}
 
 	get_arena_handle().on_mode_with_input(
 		[&](const auto& mode, const auto&) {
@@ -7649,6 +7894,7 @@ void server_setup::publish_live_state_if_its_time() {
 
 			state.score_resistance = mode.get_faction_score(faction_type::RESISTANCE);
 			state.score_metropolis = mode.get_faction_score(faction_type::METROPOLIS);
+			state.live = mode.get_ranked_state() == ranked_state_type::LIVE;
 		}
 	);
 
@@ -7657,9 +7903,10 @@ void server_setup::publish_live_state_if_its_time() {
 }
 
 void server_setup::close_open_match_if_requested() {
+	sync_open_match_teams();
 	name_open_match();
 
-	if (!is_open_match() || open_match_closed || close_open_round == nullptr) {
+	if (!is_open_match() || open_match_closed || close_bracket_round == nullptr) {
 		return;
 	}
 
@@ -7669,12 +7916,12 @@ void server_setup::close_open_match_if_requested() {
 	*/
 
 	const bool all_came =
-		open_round_players != nullptr
-		&& open_round_expected_players > 0
-		&& open_round_players->load() >= open_round_expected_players
+		open_bracket_round_players != nullptr
+		&& open_bracket_round_expected_players > 0
+		&& open_bracket_round_players->load() >= open_bracket_round_expected_players
 	;
 
-	if (!all_came && !close_open_round->load() && !join_timeout_due()) {
+	if (!all_came && !close_bracket_round->load() && !join_timeout_due()) {
 		return;
 	}
 
@@ -7715,11 +7962,11 @@ void server_setup::close_open_match_if_requested() {
 
 	open_match_closed = true;
 
-	if (all_came && !close_open_round->load()) {
-		LOG("All %x players of the tournament came - round 1 closes by itself.", open_round_expected_players);
+	if (all_came && !close_bracket_round->load()) {
+		LOG("All %x players of the tournament came - round 1 closes by itself.", open_bracket_round_expected_players);
 	}
-	else if (join_timeout_due() && !close_open_round->load()) {
-		LOG("Join timeout: round 1's match here closes.");
+	else if (join_timeout_due() && !close_bracket_round->load()) {
+		LOG("Round timeout: round 1's match here closes.");
 	}
 
 	LOG("Round 1 closed: this open match ends with %x waiting.", assigned_playing);

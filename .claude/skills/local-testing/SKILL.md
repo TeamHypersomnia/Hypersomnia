@@ -307,7 +307,7 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
   (time runs out, no bomb), so a tournament match of idle clients never ends - use a regular ranked server, where 1:1 after both
   halves ends it, and click Auto-assign (585,430 in 1280x720) in the faction window. A map's rules (max_team_score - at least 2 -,
   round_time, warmup_time, freeze_time, buy_time, round_end_time) are in its JSON under game_modes.bomb_defusal; a server takes
-  test maps from user/downloads/arenas, clients download them from it directly when hypersomnia.io has no such map.
+  test maps from user/downloads/maps, clients download them from it directly when hypersomnia.io has no such map.
 - The site counts wins only from 5 rounds (MIN_ROUNDS_TO_COUNT_WINS): short test matches update MMR but show W 0 / L 0.
 - The headless-only sources (`HEADLESS`: tournament, crash recovery) are not in the client build: after removing a var, also build
   `build/Debug-x64-clang-claude-headless`.

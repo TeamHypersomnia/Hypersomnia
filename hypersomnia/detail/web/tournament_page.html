@@ -31,8 +31,9 @@
 		box-sizing: border-box;
 	}
 
+	/* the config generator's colors: the page almost black, its bars and boxes a shade lighter */
 	html {
-		background: #0a0806;
+		background: #030303;
 	}
 
 	/* a column: the footer at the window's bottom also when the page is short */
@@ -43,7 +44,7 @@
 		min-height: 100vh;
 		color: rgba(255, 255, 255, 0.85);
 		font-family: var(--font);
-		background: #0a0806;
+		background: #030303;
 	}
 
 	/* across the whole page - the rounds' panel too, like the bars above and below it */
@@ -80,8 +81,8 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.6em;
-		padding: 1.5em 1.875em;
-		background: #050403;
+		padding: 2.1em 1.875em 1.4em;
+		background: #080808;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 	}
 
@@ -206,8 +207,6 @@
 		width: 100%;
 		padding: var(--rhythm);
 		gap: var(--rhythm);
-		background: #050403;
-		border-top: 1px solid rgba(255, 255, 255, 0.07);
 	}
 
 	.site-footer {
@@ -217,14 +216,14 @@
 		justify-content: space-between;
 		gap: 0.6em 2em;
 		padding: 1.8em 2em;
-		background: #050403;
+		background: #080808;
 		border-top: 1px solid rgba(255, 255, 255, 0.07);
 		color: rgba(255, 255, 255, 0.45);
 		font-size: 0.95rem;
 	}
 
 	.site-footer a {
-		color: var(--amber-text);
+		color: rgb(255, 176, 64);
 		text-decoration: none;
 	}
 
@@ -234,26 +233,46 @@
 
 	.footer-logo img {
 		display: block;
+		filter: grayscale(1);
 	}
 
 	/* a round in a box of its own: its arena on the left, its matches on the right */
-	.stage-section {
+	.bracket-round-section {
 		display: grid;
 		/* one width for every round's arena column - the widest miniature's (fit_miniatures) - the ladders line up */
-		grid-template-columns: min(var(--arena-column, 240px), 320px, 45vw) 1fr;
+		grid-template-columns: min(var(--map-column, 240px), 320px, 45vw) 1fr;
 		align-items: center;
 		gap: 24px;
 		/* room for the widest miniature (320px) and the ladder (about 630px) side by side */
 		width: min(100%, 1080px);
-		padding: 1.2em 1.4em 1.4em;
+		/* the frame's cut corners clear of the content (game_button_frame) */
+		padding: 30px 42px 44px 36px;
 		margin: 0;
-		/* in grey - only the final's frame has a color */
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		background: rgba(0, 0, 0, 0.32);
+		position: relative;
+		isolation: isolate;
+	}
+
+	/* a round's frame: the winners' menu button, a shade lighter than the page - as the config generator's tiles */
+	.bracket-round-frame .frame-inside {
+		fill: #080808;
+	}
+
+	.bracket-round-frame .frame-border {
+		stroke: rgba(255, 255, 255, 0.1);
+	}
+
+	.bracket-round-frame .frame-corners {
+		stroke: rgba(255, 255, 255, 0.22);
+	}
+
+	/* the round being played: framed in the amber rainbow, as its live matches (game_button_frame) */
+	.bracket-round-section.playing .frame-border,
+	.bracket-round-section.playing .frame-corners {
+		stroke: var(--frame-rainbow);
 	}
 
 	/* the box's header: the round, then its arena - a thin line under them, so the arena's name has its ground */
-	.stage-head {
+	.bracket-round-head {
 		position: relative;
 		grid-column: 1 / -1;
 		display: flex;
@@ -264,7 +283,7 @@
 		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	}
 
-	.stage-label {
+	.bracket-round-label {
 		position: relative;
 		font-weight: 800;
 		/* in grey, a bit dark - the final's own in its rainbow */
@@ -275,18 +294,18 @@
 	}
 
 	/* the semifinals' name in white - the rounds before them stay grey */
-	.stage-section.semifinal .stage-label {
+	.bracket-round-section.semifinal .bracket-round-label {
 		color: #fff;
 	}
 
-	.stage-side {
+	.bracket-round-side {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: 8px;
 	}
 
-	.stage-body {
+	.bracket-round-body {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -295,7 +314,7 @@
 	}
 
 	/* the arena: as big as the round's name, in grey italics */
-	.stage-arena {
+	.bracket-round-map {
 		color: rgba(255, 255, 255, 0.45);
 		font-size: 1.3rem;
 		font-style: italic;
@@ -307,17 +326,18 @@
 		(the arena column's most) or on a narrow screen.
 	*/
 
-	.stage-miniature {
+	.bracket-round-miniature {
 		display: block;
 		max-width: 100%;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		image-rendering: pixelated;
 	}
 
+	/* the score's chip as tall as the teams' */
 	.match-pair {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
+		align-items: stretch;
 		justify-content: center;
 		position: relative;
 		gap: 8px;
@@ -355,16 +375,103 @@
 		text-align: center;
 	}
 
+	/*
+		A score as on a scoreboard: the colon in the middle, each number right next to it - 13:3, never 13: 3
+		nor a leading zero. As tall as fits.
+	*/
+
+	.match-score.scored {
+		flex: 1;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 0;
+		padding: 0 4px;
+		font-size: 2.6rem;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	.score-number {
+		position: relative;
+		text-align: right;
+	}
+
+	.score-colon + .score-number {
+		text-align: left;
+	}
+
+	/* centered in its half, then back towards the colon (0.19em - 8 px at 13 : 9) */
+	.score-number.centered,
+	.score-colon + .score-number.centered {
+		text-align: center;
+	}
+
+	.score-number.centered {
+		left: 0.19em;
+	}
+
+	.score-colon + .score-number.centered {
+		left: -0.19em;
+	}
+
+	.score-colon {
+		padding: 0 0.3em;
+		font-size: 0.6em;
+		opacity: 0.5;
+	}
+
+	/* a number that just changed: drawn again over it, going up and fading away (pop_scores) */
+	.score-pop {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		color: rgb(var(--amber));
+		-webkit-text-fill-color: rgb(var(--amber));
+	}
+
 	/* why a team goes on alone - in the score's chip, its size */
+	/* WALKOVER, BYE, FORFEIT: as big as fits the chip */
 	.match-score.reason {
-		font-size: 0.85rem;
-		letter-spacing: 0.08em;
+		font-size: 1.35rem;
+		letter-spacing: 0.02em;
+		padding: 4px 2px;
 		color: rgba(255, 255, 255, 0.5);
 		border-color: rgba(255, 255, 255, 0.15);
 	}
 
-	/* a match waiting for its players: where its score will be, a call to come in */
-	/* as big as fits: two lines */
+	/* a match waiting for its players: where its score will be, a call to come in - the round's time to enter under it */
+	.match-score.join:has(.join-timer) {
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	/* the grace: the whole chip pulses red - the last moment to come */
+	.match-score.join.last-call {
+		color: #ff4d4d;
+		border-color: rgba(255, 77, 77, 0.8);
+		animation: last-call-pulse 1s ease-in-out infinite;
+	}
+
+	.match-score.join.last-call .join-timer {
+		color: #ff8080;
+	}
+
+	/* both teams in, the countdown on: still joinable, pulsing amber */
+	.match-score.join.starting {
+		animation: starting-pulse 1s ease-in-out infinite;
+	}
+
+	@keyframes starting-pulse {
+		0%, 100% { background: rgba(var(--amber), 0.08); box-shadow: 0 0 0 rgba(var(--amber), 0); }
+		50% { background: rgba(var(--amber), 0.26); box-shadow: 0 0 14px rgba(var(--amber), 0.45); }
+	}
+
+	@keyframes last-call-pulse {
+		0%, 100% { background: rgba(255, 60, 60, 0.08); box-shadow: 0 0 0 rgba(255, 60, 60, 0); }
+		50% { background: rgba(255, 60, 60, 0.28); box-shadow: 0 0 14px rgba(255, 60, 60, 0.45); }
+	}
+
 	.match-score.join {
 		font-family: var(--font);
 		font-size: 1.6rem;
@@ -395,7 +502,7 @@
 	}
 
 	/* the final: framed as every round - its name in gold, bigger, tells it apart */
-	.stage-section.final .stage-label {
+	.bracket-round-section.final .bracket-round-label {
 		font-size: 1.7rem;
 		color: rgb(var(--gold));
 	}
@@ -499,6 +606,16 @@
 		visibility: hidden;
 	}
 
+	/* who didn't come to a walkover: out, in grey - struck through as a loser */
+	.team-card.out .players {
+		border-color: rgba(255, 255, 255, 0.08);
+		background: #0e0c0a;
+		color: rgba(255, 255, 255, 0.35);
+		text-decoration: line-through;
+		text-decoration-thickness: 2px;
+		text-decoration-color: rgba(255, 255, 255, 0.35);
+	}
+
 	.team-card.bye .players {
 		border-color: rgba(255, 255, 255, 0.08);
 		background: #0e0c0a;
@@ -518,12 +635,18 @@
 		text-overflow: ellipsis;
 	}
 
-	/* the avatar's place is kept also without one - a faint square, the nicknames start in one line */
+	/*
+		The avatar's place is kept also without one - a grey figure (Lucide's "user", ISC),
+		the nicknames start in one line. A player's own avatar covers it.
+	*/
+
 	.avatar-slot {
 		flex: none;
 		width: 26px;
 		height: 26px;
-		background: rgba(0, 0, 0, 0.2);
+		background: rgba(0, 0, 0, 0.2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(120,120,120)' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E") center / 76% no-repeat;
+		/* a thin grey frame - around a player's own avatar too */
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
 	}
 
 	.avatar {
@@ -536,15 +659,15 @@
 	/* narrower than both side by side: the miniature over the ladder */
 	@media (max-width: 1120px) {
 		/* the column as narrow as the box - the miniature shrinks to it, never pushes the ladder out */
-		.stage-section {
+		.bracket-round-section {
 			grid-template-columns: minmax(0, 1fr);
 		}
 
-		.stage-section > * {
+		.bracket-round-section > * {
 			min-width: 0;
 		}
 
-		.stage-side {
+		.bracket-round-side {
 			justify-self: center;
 		}
 	}
@@ -554,12 +677,12 @@
 			padding: 1.5em 0 0;
 		}
 
-		.stage-section {
+		.bracket-round-section {
 			grid-template-columns: 1fr;
 			gap: 12px;
 		}
 
-		.stage-miniature {
+		.bracket-round-miniature {
 			max-height: 160px !important;
 		}
 
@@ -576,8 +699,12 @@
 			padding: var(--rhythm) 0.4em;
 		}
 
-		.stage-section {
-			padding: 0.8em 0.5em 1em;
+		.bracket-round-section {
+			padding: 26px 14px 38px 18px;
+		}
+
+		.match-score.reason {
+			font-size: 0.85rem;
 		}
 
 		.match-connector {
@@ -590,6 +717,11 @@
 			min-height: 40px;
 			gap: 10px;
 			padding: 3px 0;
+		}
+
+		.match-score.scored {
+			font-size: 1.6rem;
+			padding: 0 2px;
 		}
 
 		.team-card {
@@ -623,6 +755,68 @@
 			transition: none !important;
 		}
 	}
+
+	/*
+		Every chip between the teams as tall as a 2v2 team - whatever the state, whatever the team size.
+	*/
+
+	.match-connector .match-score {
+		box-sizing: border-box;
+		height: 82px;
+		min-height: 82px;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	/* JOIN NOW on one line - the timer under it big */
+	.match-score.join {
+		line-height: 1;
+		white-space: nowrap;
+		font-size: 1.6rem;
+		letter-spacing: 0;
+		/* a little room at the sides, as STARTING has */
+		padding-left: 7px;
+		padding-right: 7px;
+		/* the caps and digits sit high in their lines - optically centered */
+		padding-top: 7px;
+	}
+
+	.match-score.join .join-timer {
+		display: block;
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+		margin-top: 0;
+		line-height: 1;
+		font-size: 2.3rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	@media (max-width: 600px) {
+		.match-score.join {
+			font-size: 0.95rem;
+			padding-left: 4px;
+			padding-right: 4px;
+			padding-top: 5px;
+		}
+
+		.match-score.join .join-timer {
+			font-size: 1.6rem;
+		}
+	}
+
+	/* a team shorter than the chip (1v1): centered against it */
+	.match-pair {
+		align-items: center;
+	}
+
+	/* the groups of a round apart: to join, being played, decided, byes */
+	.group-gap {
+		height: 1px;
+		margin: 0 8%;
+		background: rgba(255, 255, 255, 0.07);
+	}
 </style>
 </head>
 <body>
@@ -648,6 +842,7 @@
 	<a href="tournament.json" target="_blank">tournament.json</a>
 </footer>
 <script>
+
 (() => {
 	const root = document.getElementById('tournament-root');
 
@@ -666,7 +861,34 @@
 	};
 
 	// a figure space - as wide as a digit
-	const pad2 = n => String(n).padStart(2, '\u2007');
+	/*
+		The scores as last drawn, by match - a number that changed pops up once the page is drawn anew.
+	*/
+
+	let last_scores = new Map();
+	let seen_scores = new Map();
+	let pending_pops = [];
+
+	function pop_scores() {
+		pending_pops.forEach(([number, value]) => {
+			const ghost = el('span', 'score-pop', String(value));
+			number.appendChild(ghost);
+
+			const fade = ghost.animate(
+				[
+					{ transform: 'translateY(0)', opacity: 1 },
+					{ transform: 'translateY(-1.1em)', opacity: 0 }
+				],
+				{ duration: 1000, easing: 'ease-out' }
+			);
+
+			fade.onfinish = () => ghost.remove();
+		});
+
+		pending_pops = [];
+		last_scores = seen_scores;
+		seen_scores = new Map();
+	}
 
 	/*
 		A team's players, one per line, each after their avatar - served by this server, by the account;
@@ -705,12 +927,13 @@
 	*/
 
 	const BUTTON_SCALE = 3;
+	let frame_rainbows = 0;
 	const SIDE_L = 8, SIDE_T = 8, SIDE_R = 12, SIDE_B = 12;
 
-	function game_button_frame(box) {
+	function game_button_frame(box, variant) {
 		const ns = 'http://www.w3.org/2000/svg';
 		const svg = document.createElementNS(ns, 'svg');
-		svg.setAttribute('class', 'winner-button-frame');
+		svg.setAttribute('class', 'winner-button-frame' + (variant ? ' ' + variant : ''));
 		svg.setAttribute('aria-hidden', 'true');
 		svg.setAttribute('shape-rendering', 'crispEdges');
 
@@ -720,6 +943,41 @@
 			svg.appendChild(p);
 			return p;
 		};
+
+		/*
+			The round being played: its frame's lines in the amber rainbow, moving as the live matches' frames.
+		*/
+
+		if (box.classList.contains('playing')) {
+			const id = `frame-rainbow-${++frame_rainbows}`;
+			const gradient = document.createElementNS(ns, 'linearGradient');
+			gradient.setAttribute('id', id);
+			gradient.setAttribute('x2', '0.5');
+			gradient.setAttribute('spreadMethod', 'repeat');
+
+			['#ffe680', '#ffd700', '#ffb040', '#ff8a3d', '#ff5a3d', '#ff8a3d', '#ffb040', '#ffd700', '#ffe680'].forEach((color, i, all) => {
+				const stop = document.createElementNS(ns, 'stop');
+				stop.setAttribute('offset', String(i / (all.length - 1)));
+				stop.setAttribute('stop-color', color);
+				gradient.appendChild(stop);
+			});
+
+			const move = document.createElementNS(ns, 'animateTransform');
+			move.setAttribute('attributeName', 'gradientTransform');
+			move.setAttribute('type', 'translate');
+			move.setAttribute('from', '0 0');
+			move.setAttribute('to', '0.5 0');
+			move.setAttribute('dur', '4s');
+			move.setAttribute('repeatCount', 'indefinite');
+			// each frame drawn anew starts in the phase of the page's clock - a refresh doesn't restart it
+			move.setAttribute('begin', `${-((performance.now() / 1000) % 4)}s`);
+			gradient.appendChild(move);
+
+			const defs = document.createElementNS(ns, 'defs');
+			defs.appendChild(gradient);
+			svg.appendChild(defs);
+			box.style.setProperty('--frame-rainbow', `url(#${id})`);
+		}
 
 		const inside = path('frame-inside');
 		const border = path('frame-border');
@@ -773,21 +1031,65 @@
 	function connector(m) {
 		const box = el('div', 'match-connector');
 
-		// the two numbers apart, each as wide as two digits
+		// the two numbers by the colon between them - a number changed since the last time pops up (pop_scores)
 		const score = cls => {
 			const chip = el('span', cls);
-			chip.appendChild(el('span', 'score-number', pad2(m.score_a)));
-			chip.appendChild(el('span', 'score-number', pad2(m.score_b)));
+			/*
+				13 : 9 - with a two-digit score on one side, the one-digit one centered in its half instead of
+				pressed to the colon.
+			*/
+
+			const wide = Math.max(m.score_a, m.score_b) >= 10;
+			const number = v => el('span', 'score-number' + (wide && v < 10 ? ' centered' : ''), String(v));
+			const a = number(m.score_a);
+			const b = number(m.score_b);
+			chip.appendChild(a);
+			chip.appendChild(el('span', 'score-colon', ':'));
+			chip.appendChild(b);
+
+			/*
+				Kept by the match's own sides: a decided match shows its winner on the left, so its sides may swap.
+			*/
+
+			const key = m.key || '';
+			const ours = m.swapped ? [m.score_b, m.score_a] : [m.score_a, m.score_b];
+			const before = last_scores.get(key);
+			const [left, right] = m.swapped ? [b, a] : [a, b];
+
+			if (before) {
+				if (before[0] !== ours[0]) {
+					pending_pops.push([left, ours[0]]);
+				}
+
+				if (before[1] !== ours[1]) {
+					pending_pops.push([right, ours[1]]);
+				}
+			}
+
+			seen_scores.set(key, ours);
 			return chip;
 		};
 
 		if ((m.status === 'done' || m.status === 'live') && m.score_a !== undefined) {
-			box.appendChild(score('match-score' + (m.status === 'live' ? ' live' : '')));
+			box.appendChild(score('match-score scored' + (m.status === 'live' ? ' live' : '')));
+		}
+		else if (m.status === 'starting') {
+			// both teams in, the countdown on - framed as live, nothing scored yet
+			box.appendChild(el('span', 'match-score join starting', 'STARTING'));
 		}
 		else if (m.status === 'waiting') {
 			// its players are to come in - the server's name on hover
 			const join = el('span', 'match-score join', 'JOIN NOW');
 			join.title = m.server_name || '';
+
+			if (m.deadline) {
+				const timer = el('span', 'join-timer');
+				timer.dataset.deadline = m.deadline;
+				timer.dataset.grace = m.grace_secs || 0;
+				timer.title = 'A team that doesn\'t show up by then is out';
+				join.appendChild(timer);
+			}
+
 			box.appendChild(join);
 		}
 		else {
@@ -842,9 +1144,27 @@
 			return forfeitPair(m);
 		}
 
-		// whichever team came: in a round being played the teams are as paired, the winner either one
+		/*
+			A walkover: who came won it, in green on the left - who didn't, in grey, struck through on the right.
+			Nobody to name on the other side (an open match): the winner alone.
+		*/
+
 		if (m.status === 'walkover') {
-			return alonePair(m.winner === 'b' ? m.team_b : m.team_a, 'WALKOVER');
+			const winner = m.winner === 'b' ? m.team_b : m.team_a;
+			const out = m.winner === 'b' ? m.team_a : m.team_b;
+
+			if (!out || !out.length) {
+				return alonePair(winner, 'WALKOVER');
+			}
+
+			const pair = el('div', 'match-pair');
+			const box = el('div', 'match-connector');
+			box.appendChild(el('span', 'match-score reason', 'WALKOVER'));
+
+			pair.appendChild(card('won', winner));
+			pair.appendChild(box);
+			pair.appendChild(card('out', out));
+			return pair;
 		}
 
 		const pair = el('div', 'match-pair');
@@ -859,10 +1179,13 @@
 		const waiting = m.status === 'waiting' ? (m.server_name || 'waiting...') : '?';
 
 		// a match being played: its players framed as its score
+		// the rainbow frames only a match being played - not one still starting
 		const playing = m.status === 'live' ? 'live' : '';
 
 		pair.appendChild(teamCard(left, decided ? 'won' : playing, waiting));
-		pair.appendChild(connector(Object.assign({}, m, { score_a: leftScore, score_b: rightScore })));
+		const names = team => (team || []).map(p => p.nickname).join(',');
+		const key = `${names(m.team_a)}|${names(m.team_b)}`;
+		pair.appendChild(connector(Object.assign({}, m, { score_a: leftScore, score_b: rightScore, key, swapped: winnerIsB })));
 		pair.appendChild(teamCard(right, decided ? 'lost' : playing, waiting));
 
 		return pair;
@@ -908,32 +1231,54 @@
 				its name and matches on the right. The final (the first of the rounds) framed in gold.
 			*/
 
-			const section = el('div', 'stage-section' + (r === t.rounds[0] ? ' final' : r === t.rounds[1] ? ' semifinal' : ''));
-			const head = el('div', 'stage-head');
-			const side = el('div', 'stage-side');
-			const body = el('div', 'stage-body');
+			const section = el('div', 'bracket-round-section' + (r === t.rounds[0] ? ' final' : r === t.rounds[1] ? ' semifinal' : '') + (r.state === 'PLAYING' ? ' playing' : ''));
+			const head = el('div', 'bracket-round-head');
+			const side = el('div', 'bracket-round-side');
+			const body = el('div', 'bracket-round-body');
 
-			head.appendChild(el('div', 'stage-label', r.name));
+			head.appendChild(el('div', 'bracket-round-label', r.name));
 
-			if (r.arena) {
-				head.appendChild(el('div', 'stage-arena', r.arena));
+			if (r.map) {
+				head.appendChild(el('div', 'bracket-round-map', r.map));
 
-				const miniature = el('img', 'stage-miniature');
+				const miniature = el('img', 'bracket-round-miniature');
 				miniature.alt = '';
-				miniature.src = `miniature/${encodeURIComponent(r.arena.split(' ')[0])}.png`;
+				miniature.src = `miniature/${encodeURIComponent(r.map.split(' ')[0])}.png`;
 				miniature.onerror = () => miniature.remove();
 				side.appendChild(miniature);
 			}
 
 			section.appendChild(head);
 
-			r.matches.forEach(m => {
-				const pair = matchPair(m);
+			/*
+				Its matches by what they need: the ones to join on top, then those being played, the decided below.
+			*/
+
+			const order = { waiting: 0, starting: 0, live: 2, done: 3, walkover: 4, empty: 5, coming: 6 };
+			const sorted = r.matches.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
+
+			let last_group;
+
+			sorted.forEach(m => {
+				// the round's one deadline - the same for each of its matches
+				const pair = matchPair(Object.assign({}, m, { deadline: r.deadline, grace_secs: r.grace_secs }));
+
+				const group = { waiting: 0, starting: 0, live: 1, done: 2, walkover: 2, empty: 2 }[m.status] ?? 3;
+
+				if (last_group !== undefined && group !== last_group) {
+					body.appendChild(el('div', 'group-gap'));
+				}
+
+				last_group = group;
 
 				if (pair) {
 					body.appendChild(pair);
 				}
 			});
+
+			if (last_group !== undefined && (r.byes || []).length) {
+				body.appendChild(el('div', 'group-gap'));
+			}
 
 			(r.byes || []).forEach(b => {
 				body.appendChild(alonePair(b, 'BYE'));
@@ -942,6 +1287,7 @@
 			section.appendChild(side);
 			section.appendChild(body);
 			stack.appendChild(section);
+			game_button_frame(section, 'bracket-round-frame');
 		});
 
 		root.appendChild(stack);
@@ -952,14 +1298,14 @@
 		The arena column as wide as the widest miniature - known once each is loaded.
 	*/
 
-	let arena_column = 0;
+	let map_column = 0;
 
 	function fit_miniatures() {
-		document.querySelectorAll('.stage-miniature').forEach(miniature => {
+		document.querySelectorAll('.bracket-round-miniature').forEach(miniature => {
 			const widen = () => {
-				if (miniature.naturalWidth > arena_column) {
-					arena_column = miniature.naturalWidth;
-					document.documentElement.style.setProperty('--arena-column', `${arena_column + 2}px`);
+				if (miniature.naturalWidth > map_column) {
+					map_column = miniature.naturalWidth;
+					document.documentElement.style.setProperty('--map-column', `${map_column + 2}px`);
 				}
 			};
 
@@ -983,11 +1329,11 @@
 	*/
 
 	function align_arena_names() {
-		document.querySelectorAll('.stage-section').forEach(section => {
-			const head = section.querySelector('.stage-head');
-			const label = section.querySelector('.stage-label');
-			const name = section.querySelector('.stage-arena');
-			const miniature = section.querySelector('.stage-miniature');
+		document.querySelectorAll('.bracket-round-section').forEach(section => {
+			const head = section.querySelector('.bracket-round-head');
+			const label = section.querySelector('.bracket-round-label');
+			const name = section.querySelector('.bracket-round-map');
+			const miniature = section.querySelector('.bracket-round-miniature');
 
 			if (!head || !name) {
 				return;
@@ -1023,21 +1369,57 @@
 	async function refresh() {
 		try {
 			const res = await fetch('tournament.json', { cache: 'no-store' });
-			const text = await res.text();
+			const t = JSON.parse(await res.text());
+
+			// the server's time changes every second - compared without it, the page redraws only when the rest does
+			// "now" is up to a second old (cached) and in whole seconds: the largest offset seen is the closest - the timers don't stutter
+			if (t.now) {
+				const offset = t.now - Date.now() / 1000;
+				server_clock_offset = server_clock_offset === null ? offset : Math.max(server_clock_offset, offset);
+				delete t.now;
+			}
+
+			const text = JSON.stringify(t);
 
 			if (text !== shown) {
 				shown = text;
-				render(JSON.parse(text));
+				render(t);
+				tick_timers();
 
 				if (document.getAnimations) {
 					document.getAnimations().forEach(a => { a.startTime = 0; });
 				}
+
+				pop_scores();
 			}
 		}
 		catch (e) {}
 
 		setTimeout(refresh, 1000);
 	}
+
+	/*
+		The time to enter, counted down every second - the JSON stays the same meanwhile, so nothing else redraws.
+		The advertised minutes first, then the grace as "last call".
+	*/
+
+	const clock = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+	// the server's clock minus the viewer's (tournament.json's now) - a viewer's wrong clock shows the right time
+	let server_clock_offset = null;
+
+	function tick_timers() {
+		document.querySelectorAll('.join-timer').forEach(t => {
+			const left = Math.max(0, Math.floor(Number(t.dataset.deadline) - (Date.now() / 1000 + server_clock_offset)));
+			const before_grace = Math.max(0, left - Number(t.dataset.grace));
+			// after the grace: no timer - the match plays with whoever came, the rest may still join
+			// the grace: the same clock, the chip red (last-call)
+			t.textContent = before_grace > 0 ? clock(before_grace) : left > 0 ? clock(left) : '';
+			t.parentElement.classList.toggle('last-call', before_grace === 0 && left > 0);
+		});
+	}
+
+	setInterval(tick_timers, 1000);
 
 	refresh();
 })();

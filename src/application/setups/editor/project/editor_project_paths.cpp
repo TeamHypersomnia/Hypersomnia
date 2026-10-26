@@ -13,31 +13,46 @@ std::string editor_project_paths::load_project_json() const {
 	return augs::file_to_string_crlf_to_lf(project_json);
 }
 
-augs::path_type server_choose_arena_file_by(const std::string& name) {
-	if (!sanitization::arena_name_safe(name)) {
-		return {};
-	}
-
+std::vector<augs::path_type> server_arena_folders(const bool with_custom_maps) {
 	/*
 		Prioritize EDITOR_PROJECTS_DIR over DOWNLOADED_ARENAS_DIR
 		in case that the mapper downloads their own map hosted on another server.
 		This will make spawning the online playtesting session work out of the box.
+		The custom maps last: never in place of an official, a project's or a downloaded one.
 	*/
 
-	const std::array<augs::path_type, 3> candidates = { 
+	auto folders = std::vector<augs::path_type> {
 		OFFICIAL_ARENAS_DIR,
 		EDITOR_PROJECTS_DIR,
 		DOWNLOADED_ARENAS_DIR
 	};
 
-	for (const auto& candidate_folder : candidates) {
-		const auto arena_path = candidate_folder / name;
+	if (with_custom_maps) {
+		folders.push_back(CUSTOM_ARENAS_DIR);
+	}
 
-		if (augs::exists(arena_path)) {
-			auto paths = editor_project_paths(arena_path);
+	return folders;
+}
 
-			return paths.project_json;
+augs::path_type server_arena_folder_of(const std::string& name, const bool with_custom_maps) {
+	if (!sanitization::arena_name_safe(name)) {
+		return {};
+	}
+
+	for (const auto& candidate_folder : ::server_arena_folders(with_custom_maps)) {
+		if (augs::exists(candidate_folder / name)) {
+			return candidate_folder;
 		}
+	}
+
+	return {};
+}
+
+augs::path_type server_choose_arena_file_by(const std::string& name, const bool with_custom_maps) {
+	if (const auto folder = ::server_arena_folder_of(name, with_custom_maps); !folder.empty()) {
+		auto paths = editor_project_paths(folder / name);
+
+		return paths.project_json;
 	}
 
 	return {};

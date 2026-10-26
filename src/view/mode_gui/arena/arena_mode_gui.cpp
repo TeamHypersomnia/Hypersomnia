@@ -276,16 +276,31 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 			choose_team.show = false;
 		}
 
-		if (mode_input.dynamic_vars.preassigned_factions) {
+		if (mode_input.dynamic_vars.preassigned_factions && !typed_mode.team_choice_allowed(mode_input)) {
 			choose_team.show = false;
 		}
 
 		if (prediction.play_unpredictable) {
-			const auto p = typed_mode.calc_participating_factions(mode_input);
+			const auto open_team_size = mode_input.dynamic_vars.open_team_size;
+
+			/*
+				A tournament's open match: Resistance and Metropolis, as many as the team size (arena_mode.cpp).
+			*/
+
+			const auto p = [&]() {
+				auto participating = typed_mode.calc_participating_factions(mode_input);
+
+				if (open_team_size > 0) {
+					participating.defusing = faction_type::METROPOLIS;
+					participating.bombing = faction_type::RESISTANCE;
+				}
+
+				return participating;
+			}();
 
 			using I = arena_choose_team_gui::input::faction_info;
 
-			const auto max_players_in_each = mode_input.rules.max_players_per_team;
+			const auto max_players_in_each = open_team_size > 0 ? open_team_size : mode_input.rules.max_players_per_team;
 
 			std::vector<I> factions;
 

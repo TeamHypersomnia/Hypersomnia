@@ -25,6 +25,7 @@ struct choose_arena_input {
 	editor_project* keep_loaded_project;
 	scene_entity_to_node_map* const entity_to_node;
 	uint32_t rng_offset = 0;
+	bool with_custom_maps = false;
 
 	bool is_for_playtesting() const {
 		return playtesting_context.has_value();
@@ -135,7 +136,7 @@ inline server_choose_arena_result choose_arena_server(
 
 	auto result = server_choose_arena_result();
 
-	if (const auto path = ::server_choose_arena_file_by(in.name); !path.empty()) {
+	if (const auto path = ::server_choose_arena_file_by(in.name, in.with_custom_maps); !path.empty()) {
 		LOG_NOFORMAT("Loading arena from: " + path.string());
 
 		::load_arena_from_path(in, path, std::addressof(result.loaded_arena_hash));

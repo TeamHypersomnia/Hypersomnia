@@ -39,9 +39,9 @@ struct arena_switching_settings {
 struct server_runtime_info {
 	// GEN INTROSPECTOR struct server_runtime_info
 	std::vector<arena_identifier> arenas_on_disk;
+	std::vector<arena_identifier> custom_arenas_on_disk;
 	std::string runtime_prefs;
-	bool can_close_round_1 = false;
-	bool can_timeout_absent_players = false;
+	bool can_close_bracket_round = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -127,6 +127,7 @@ struct server_vars {
 	std::vector<arena_and_mode_identifier> map_cycle;
 	game_mode_name_type map_cycle_game_mode_always;
 	bool map_cycle_random = true;
+	bool map_cycle_add_custom_maps = false;
 
 	std::optional<arena_playtesting_context> playtesting_context;
 

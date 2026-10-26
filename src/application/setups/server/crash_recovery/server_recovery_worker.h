@@ -55,7 +55,7 @@ public:
 		Blocks until every task currently queued has been processed AND the worker
 		is not mid-task. Used by callers that need to read a recovery file
 		synchronously after the worker may have queued writes/deletes for it
-		(e.g. tournament coordinator recycling the same port across stages).
+		(e.g. tournament coordinator recycling the same port across bracket rounds).
 	*/
 	void wait_until_idle();
 

@@ -44,23 +44,24 @@ struct tournament_config {
 
 	std::vector<std::vector<std::string>> teams;
 	std::vector<std::vector<std::string>> team_nicknames;
-	std::vector<std::string> arenas;
-	std::vector<std::string> additional_spectators;
+	std::vector<std::string> maps;
 
 	uint32_t open_players = 0;
 	uint32_t open_team_size = 1;
 	// END GEN INTROSPECTOR
 
 	/*
-		Join timeout: how long a match waits for all its players - then it's decided without them
-		(server_join_timeout.hpp). 0: it waits. Not part of the tournament's identity (compute_hash) -
-		changed on a restart, the tournament carries on.
+		How long a round waits for its players - then its matches still waiting are decided without them
+		(server_join_timeout.hpp). Round 1 from the tournament's start, the next rounds from the previous round's end
+		(the break). 0: it waits for an admin. Not part of the tournament's identity (compute_hash) - changed on
+		a restart, the tournament carries on.
 	*/
 
-	uint32_t join_timeout_secs = 10 * 60;
+	uint32_t bracket_round_1_max_wait_secs = 30 * 60;
+	uint32_t next_bracket_rounds_max_wait_secs = 15 * 60;
 
 	/*
-		How many others may watch each match at once (--tournament-spectators) - the teams out or waiting. Every
+		How many others may watch each match at once (--tournament-spectator-slots) - the teams out or waiting. Every
 		connection takes RAM and upload on the server playing it. The match's players always get in, the admins and
 		the spectator account have their own places. Not part of the tournament's identity.
 	*/
@@ -96,14 +97,14 @@ struct tournament_config {
 		How many rounds are left for this many teams - the byes fill them up to 2, 4, 8... once, in the next round.
 	*/
 
-	static uint32_t rounds_for_teams(uint32_t teams);
+	static uint32_t bracket_rounds_for_teams(uint32_t teams);
 
 	/*
 		The arena of a round with this many rounds left, this one included: counted from the end of the list,
 		so the last arena is always the final's - also when fewer came than the bracket was made for.
 	*/
 
-	const std::string& arena_for_rounds_left(uint32_t rounds_left) const;
+	const std::string& map_for_bracket_rounds_left(uint32_t bracket_rounds_left) const;
 
 	std::string compute_hash() const;
 };

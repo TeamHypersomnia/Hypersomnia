@@ -20,7 +20,7 @@ CONNECT=${1:-pl}
 BROKER_URL=${BROKER_URL:-http://127.0.0.1:13500}
 BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 WAIT=${2:-120}
-# MAP=<arena in hypersomnia/user/downloads/arenas>: the server plays it, the browser downloads it (EXT=<provider url>,
+# MAP=<arena in hypersomnia/user/downloads/maps>: the server plays it, the browser downloads it (EXT=<provider url>,
 # e.g. a slow one - the browser downloads only from an external provider);
 # TAB_AWAY=<s>: the game's tab left for another one that long, then back (screen_back.png); KILL_SERVER=1: see the end
 EXTRA=$(( ${TAB_AWAY:-0} + ${KILL_SERVER:+30} + 0 ))
@@ -72,8 +72,8 @@ user_pref("media.volume_scale", "0.0");
 EOF
 
 if [ -n "$MAP" ]; then
-	mkdir -p $T/server/user/downloads/arenas
-	cp -r $GAME/user/downloads/arenas/$MAP $T/server/user/downloads/arenas/
+	mkdir -p $T/server/user/downloads/maps
+	cp -r $GAME/user/downloads/maps/$MAP $T/server/user/downloads/maps/
 fi
 
 cd $GAME

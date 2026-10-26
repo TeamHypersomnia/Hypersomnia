@@ -9,13 +9,19 @@
 #include "application/setups/server/tournament/tournament_state.h"
 
 /*
+	On top of a round's time to enter: a player coming at the very minute still gets in.
+*/
+
+inline constexpr uint32_t tournament_round_grace_secs_v = 2 * 60;
+
+/*
 	Called by the runner as soon as a single match resolves. The coordinator's
 	implementation serializes concurrent invocations and persists the state
 	atomically before returning, so a crash after this call sees the result on
 	resume - no replay of finished matches.
 
 	An open match of the first round has its team_a/b_player_ids filled by the runner first - the coordinator
-	makes its teams of them. Closed by Close round 1: a walkover of team a (whoever waited), or with both
+	makes its teams of them. Closed by Close the round (or its time to enter): a walkover of team a (whoever waited), or with both
 	rosters empty, an empty server that's gone.
 */
 
@@ -61,27 +67,27 @@ struct tournament_coordinator_dependencies {
 	std::function<void(
 		std::vector<tournament_match>&,
 		tournament_commit_match_result_fn
-	)> run_stage;
+	)> run_bracket_round;
 
 	/*
 		Called once per port whose per-port crash-recovery file should be removed.
 		Used at two points:
 		  - Just after a fresh pair_teams() to wipe stale snapshots that any prior
 		    process left at the ports the coordinator is about to bind. Without this,
-		    a port the new tournament didn't use in stage 0 but does use in stage 1
+		    a port the new tournament didn't use in bracket round 0 but does use in bracket round 1
 		    (e.g. after byes inflate the field) would inherit an unrelated old match's
 		    snapshot and resume the wrong arena.
 		  - For matches a resumed state.json reports as already resolved, so their
-		    stale snapshot doesn't fight the next stage's bind on the same port.
-		On resume into a stage with unresolved matches, the wipe is intentionally
+		    stale snapshot doesn't fight the next bracket round's bind on the same port.
+		On resume into a bracket round with unresolved matches, the wipe is intentionally
 		NOT called - those per-port files ARE the mid-match resume payload.
 	*/
 	std::function<void(uint16_t port)> wipe_recovery_for_port;
 
 	/*
 		Optional - blocks until the per-port crash-recovery worker has drained its
-		queue. Called between stages so any in-flight delete from a just-finished
-		match is on disk before the next stage's server_setup constructor calls
+		queue. Called between bracket rounds so any in-flight delete from a just-finished
+		match is on disk before the next bracket round's server_setup constructor calls
 		load() on the same path. Without this, the new instance can read a stale
 		snapshot the worker hadn't gotten around to deleting and resume the wrong
 		match.
@@ -145,20 +151,28 @@ public:
 
 	bool claim_listed_nickname(tournament_match&, const account_id_string& placeholder, const account_id_string& account);
 
+	/*
+		When the current round's matches stop waiting for their players (seconds since the epoch, 0: never) -
+		round 1 from the tournament's start, the next ones from the previous round's end. A restart (a crash) gives
+		the round its whole time again, from the restart.
+	*/
+
+	int64_t current_bracket_round_deadline() const;
+
 private:
 	bool finished() const;
 	void initialize_state_if_fresh();
 	void pair_teams();
-	void run_current_stage();
+	void run_current_bracket_round();
 	void update_skills();
 	void eliminate_losers();
-	void advance_stage();
+	void advance_bracket_round();
 	void persist() const;
 	void declare_winner() const;
 	void cleanup() const;
 
 	std::string make_server_name_for(const tournament_match&) const;
-	void pair_open_first_round();
+	void pair_open_first_bracket_round();
 	std::optional<augs::path_type> find_completed_archive() const;
 
 	void commit_match_result(tournament_match& m, const tournament_match_outcome&);
@@ -166,6 +180,12 @@ private:
 
 	tournament_config cfg;
 	tournament_state state;
+
+	/*
+		When the current round started in this run - not saved: a restart counts the round's time from the restart.
+	*/
+
+	uint64_t bracket_round_started_at = 0;
 	augs::path_type state_path;
 	bool resumed = false;
 	tournament_coordinator_dependencies deps;

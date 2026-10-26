@@ -24,7 +24,7 @@ Build into `build/Debug-x64-clang-claude` first (`BIN` defaults to it), never `b
   (`run_map.sh` does).
 - **A copy named like an existing map is shadowed** by `content/arenas/<name>` (or the downloads): the edits seem to do
   nothing. Give it a new name, and the JSON inside must be named `<folder>.json` (`map_copy.py` does both).
-- Downloaded maps are in `hypersomnia/user/downloads/arenas/` (e.g. `fy_iceworld`); `run_map.sh` takes them by name.
+- Downloaded maps are in `hypersomnia/user/downloads/maps/` (e.g. `fy_iceworld`); `run_map.sh` takes them by name.
 - **Bots play only while a human client is connected** - with `CLIENT=none` they stand still. A spectator client is enough.
 - Bots get mixed levels by default (`bot_difficulty: PROGRESSIVE`) - for per-difficulty numbers pass
   `SERVER_EXTRA=', "bot_difficulty": "HARD"'` (a var of the "server" section, like "bots").

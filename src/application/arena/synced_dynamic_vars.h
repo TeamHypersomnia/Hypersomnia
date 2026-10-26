@@ -63,6 +63,7 @@ struct synced_dynamic_vars {
 	// GEN INTROSPECTOR struct synced_dynamic_vars
 	bool preassigned_factions = false;
 	bool all_assigned_present = false;
+	uint32_t open_team_size = 0;
 	bool all_authenticated = false;
 	bool friendly_fire = false;
 	bool freeze_time = true;

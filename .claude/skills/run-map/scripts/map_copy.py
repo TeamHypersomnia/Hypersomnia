@@ -7,7 +7,7 @@ Copies a map under a new name and edits its JSON - for testing a map with other 
 e.g. map_copy.py hypersomnia/content/arenas/de_cyberaqua $SCRATCH de_snipers \
         'game_modes.bomb_defusal.shop_allowed_firearms=["hunter","awka"]' 'game_modes.bomb_defusal.round_time=30'
 
-The new name matters: a map named like one in content/arenas or user/downloads/arenas is shadowed by it,
+The new name matters: a map named like one in content/arenas or user/downloads/maps is shadowed by it,
 and the JSON file inside has to be named after the folder. Prints the new map dir.
 """
 import json, os, shutil, sys

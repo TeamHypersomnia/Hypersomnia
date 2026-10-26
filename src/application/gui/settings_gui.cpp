@@ -5113,7 +5113,7 @@ void do_server_vars_section(
 
 			ImGui::Separator();
 			text_color("Cycle arena list", yellow);
-			text_disabled("Empty or one arena: the arena stays.");
+			text_disabled("Empty or one arena: the arena stays - unless the custom maps are added to it.");
 			ImGui::Separator();
 
 			std::optional<std::size_t> to_remove;

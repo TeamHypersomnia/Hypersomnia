@@ -270,31 +270,16 @@ void perform_rcon_gui(
 			case rcon_pane::MAINTENANCE:
 				{
 					/*
-						A tournament's open first round: whoever waits alone advances, the empty servers close.
+						A tournament's round: its matches still waiting for their players decided now, on all its servers -
+						as its time to enter running out would.
 					*/
 
-					if (runtime_info && runtime_info->can_close_round_1) {
-						if (do_command_button("Close round 1", RS::CLOSE_ROUND_1)) {
-							LOG("Requesting the tournament to close round 1");
+					if (runtime_info && runtime_info->can_close_bracket_round) {
+						if (do_command_button("Close the round", RS::CLOSE_ROUND)) {
+							LOG("Requesting the tournament to close the round");
 						}
 
-						text_disabled("Fewer players came? Whoever waits alone advances without playing,\nthe empty servers close. The matches being played go on.");
-						ImGui::Separator();
-					}
-
-					/*
-						A tournament's match still waiting for its players: decided now, as its join timeout would.
-					*/
-
-					if (runtime_info && runtime_info->can_timeout_absent_players) {
-						if (do_command_button("Timeout absent players", RS::TIMEOUT_ABSENT_PLAYERS)) {
-							LOG("Requesting the match to time out its absent players");
-						}
-
-						if (ImGui::IsItemHovered()) {
-							ImGui::SetTooltip("Decides this match now: the team with more players present wins - equal numbers play as they are - nobody here: both teams out.");
-						}
-
+						text_disabled("Not everyone came? The matches still waiting are decided now, on all servers:\na team with nobody there is out, both teams there play with whoever came.\nRound 1 open to anyone: whoever waits alone advances. The matches being played go on.");
 						ImGui::Separator();
 					}
 

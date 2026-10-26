@@ -9,6 +9,7 @@
 #include "augs/misc/randomization.h"
 #include "augs/misc/date_time.h"
 #include "augs/templates/algorithm_templates.h"
+#include "application/setups/server/tournament/match_server_name.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/json_readwrite.h"
@@ -77,11 +78,31 @@ tournament_coordinator::tournament_coordinator(
 		else {
 			state = *loaded;
 			resumed = true;
-			LOG("Tournament: resumed from %x at stage %x.", state_path.string(), state.stage_index);
+			LOG("Tournament: resumed from %x at round %x.", state_path.string(), state.bracket_round_index + 1);
 		}
 	}
 
 	state.config_hash = current_hash;
+	bracket_round_started_at = static_cast<uint64_t>(augs::date_time::secs_since_epoch());
+}
+
+int64_t tournament_coordinator::current_bracket_round_deadline() const {
+	std::scoped_lock lk(state_lk);
+
+	const auto timeout = state.bracket_round_index == 0 ? cfg.bracket_round_1_max_wait_secs : cfg.next_bracket_rounds_max_wait_secs;
+
+	if (timeout == 0) {
+		return 0;
+	}
+
+	const auto started = bracket_round_started_at;
+
+	/*
+		2 minutes of grace on top: a host who sets 15 minutes tells the players "15 minutes" - one coming at exactly
+		the 15th minute must still get in.
+	*/
+
+	return static_cast<int64_t>(started + timeout + tournament_round_grace_secs_v);
 }
 
 bool tournament_coordinator::may_watch_others(const std::function<bool(const std::string&)>& is_player) const {
@@ -98,7 +119,7 @@ bool tournament_coordinator::may_watch_others(const std::function<bool(const std
 			return true;
 		}
 
-		const bool undecided_match = std::any_of(state.current_stage_matches.begin(), state.current_stage_matches.end(), [&](const auto& m) {
+		const bool undecided_match = std::any_of(state.current_bracket_round_matches.begin(), state.current_bracket_round_matches.end(), [&](const auto& m) {
 			return !m.result.has_value() && !m.closed_empty && (m.team_a_index == t || m.team_b_index == t);
 		});
 
@@ -115,16 +136,6 @@ bool tournament_coordinator::claim_listed_nickname(
 ) {
 	std::scoped_lock lk(state_lk);
 
-	/*
-		An account in a team already: it would play for two teams.
-	*/
-
-	for (const auto& t : state.teams) {
-		if (std::find(t.player_ids.begin(), t.player_ids.end(), account) != t.player_ids.end()) {
-			return false;
-		}
-	}
-
 	auto claim_in = [&](std::vector<account_id_string>& ids) {
 		for (auto& id : ids) {
 			if (id == placeholder) {
@@ -132,6 +143,38 @@ bool tournament_coordinator::claim_listed_nickname(
 			}
 		}
 	};
+
+	/*
+		Each match's server keeps its own copy of the teams. The account that took this nickname on another server
+		(watching there): the same player - only this match's copy learns it. Another account in a team already:
+		it would play for two teams. The nickname taken by someone else: no longer anyone's to take.
+	*/
+
+	const auto nickname = ::account_id_to_nickname(placeholder);
+	bool placeholder_left = false;
+
+	for (const auto& t : state.teams) {
+		for (std::size_t i = 0; i < t.player_ids.size(); ++i) {
+			const bool same_nickname = i < t.nicknames.size() && t.nicknames[i] == nickname;
+
+			if (t.player_ids[i] == account) {
+				if (same_nickname) {
+					claim_in(m.team_a_player_ids);
+					claim_in(m.team_b_player_ids);
+					claim_in(m.spectator_player_ids);
+					return true;
+				}
+
+				return false;
+			}
+
+			placeholder_left = placeholder_left || t.player_ids[i] == placeholder;
+		}
+	}
+
+	if (!placeholder_left) {
+		return false;
+	}
 
 	claim_in(m.team_a_player_ids);
 	claim_in(m.team_b_player_ids);
@@ -156,7 +199,7 @@ bool tournament_coordinator::finished() const {
 		The open first round has no teams yet - they come from its matches.
 	*/
 
-	if (cfg.is_open() && state.stage_index == 0) {
+	if (cfg.is_open() && state.bracket_round_index == 0) {
 		return false;
 	}
 
@@ -206,7 +249,7 @@ void tournament_coordinator::initialize_state_if_fresh() {
 	}
 
 	if (cfg.is_open()) {
-		state.stage_index = 0;
+		state.bracket_round_index = 0;
 		state.initialized = true;
 
 		LOG("Tournament: an open first round for %x players, %x per team.", cfg.open_players, cfg.open_team_size);
@@ -265,7 +308,7 @@ void tournament_coordinator::initialize_state_if_fresh() {
 		state.teams.push_back(std::move(ts));
 	}
 
-	state.stage_index = 0;
+	state.bracket_round_index = 0;
 	state.initialized = true;
 
 	LOG("Tournament: initialized with %x teams.", N);
@@ -276,7 +319,7 @@ void tournament_coordinator::initialize_state_if_fresh() {
 	Whoever waits alone on one when round 1 is closed advances without playing.
 */
 
-void tournament_coordinator::pair_open_first_round() {
+void tournament_coordinator::pair_open_first_bracket_round() {
 	const auto bracket = next_pow2(std::max(2u, cfg.num_teams()));
 	const auto num_servers = bracket / 2;
 
@@ -288,21 +331,21 @@ void tournament_coordinator::pair_open_first_round() {
 		m.team_b_index = no_tournament_team_v;
 		m.open_team_size = cfg.open_team_size;
 		m.port = port_cursor++;
-		m.arena_and_mode = cfg.arena_for_rounds_left(tournament_config::rounds_for_teams(cfg.num_teams()));
+		m.map_and_mode = cfg.map_for_bracket_rounds_left(tournament_config::bracket_rounds_for_teams(cfg.num_teams()));
 		m.heartbeat_ranked_type = static_cast<uint8_t>(bracket == 2 ? ranked_server_type::TOURNAMENT_FINALS : ranked_server_type::TOURNAMENT_MID);
 		m.server_name = typesafe_sprintf("Match #%x (any pair)", i + 1);
 
-		state.current_stage_matches.push_back(std::move(m));
+		state.current_bracket_round_matches.push_back(std::move(m));
 	}
 
 	LOG("Tournament: round 1 open - %x servers, the first ones there make each match.", num_servers);
 }
 
 void tournament_coordinator::pair_teams() {
-	state.current_stage_matches.clear();
+	state.current_bracket_round_matches.clear();
 
-	if (cfg.is_open() && state.stage_index == 0) {
-		pair_open_first_round();
+	if (cfg.is_open() && state.bracket_round_index == 0) {
+		pair_open_first_bracket_round();
 		return;
 	}
 
@@ -334,14 +377,14 @@ void tournament_coordinator::pair_teams() {
 				playing.assign(alive.begin(), alive.end() - byes);
 			}
 
-			LOG("Tournament stage %x: %x byes (to %x).", state.stage_index, byes, cfg.byes_to_strongest ? "strongest" : "weakest");
+			LOG("Tournament round %x: %x byes (to %x).", state.bracket_round_index + 1, byes, cfg.byes_to_strongest ? "strongest" : "weakest");
 
 			/*
 				Apply synthetic match-time skills to bye teams immediately so subsequent
-				stages sort them consistently against real match-time winners.
+				bracket_rounds sort them consistently against real match-time winners.
 
 				Only relevant when skill_by_match_time = true; otherwise the source skill
-				is authoritative across all stages and bye teams retain their rank naturally.
+				is authoritative across all bracket_rounds and bye teams retain their rank naturally.
 			*/
 
 			if (cfg.skill_by_match_time) {
@@ -363,34 +406,34 @@ void tournament_coordinator::pair_teams() {
 		Counted from the end of the list: the final always on the last arena, whatever number came.
 	*/
 
-	const std::string& arena_and_mode_for_stage = cfg.arena_for_rounds_left(tournament_config::rounds_for_teams(static_cast<uint32_t>(alive.size())));
+	const std::string& map_and_mode_for_bracket_round = cfg.map_for_bracket_rounds_left(tournament_config::bracket_rounds_for_teams(static_cast<uint32_t>(alive.size())));
 
 	uint16_t port_cursor = deps.base_port;
 
 	const auto k = playing.size();
-	const auto alive_at_stage_start = alive.size();
-	const bool byes_this_stage = !getting_bye.empty();
+	const auto alive_at_bracket_round_start = alive.size();
+	const bool byes_this_bracket_round = !getting_bye.empty();
 
 	/*
-		Spectators allowed on every match in this stage: tournament players who
-		are NOT on any team playing this stage. Includes:
+		Spectators allowed on every match in this bracket round: tournament players who
+		are NOT on any team playing this bracket round. Includes:
 		  - eliminated teams,
-		  - bye recipients (stage 0).
-		Players assigned to another match this stage are NOT allowed to roam -
+		  - bye recipients (bracket round 0).
+		Players assigned to another match this bracket round are NOT allowed to roam -
 		they should be on their own server. assigned_teams kicks any client whose
 		id isn't in the roster, so this list does the gatekeeping.
 	*/
 
-	std::vector<bool> plays_this_stage(state.teams.size(), false);
+	std::vector<bool> plays_this_bracket_round(state.teams.size(), false);
 
 	for (const auto idx : playing) {
-		plays_this_stage[idx] = true;
+		plays_this_bracket_round[idx] = true;
 	}
 
 	std::vector<std::string> shared_spectator_ids;
 
 	for (uint32_t i = 0; i < state.teams.size(); ++i) {
-		if (plays_this_stage[i]) {
+		if (plays_this_bracket_round[i]) {
 			continue;
 		}
 
@@ -399,31 +442,20 @@ void tournament_coordinator::pair_teams() {
 		}
 	}
 
-	/*
-		Players listed in additional_spectators don't take part in the tournament
-		but are whitelisted as spectators on every match in every stage - useful
-		for casters, observers and admins. They go into every match's roster as
-		SPECTATOR; assigned_teams would otherwise kick them as "wrong match".
-	*/
-
-	for (const auto& pid : cfg.additional_spectators) {
-		shared_spectator_ids.push_back(::normalize_account_id(pid));
-	}
-
 	const uint8_t heartbeat_value = [&]() -> uint8_t {
 		const auto as_u8 = [](const ranked_server_type t) {
 			return static_cast<uint8_t>(t);
 		};
 
-		if (alive_at_stage_start == 2) {
+		if (alive_at_bracket_round_start == 2) {
 			return as_u8(ranked_server_type::TOURNAMENT_FINALS);
 		}
 
-		if (alive_at_stage_start == 4) {
+		if (alive_at_bracket_round_start == 4) {
 			return as_u8(ranked_server_type::TOURNAMENT_SEMIFINALS);
 		}
 
-		if (state.stage_index == 0 && byes_this_stage) {
+		if (state.bracket_round_index == 0 && byes_this_bracket_round) {
 			return as_u8(ranked_server_type::TOURNAMENT_BYES);
 		}
 
@@ -450,11 +482,11 @@ void tournament_coordinator::pair_teams() {
 		m.team_b_player_ids = state.teams[b].player_ids;
 		m.spectator_player_ids = shared_spectator_ids;
 		m.port = port_cursor++;
-		m.arena_and_mode = arena_and_mode_for_stage;
+		m.map_and_mode = map_and_mode_for_bracket_round;
 		m.heartbeat_ranked_type = heartbeat_value;
 		m.server_name = make_server_name_for(m);
 
-		state.current_stage_matches.push_back(std::move(m));
+		state.current_bracket_round_matches.push_back(std::move(m));
 	}
 }
 
@@ -463,23 +495,18 @@ std::string tournament_coordinator::make_server_name_for(const tournament_match&
 		By the nicknames, if known - a team from an open first round is account ids otherwise.
 	*/
 
-	auto stringify = [](const tournament_team_state& t) {
-		std::string s = "[";
+	auto names_of = [](const tournament_team_state& t) {
+		std::vector<std::string> names;
 
 		for (size_t i = 0; i < t.player_ids.size(); ++i) {
-			if (i > 0) {
-				s += ", ";
-			}
-
 			const bool has_nickname = i < t.nicknames.size() && !t.nicknames[i].empty();
-			s += has_nickname ? t.nicknames[i] : t.player_ids[i];
+			names.push_back(has_nickname ? t.nicknames[i] : t.player_ids[i]);
 		}
 
-		s += "]";
-		return s;
+		return names;
 	};
 
-	return stringify(state.teams[m.team_a_index]) + " vs " + stringify(state.teams[m.team_b_index]);
+	return ::match_server_name(names_of(state.teams[m.team_a_index]), names_of(state.teams[m.team_b_index]));
 }
 
 void tournament_coordinator::commit_match_result(tournament_match& m, const tournament_match_outcome& outcome) {
@@ -490,7 +517,7 @@ void tournament_coordinator::commit_match_result(tournament_match& m, const tour
 	}
 
 	/*
-		Nobody came to a match of known teams before the join timeout: both are out (eliminate_losers).
+		Nobody came to a match of known teams before the round's timeout: both are out (eliminate_losers).
 	*/
 
 	if (outcome.nobody_came && m.team_a_index != no_tournament_team_v) {
@@ -563,18 +590,18 @@ void tournament_coordinator::commit_match_result(tournament_match& m, const tour
 	}
 }
 
-void tournament_coordinator::run_current_stage() {
-	if (state.current_stage_matches.empty()) {
+void tournament_coordinator::run_current_bracket_round() {
+	if (state.current_bracket_round_matches.empty()) {
 		return;
 	}
 
-	LOG("Tournament stage %x: running %x matches.", state.stage_index, state.current_stage_matches.size());
+	LOG("Tournament round %x: running %x matches.", state.bracket_round_index + 1, state.current_bracket_round_matches.size());
 
 	auto commit = [this](tournament_match& m, const tournament_match_outcome& outcome) {
 		commit_match_result(m, outcome);
 	};
 
-	deps.run_stage(state.current_stage_matches, commit);
+	deps.run_bracket_round(state.current_bracket_round_matches, commit);
 }
 
 void tournament_coordinator::update_skills() {
@@ -582,7 +609,7 @@ void tournament_coordinator::update_skills() {
 		return;
 	}
 
-	for (const auto& m : state.current_stage_matches) {
+	for (const auto& m : state.current_bracket_round_matches) {
 		if (!m.result.has_value()) {
 			continue;
 		}
@@ -596,7 +623,7 @@ void tournament_coordinator::update_skills() {
 }
 
 void tournament_coordinator::eliminate_losers() {
-	for (const auto& m : state.current_stage_matches) {
+	for (const auto& m : state.current_bracket_round_matches) {
 		if (m.closed_empty) {
 			/*
 				A match of known teams nobody came to: both out. An open one nobody came to had no teams.
@@ -630,7 +657,7 @@ void tournament_coordinator::eliminate_losers() {
 			*/
 
 			tournament_match_history_entry h;
-			h.played_in_stage = state.stage_index;
+			h.played_in_bracket_round = state.bracket_round_index;
 			h.winner_player_ids = state.teams[r.winner_team_index].player_ids;
 			h.walkover = true;
 
@@ -643,7 +670,7 @@ void tournament_coordinator::eliminate_losers() {
 		const bool winner_is_a = r.winner_team_index == m.team_a_index;
 
 		tournament_match_history_entry h;
-		h.played_in_stage = state.stage_index;
+		h.played_in_bracket_round = state.bracket_round_index;
 		h.winner_player_ids = state.teams[r.winner_team_index].player_ids;
 		h.loser_player_ids = state.teams[loser].player_ids;
 		h.duration_secs = r.duration_secs;
@@ -651,7 +678,7 @@ void tournament_coordinator::eliminate_losers() {
 		h.loser_score = winner_is_a ? r.team_b_score : r.team_a_score;
 
 		/*
-			The join timeout's walkover of known teams: the other one didn't come.
+			The round timeout's walkover of known teams: the other one didn't come.
 		*/
 
 		h.walkover = r.walkover;
@@ -660,9 +687,14 @@ void tournament_coordinator::eliminate_losers() {
 	}
 }
 
-void tournament_coordinator::advance_stage() {
-	state.stage_index += 1;
-	state.current_stage_matches.clear();
+/*
+	The next round's timeout (the break) counts from here - the previous round decided.
+*/
+
+void tournament_coordinator::advance_bracket_round() {
+	state.bracket_round_index += 1;
+	state.current_bracket_round_matches.clear();
+	bracket_round_started_at = static_cast<uint64_t>(augs::date_time::secs_since_epoch());
 }
 
 void tournament_coordinator::persist() const {
@@ -771,14 +803,14 @@ bool tournament_coordinator::run() {
 		}
 
 		/*
-			On a fresh stage we compute pairings, persist, and wipe every port the
-			new stage will bind. That last step matters when stage N+1 has more
-			matches than stage N (e.g. when stage 0 byes shrink the bracket to a
+			On a fresh bracket round we compute pairings, persist, and wipe every port the
+			new bracket round will bind. That last step matters when bracket round N+1 has more
+			matches than bracket round N (e.g. when bracket round 0 byes shrink the bracket to a
 			pow2): the extra ports may carry an unrelated old snapshot from a prior
 			tournament/run, and a server_setup constructed on them would otherwise
 			resume that snapshot's arena.
 
-			On a recovery (state file loaded with current_stage_matches already
+			On a recovery (state file loaded with current_bracket_round_matches already
 			populated) we skip pair_teams so resume reuses the exact pairings,
 			ports and rosters that were live before the crash. We only wipe ports
 			of already-resolved matches in that case - per-port recovery files for
@@ -786,25 +818,25 @@ bool tournament_coordinator::run() {
 			pick up.
 		*/
 
-		if (state.current_stage_matches.empty()) {
+		if (state.current_bracket_round_matches.empty()) {
 			pair_teams();
 			persist();
 
-			for (const auto& m : state.current_stage_matches) {
+			for (const auto& m : state.current_bracket_round_matches) {
 				wipe_port(m.port);
 			}
 		}
 		else {
-			LOG("Tournament: resuming stage %x with %x ongoing matches.", state.stage_index, state.current_stage_matches.size());
+			LOG("Tournament: resuming round %x with %x ongoing matches.", state.bracket_round_index + 1, state.current_bracket_round_matches.size());
 
-			for (const auto& m : state.current_stage_matches) {
+			for (const auto& m : state.current_bracket_round_matches) {
 				if (m.result.has_value()) {
 					wipe_port(m.port);
 				}
 			}
 		}
 
-		run_current_stage();
+		run_current_bracket_round();
 
 		if (deps.should_interrupt && deps.should_interrupt()) {
 			persist();
@@ -812,20 +844,20 @@ bool tournament_coordinator::run() {
 		}
 
 		/*
-			A match that finished the stage without resolving means the server worker
+			A match that finished the bracket round without resolving means the server worker
 			exited before posting a match summary - a real bug somewhere downstream
 			(e.g. yojimbo bind/socket issue we didn't catch, internal assertion).
 			Don't silently advance: that would let both teams survive into the next
-			stage and corrupt the bracket. Persist and bail loudly; operator can
+			bracket round and corrupt the bracket. Persist and bail loudly; operator can
 			edit tournament.ongoing.json to force a resolution and resume.
 		*/
 
-		for (const auto& m : state.current_stage_matches) {
+		for (const auto& m : state.current_bracket_round_matches) {
 			if (!m.result.has_value() && !m.closed_empty) {
 				LOG(
-					"Tournament: stage %x match on port %x (%x) exited without resolving. "
+					"Tournament: round %x match on port %x (%x) exited without resolving. "
 					"Aborting tournament; edit %x to force a resolution before resuming.",
-					state.stage_index, m.port, m.server_name, state_path.string()
+					state.bracket_round_index + 1, m.port, m.server_name, state_path.string()
 				);
 
 				persist();
@@ -836,12 +868,12 @@ bool tournament_coordinator::run() {
 
 		update_skills();
 		eliminate_losers();
-		advance_stage();
+		advance_bracket_round();
 		persist();
 
 		/*
 			Block until the per-port recovery worker has drained any pending writes
-			or deletes from this stage. Without this, the next stage's server_setup
+			or deletes from this bracket round. Without this, the next bracket round's server_setup
 			on the same port could call load() before the worker's queued delete
 			runs and resume the just-finished match's snapshot - wrong arena, wrong
 			teams.
@@ -864,16 +896,16 @@ bool tournament_coordinator::run() {
 
 namespace {
 	/*
-		An open tournament played by a script: every stage's matches resolved as `play` says - a stage's
+		An open tournament played by a script: every bracket round's matches resolved as `play` says - a bracket round's
 		matches seen by the test as they were run.
 	*/
 
 	struct scripted_tournament {
-		std::vector<std::vector<tournament_match>> stages;
+		std::vector<std::vector<tournament_match>> bracket_rounds;
 
 		void run(
 			tournament_config cfg,
-			std::function<void(std::size_t stage, std::vector<tournament_match>&, tournament_commit_match_result_fn)> play
+			std::function<void(std::size_t bracket_round, std::vector<tournament_match>&, tournament_commit_match_result_fn)> play
 		) {
 			/*
 				Unit tests run at every start, servers' too: the coordinator's lines muted - never read as a tournament.
@@ -894,9 +926,9 @@ namespace {
 			tournament_coordinator_dependencies deps;
 			deps.base_port = 30000;
 
-			deps.run_stage = [&](std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
-				play(stages.size(), matches, commit);
-				stages.push_back(matches);
+			deps.run_bracket_round = [&](std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+				play(bracket_rounds.size(), matches, commit);
+				bracket_rounds.push_back(matches);
 			};
 
 			auto coordinator = tournament_coordinator(std::move(cfg), dir / "tournament.ongoing.json", std::move(deps));
@@ -923,7 +955,7 @@ namespace {
 	tournament_config open_config(const uint32_t players) {
 		auto cfg = tournament_config();
 		cfg.open_players = players;
-		cfg.arenas = { "a1", "a2", "a3" };
+		cfg.maps = { "a1", "a2", "a3" };
 		return cfg;
 	}
 
@@ -939,8 +971,8 @@ namespace {
 TEST_CASE("Tournament: a walkover doesn't take the next round's bye") {
 	auto t = scripted_tournament();
 
-	t.run(open_config(8), [](const std::size_t stage, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
-		if (stage == 0) {
+	t.run(open_config(8), [](const std::size_t bracket_round, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		if (bracket_round == 0) {
 			REQUIRE(matches.size() == 4);
 
 			commit(matches[0], open_match({ "A" }, { "B" }, 100));
@@ -953,17 +985,17 @@ TEST_CASE("Tournament: a walkover doesn't take the next round's bye") {
 		team_a_wins(matches, commit);
 	});
 
-	REQUIRE(t.stages.size() == 3);
+	REQUIRE(t.bracket_rounds.size() == 3);
 
 	/*
 		Round 2: A, C and D - the bye to D, the fastest winner; C, who waited alone, plays.
 	*/
 
-	const auto& round_2 = t.stages[1];
-	REQUIRE(round_2.size() == 1);
+	const auto& bracket_round_2 = t.bracket_rounds[1];
+	REQUIRE(bracket_round_2.size() == 1);
 
-	auto ids = round_2[0].team_a_player_ids;
-	ids.insert(ids.end(), round_2[0].team_b_player_ids.begin(), round_2[0].team_b_player_ids.end());
+	auto ids = bracket_round_2[0].team_a_player_ids;
+	ids.insert(ids.end(), bracket_round_2[0].team_b_player_ids.begin(), bracket_round_2[0].team_b_player_ids.end());
 	std::sort(ids.begin(), ids.end());
 
 	REQUIRE(ids == std::vector<account_id_string> { "A", "C" });
@@ -972,9 +1004,9 @@ TEST_CASE("Tournament: a walkover doesn't take the next round's bye") {
 TEST_CASE("Tournament: the final on the last arena when fewer came") {
 	auto t = scripted_tournament();
 
-	t.run(open_config(8), [](const std::size_t stage, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
-		if (stage == 0) {
-			REQUIRE(matches[0].arena_and_mode == "a1");
+	t.run(open_config(8), [](const std::size_t bracket_round, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		if (bracket_round == 0) {
+			REQUIRE(matches[0].map_and_mode == "a1");
 
 			commit(matches[0], open_match({ "A" }, { "B" }, 100));
 			commit(matches[1], open_match({ "C" }, {}, 0));
@@ -990,20 +1022,46 @@ TEST_CASE("Tournament: the final on the last arena when fewer came") {
 		3 came of 8: A and C left after round 1 - round 2 is the final, on the arena chosen for the final.
 	*/
 
-	REQUIRE(t.stages.size() == 2);
-	REQUIRE(t.stages[1].size() == 1);
-	REQUIRE(t.stages[1][0].arena_and_mode == "a3");
+	REQUIRE(t.bracket_rounds.size() == 2);
+	REQUIRE(t.bracket_rounds[1].size() == 1);
+	REQUIRE(t.bracket_rounds[1][0].map_and_mode == "a3");
 }
 
-TEST_CASE("Tournament: join timeout - nobody came, both teams are out") {
+TEST_CASE("Tournament: match server names fit the server list") {
+	REQUIRE(::match_server_name({ "alice", "bob" }, { "carol", "dave" }) == "[alice, bob] vs [carol, dave]");
+
+	const auto long_teams = ::match_server_name(
+		{ "aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc", "dddddddddd" },
+		{ "eeeeeeeeee", "ffffffffff", "gggggggggg", "hhhhhhhhhh" }
+	);
+
+	REQUIRE(long_teams == "[aaaaaaaaaa +3] vs [eeeeeeeeee +3]");
+
+	const auto long_nicknames = ::match_server_name({ std::string(40, 'x'), "y" }, { std::string(40, 'z') });
+	REQUIRE(long_nicknames.size() <= max_server_name_length_v);
+
+	/*
+		A two-byte letter at the cut: dropped whole.
+	*/
+
+	const auto polish = ::match_server_name({ std::string(25, 'a') + "\xC5\x82" + std::string(20, 'b'), "c" }, { std::string(40, 'd') });
+	REQUIRE(polish.size() <= max_server_name_length_v);
+	REQUIRE(polish.find("\xC5[") == std::string::npos);
+
+	for (std::size_t i = 0; i < polish.size(); ++i) {
+		REQUIRE(static_cast<unsigned char>(polish[i]) != 0xC5);
+	}
+}
+
+TEST_CASE("Tournament: round timeout - nobody came, both teams are out") {
 	auto cfg = tournament_config();
 	cfg.teams = { { "A" }, { "B" }, { "C" }, { "D" } };
-	cfg.arenas = { "a1", "a2" };
+	cfg.maps = { "a1", "a2" };
 
 	auto t = scripted_tournament();
 
-	t.run(cfg, [](const std::size_t stage, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
-		if (stage == 0) {
+	t.run(cfg, [](const std::size_t bracket_round, std::vector<tournament_match>& matches, tournament_commit_match_result_fn commit) {
+		if (bracket_round == 0) {
 			REQUIRE(matches.size() == 2);
 
 			auto nobody = tournament_match_outcome();
@@ -1025,13 +1083,13 @@ TEST_CASE("Tournament: join timeout - nobody came, both teams are out") {
 		One match nobody came to, the other one's team that came wins: it's the only one left - no final to play.
 	*/
 
-	REQUIRE(t.stages.size() == 1);
+	REQUIRE(t.bracket_rounds.size() == 1);
 }
 
-TEST_CASE("Tournament: join timeout - nobody came to the final, no winner") {
+TEST_CASE("Tournament: round timeout - nobody came to the final, no winner") {
 	auto cfg = tournament_config();
 	cfg.teams = { { "A" }, { "B" } };
-	cfg.arenas = { "a1" };
+	cfg.maps = { "a1" };
 
 	auto t = scripted_tournament();
 
@@ -1042,24 +1100,24 @@ TEST_CASE("Tournament: join timeout - nobody came to the final, no winner") {
 		commit(matches[0], nobody);
 	});
 
-	REQUIRE(t.stages.size() == 1);
+	REQUIRE(t.bracket_rounds.size() == 1);
 }
 
 TEST_CASE("Tournament: rounds and arenas counted from the end") {
 	auto cfg = open_config(8);
 
-	REQUIRE(tournament_config::rounds_for_teams(2) == 1);
-	REQUIRE(tournament_config::rounds_for_teams(3) == 2);
-	REQUIRE(tournament_config::rounds_for_teams(4) == 2);
-	REQUIRE(tournament_config::rounds_for_teams(5) == 3);
-	REQUIRE(tournament_config::rounds_for_teams(8) == 3);
+	REQUIRE(tournament_config::bracket_rounds_for_teams(2) == 1);
+	REQUIRE(tournament_config::bracket_rounds_for_teams(3) == 2);
+	REQUIRE(tournament_config::bracket_rounds_for_teams(4) == 2);
+	REQUIRE(tournament_config::bracket_rounds_for_teams(5) == 3);
+	REQUIRE(tournament_config::bracket_rounds_for_teams(8) == 3);
 
-	REQUIRE(cfg.arena_for_rounds_left(3) == "a1");
-	REQUIRE(cfg.arena_for_rounds_left(1) == "a3");
-	REQUIRE(cfg.arena_for_rounds_left(5) == "a1");
+	REQUIRE(cfg.map_for_bracket_rounds_left(3) == "a1");
+	REQUIRE(cfg.map_for_bracket_rounds_left(1) == "a3");
+	REQUIRE(cfg.map_for_bracket_rounds_left(5) == "a1");
 
-	cfg.arenas = { "only" };
-	REQUIRE(cfg.arena_for_rounds_left(4) == "only");
+	cfg.maps = { "only" };
+	REQUIRE(cfg.map_for_bracket_rounds_left(4) == "only");
 }
 #endif
 
