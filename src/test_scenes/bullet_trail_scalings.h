@@ -55,7 +55,7 @@ inline const auto& get_bullet_trail_scalings() {
 		*/
 
 		{ E::STEEL_PROJECTILE_TRACE, { R::STEEL_ROUND, R::LEWSII_ROUND }, 0.5f },
-		{ E::DEAGLE_ROUND_TRACE, { R::DEAGLE_ROUND }, 1.04f, 0.454f/5, 1.03f, 0.308f, 1.04f },
+		{ E::DEAGLE_ROUND_TRACE, { R::DEAGLE_ROUND }, 0.54f, 0.454f/5, 1.03f, 0.308f, 1.04f },
 		{ E::ORANGE_ROUND_TRACE, { R::ORANGE_ROUND }, 0.7f, 0.8f },
 		{ E::AO44_ROUND_TRACE, { R::AO44_ROUND }, 0.56f, 0.56f },
 		{ E::KEK9_ROUND_TRACE, { R::KEK9_ROUND }, 0.8f },
