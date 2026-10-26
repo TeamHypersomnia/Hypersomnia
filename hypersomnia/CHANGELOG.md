@@ -32,6 +32,8 @@
 
 ### Fixed
 
+- **Items no longer fall out of the backpack between rounds.**
+	- With a full backpack, part of your grenades or shotgun shells landed somewhere on the map.
 - **Metropolis bots** correctly go to the bombsite under attack (broken in `4.2.0`).
 - **Bots on de_hotline** no longer walk into walls or stare at them.
 	- Every bombsite gets its correct waypoints.
