@@ -55,15 +55,21 @@ alternative with separate steam row
 <br undefined>
 -->
 
-Only 29 MB!
-
-The game will start with an **interactive Tutorial!**
-
-Run the [<img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" width=25 hspace=8 vspace=20><b>Server Docker</b></a>](./README_SERVER.md#docker-setup)  
-Or download <a href="https://hypersomnia.io/builds/latest/Hypersomnia-Headless.AppImage"> <img src="https://hypersomnia.io/assets/images/linux_icon.svg" width=30 hspace=5 vspace=15><b>Server AppImage</b></a>  
-<a href="https://hypersomnia.io/generator"><b>Interactive Server Setup!</b></a>
-
 <sup>*All archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.io/builds/latest/)*</sup>
+
+Only ~30 MB!
+
+The game will start with a **Tutorial!**
+
+### Host your own server
+
+**[Interactive Server Setup](https://hypersomnia.io/generator)**
+
+Complete server configuration in a few clicks.  
+*Never read the docs again!*  
+
+<a href="https://hypersomnia.io/generator#server-compose"><img src="https://www.docker.com/app/uploads/2022/03/Moby-logo.png" width=20 hspace=5><b>Docker</b></a> ·
+<a href="https://hypersomnia.io/generator#server-appimage"><img src="https://hypersomnia.io/assets/images/linux_icon.svg" width=20 hspace=5><b>AppImage</b></a>
 
 # Press
 
