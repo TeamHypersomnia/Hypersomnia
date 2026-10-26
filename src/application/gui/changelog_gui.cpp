@@ -133,6 +133,13 @@ static rgba get_heading_color(const std::string& heading) {
 	return white;
 }
 
+/*
+	A link pressed: the click opens the link only, never also folds the row it's in (draw_expandable).
+	Kept until the button is up again - the link opens on the press, the row folds on the release.
+*/
+
+static bool link_clicked = false;
+
 static void draw_token(const std::string& token, const augs::markdown_span& span, const rgba base_col) {
 	using namespace augs::imgui;
 
@@ -164,6 +171,7 @@ static void draw_token(const std::string& token, const augs::markdown_span& span
 			}
 
 			if (ImGui::IsItemClicked()) {
+				link_clicked = true;
 				augs::open_url(span.url);
 			}
 #else
@@ -412,6 +420,11 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 		draw_list->ChannelsSetCurrent(1);
 
 		ImGui::SetCursorPosY(row_start.y + row_pad);
+
+		if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+			link_clicked = false;
+		}
+
 		draw_marked_line(line, open ? marker_type::MINUS : marker_type::PLUS, text_col);
 
 		const auto row_h = ImGui::GetCursorPosY() + row_pad - row_start.y;
@@ -433,7 +446,7 @@ static void draw_entry(const changelog_entry& entry, changelog_view_state& state
 
 		draw_list->ChannelsMerge();
 
-		if (clicked) {
+		if (clicked && !link_clicked) {
 			if (open) {
 				state.expanded_items.erase(key);
 			}
