@@ -22,8 +22,13 @@
 	| Weapon | Before | After |
 	|---|---|---|
 	| Awka | 10500 | **9500** |
-	| Hunter | 9500 | **8500-9500** |
+	| Hunter | 9500 | **8500** |
 	| BullDup 2000 | 8500 | **7000** |
+- **Balance (nerf):** Hunter costs more.
+
+	| Weapon | Before | After |
+	|---|---|---|
+	| Hunter | $2400 | **$2700** |
 
 ### Fixed
 

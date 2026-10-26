@@ -4558,7 +4558,7 @@ namespace test_flavours {
 			gun_def.bot_aim_radius_to_shoot = 8.0f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {8500.f, 9500.f};
+			gun_def.muzzle_velocity = {8500.f, 8500.f};
 			gun_def.shot_cooldown_ms = 400.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HUNTER_CHAMBERING);
@@ -4591,7 +4591,7 @@ namespace test_flavours {
 			only_allow_mag(meta, test_container_items::HUNTER_MAGAZINE);
 			set_density_from_sprint_speed(meta, 900.f);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SNIPER_DRAW);
-			meta.get<invariants::item>().standard_price = 2400;
+			meta.get<invariants::item>().standard_price = 2700;
 			set_chambering_duration_ms(meta, 590.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
