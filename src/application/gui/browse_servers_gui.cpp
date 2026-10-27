@@ -507,6 +507,10 @@ static std::string favorite_address_of(const server_list_entry& s) {
 }
 
 static std::string favorite_name_of(const server_list_entry& s) {
+	if (!s.manual_favorite_name.empty()) {
+		return s.manual_favorite_name;
+	}
+
 	return std::string(s.heartbeat.server_name);
 }
 
@@ -954,15 +958,16 @@ void browse_servers_gui_state::show_server_list(
 		*/
 
 		/*
-			A favorite added by hand (unlisted) is that address and key - see favorite_servers.h.
+			A favorite added by hand is that address and key - see favorite_servers.h. On the list too, when the list
+			has that key at that address.
 		*/
 
 		const auto key = s.get_public_key();
-		const bool manual_favorite = s.favorite_only && s.unlisted;
+		const bool manual_favorite = s.is_manual_favorite();
 
 		const bool is_favorite = key.has_value() && (
 			manual_favorite ?
-			in.favorites.contains_manual(*key, s.favorite_address) :
+			in.favorites.contains_manual(*key, s.get_manual_favorite_address()) :
 			in.favorites.contains(*key, s.get_instance_label())
 		);
 		bool star_hovered = false;
@@ -1000,8 +1005,8 @@ void browse_servers_gui_state::show_server_list(
 			if (star_hovered && ImGui::IsMouseClicked(0)) {
 				if (is_favorite) {
 					if (manual_favorite) {
-						forget_unlisted = std::make_pair(*key, s.favorite_address);
-						forget_unlisted_name = std::string(s.heartbeat.server_name);
+						forget_unlisted = std::make_pair(*key, s.get_manual_favorite_address());
+						forget_unlisted_name = ::favorite_name_of(s);
 					}
 					else {
 						in.favorites.remove(*key, s.get_instance_label());
@@ -1103,6 +1108,14 @@ void browse_servers_gui_state::show_server_list(
 			auto col_scope = scoped_style_color(ImGuiCol_Text, color);
 
 			auto displayed_name = d.server_name;
+
+			/*
+				A favorite added by hand keeps the name the player gave it - on the list too.
+			*/
+
+			if (!s.manual_favorite_name.empty()) {
+				displayed_name = s.manual_favorite_name;
+			}
 
 			if (streamer_mode && s.is_community_server()) {
 				displayed_name = "Community server";
@@ -1938,7 +1951,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			auto out = std::vector<server_list_entry*>();
 
 			for (const auto e : list) {
-				if (const auto key = e->get_public_key(); key.has_value() && in.favorites.contains(*key, e->get_instance_label())) {
+				const auto key = e->get_public_key();
+
+				if (key.has_value() && (e->is_manual_favorite() || in.favorites.contains(*key, e->get_instance_label()))) {
 					out.push_back(e);
 				}
 			}
@@ -2253,9 +2268,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 #if !PLATFORM_WEB
 	if (std::exchange(server_details.forget_requested, false)) {
-		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.unlisted) {
-			forget_unlisted = std::make_pair(*key, selected_server.favorite_address);
-			forget_unlisted_name = std::string(selected_server.heartbeat.server_name);
+		if (const auto key = selected_server.get_public_key(); key.has_value() && selected_server.is_manual_favorite()) {
+			forget_unlisted = std::make_pair(*key, selected_server.get_manual_favorite_address());
+			forget_unlisted_name = ::favorite_name_of(selected_server);
 		}
 	}
 
@@ -2940,20 +2955,20 @@ bool server_details_gui_state::perform(
 
 	if (favorites != nullptr && favorites_kept) {
 		if (const auto key = entry.get_public_key()) {
-			const bool manual = entry.favorite_only && entry.unlisted;
+			const bool manual = entry.is_manual_favorite();
 
 			const bool is_favorite =
 				manual ?
-				favorites->contains_manual(*key, entry.favorite_address) :
+				favorites->contains_manual(*key, entry.get_manual_favorite_address()) :
 				favorites->contains(*key, entry.get_instance_label())
 			;
 
 			if (is_favorite) {
 				/*
-					Only a favorite added by hand is edited - the list's ones are as the list has them.
+					Only a favorite added by hand and not on the list is edited - the list's ones are as the list has them.
 				*/
 
-				if (manual) {
+				if (manual && entry.favorite_only) {
 					if (ImGui::Button("Edit")) {
 						edit_requested = true;
 					}
@@ -3242,19 +3257,94 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 
 	auto now_official = std::vector<std::pair<favorite_server, bool>>();
 
+	auto& shown_list = displayed_list();
+
+	for (auto& s : shown_list) {
+		s.manual_favorite_address.clear();
+		s.manual_favorite_name.clear();
+	}
+
+#if BUILD_NATIVE_SOCKETS
+	/*
+		Where a favorite's address points - a domain is resolved first, once. Nothing yet while it resolves.
+	*/
+
+	struct favorite_resolution {
+		std::optional<netcode_address_t> address;
+		bool failed = false;
+	};
+
+	auto resolve = [&](const std::string& address) {
+		auto host = client_connect_string(address);
+		cut_preffix(host, "rtc:");
+
+		if (const auto parsed = ::find_netcode_addr(host)) {
+			return favorite_resolution { *parsed, false };
+		}
+
+		if (const auto resolving = favorite_resolutions.find(host); resolving != favorite_resolutions.end()) {
+			if (!::valid_and_is_ready(resolving->second)) {
+				return favorite_resolution();
+			}
+
+			const auto result = resolving->second.get();
+
+			favorite_resolved[host] =
+				result.result == resolve_result_type::OK ?
+				std::optional<netcode_address_t>(result.addr) :
+				std::nullopt
+			;
+
+			favorite_resolutions.erase(resolving);
+		}
+
+		if (const auto resolved = favorite_resolved.find(host); resolved != favorite_resolved.end()) {
+			return favorite_resolution { resolved->second, !resolved->second.has_value() };
+		}
+
+		auto in = host_with_default_port();
+		in.address = host;
+		favorite_resolutions.emplace(host, ::async_resolve_address(in));
+
+		return favorite_resolution();
+	};
+#endif
+
 	for (const auto& f : favorites.all()) {
-		const auto& shown_list = displayed_list();
+#if BUILD_NATIVE_SOCKETS
+		const auto resolution = f.address.empty() ? favorite_resolution() : resolve(f.address);
+#endif
 
 		/*
-			One starred on the list: shown here only while the list does not have it. One added by hand: always here,
-			never matched against the list.
+			One starred on the list: shown here only while the list does not have it. One added by hand: the same while
+			the list has its key at its address (or answering there inside this network) - then that listed one is it.
 		*/
 
-		const auto listed_entry = f.manual ? shown_list.end() : std::find_if(shown_list.begin(), shown_list.end(), [&](const auto& s) {
-			return s.get_public_key() == f.key && s.get_instance_label() == f.label;
+		const auto listed_entry = std::find_if(shown_list.begin(), shown_list.end(), [&](const auto& s) {
+			if (s.get_public_key() != f.key) {
+				return false;
+			}
+
+			if (!f.manual) {
+				return s.get_instance_label() == f.label;
+			}
+
+#if BUILD_NATIVE_SOCKETS
+			if (const auto& at = resolution.address; at.has_value()) {
+				return s.address == *at || s.heartbeat.internal_network_address == *at;
+			}
+#endif
+
+			return false;
 		});
 
 		if (const bool listed = listed_entry != shown_list.end()) {
+			if (f.manual) {
+				listed_entry->manual_favorite_address = f.address;
+				listed_entry->manual_favorite_name = f.name;
+				continue;
+			}
+
 			if (listed_entry->is_official_server() != f.official) {
 				now_official.emplace_back(f, listed_entry->is_official_server());
 			}
@@ -3290,40 +3380,14 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 
 #if BUILD_NATIVE_SOCKETS
 		/*
-			Pinged at the address it was last at - a domain is resolved first, once.
+			Pinged at the address it was last at.
 		*/
 
-		auto host = client_connect_string(f.address);
-		cut_preffix(host, "rtc:");
-
-		if (const auto parsed = ::find_netcode_addr(host)) {
-			entry.address = *parsed;
+		if (resolution.address.has_value()) {
+			entry.address = *resolution.address;
 		}
-		else if (const auto resolved = favorite_resolved.find(host); resolved != favorite_resolved.end()) {
-			if (resolved->second.has_value()) {
-				entry.address = *resolved->second;
-			}
-			else {
-				entry.progress.state = server_entry_state::GIVEN_UP;
-			}
-		}
-		else if (const auto resolving = favorite_resolutions.find(host); resolving != favorite_resolutions.end()) {
-			if (::valid_and_is_ready(resolving->second)) {
-				const auto result = resolving->second.get();
-
-				favorite_resolved[host] =
-					result.result == resolve_result_type::OK ?
-					std::optional<netcode_address_t>(result.addr) :
-					std::nullopt
-				;
-
-				favorite_resolutions.erase(resolving);
-			}
-		}
-		else {
-			auto in = host_with_default_port();
-			in.address = host;
-			favorite_resolutions.emplace(host, ::async_resolve_address(in));
+		else if (resolution.failed) {
+			entry.progress.state = server_entry_state::GIVEN_UP;
 		}
 #else
 		entry.progress.state = server_entry_state::GIVEN_UP;

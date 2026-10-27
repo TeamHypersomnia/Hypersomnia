@@ -79,6 +79,22 @@ struct server_list_entry {
 	std::string favorite_address;
 
 	/*
+		A listed server that is also a favorite added by hand (the same key and address) - that favorite's address as
+		typed and the name given to it. Set anew every frame (see update_favorite_only_list).
+	*/
+
+	std::string manual_favorite_address;
+	std::string manual_favorite_name;
+
+	bool is_manual_favorite() const {
+		return (favorite_only && unlisted) || !manual_favorite_address.empty();
+	}
+
+	const std::string& get_manual_favorite_address() const {
+		return favorite_only ? favorite_address : manual_favorite_address;
+	}
+
+	/*
 		The server list has another server (another key) at the favorite's address - named here; the favorite is
 		not pinged there (that one would answer).
 	*/
