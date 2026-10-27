@@ -15,13 +15,25 @@ mv -f "$T.new" "$T"
 if [ "$2" = sudo ]; then
 	sudo -n systemctl restart hypersomnia
 else
+	# No sudo: the game process itself (not the AppImage wrapper). A stuck one ignores SIGINT and SIGTERM (DE, 4.3.0) -
+	# then SIGKILL; the service has Restart=always.
 	P=$(ps -eo pid,args | grep "[u]sr/bin/Hypersomnia --calling-cwd" | awk "{print \$1}" | head -1)
-	kill -INT $P
+	for SIG in INT TERM KILL; do
+		kill -$SIG $P 2>/dev/null || true
+		for i in $(seq 1 15); do
+			sleep 2
+			kill -0 $P 2>/dev/null || break
+		done
+		kill -0 $P 2>/dev/null || break
+		echo "still running after SIG$SIG"
+	done
 fi
 sleep 10
 systemctl is-active hypersomnia
 "$T" --version 2>/dev/null | head -1
+# the running process's age, not the file's version: a process that never restarted still runs the old one
+echo "game process up for: $(ps -eo etime,args | grep "[u]sr/bin/Hypersomnia --calling-cwd" | awk "{print \$1}" | head -1)"
 '
-echo "== US"; ssh -o BatchMode=yes ubuntu@arena-us.hypersomnia.io "bash -s /home/ubuntu/Hypersomnia-Headless.AppImage sudo" <<< "$REMOTE" 2>&1 | tail -2
-echo "== NL"; ssh -o BatchMode=yes -p 10600 hypersomnia@80.78.132.21 "bash -s /home/hypersomnia/hypersomnia/Hypersomnia-Headless.AppImage sudo" <<< "$REMOTE" 2>&1 | tail -2
-echo "== DE"; ssh -o BatchMode=yes hypersomnia@kestrel.timofei302.su "bash -s /home/hypersomnia/Hypersomnia-Headless.AppImage kill" <<< "$REMOTE" 2>&1 | grep -v "Ich will" | tail -2
+echo "== US"; ssh -o BatchMode=yes ubuntu@arena-us.hypersomnia.io "bash -s /home/ubuntu/Hypersomnia-Headless.AppImage sudo" <<< "$REMOTE" 2>&1 | tail -3
+echo "== NL"; ssh -o BatchMode=yes -p 10600 hypersomnia@80.78.132.21 "bash -s /home/hypersomnia/hypersomnia/Hypersomnia-Headless.AppImage sudo" <<< "$REMOTE" 2>&1 | tail -3
+echo "== DE"; ssh -o BatchMode=yes hypersomnia@kestrel.timofei302.su "bash -s /home/hypersomnia/Hypersomnia-Headless.AppImage kill" <<< "$REMOTE" 2>&1 | grep -v "Ich will" | tail -3

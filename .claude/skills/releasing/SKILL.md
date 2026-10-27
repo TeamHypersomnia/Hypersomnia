@@ -89,8 +89,18 @@ reaches production unless they have said to go ahead with all of them.
 - Smoke: the server list in the game and in the browser, a ranked match report on the site, the generator opens.
 - Back up the site's DB (`dbsyncback`) - before any test on production that sends ranked reports, and after the
   first real matches.
-- Production tests of the server setup scripts: on arenaus only, in a test folder, never touching the production
-  processes (check their uptime after); test servers off the public list afterwards.
+- Production tests of the server setup scripts (4.3.0 did all of these):
+  - scripts straight from hypersomnia.io/generator; on arenaus a throwaway user (`useradd -m`, `usermod -p '*'` so
+    key login works, its own `authorized_keys`) or `HOME=<test folder>` - never the `ubuntu` user's `~/.config`;
+    no generator systemd setup there (its unit is `hypersomnia.service`, production's name)
+  - the released client (the downloaded AppImage, unpacked) - a local build past the tag is "another version"
+  - make a test server official: its `--print-server-key` into the hub's `official_servers.d/<cc>-<name>` (read every
+    minute) - then its ranked/tournament reports count; remove the files afterwards
+  - ranked: two clients join, click Auto-assign, one is killed after the start - the abandonment's report (HTTP 200,
+    a row on /matches); a new key that abandons gets no MMR row by design
+  - Docker against production: `docker-matrix/run_dprod.sh` (the real ghcr image, the masterserver not blocked)
+  - afterwards: test servers stopped by exact pattern (`pgrep -f "[y]ojimbo..."` - a plain pattern kills the ssh
+    session), the test user deleted, production processes' uptime unchanged, test names gone from server_list_json
 
 ## Pitfalls that already happened
 
@@ -101,6 +111,17 @@ reaches production unless they have said to go ahead with all of them.
 - Steam upload stalled ("No progress while uploading chunks") and the rest ran on: upload first, servers after.
 - A web build with an old version file (4.0.0 showed 3.0.0): fixed by `build_webs.sh` deleting it.
 - A mistyped Steam password (4.2.0): rerun with `SKIP_DOWNLOADING=1`, servers were not touched.
+- `--appimage-extract-and-run` unpacks to the shared `/tmp/appimage_extracted_<md5>`: the first user to run a version
+  blocks it for every other user ("Failed to extract AppImage") and could plant files there - the generator's
+  own-user service has `PrivateTmp=yes` (4.3.0); run test servers of another user with their own `TMPDIR`.
+- itch's version column: `butler push ... --userversion X.Y.Z` (without it the old number stays); a second push
+  right after is refused while the first one is processing - wait for `butler status`.
+- A proxied endpoint with CORS from both nginx and the backend (4.3.0 `/server_list`): two
+  `Access-Control-Allow-Origin` headers, every web build refused the list. curl doesn't show it - check from a browser
+  (a cross-origin `fetch` in Playwright), or `curl -D -` that the header appears once.
+- DE's game process ignored SIGINT and SIGTERM (4.3.0): stuck, off the server list, the old version still running
+  while `--version` of the file said the new one. `update_other_hosts.sh` now escalates to SIGKILL and prints the
+  process's uptime - check it's fresh, and that all 10 official servers are in `server_list_json` with the version.
 - `server_update` thought to update all servers: it updates only the hub (4.0.0-4.2.0) - `update_other_hosts.sh`.
 - The site deployed before the game: the generator wrote commands the old game didn't understand - pages after the
   game, only what the new game needs (nginx) before.
