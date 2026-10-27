@@ -6,7 +6,7 @@ description: Releasing a new version of Hypersomnia - the order of every step (s
 # Releasing Hypersomnia
 
 **Never test on production (test servers, test keys in official_servers.d, ranked reports, test users) unless the user
-has asked for it himself, explicitly, in this session.**
+has asked for it themselves, explicitly, in this session.**
 
 Write the release's own checklist first (a markdown file outside the scratchpad, opened for the user in nvim) from the
 order below, with the release's specifics added, and tick it off as you go. Ask the user before every step that
@@ -92,7 +92,7 @@ reaches production unless they have said to go ahead with all of them.
 - Smoke: the server list in the game and in the browser, a ranked match report on the site, the generator opens.
 - Back up the site's DB (`dbsyncback`) - before any test on production that sends ranked reports, and after the
   first real matches.
-- **Production tests only when the user asks for them himself, explicitly, in his own words** ("testuj na produkcji").
+- **Production tests only when the user asks for them themselves, explicitly, in their own words** ("testuj na produkcji").
   Never propose-and-start, never as "the next step" of a release, never because an earlier session did them: a
   release ends with the smoke checks above. Asked, they go as below.
 - Production tests of the server setup scripts (4.3.0 did all of these):
