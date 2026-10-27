@@ -36,6 +36,8 @@ for i in $(seq 60); do
 	sleep 1
 done
 
+# a favorite at a real server's address, starred with another key: its signed answers are not taken
+WRONG_KEY=$(openssl rand -hex 32)
 key_of() { (cd $REPO/hypersomnia && $BIN --print-server-key --appdata-dir $1 $GAME_TEST_FLAGS 2>/dev/null | tail -1); }
 T_KEY=$(key_of $S/tournament); C_KEY=$(key_of $S/casual)
 
@@ -44,7 +46,8 @@ echo '{ "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "ht
 cat > $S/eve/user/favorite_servers.json <<EOF
 [
   { "key": "$T_KEY", "label": "", "address": "127.0.0.1:$P", "name": "LAN tournament", "manual": true, "official": false },
-  { "key": "$C_KEY", "label": "", "address": "127.0.0.1:$Q", "name": "LAN casual", "manual": true, "official": false }
+  { "key": "$C_KEY", "label": "", "address": "127.0.0.1:$Q", "name": "LAN casual", "manual": true, "official": false },
+  { "key": "$WRONG_KEY", "label": "", "address": "127.0.0.1:$((Q + 1))", "name": "Someone else's key", "manual": false, "official": false }
 ]
 EOF
 
@@ -58,11 +61,12 @@ DISPLAY=$DISP python3 $HERE/xinput.py key Escape; sleep 3
 DISPLAY=$DISP python3 $HERE/xinput.py click 190 497; sleep 15
 DISPLAY=$DISP import -window root $S/browse.png
 
-check "both favorites asked directly" grep -q "Asked 2 favorites on the local network directly" $S/eve.out
+check "all three favorites asked directly" grep -q "Asked 3 favorites on the local network directly" $S/eve.out
 check "the tournament found" grep -q "Found a server on the local network at: 127.0.0.1:$P" $S/eve.out
 check "... with both its matches" grep -q "127.0.0.1:$P on the local network has 2 ports: $P-$((P + 1))" $S/eve.out
 check "the casual host found" grep -q "Found a server on the local network at: 127.0.0.1:$Q" $S/eve.out
 check "... with both its instances" grep -q "127.0.0.1:$Q on the local network has 2 ports: $Q-$((Q + 1))" $S/eve.out
+check "a favorite starred with another key: its server's answers ignored" grep -q "A heartbeat from 127.0.0.1:$((Q + 1)) signed with another key" $S/eve.out
 
 for pid in $(pgrep -f -- "--appdata-dir $S/"); do kill $pid 2>/dev/null; done
 kill $XVFB 2>/dev/null
