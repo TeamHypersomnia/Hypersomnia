@@ -652,6 +652,15 @@ bool browse_servers_gui_state::handle_gameserver_response(netcode_socket_t& sock
 		auto take_into = [&](auto& list) {
 			for (auto& s : list) {
 				if (s.address == from && s.progress.ping_sequence == sequence) {
+					/*
+						A server known by its key (starred from the list) answers only signed with that key.
+					*/
+
+					if (const auto known_key = s.get_public_key(); known_key.has_value() && *known_key != received->server_public_key) {
+						BRW_LOG("A heartbeat from %x signed with another key than the server's - ignored.", ::ToString(from));
+						return true;
+					}
+
 					if (s.lan) {
 						data->lan.take_heartbeat(s, std::move(*received), on_list);
 					}

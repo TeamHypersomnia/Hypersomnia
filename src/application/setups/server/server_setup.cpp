@@ -2942,8 +2942,11 @@ bool server_setup::handle_gameserver_command(
 				const auto first_port = lan_first_port != 0 ? lan_first_port : last_start.port;
 				const auto num_ports = lan_num_ports != 0 ? lan_num_ports : uint16_t(1);
 
-				auto bytes = ::make_heartbeat_on_ping_bytes(typed_request.sequence, first_port, num_ports, std::move(heartbeat));
-				server->send_udp_packet(from, bytes.data(), bytes.size());
+				auto bytes = ::make_heartbeat_on_ping_bytes(typed_request.sequence, first_port, num_ports, std::move(heartbeat), this_server_key);
+
+				if (!bytes.empty()) {
+					server->send_udp_packet(from, bytes.data(), bytes.size());
+				}
 			}
 
 			return true;

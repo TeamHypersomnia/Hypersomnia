@@ -42,6 +42,57 @@
 
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
+#include "application/masterserver/heartbeat_on_ping.h"
+
+TEST_CASE("A heartbeat to a ping is signed by the server's key") {
+	const auto seed = *augs::ed25519_generate_seed();
+	const auto public_key = *augs::ed25519_public_key(seed);
+
+	auto heartbeat = server_heartbeat();
+	heartbeat.server_name = "Signed server";
+
+	const auto bytes = ::make_heartbeat_on_ping_bytes(0x1234, 8412, 4, heartbeat, seed);
+	REQUIRE(!bytes.empty());
+
+	auto read = [](std::vector<std::byte> b) {
+		return ::read_heartbeat_on_ping(reinterpret_cast<const uint8_t*>(b.data()), b.size());
+	};
+
+	const auto received = read(bytes);
+	REQUIRE(received.has_value());
+	REQUIRE(received->server_public_key == public_key);
+	REQUIRE(received->header.sequence == 0x1234);
+	REQUIRE(received->header.lan_first_port == 8412);
+	REQUIRE(received->header.lan_num_ports == 4);
+	REQUIRE(received->heartbeat.server_name == "Signed server");
+
+	/* What it said changed - its instances, its name: the signature no longer holds. */
+	{
+		auto tampered = bytes;
+		tampered[offsetof(heartbeat_on_ping_header, lan_num_ports)] = std::byte(64);
+		REQUIRE(!read(tampered).has_value());
+	}
+
+	{
+		auto tampered = bytes;
+		tampered[sizeof(heartbeat_on_ping_header) + 2] ^= std::byte(1);
+		REQUIRE(!read(tampered).has_value());
+	}
+
+	/* Without the signature - as before 4.3.1 - or with another key in its place. */
+	{
+		auto unsigned_bytes = bytes;
+		unsigned_bytes.resize(bytes.size() - heartbeat_on_ping_signature_bytes_v);
+		REQUIRE(!read(unsigned_bytes).has_value());
+	}
+
+	{
+		const auto other = *augs::ed25519_public_key(*augs::ed25519_generate_seed());
+		auto swapped = bytes;
+		std::memcpy(swapped.data() + bytes.size() - heartbeat_on_ping_signature_bytes_v, other.data(), other.size());
+		REQUIRE(!read(swapped).has_value());
+	}
+}
 
 TEST_CASE("Masterserver signalling message tokens") {
 	using peer_type = signalling_server::signalling_peer;

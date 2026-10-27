@@ -276,7 +276,15 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	int sort_by_column = 2;
 	bool ascending = false;
 	std::string loading_dots;
-	uint64_t ping_sequence_counter = 0;
+	/*
+		From a random start: an answer to a ping of another run never matches one of this run.
+	*/
+
+	uint64_t ping_sequence_counter = []() {
+		auto start = uint64_t(0);
+		augs::secure_random_bytes(reinterpret_cast<uint8_t*>(&start), sizeof(start));
+		return start;
+	}();
 
 	void refresh_server_pings();
 
