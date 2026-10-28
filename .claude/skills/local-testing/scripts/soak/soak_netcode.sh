@@ -7,7 +7,7 @@
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 SCALE=${1:-1}
-T=$S/soak/netcode; rm -rf $T; mkdir -p $T
+T=$S/soak/netcode; T=$T.$(date +%s%N); mkdir -p $T
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 SOAK=$S/soak/soak
 

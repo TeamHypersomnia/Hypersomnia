@@ -7,7 +7,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 CONNECT=$1; A=$2; OUT=$3; SECS=${4:-10}
 BIN=${5:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 F=$(dirname $OUT)/frames_$(basename $OUT .png)
-rm -rf $F; mkdir -p $F
+F=$F.$(date +%s%N); mkdir -p $F
 cd $REPO/hypersomnia
 Xvfb :91 -screen 0 1280x720x24 > /dev/null 2>&1 &
 XV=$!

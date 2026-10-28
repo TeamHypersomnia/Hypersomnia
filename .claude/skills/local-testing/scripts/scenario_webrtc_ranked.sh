@@ -70,7 +70,7 @@ timeout 30 xvfb-run -a nice -n 10 $BIN --connect "rtc:ranked-pl:1" --appdata-dir
 echo "=== client"
 grep -hE "WebRTC|Connecting as|identity cert|client connected to server|Received initial|last_disconnect_reason" $T/c_rtc.out | sed 's/^\[[0-9:]*\] //' | head -10
 echo "=== server"
-grep -hE "connected\. SID|Authenticated|did not verify|kicked|Reason|Ranked matches need" $T/ranked.out | sed 's/^\[[0-9:]*\] //' | head -10
+grep -hE "connected\. SID|Authenticated|did not verify|kicked|Reason" $T/ranked.out | sed 's/^\[[0-9:]*\] //' | head -10
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
 sleep 1

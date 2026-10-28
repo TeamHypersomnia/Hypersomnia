@@ -159,7 +159,7 @@ if [ -n "$STRANGER" ]; then
 	start_client carol 97 carol.out --connect 127.0.0.1:$PORT
 	sleep 15
 	DISPLAY=:97 import -window root $T/stranger.png
-	echo "=== the stranger: $(grep -ao 'A ranked match is in progress[^.]*' $T/carol.out | head -1)"
+	echo "=== the stranger: $(grep -ao 'A match is being played there[^.]*' $T/carol.out | head -1)"
 fi
 
 for i in $(seq 1 180); do

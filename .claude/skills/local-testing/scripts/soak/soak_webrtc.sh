@@ -7,7 +7,7 @@
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 CYCLES=${1:-150}
-T=$S/soak/webrtc; rm -rf $T; mkdir -p $T
+T=$S/soak/webrtc; T=$T.$(date +%s%N); mkdir -p $T
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 
 for port in 18000 18410 18420 18430 10030 19300; do

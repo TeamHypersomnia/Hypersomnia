@@ -100,7 +100,7 @@ sleep $((WAIT - 10))
 DISPLAY=:78 import -window root $T/screen.png
 
 echo "=== server"
-grep -hE "connected\. SID|requested nickname|Adding|Authenticated|did not verify|kicked|Reason|Ranked matches need" $T/server.out | sed 's/^\[[0-9:]*\] //' | head -10
+grep -hE "connected\. SID|requested nickname|Adding|Authenticated|did not verify|kicked|Reason" $T/server.out | sed 's/^\[[0-9:]*\] //' | head -10
 echo "=== browser console (game)"
 grep -E "identity cert|Connecting as|client connected|Received initial|WebRTC: DataChannel|last_disconnect_reason" $T/firefox.out | head -10
 

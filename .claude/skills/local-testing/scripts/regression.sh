@@ -103,7 +103,8 @@ fi
 
 if wanted admin; then
 	run admin 300 ./scenario_admin.sh
-	check admin bash -c "grep -a -q 'case A: 1 wrong password' $LOG/admin.log && grep -a -q 'case B: 0 wrong password' $LOG/admin.log"
+	# case B: in without the password - authenticated, not only "never asked"
+	check admin bash -c "grep -a -q 'case A: 1 wrong password' $LOG/admin.log && grep -a -q -E 'case B: 0 wrong password, [1-9][0-9]* authenticated' $LOG/admin.log"
 fi
 
 if wanted ranked_report; then
@@ -114,14 +115,18 @@ fi
 for c in broker_down unlink; do
 	if wanted corners_$c; then
 		run corners_$c 420 env CASE=$c STRANGER=1 ./scenario_ranked_corners.sh
-		check corners_$c bash -c "grep -a -q 'A ranked match is in progress there' $LOG/corners_$c.log && grep -a -q 'delivered (HTTP 200)' $LOG/corners_$c.log && [ \$(grep -a -c 'Authenticated.*steam_' $LOG/corners_$c.log) -ge 2 ]"
+		# unlink: alice may come back as steam_ or be refused (an accepted loss, see the scenario) - only broker_down must
+		# bring her back as steam_
+		steam_back="[ \$(grep -a -c 'Authenticated.*steam_' $LOG/corners_$c.log) -ge 2 ]"
+		[ $c = unlink ] && steam_back=true
+		check corners_$c bash -c "grep -a -q 'A match is being played there' $LOG/corners_$c.log && grep -a -q 'delivered (HTTP 200)' $LOG/corners_$c.log && $steam_back"
 	fi
 done
 
 if [ -n "$SOAK" ] && wanted soak; then
 	run soak 3000 bash -c "./soak/build_soak.sh && ./soak/soak_netcode.sh 1"
 	# Every phase "0 failed", except the one wrong key that must fail; then a real client gets in
-	check soak bash -c "[ -z \"\$(grep -a 'done:' $LOG/soak.log | grep -v ' 0 failed' | grep -v '0 connected, 0 abandoned mid-handshake, 1 failed')\" ] && grep -a -q 'Received initial state' $LOG/soak.log"
+	check soak bash -c "[ -z \"\$(grep -a 'done:' $LOG/soak.log | grep -v ' 0 failed' | grep -v '0 connected, 0 abandoned mid-handshake, 1 failed')\" ] && grep -a -q '0 connected, 0 abandoned mid-handshake, 1 failed' $LOG/soak.log && grep -a -q 'Received initial state' $LOG/soak.log"
 fi
 
 if [ -n "$REMOTE" ] && wanted remote; then

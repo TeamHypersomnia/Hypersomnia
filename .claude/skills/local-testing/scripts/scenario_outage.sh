@@ -2,7 +2,7 @@
 # Joining by address while the masterserver is gone and the broker is down or up:
 # a casual and a ranked server heartbeating to nowhere; a client whose broker is unreachable (self-signed cert)
 # and one with the live broker (BROKER_URL, BROKER_PUBLIC_KEY - see broker.sh).
-# Expected: the self-signed client plays casual and is told ranked needs an account; the broker client plays both.
+# Expected: both clients play casual and ranked - every valid cert is taken, a self-signed one too.
 . "$(dirname "$0")/test_env.sh"
 umask 077
 REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
@@ -15,7 +15,8 @@ for port in 10040 10042; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port is busy - aborting"; exit 1; fi
 done
 
-rm -rf $T
+# a fresh folder each run (never rm -rf)
+T=$T.$(date +%s%N)
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
 server_conf() {
@@ -59,7 +60,7 @@ wait
 
 for s in casual ranked; do
 	echo "=== server $s"
-	grep -hE "Authenticated|Ranked matches need|kicked" $T/$s.out | sed 's/^\[[0-9:]*\] //' | head -8
+	grep -hE "Authenticated|kicked" $T/$s.out | sed 's/^\[[0-9:]*\] //' | head -8
 done
 
 for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done

@@ -14,7 +14,8 @@ for port in 18000 18410 18420 18430 10070; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port busy, abort"; exit 1; fi
 done
 
-rm -rf $T
+# a fresh folder each run (never rm -rf)
+T=$T.$(date +%s%N)
 mk() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 mk ms <<J
 { "masterserver": { "ip": "127.0.0.1", "signalling_server_port": 18000, "first_udp_command_port": 18430, "num_udp_command_ports": 1,

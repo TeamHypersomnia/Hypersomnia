@@ -9,7 +9,7 @@ S=${SCRATCH:-/tmp/hypersomnia-nettest}
 T=$S/pw_test
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 if ss -tuln | grep -q ":10040 "; then echo "port 10040 busy, abort"; exit 1; fi
-rm -rf $T; mkdir -p $T/srv/user/conf.d $T/c/user/conf.d
+T=$T.$(date +%s%N); mkdir -p $T/srv/user/conf.d $T/c/user/conf.d
 cat > $T/srv/user/conf.d/test.json <<J
 { "server_start": { "ip": "0.0.0.0", "port": 10040, "slots": 8 },
   "server": { "server_name": "pw test", "notified_server_list": "127.0.0.1:1", "suppress_new_community_server_webhook": true,

@@ -56,7 +56,7 @@ reaches production unless they have said to go ahead with all of them.
    need retries. Fallback: `sign_deploy_last_builds`.
    A failed upload (e.g. a mistyped Steam password - steamcmd asks for it mid-run) skips `server_update`; run it
    all again from the already downloaded binaries (`/tmp/hypersomnia-deployment`) instead of downloading anew:
-   `(cd <admin shell repo> && STEAM_LOGIN=geneotech UPLOAD_TO_STEAM=1 SKIP_DOWNLOADING=1 ./sign_and_upload_last_builds --set-to-latest) && server_update`.
+   `(cd <admin shell repo> && STEAM_LOGIN=<the Steam login> UPLOAD_TO_STEAM=1 SKIP_DOWNLOADING=1 ./sign_and_upload_last_builds --set-to-latest) && server_update`.
    Without Steam: `UPLOAD_TO_STEAM=0`.
 6. **The hub** (the site's host, it runs a game server too): anything the new game changes on disk that the site reads
    (e.g. 4.3.0 moved `downloads/arenas` to `downloads/maps`, which `hosting/arenas` points at) - stop the game there
@@ -104,7 +104,7 @@ reaches production unless they have said to go ahead with all of them.
     minute) - then its ranked/tournament reports count; remove the files afterwards
   - ranked: two clients join, click Auto-assign, one is killed after the start - the abandonment's report (HTTP 200,
     a row on /matches); a new key that abandons gets no MMR row by design
-  - Docker against production: `docker-matrix/run_dprod.sh` (the real ghcr image, the masterserver not blocked)
+  - Docker against production: `docker-matrix/run_dprod.sh` (the matrix is not in the repo - ask the user where it is) (the real ghcr image, the masterserver not blocked)
   - afterwards: test servers stopped by exact pattern (`pgrep -f "[y]ojimbo..."` - a plain pattern kills the ssh
     session), the test user deleted, production processes' uptime unchanged, test names gone from server_list_json
 

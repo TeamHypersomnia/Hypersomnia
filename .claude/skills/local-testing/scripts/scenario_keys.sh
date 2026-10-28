@@ -107,7 +107,7 @@ done
 
 for s in casual_de ranked_pl community; do
 	echo "=== server $s"
-	grep -hE "connected\. SID|Authenticated|did not verify|kicked|Kicking|Ranked matches need|banned" $T/$s.out | sed 's/^\[[0-9:]*\] //' | head -12
+	grep -hE "connected\. SID|Authenticated|did not verify|kicked|Kicking|banned" $T/$s.out | sed 's/^\[[0-9:]*\] //' | head -12
 done
 
 echo "=== account.key files"

@@ -41,7 +41,7 @@ start_client() {
 	(cd $REPO/hypersomnia && DISPLAY=:96 setsid timeout 120 $BIN "$@" --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/$out 2>&1 < /dev/null &)
 }
 stop_client() {
-	for p in $(pgrep -f -- "Hypersomnia --appdata-dir $T/alice"); do kill $p; done
+	for p in $(pgrep -f -- "--appdata-dir $T/alice "); do kill $p; done
 	sleep 2
 }
 

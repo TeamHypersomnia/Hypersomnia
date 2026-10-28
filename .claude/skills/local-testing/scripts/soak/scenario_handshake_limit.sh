@@ -5,7 +5,7 @@
 . "$(dirname "$0")/../test_env.sh"
 REPO=$(cd "$(dirname "$0")/../../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/handshake_limit; rm -rf $T; mkdir -p $T/srv/user/conf.d
+T=$S/handshake_limit; T=$T.$(date +%s%N); mkdir -p $T/srv/user/conf.d
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 SOAK=$S/soak/soak
 LAN=$(ip -4 -o addr show scope global | awk '{print $4}' | cut -d/ -f1 | head -1)

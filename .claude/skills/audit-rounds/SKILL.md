@@ -24,7 +24,8 @@ skill keeps that from happening.
    (e.g. a removed mechanism), do not edit the prompt - append a short "current state" context block to it, listing
    what was removed and which decisions are intentional (no backward compatibility, etc.), so the auditor does not
    flag decided behavior or hunt for deleted code. Say you did this.
-3. Every audit runs as the `auditor` agent (`.claude/agents/auditor.md` - read-only, writes one Markdown report in
+3. Every audit runs as the `auditor` agent - launched only after the user's yes to it with a rough token cost
+   (`.claude/agents/auditor.md` - read-only, writes one Markdown report in
    its own finding format; you read it and summarize it for the user, never an HTML report here).
 4. Diff audits: one `auditor` over the exact ranges (game commit range, the site's commits since the same time, the
    netcode fork's commits).

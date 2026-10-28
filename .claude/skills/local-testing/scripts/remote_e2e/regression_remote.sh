@@ -39,7 +39,7 @@ for h in "arena:yojimbo-test/e2e" "arenaus:hs-test-backend"; do
 		|| fail "upload to $h"
 done
 timeout 600 rsync -az --exclude .git --exclude .env --exclude private --exclude node_modules --exclude hosting --exclude infra \
-	"$HOME/page/" arenaus:hs-test-backend/page/ || fail "site upload"
+	"${SITE:-$HOME/page}/" arenaus:hs-test-backend/page/ || fail "site upload"
 scp -q "$HERE/backend.sh" arenaus:hs-test-backend/backend.sh
 scp -q "$HERE/match.sh" "$HERE/community.sh" arena:yojimbo-test/e2e/
 ssh arenaus 'SECS=3600 timeout 60 bash ~/hs-test-backend/backend.sh start' > $S/remote_backend.out 2>&1

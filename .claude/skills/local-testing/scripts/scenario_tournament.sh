@@ -3,6 +3,9 @@
 # (the game under Xvfb), a match ended by its loser's game killed. Each case in its own fresh directory, a PASS/FAIL
 # table at the end. CASES="..." runs some only (default: all). BIN / CLIENT_BIN: the headless server / the client.
 #
+#   finished_servers    "alice; bob; carol; dave", a local master: a decided match's server stays up empty (finished on the
+#                       list, a newcomer refused with "Match finished..."), the round waits for the other match; the final
+#                       stays finished on the list after the end and after a restart ("The tournament has finished.")
 #   teams_bye           --tournament-teams "A; B; C": A's bye, B-C, then A-B; the live page on the way; then the same
 #                       flags again: "played to the end already", the page showing the winner
 #   open_auto_close     HYPERSOMNIA_TOURNAMENT=3: two "Match #N (any pair)" servers, A+B on #1 ([alice] vs [bob]),
@@ -112,7 +115,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="map_download_retry_typo tournament_custom_late custom_live custom_star custom_broken maps_folder_move tournament_custom_missing custom_maps tournament_custom_map kept_map_not_in_cycle map_download_retry map_catalogue_deadline map_download_and_quit map_download_cycle map_download bomb_always open_long_names round1_off five_teams_walkovers crash_renews_deadline crash_in_break open_deadline_spectator break_timeout open_choice open_same_nick watch_limit_final crash_nobody_back_listed crash_nobody_back_open watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams password_known"
+ALL="finished_servers map_download_retry_typo tournament_custom_late custom_live custom_star custom_broken maps_folder_move tournament_custom_missing custom_maps tournament_custom_map kept_map_not_in_cycle map_download_retry map_catalogue_deadline map_download_and_quit map_download_cycle map_download bomb_always open_long_names round1_off five_teams_walkovers crash_renews_deadline crash_in_break open_deadline_spectator break_timeout open_choice open_same_nick watch_limit_final crash_nobody_back_listed crash_nobody_back_open watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams password_known"
 CASES=${CASES:-$ALL}
 # SHARD=0, 1, ...: run several suites at once (CASES split between them) - each on its own ports and X displays
 SHARD=${SHARD:-0}
@@ -294,7 +297,7 @@ kill_client() {
 }
 
 kill_all_clients() {
-	for c in alice bob carol dave mallory alice2 carol2; do kill_client $c; done
+	for pid in $(pgrep -f -- "^$CLIENT_BIN --connect .*--appdata-dir $T/"); do kill -9 $pid 2>/dev/null; done
 	sleep 2
 }
 
@@ -305,7 +308,7 @@ wait_log() {
 		sleep 1
 	done
 
-	echo "  (timeout waiting for: $1)"
+	echo "FAIL  $CASE: timeout waiting for: $1" | tee -a $RESULTS
 	return 1
 }
 
@@ -316,7 +319,7 @@ wait_count() {
 		sleep 1
 	done
 
-	echo "  (timeout waiting for $2x: $1)"
+	echo "FAIL  $CASE: timeout waiting for $2x: $1" | tee -a $RESULTS
 	return 1
 }
 
@@ -354,6 +357,84 @@ finish_case() {
 # server_extra '<json>' - one more config file for the case's server, applied after the test's own
 server_extra() {
 	echo "$1" > $T/server/user/conf.d/zz_case.json
+}
+
+# The local masterserver for a case - its server_list_json read by list '<python on l, the entries>'
+start_master() {
+	mkdir -p $T/ms/user/conf.d $T/official_servers.d
+	cat > $T/ms/user/conf.d/test.json <<EOF
+{ "masterserver": { "ip": "127.0.0.1", "signalling_server_port": $P_SIGNAL, "first_udp_command_port": $P_MASTER, "num_udp_command_ports": 1,
+  "server_list_port": $P_LIST, "fallback_http_server_list_port": $P_LIST_FALLBACK, "report_rtc_errors_to_webhook": false,
+  "official_servers_dir": "$T/official_servers.d" } }
+EOF
+	(cd $REPO/hypersomnia && exec timeout 900 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1) &
+	sleep 3
+}
+
+stop_master() {
+	for pid in $(pgrep -f -- "--appdata-dir $T/ms "); do kill $pid 2>/dev/null; done
+}
+
+# list '<python on l, the list's entries>' - P(port): the entries at that port
+list() {
+	sleep 2
+	curl -s --max-time 3 http://127.0.0.1:$P_LIST/server_list_json > $T/list.json || return 1
+	python3 -c "
+import json,sys
+l=json.load(open('$T/list.json'))
+P=lambda port: [e for e in l if e['ip'].endswith(':%d' % port)]
+sys.exit(0 if ($1) else 1)"
+}
+
+# in_client_log <name> <pattern> - any of its logs
+in_client_log() { cat $T/$1.*.out 2>/dev/null | grep -q "$2"; }
+
+case_finished_servers() {
+	new_case finished_servers
+	start_master
+	player alice; player bob; player carol; player dave; player mallory
+	local flags=(--tournament-teams "${ID[alice]}; ${ID[bob]}; ${ID[carol]}; ${ID[dave]}" --tournament-name "Cup")
+	local A=$PORT B=$((PORT + 1))
+	start_server -- "${flags[@]}"
+	client alice $A; sleep 2; client bob $A
+	client carol $B; sleep 2; client dave $B
+	wait_count "Starting ranked" 2 120
+	sleep 8
+	check "list: both matches, the round's range and stage" list "len(P($A))==1 and len(P($B))==1 and all(e['tournament_name']=='Cup' and e['tournament_stage']==1 and e['instance_first_port']==$A and e['instance_num_ports']==2 and not e['finished'] for e in P($A)+P($B))"
+	kill_client bob
+	wait_log "\[T$A\] Tournament match finished" 120
+	sleep 3
+	check "#1 finished, still up, empty" list "P($A) and P($A)[0]['finished'] and P($A)[0]['num_playing']==0"
+	check "alice left by herself, told why" in_client_log alice "Match finished. You can watch the other matches."
+	NO_TEAM=1 client mallory $A
+	sleep 15
+	check "a newcomer refused, told why" in_client_log mallory "Match finished. You can watch the other matches."
+	check "the round goes on while #2 is played" not_in_log "Tournament round 2: running"
+	kill_client dave
+	wait_log "Tournament round 2: running" 120
+	sleep 6
+	check "round 2: the final on the first port, stage 0" list "len(P($A))==1 and P($A)[0]['tournament_stage']==0 and not P($A)[0]['finished'] and P($A)[0]['instance_num_ports']==1"
+	kill_all_clients
+	client alice $A; sleep 2; client carol $A
+	wait_count "Starting ranked" 3 90
+	sleep 5
+	kill_client carol
+	wait_log "Tournament WINNER" 120
+	check "alice won" winner_is alice
+	sleep 12
+	check "over: the final stays on the list, finished" list "len(P($A))==1 and P($A)[0]['finished'] and P($A)[0]['tournament_stage']==0 and not P($B)"
+	kill_client mallory
+	NO_TEAM=1 client mallory $A
+	sleep 15
+	check "over: a newcomer told the tournament finished" in_client_log mallory "The tournament has finished."
+	finish_case
+
+	start_server -- "${flags[@]}"
+	check "not started again" in_log "played to the end already"
+	sleep 12
+	check "restarted over: the final finished on the list" list "len(P($A))==1 and P($A)[0]['finished'] and P($A)[0]['tournament_stage']==0"
+	finish_case
+	stop_master
 }
 
 # ---------- the cases ----------
@@ -472,7 +553,7 @@ case_crash_renews_deadline() {
 	wait_log "Round timeout: " 300
 	local decided=$(date +%s)
 	# a restart gives round 1 its whole time again: 1 minute + 2 of grace from the restart, not from the start
-	check "round 1's time counted again from the restart" [ $((decided - restarted)) -ge 170 ]
+	check "round 1's time counted again from the restart" [ $((decided - restarted)) -ge 170 -a $((decided - restarted)) -le 220 ]
 	check "alice wins by walkover" in_log "the other wins by walkover"
 	finish_case
 }
@@ -498,7 +579,7 @@ case_crash_in_break() {
 	wait_log "Round timeout: " 300
 	local decided=$(date +%s)
 	# a restart gives the break its whole time again: 1 min + 2 min of grace from the restart
-	check "the break counted again from the restart" [ $((decided - restarted)) -ge 170 ]
+	check "the break counted again from the restart" [ $((decided - restarted)) -ge 170 -a $((decided - restarted)) -le 220 ]
 	wait_log "Tournament WINNER" 60
 	check "alice the winner" winner_is alice
 	finish_case
@@ -898,7 +979,7 @@ case_admin_live() {
 	check "carol watches as a spectator" in_log "watches the tournament's match as a spectator"
 	wait_log "Adding carol to game state" 30
 	check "carol: never a team problem" not_in_log "pre-assigning your team"
-	check "carol in the game, not timed out" bash -c "grep -q 'Adding carol to game state' $SRV && ! grep -q 'carol.*timed out' $SRV"
+	check "carol in the game, not timed out" bash -c "grep -q 'Adding carol to game state' $SRV && ! grep -q 'Connection timed out' $T/carol.*.out"
 	sleep 5
 	check "not too late, not theirs" not_in_log "carol has connected to a match that's not theirs"
 	check "the match goes on" not_in_log "Tournament WINNER"
@@ -951,7 +1032,7 @@ case_quick_rejoin() {
 	wait_count "Adding bob to game state" 2 60
 	check "bob back in his match" bash -c "[ \$(grep -c 'Adding bob to game state' $SRV) -ge 2 ]"
 	check "never joined too late" not_in_log "Joined too late"
-	check "his game never told \"only its players can rejoin\"" bash -c "! grep -q 'only its players can rejoin' $T/bob.*.out"
+	check "his game never told \"wrong match\" or \"too late\"" bash -c "! grep -q 'Connected to a wrong match\|Joined too late' $T/bob.*.out"
 	finish_case
 }
 
@@ -975,7 +1056,7 @@ case_spectator_live() {
 	wait_count "Adding dave to game state" 2 60
 	check "the spectator back again" bash -c "[ \$(grep -c 'Adding dave to game state' $SRV) -ge 2 ]"
 	check "never a team problem" not_in_log "pre-assigning your team"
-	check "dave never froze the match" bash -c "! grep -i 'dave' $SRV | grep -qi 'suspend\|abandon'"
+	check "dave never froze the match" bash -c "! grep -q 'Arena: suspending\|abandoned by faction' $SRV"
 	check "the match goes on" not_in_log "Tournament WINNER"
 	kill_client bob
 	wait_log "Tournament WINNER" 200
@@ -1003,7 +1084,7 @@ case_watch_limit() {
 	wait_log "No more places to watch this match" 60
 	check "alice watches carol-dave" bash -c "grep -q \"T$((PORT + 1))] Adding alice to game state\" $SRV"
 	check "bob refused - no more places to watch" in_log "No more places to watch this match"
-	check "carol and dave still in their match" bash -c "! grep -E -q \"T$((PORT + 1))] .*(carol|dave) was kicked\" $SRV"
+	check "carol and dave still in their match" bash -c "! grep -q 'was kicked\|You were kicked' $T/carol.*.out $T/dave.*.out"
 	finish_case
 }
 
@@ -1162,7 +1243,7 @@ case_nick_claim() {
 	client alice $PORT; sleep 2; client bob $PORT
 	wait_count "Starting ranked" 1 90
 	sleep 5
-	check "alice back under another nickname - in by her key" in_log "alice_renamed"
+	check "alice back under another nickname - in by her key" in_log "Adding alice_renamed to game state"
 	check "page: alice and bob as listed, by their accounts" page 'sorted((p["nickname"], p["account"]) for p in R(0)["matches"][0]["team_a"]+R(0)["matches"][0]["team_b"])==[("alice","'${ID[alice]}'"),("bob","'${ID[bob]}'")] and "alice_renamed" not in str(t)'
 	kill_client bob
 	wait_log "Tournament WINNER" 120
@@ -1215,7 +1296,7 @@ case_teams_accounts() {
 	wait_log "Tournament WINNER" 120
 	check "bob won" winner_is bob
 	sleep 2
-	check "renamed between rounds: let in" in_log "bob_renamed"
+	check "renamed between rounds: let in" in_log "Adding bob_renamed to game state"
 	check "page: everyone by the listed nickname" page "$all_named"' and "bobby_in_game" not in str(t) and "bob_renamed" not in str(t) and all(p["account"].startswith("key_") for r in t["rounds"] for m in r["matches"] for p in m["team_a"]+m["team_b"])'
 	finish_case
 }
@@ -1253,7 +1334,7 @@ case_crash_in_freeze() {
 	sleep 8
 	kill_client bob
 	sleep 4
-	check "bob suspended, not abandoned" not_in_log "ABANDONED"
+	check "bob suspended, not abandoned" bash -c "grep -q 'Arena: suspending' $SRV && ! grep -q 'abandoned by faction' $SRV"
 	crash_server
 	kill_client alice
 	start_server -- "${flags[@]}"
@@ -1299,11 +1380,13 @@ case_crash_open() {
 	wait_count "Starting ranked" 2 120
 	sleep 3
 	kill_client bob
-	wait_log "Quitting tournament match #$PORT" 60
+	wait_log "\[T$PORT\] Tournament match finished" 60
 	crash_server
 	kill_all_clients
 	start_server HYPERSOMNIA_TOURNAMENT=4 --
 	check "resumed with #1 decided" in_log "resuming round 1 with 2 ongoing"
+	wait_log "\[T$PORT\] Tournament match finished" 15
+	check "#1 started again finished, not resumed" in_log "\[T$PORT\] Tournament match finished"
 	check "#2 open again" in_log "Match #2 (any pair)"
 	client carol $((PORT + 1)); sleep 3; client dave $((PORT + 1))
 	wait_count "comes back to the recovered match" 2 90
@@ -1438,7 +1521,8 @@ case_join_timeout_open() {
 	sleep 5
 	kill_client bob
 	wait_log "Tournament WINNER" 200
-	check "his game never told \"only its players can rejoin\"" bash -c "! grep -q 'only its players can rejoin' $T/bob.*.out"
+	check "alice won" winner_is alice
+	check "his game never told \"wrong match\" or \"too late\"" bash -c "! grep -q 'Connected to a wrong match\|Joined too late' $T/bob.*.out"
 	finish_case
 }
 
@@ -1736,3 +1820,4 @@ echo
 echo "=== results ($SUITE)"
 cat $RESULTS
 echo "$(grep -c '^PASS' $RESULTS) passed, $(grep -c '^FAIL' $RESULTS) failed"
+[ "$(grep -c '^FAIL' $RESULTS)" = 0 ]

@@ -17,7 +17,8 @@ committed; a new kind of such change gets its check added there. The site's MMR 
 Everything runs from scripts in `scripts/`, each isolated: own appdata dirs, own scratch dir, and they check their ports
 are free (the scenarios share 18000/18410/18420/18430/10002 - run one at a time)
 (`SCRATCH`, default `/tmp/hypersomnia-nettest` - point it at the session scratchpad).
-Build into your own build folder first and pass it as `BIN` (default `build/Debug-x64-clang-claude/Hypersomnia`).
+Build into your own build folder first and pass it as `BIN` (default `build/Debug-x64-clang-claude/Hypersomnia`; the tournament
+and favorite scripts take the headless server as `BIN` and the client as `CLIENT_BIN`).
 
 ## Isolation rules - read first, all of them were learned the hard way
 
@@ -35,6 +36,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
    the batch, after the user has tested; never in the middle of iterating. Rebuilding all five for every small fix made
    the iterations too slow. **A commit needs only the Linux build** - a variant that stops compiling is fixed later, at
    the very end; build the other variants before a commit only for a big architectural change across platforms.
+   Exception: a change to headless-only code (tournaments, crash recovery) is tested with `-headless` while iterating.
 3. **Never `pkill -f <pattern>` (or `pgrep -f`) in a command whose own text contains the pattern** - it kills your own shell
    (exit 144). Put the kill in a script file and run the script, or kill by exact PID.
 4. **Port 3000 is the user's local hypersomnia.io** (the site repo, `node app.js`, its `private/mmr.db`). Never post to it.
@@ -52,21 +54,26 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 
 | Script | What it proves |
 |---|---|
-| `broker.sh start\|stop\|sql` | A scratch copy of the site on 13500 as the identity broker and report endpoint, with its own broker key; prints `BROKER_URL` and `BROKER_PUBLIC_KEY` to export for the scenarios |
+| `broker.sh start\|stop\|sql` (`SITE`: the site's repo, default `~/page`) | A scratch copy of the site on 13500 as the identity broker and report endpoint, with its own broker key; prints `BROKER_URL` and `BROKER_PUBLIC_KEY` to export for the scenarios |
 | `scenario_keys.sh` | Master with `official_servers.d` (servers official by their `--print-server-key`), official casual (de) + ranked (pl) + community servers, 3 CLI clients: signed heartbeats, every client self-signed (unlinked keys never ask the broker) and taken by ranked too, `.keys/account.key` 0600. `COMMUNITY_PASSWORD`, `KEEP_RUNNING`, `*_SECS` |
 | `scenario_webrtc_ranked.sh` | Native client over WebRTC (`--connect rtc:ranked-pl:1` - a ranked instance's alias has its number) through the local signalling server to the official ranked server by its alias, with a broker cert |
 | `scenario_web_firefox.sh [connect] [wait]` | The real web build in Firefox under Xvfb joining `/game/<connect>` (default `pl`) over WebRTC with a cert from the local broker; screenshot in `$SCRATCH/web_test/screen.png` |
-| `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: self-signed plays casual and is told ranked needs an account; a broker cert plays both |
+| `scenario_outage.sh` | No masterserver, broker down vs up, joining by address: a self-signed cert and a broker cert both play casual and ranked (every valid cert is taken) |
 | `scenario_crazygames.sh` | The CrazyGames build in Chromium with a stubbed SDK (`crazygames_sdk_stub.py`, token signed by `CG_KEY`) joins an official ranked server over WebRTC as `crazygames_...` |
 | `scenario_steam.sh` | The Steam build with the user's running Steam: a real Web API ticket -> broker cert -> ranked (broker started with `STEAM_API_KEY_FILE`) |
 | `scenario_ranked_report.sh` | A whole ranked match to its natural end in about a minute: the test map `de_e2e_short` (de_cyberaqua, max team score 2, 5 s rounds, no warmup) on a ranked server, two key clients clicking Auto-assign, the signed report at the local broker, the site's match and MMR rows |
-| `scenario_tournament.sh` (`CASES=...`) | Tournaments end to end, a PASS/FAIL table: fixed teams with a bye, an open first round (auto close, leaving before the start, 2v2), crashes (SIGKILL) mid-match, in a freeze after someone left, between rounds and in an open round - resumed by the same flags, nothing replayed or lost; the live results page's JSON on the way; the page in the masterserver's list. Run it after any tournament change (~25 min; the cases are listed at its top). Clients run small (480x270, `LP_NUM_THREADS=2`) - four full-size ones starve each other into timeouts |
+| `scenario_tournament.sh` (`CASES=...`) | Tournaments end to end, a PASS/FAIL table: fixed teams with a bye, an open first round (auto close, leaving before the start, 2v2), crashes (SIGKILL) mid-match, in a freeze after someone left, between rounds and in an open round - resumed by the same flags, nothing replayed or lost; the live results page's JSON on the way; the page in the masterserver's list. Run it after any tournament change (~90 min alone; the cases are listed at its top). `SHARD=0..2` runs a copy on its own ports and displays - split `CASES` between the shards yourself (3 at once overload the machine: a few cases then fail on timing - rerun those alone). Never edit the script while it runs - bash reads it as it goes; run a copy if you must. Clients run small (480x270, `LP_NUM_THREADS=2`) - four full-size ones starve each other into timeouts |
 | `check_environment_variables.sh` (`PAGE=<site repo>`) | The `HYPERSOMNIA_*` names in the game (`environment_variables.{h,cpp}`), `README_SERVER.md`'s table and the config generator are the same - after adding or renaming one |
 | `scenario_ranked_corners.sh` (`CASE=unlink\|broker_down`) | A linked account (a key linked to a fake Steam id straight in the site's DB, its broker behind a stoppable proxy) in a ranked match: mid-match its key is unlinked on the site, or its broker goes down; it is killed and started again - it must rejoin as the same `steam_` account (its saved steam_cert.json) and the report must name that account. Note: a key put in by hand is linked only after the game's link check - started with `--connect` right away, it joins as `key_`; the script lets alice save her steam_cert.json first |
 | `scenario_disconnects.sh` (`CASES=...`) | Filmstrips of each disconnect as the player sees it, with timings: server SIGTERM/SIGKILL/SIGSTOP, full, the same key joining again, wrong password, AFK, client SIGSTOP/SIGKILL/SIGTERM. Expected: every kick reason shows at once; a dead server or a dropped network shows "Nothing came from the server for 10 seconds" (native only); a 6 s server freeze is survived; a killed client frees its slot in about 5 s, a quitting one at once |
 | `scenario_map_download.sh <out>` (`MAP`, `EXT`, `LATENCY`, `LOSS`, `KILL_AT`) | A client without the server's map downloads it - over UDP or from an HTTP provider (`slow_http.py` serves one at a set rate, with CORS for the browser); a long download never disconnects, a server killed meanwhile shows "Nothing came from the server for 10 seconds". In the browser: `scenario_web_firefox.sh` with `MAP`, `EXT` (and `KILL_SERVER=1`, `TAB_AWAY=<s>`) |
 | `scenario_lan_favorite.sh` (`P`, `DISP`) | A LAN party whose router blocks broadcast: a favorite on the local network is asked directly too and brings all its host's instances into Local - a tournament (2 matches) and a casual server (2 instances) on ports broadcast never reaches, one favorite each; checks the client log and screenshots Browse servers (clicked at 190,497 in a 1280x720 window, after Escape from the tutorial) |
 | `scenario_manual_favorite_listed.sh` (`DISP`, `KEEP_RUNNING`) | A favorite added by hand (key + address) of a server also on the local master's list: one row, the list's, with the typed name and a lit star, Unlisted empty (no ping of its own); `KEEP_RUNNING=1` leaves it up to click the star (Forget? asks, the row stays with the list's name) |
+| `scenario_browser_tournaments.sh` (`KEEP_RUNNING`, `FAVORITES`, `stop`) | The browser's tournament rows: a local master with an official tournament (2 matches), a community one (open, 4 matches) and a casual server; Browse servers screenshotted (imgui_big.ini), the list checked (the casual server on it too). `KEEP_RUNNING=1` for clicking: a tournament row expands/collapses, its star saves the first instance (key + `t1`), the filter shows a match under its tournament |
+| `scenario_demo.sh` | A client records a demo while it plays on a local server, another start replays it (`demo://<path>`) - the replay must load and run without errors |
+| `scenario_webrtc_crowd.sh [N=10]` | N native clients over WebRTC from one address join one community server at the same moment - all must get in |
+| `connect_filmstrip.sh <connect> <appdata> <out.png> [secs] [bin]` | A contact sheet of a client joining, a screenshot every half second - everything the game draws while connecting |
+| `scenario_menu_mmr.sh <shot.png>` (`PLAYER`, `BIN`) | After `scenario_ranked_report.sh`: the main menu's leaderboards header shows the player's place and MMR from the local site |
 | `scenario_admin.sh` | A key linked to a Steam account on a server with a password: with only the `steam_` account in `admin_profiles` it is asked for the password (outside the Steam build a linked key is no admin), with its `key_` too it gets in without one |
 | `scenario_password_limit.sh` | 7 joins without the password: 5x "Wrong password", then "Too many wrong passwords" |
 | `link_flow_test.py`, `crazygames_cert_test.py` | The site's link/unlink/start endpoints and the broker's CrazyGames token checks, at the HTTP level |
@@ -83,7 +90,7 @@ Build into your own build folder first and pass it as `BIN` (default `build/Debu
 | `build_headless_ubuntu_container.sh` | The same in Ubuntu 24.04 (glibc 2.39) - arena only |
 
 Pass/fail is read from the logs - the scripts grep the meaningful lines: `Received an identity cert for X`,
-`Authenticated "nick". ID: steam_...|key_...`, `Ranked matches need`, `Received initial public vars`.
+`Authenticated "nick". ID: steam_...|key_...`, `Received initial public vars`.
 
 ## The web build headless - how it works
 
@@ -181,6 +188,7 @@ run-map skill.
 ## Soak: servers must never quietly stop taking players (scripts/soak)
 
 The worst bug class: after N connections a table fills up and the server silently refuses everyone.
+`soak/scenario_handshake_limit.sh` (after `build_soak.sh`): the per-address handshake limit is hit from the LAN address and the same address gets in again a moment later.
 `build_soak.sh` builds a netcode-level client from the game's own netcode; then:
 
 - `soak_netcode.sh [scale]` - ~9000 connect/disconnect cycles, half abandoned mid-handshake, by address and with the server's key,
@@ -297,7 +305,6 @@ the seeds `sha256("hypersomnia-test-server-<id>")`; `run_mmr_tests.py` signs its
 - **Soak RSS:** a server's RSS jumps ~25 MB with the first ~2000 connections and then stays flat (+0.1 MB per 2000) - per-client
   buffers touched once, not a leak. To tell, measure after several batches against one server, not just before/after one run,
   and never with a build running at the same time.
-- After the WebRTC soak, `grep -c "did not open its DataChannel in time"` in the server log shows the 15 s freeing of unopened peers working.
 - **Commit before anything long.** The machine was rebooted twice mid-test (network outages) - each time /tmp, the scratch scripts
   and the test broker were gone; anything worth keeping goes into this skill's scripts, not the scratchpad.
 - The site's link limits are per minute: running `link_flow_test.py` several times in a row from localhost hits "Too many attempts" -

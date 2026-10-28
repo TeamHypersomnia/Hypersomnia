@@ -5,8 +5,8 @@
 # Usage: MAP=<arena in hypersomnia/user/downloads/maps> [EXT=..] [LATENCY=..] [LOSS=..] [KILL_AT=..] scenario_map_download.sh <out dir>
 # A long download: EXT=http://127.0.0.1:12180/arenas with slow_http.py <dir with arenas/> 12180 50000 (the provider is the arenas folder).
 . "$(dirname "$0")/test_env.sh"
-REPO=$HOME/Hypersomnia
-BIN=$REPO/build/Debug-x64-clang-claude/Hypersomnia
+REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
+BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 T=$1
 MAP=${MAP:-hyperactive_space_station}
 mkdir -p $T/srv/user/conf.d $T/srv/user/downloads/maps $T/cli/user/conf.d
