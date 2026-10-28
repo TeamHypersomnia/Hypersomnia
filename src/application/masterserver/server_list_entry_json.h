@@ -22,6 +22,11 @@ struct server_list_entry_json {
 	std::string server_public_key;
 	std::string instance_label;
 	std::string tournament_page;
+	std::string tournament_name;
+	int tournament_stage = -1;
+	bool finished = false;
+	uint16_t instance_first_port = 0;
+	uint16_t instance_num_ports = 0;
 
 	double time_hosted = 0.0;
 	double time_last_heartbeat = 0.0;

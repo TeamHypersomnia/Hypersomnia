@@ -10,6 +10,7 @@
 #include "application/network/host_with_default_port.h"
 #include "application/setups/server/server_webhook_vars.h"
 #include "application/setups/server/admin_profiles.h"
+#include "application/setups/server/tournament_stage.h"
 #include "augs/misc/secure_hash.h"
 #include "application/arena/arena_playtesting_context.h"
 #include "game/modes/difficulty_type.h"
@@ -190,6 +191,7 @@ struct server_vars {
 	server_webhook_vars webhooks;
 
 	bool shutdown_after_one_match = false;
+	int tournament_stage = -1;
 
 	bool sync_all_external_arenas_on_startup = false;
 	// END GEN INTROSPECTOR

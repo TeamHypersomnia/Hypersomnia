@@ -179,7 +179,8 @@ A knockout tournament: a server for every match, the winners go on round by roun
 - A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, a map that doesn't exist. Other servers only warn.
 - After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew - and so it does after any change to the teams, their size or the maps (a fixed typo in a nickname too); the old state stays in `tournament.config-changed.<time>.json`.
 - It never updates in the middle of it.
-- On a LAN everyone sees the matches together under `Ongoing Tournament`; on the public list only official servers' tournaments show so.
+- In `Browse servers` a tournament is one row - a click on it shows its matches (a favorite one is shown expanded). A finished match stays on the list empty until its round ends; the finished tournament's final until you stop it.
+- LAN players don't see it (a router blocking broadcast, another port than 8412-8415): the server's log says where it is on the local network - they add that address with the server's key (`--print-server-key`) under `Favorites`, `Add an unlisted server`. A match's address brings the whole tournament.
 
 ## The results as JSON
 

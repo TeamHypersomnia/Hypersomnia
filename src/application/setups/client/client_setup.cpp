@@ -2159,7 +2159,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 							break;
 
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_MATCH_IN_PROGRESS:
-							set_disconnect_reason("A ranked match is in progress there - only its players can rejoin.");
+							set_disconnect_reason("A match is being played there - only its players, and those who may watch it, get in.");
 							break;
 
 						default:
@@ -2702,6 +2702,18 @@ std::string client_setup::get_scoreboard_caption() const {
 	}
 
 	return base;
+}
+
+/*
+	A tournament's match: its stage on the scoreboard (tournament_stage.h).
+*/
+
+std::string client_setup::get_scoreboard_stage() const {
+	if (sv_dynamic_vars.tournament_stage < 0) {
+		return std::string();
+	}
+
+	return ::tournament_stage_label(sv_dynamic_vars.tournament_stage);
 }
 
 void client_setup::request_abandon_ranked_match(ingame_menu_button_type op) {

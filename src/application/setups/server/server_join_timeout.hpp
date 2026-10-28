@@ -28,7 +28,7 @@ bool server_setup::join_timeout_due() const {
 }
 
 void server_setup::check_join_timeout() {
-	if (shutdown_scheduled || !join_timeout_due() || is_open_match() || is_ranked_live_or_starting()) {
+	if (shutdown_scheduled || tournament_finished || !join_timeout_due() || is_open_match() || is_ranked_live_or_starting()) {
 		return;
 	}
 
@@ -80,5 +80,5 @@ void server_setup::decide_by_present_players() {
 		on_join_timeout(winner);
 	}
 
-	schedule_shutdown();
+	enter_tournament_finished();
 }

@@ -17,6 +17,12 @@ enum class server_instance_type : uint8_t {
 
 using instance_label_type = augs::constant_size_string<8>;
 
+/*
+	At most this many instances launched together (a tournament's matches in one round) - its ports told in the heartbeat.
+*/
+
+inline constexpr uint16_t max_instance_ports_v = 64;
+
 inline instance_label_type make_instance_label(const server_instance_type type, const uint16_t number) {
 	const auto letter = [type]() {
 		switch (type) {

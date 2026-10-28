@@ -52,6 +52,7 @@ struct tournament_match {
 
 	std::optional<tournament_match_result> result;
 	uint8_t heartbeat_ranked_type = 0;
+	uint8_t tournament_stage = 0;
 	// END GEN INTROSPECTOR
 };
 

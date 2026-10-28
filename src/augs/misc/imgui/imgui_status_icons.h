@@ -246,6 +246,22 @@ namespace augs {
 		}
 
 		/*
+			A trophy (e.g. a tournament's results): a cup with two handles on a stem and a base - drawn, no glyph needed.
+		*/
+
+		inline void trophy_shape(ImDrawList* const draw_list, const ImVec2 pos, const float size, const ImU32 col) {
+			const auto x = [&](const float f) { return pos.x + size * f; };
+			const auto y = [&](const float f) { return pos.y + size * f; };
+			const auto line_w = std::max(1.0f, size * 0.09f);
+
+			draw_list->AddRectFilled(ImVec2(x(0.28f), y(0.1f)), ImVec2(x(0.72f), y(0.45f)), col, size * 0.18f, ImDrawFlags_RoundCornersBottom);
+			draw_list->AddBezierQuadratic(ImVec2(x(0.28f), y(0.18f)), ImVec2(x(0.05f), y(0.18f)), ImVec2(x(0.3f), y(0.42f)), col, line_w);
+			draw_list->AddBezierQuadratic(ImVec2(x(0.72f), y(0.18f)), ImVec2(x(0.95f), y(0.18f)), ImVec2(x(0.7f), y(0.42f)), col, line_w);
+			draw_list->AddRectFilled(ImVec2(x(0.45f), y(0.45f)), ImVec2(x(0.55f), y(0.72f)), col);
+			draw_list->AddRectFilled(ImVec2(x(0.3f), y(0.72f)), ImVec2(x(0.7f), y(0.85f)), col, size * 0.04f);
+		}
+
+		/*
 			A five-pointed star (favorites): gold and filled, or only its outline - drawn by ImGui, no glyph needed.
 		*/
 

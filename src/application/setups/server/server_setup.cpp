@@ -102,6 +102,7 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 #include "application/setups/server/server_nickname_auth.h"
 #include "application/setups/server/server_handle_payload.hpp"
 #include "application/setups/server/server_join_timeout.hpp"
+#include "application/setups/server/server_tournament_finished.hpp"
 #include "application/setups/server/tournament/match_server_name.h"
 #include "application/platform_settings.h"
 
@@ -1316,6 +1317,14 @@ bool server_heartbeat::is_valid() const {
 		return false;
 	}
 
+	if (!tournament_name.empty() && !is_nickname_valid_characters(tournament_name)) {
+		return false;
+	}
+
+	if (instance_num_ports > max_instance_ports_v) {
+		return false;
+	}
+
 	return !server_name.empty() && !current_arena.empty() && !game_mode.empty();
 }
 
@@ -1575,7 +1584,7 @@ void server_setup::admit_or_refuse(const client_id_type id) {
 		});
 
 		if (static_cast<uint32_t>(from_this_ip) >= vars.max_ranked_players_per_ip) {
-			kick_now(id, typesafe_sprintf("At most %x players from one network can join a ranked server.", vars.max_ranked_players_per_ip));
+			kick_now(id, typesafe_sprintf("At most %x players from one network can join this server.", vars.max_ranked_players_per_ip));
 			return;
 		}
 	}
@@ -1772,6 +1781,10 @@ void server_setup::crash_recovery_dump_on_round_start(const const_logic_step ste
 		const auto* const arg = std::get_if<J>(std::addressof(n.payload));
 
 		if (arg != nullptr && *arg == J::ROUND_START) {
+			if (tournament_finished) {
+				return;
+			}
+
 			/*
 				New round just set up. dump_now() is a no-op outside LIVE ranked,
 				so the warmup-round notification fires harmlessly.
@@ -2047,7 +2060,10 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 			request_immediate_heartbeat();
 
 			if (ended.is_final) {
-				if (vars.shutdown_after_one_match) {
+				if (is_tournament_match()) {
+					enter_tournament_finished();
+				}
+				else if (vars.shutdown_after_one_match) {
 					schedule_shutdown();
 				}
 
@@ -3270,6 +3286,43 @@ server_heartbeat server_setup::make_heartbeat() const {
 	heartbeat.domain = vars.domain;
 	heartbeat.instance_label = instance_label;
 	heartbeat.tournament_page_port = tournament_page_port;
+
+	/*
+		The tournament's name as the host typed it - never one that makes the heartbeat invalid: control characters
+		dropped, only spaces left - none.
+	*/
+
+	{
+		auto name = std::string(tournament_name);
+
+		std::erase_if(name, [](const char c) {
+			const auto uc = static_cast<unsigned char>(c);
+			return uc < 0x20 || uc == 0x7f;
+		});
+
+		if (name.find_first_not_of(' ') == std::string::npos) {
+			name.clear();
+		}
+
+		heartbeat.tournament_name = name;
+	}
+
+	heartbeat.tournament_stage = is_tournament_match() ? static_cast<int8_t>(std::clamp(vars.tournament_stage, 0, 127)) : int8_t(-1);
+	heartbeat.instance_first_port = lan_first_port;
+	heartbeat.instance_num_ports = lan_num_ports;
+
+	if (tournament_finished) {
+		heartbeat.finished = true;
+		heartbeat.num_online_humans = 0;
+		heartbeat.num_online = 0;
+		heartbeat.server_slots = 0;
+		heartbeat.score_resistance = 0;
+		heartbeat.score_metropolis = 0;
+		heartbeat.players_resistance.clear();
+		heartbeat.players_metropolis.clear();
+		heartbeat.players_spectating.clear();
+	}
+
 	heartbeat.time_zone = get_time_zone();
 
 	/*
@@ -3764,6 +3817,7 @@ synced_dynamic_vars server_setup::make_synced_dynamic_vars() const {
 	out.allow_overtime = vars.allow_overtime;
 	out.max_team_score = vars.max_team_score;
 	out.shutdown_after_one_match = vars.shutdown_after_one_match;
+	out.tournament_stage = is_tournament_match() ? vars.tournament_stage : -1;
 
 	out.bot_override_difficulty = vars.bot_difficulty;
 
@@ -7906,6 +7960,10 @@ void server_setup::publish_live_state_if_its_time() {
 }
 
 void server_setup::close_open_match_if_requested() {
+	if (tournament_finished) {
+		return;
+	}
+
 	sync_open_match_teams();
 	name_open_match();
 
@@ -7978,7 +8036,7 @@ void server_setup::close_open_match_if_requested() {
 		on_open_match_closed(assigned_teams);
 	}
 
-	schedule_shutdown();
+	enter_tournament_finished();
 }
 
 std::pair<std::size_t, std::size_t> server_setup::count_assigned_players_present() const {

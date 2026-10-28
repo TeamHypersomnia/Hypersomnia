@@ -22,6 +22,7 @@ struct ping_progress {
 
 	net_time_t when_sent_first_ping = -1;
 	net_time_t when_sent_last_ping = -1;
+	net_time_t when_answered = -1;
 
 	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
 
@@ -56,6 +57,7 @@ struct ping_progress {
 	}
 
 	void set_ping_from(const net_time_t current_time) {
+		when_answered = current_time;
 		ping = static_cast<int>((current_time - when_sent_last_ping) * 1000);
 	}
 };
@@ -86,8 +88,21 @@ struct server_list_entry {
 	std::string manual_favorite_address;
 	std::string manual_favorite_name;
 
+	/*
+		Another match of a remote favorite tournament - asked at the ports its answer told (update_favorite_only_list),
+		no favorite itself.
+	*/
+
+	bool range_member = false;
+
+	/*
+		Asked and didn't answer once already - asked again now and then, but shown again only once it answers.
+	*/
+
+	bool gave_up_once = false;
+
 	bool is_manual_favorite() const {
-		return (favorite_only && unlisted) || !manual_favorite_address.empty();
+		return (favorite_only && unlisted && !range_member) || !manual_favorite_address.empty();
 	}
 
 	const std::string& get_manual_favorite_address() const {

@@ -496,7 +496,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 	signalling.max_web_peers = settings.max_web_peers;
 
 	signalling.heartbeat_rejected = [&](const server_heartbeat& hb) {
-		return is_banned_server_name(hb.server_name);
+		return is_banned_server_name(hb.server_name) || is_banned_server_name(hb.tournament_name);
 	};
 
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
@@ -841,6 +841,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 				host.port = data.tournament_page_port;
 				next.tournament_page = "http://" + ::ToString(host) + "/";
 			}
+
+			next.tournament_name = data.tournament_name;
+			next.tournament_stage = data.tournament_stage;
+			next.finished = data.finished;
+			next.instance_first_port = data.instance_first_port;
+			next.instance_num_ports = data.instance_num_ports;
 			next.webrtc_id = meta.webrtc_id;
 
 			{
@@ -1244,7 +1250,7 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 						);
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::heartbeat>) {
-						if (is_banned_server_name(typed_request.server_name)) {
+						if (is_banned_server_name(typed_request.server_name) || is_banned_server_name(typed_request.tournament_name)) {
 							return;
 						}
 

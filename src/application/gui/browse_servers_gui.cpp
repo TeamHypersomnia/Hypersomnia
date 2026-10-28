@@ -11,6 +11,7 @@
 #include "augs/misc/imgui/long_input_text_with_dots.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
+#include "augs/window_framework/shell.h"
 #include "3rdparty/include_httplib.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/readwrite/memory_stream.h"
@@ -837,6 +838,23 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 			if (when_first_ping >= 0.0 && interval_passed(server_entry_timeout, when_first_ping)) {
 				p.state = server_entry_state::GIVEN_UP;
+				s.gave_up_once = true;
+				return;
+			}
+		}
+
+		/*
+			A favorite the list does not have that stopped answering its pings: gone (e.g. a tournament's match port
+			after its round) - the list's own entries go with the list.
+		*/
+
+		if (p.state == S::PING_MEASURED && s.favorite_only) {
+			const bool unanswered = p.when_sent_last_ping > p.when_answered;
+
+			if (unanswered && interval_passed(server_entry_timeout, p.when_sent_last_ping)) {
+				p.state = server_entry_state::GIVEN_UP;
+				p.when_sent_first_ping = current_time;
+				s.gave_up_once = true;
 				return;
 			}
 		}
@@ -933,11 +951,79 @@ void browse_servers_gui_state::show_server_list(
 		return;
 	}
 
-	for (const auto& sp : server_list) {
-		auto id = scoped_id(index_in(server_list, sp));
+	/*
+		The star column: gold for a favorite, an outline otherwise. Hovered - a click there is the star's, never the row's.
+	*/
+
+	auto star_column = [&](const bool is_favorite) {
+		const auto star_size = ImGui::GetTextLineHeight();
+		const auto star_pos = ImGui::GetCursorScreenPos();
+
+		/*
+			The whole star column of the row, the gaps between the rows halved - never a pixel of the row's own tooltip
+			between two stars.
+		*/
+
+		const auto& spacing = ImGui::GetStyle().ItemSpacing;
+		const auto column_left = ImGui::GetWindowPos().x + ImGui::GetColumnOffset() - ImGui::GetScrollX();
+		const auto hover_min = ImVec2(column_left, star_pos.y - spacing.y / 2 - 0.5f);
+		const auto hover_max = ImVec2(column_left + ImGui::GetColumnWidth(), star_pos.y + star_size + spacing.y / 2 + 0.5f);
+
+		const bool star_hovered =
+			ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)
+			&& ImGui::IsMouseHoveringRect(hover_min, hover_max, false)
+		;
+
+		const auto star_color = [&]() {
+			if (is_favorite) {
+				return rgba(255, 200, 0, 255);
+			}
+
+			return rgba(star_hovered ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled]);
+		}();
+
+		const auto center = ImVec2(star_pos.x + star_size / 2, star_pos.y + star_size / 2);
+		star_shape(ImGui::GetWindowDrawList(), center, star_size * 0.45f, ImGui::GetColorU32(ImVec4(star_color)), is_favorite);
+
+		ImGui::Dummy(ImVec2(star_size, star_size));
+
+		return star_hovered;
+	};
+
+	const auto wave_time = augs::steady_secs() / 4.0;
+	const auto wave_color = rgba::get_bright_wave(wave_time, 0.55);
+
+	/*
+		A tournament's prefix: its stage, or FINISHED - in the rainbow for an official, a local or a favorite one,
+		gray for the rest.
+	*/
+
+	auto tournament_prefix = [&](const std::string& label, const bool colored, const bool finished) {
+		if (finished) {
+			text_color(std::string("FINISHED"), cyan);
+		}
+		else if (colored) {
+			text_color(label, wave_color);
+		}
+		else {
+			text_disabled(label);
+		}
+
+		ImGui::SameLine();
+	};
+
+	const auto indent_w = ImGui::GetTextLineHeight() * 1.5f;
+
+	/*
+		in_tournament: one of a tournament's matches, under its row - no star of its own, indented.
+	*/
+
+	auto draw_row = [&](server_list_entry* const sp, const int row_id, const bool in_tournament, const bool tournament_colored) {
+		auto id = scoped_id(row_id);
 		const auto& s = *sp;
 		const auto& progress = s.progress;
 		const auto& d = s.heartbeat;
+		const bool finished_match = d.is_finished_tournament_match();
 
 		const bool given_up = progress.state == server_entry_state::GIVEN_UP;
 		/*
@@ -972,35 +1058,8 @@ void browse_servers_gui_state::show_server_list(
 		);
 		bool star_hovered = false;
 
-		if (key.has_value() && favorites_kept) {
-			const auto star_size = ImGui::GetTextLineHeight();
-			const auto star_pos = ImGui::GetCursorScreenPos();
-
-			/*
-				The whole star column of the row, the gaps between the rows halved - never a pixel of the row's own tooltip
-				between two stars.
-			*/
-
-			const auto& spacing = ImGui::GetStyle().ItemSpacing;
-			const auto column_left = ImGui::GetWindowPos().x + ImGui::GetColumnOffset() - ImGui::GetScrollX();
-			const auto hover_min = ImVec2(column_left, star_pos.y - spacing.y / 2 - 0.5f);
-			const auto hover_max = ImVec2(column_left + ImGui::GetColumnWidth(), star_pos.y + star_size + spacing.y / 2 + 0.5f);
-
-			star_hovered =
-				ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)
-				&& ImGui::IsMouseHoveringRect(hover_min, hover_max, false)
-			;
-
-			const auto star_color = [&]() {
-				if (is_favorite) {
-					return rgba(255, 200, 0, 255);
-				}
-
-				return rgba(star_hovered ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled]);
-			}();
-
-			const auto center = ImVec2(star_pos.x + star_size / 2, star_pos.y + star_size / 2);
-			star_shape(ImGui::GetWindowDrawList(), center, star_size * 0.45f, ImGui::GetColorU32(ImVec4(star_color)), is_favorite);
+		if (key.has_value() && favorites_kept && !in_tournament) {
+			star_hovered = star_column(is_favorite);
 
 			if (star_hovered && ImGui::IsMouseClicked(0)) {
 				if (is_favorite) {
@@ -1025,8 +1084,6 @@ void browse_servers_gui_state::show_server_list(
 					);
 				}
 			}
-
-			ImGui::Dummy(ImVec2(star_size, star_size));
 		}
 
 		ImGui::NextColumn();
@@ -1061,32 +1118,21 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 
-		const auto wave_time = augs::steady_secs() / 4.0;
-		const auto wave_color = rgba::get_bright_wave(wave_time, 0.55);
+		if (in_tournament) {
+			ImGui::Indent(indent_w);
+		}
 
 		{
 			/*
 				No CASUAL or RANKED for a favorite the list does not have now - not known without it.
 			*/
 
-			if (!s.favorite_only && (s.is_official_server() || s.is_internal_network())) {
+			if (d.is_tournament_server() && d.tournament_stage >= 0) {
+				tournament_prefix(::tournament_stage_label(d.tournament_stage), tournament_colored, finished_match);
+			}
+			else if (!s.favorite_only && (s.is_official_server() || s.is_internal_network())) {
 				if (d.is_ranked_server()) {
-					const auto [label, stage_color] = [&]() -> std::pair<const char*, rgba> {
-						switch (d.get_ranked_type()) {
-							case ranked_server_type::TOURNAMENT_BYES:        return { "BYES",       wave_color };
-							case ranked_server_type::TOURNAMENT_MID:         return { "TOURNAMENT", wave_color };
-							case ranked_server_type::TOURNAMENT_SEMIFINALS:  return { "SEMIFINALS", wave_color };
-							case ranked_server_type::TOURNAMENT_FINALS:      return { "FINALS",     wave_color };
-							default:                                         return { "RANKED",     wave_color };
-						}
-					}();
-
-					if (d.is_full()) {
-						text_color(label, color);
-					}
-					else {
-						text_color(label, stage_color);
-					}
+					text_color(std::string("RANKED"), d.is_full() ? color : wave_color);
 
 					ImGui::SameLine();
 				}
@@ -1132,6 +1178,10 @@ void browse_servers_gui_state::show_server_list(
 			if (ImGui::Selectable(displayed_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns) && !star_hovered) {
 				selected_server = s;
 			}
+		}
+
+		if (in_tournament) {
+			ImGui::Unindent(indent_w);
 		}
 
 		const bool ranked_unavailable = s.is_official_server() && d.is_ranked_server() && !ranked_unavailable_reason.empty();
@@ -1196,7 +1246,11 @@ void browse_servers_gui_state::show_server_list(
 			}
 		}
 		
-		if (ImGui::IsItemClicked() && !ranked_unavailable && !star_hovered) {
+		/*
+			A finished match refuses everyone - not joined from here.
+		*/
+
+		if (ImGui::IsItemClicked() && !ranked_unavailable && !star_hovered && !finished_match) {
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", d.server_name, ToString(s.address));
 
@@ -1215,7 +1269,7 @@ void browse_servers_gui_state::show_server_list(
 		if (!s.details_known()) {
 			text_disabled("-");
 			next_columns(num_columns - 3);
-			continue;
+			return;
 		}
 
 		const auto players_text = typesafe_sprintf("%x/%x", d.num_online, d.max_online());
@@ -1292,6 +1346,287 @@ void browse_servers_gui_state::show_server_list(
 
 		ImGui::NextColumn();
 #endif
+	};
+
+	/*
+		A tournament: its star is its first instance's (favorite_servers.h) - a favorite one is expanded by default.
+	*/
+
+	const auto first_instance_label = std::string(::make_instance_label(server_instance_type::TOURNAMENT, 1));
+
+	auto manual_favorite_in = [&](const browser_row& r) -> const server_list_entry* {
+		for (const auto e : r.entries) {
+			if (e->is_manual_favorite()) {
+				return e;
+			}
+		}
+
+		for (const auto& [group, entry] : manual_favorite_tournaments) {
+			if (group == *r.group) {
+				return entry;
+			}
+		}
+
+		return nullptr;
+	};
+
+	auto is_favorite_tournament = [&](const browser_row& r) {
+		return in.favorites.contains(r.group->key, first_instance_label) || manual_favorite_in(r) != nullptr;
+	};
+
+	auto is_expanded = [&](const browser_row& r, const bool favorite) {
+		if (r.is_finished_tournament()) {
+			return false;
+		}
+
+		const bool toggled = found_in(toggled_tournaments, *r.group);
+		return favorite != toggled;
+	};
+
+	auto toggle = [&](const browser_row& r) {
+		if (const auto it = std::find(toggled_tournaments.begin(), toggled_tournaments.end(), *r.group); it != toggled_tournaments.end()) {
+			toggled_tournaments.erase(it);
+		}
+		else {
+			toggled_tournaments.push_back(*r.group);
+		}
+	};
+
+	/*
+		A tournament's row: its name, its matches' players summed, its first instance's ping. A click expands or
+		collapses it - never selected; collapsed with one of its matches selected, nothing is.
+	*/
+
+	auto draw_tournament_row = [&](const browser_row& r, const int row_id, const bool favorite, const bool colored) {
+		auto id = scoped_id(row_id);
+
+		const auto& first_entry = *r.entries.front();
+		const auto* const first = r.first_instance();
+		const auto& key = r.group->key;
+
+		bool star_hovered = false;
+
+		if (favorites_kept) {
+			star_hovered = star_column(favorite);
+
+			if (star_hovered && ImGui::IsMouseClicked(0)) {
+				/*
+					Starred: expanded as a favorite is; un-starred: collapsed - whatever a click did before.
+				*/
+
+				std::erase(toggled_tournaments, *r.group);
+
+				if (favorite) {
+					if (const auto manual = manual_favorite_in(r)) {
+						forget_unlisted = std::make_pair(key, manual->get_manual_favorite_address());
+						forget_unlisted_name = ::favorite_name_of(*manual);
+					}
+					else {
+						in.favorites.remove(key, first_instance_label);
+					}
+				}
+				else {
+					in.favorites.set(
+						key,
+						first_instance_label,
+						connect_target::without_default_port(::ToString(r.group->first_instance)),
+						std::string(first_entry.heartbeat.tournament_name),
+						first_entry.is_official_server()
+					);
+				}
+			}
+		}
+
+		ImGui::NextColumn();
+
+		{
+			const auto ping = [&]() -> std::optional<uint32_t> {
+				if (first != nullptr && first->progress.responding()) {
+					return first->progress.ping;
+				}
+
+				auto lowest = std::optional<uint32_t>();
+
+				for (const auto e : r.entries) {
+					if (e->progress.responding() && (!lowest.has_value() || e->progress.ping < *lowest)) {
+						lowest = e->progress.ping;
+					}
+				}
+
+				return lowest;
+			}();
+
+			if (ping.has_value()) {
+				text(*ping > 999 ? std::string("999>") : std::to_string(*ping));
+			}
+			else {
+				text_disabled(loading_dots);
+			}
+		}
+
+		ImGui::NextColumn();
+
+		const bool finished = r.is_finished_tournament();
+		tournament_prefix("TOURNAMENT", colored, finished);
+
+		const auto name = [&]() {
+			if (streamer_mode && first_entry.is_community_server()) {
+				return std::string("Community tournament");
+			}
+
+			if (!first_entry.heartbeat.tournament_name.empty()) {
+				return std::string(first_entry.heartbeat.tournament_name);
+			}
+
+			auto host = r.group->first_instance;
+			host.port = 0;
+
+			auto ip = ::ToString(host);
+
+			if (const auto colon = ip.rfind(':'); colon != std::string::npos) {
+				ip = ip.substr(0, colon);
+			}
+
+			return "Tournament " + ip;
+		}();
+
+		/*
+			Its results: the tournament's page, served by its host - opened in the browser, the row neither expanded
+			nor collapsed. Not on CrazyGames (no links out).
+		*/
+
+		bool results_hovered = false;
+
+#if !WEB_CRAZYGAMES
+		const auto page_port = first_entry.heartbeat.tournament_page_port;
+#else
+		const auto page_port = uint16_t(0);
+#endif
+
+		const auto row_clicked = ImGui::Selectable(name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap);
+		const bool row_hovered = ImGui::IsItemHovered();
+
+		if (page_port != 0) {
+			ImGui::SameLine();
+
+			/*
+				At the address a join goes to - on the local network its own, not the router's.
+			*/
+
+			auto page = first_entry.get_ip_address(false);
+			page.port = page_port;
+
+			const auto url = "http://" + ::ToString(page) + "/";
+			const auto size = ImGui::GetTextLineHeight();
+			const auto pos = ImGui::GetCursorScreenPos();
+			const auto label_w = ImGui::CalcTextSize("Results").x;
+
+			ImGui::InvisibleButton("##results", ImVec2(size + label_w, size));
+			results_hovered = ImGui::IsItemHovered();
+
+			const auto col = ImGui::GetColorU32(ImVec4(results_hovered ? rgba(255, 220, 80, 255) : rgba(255, 200, 0, 200)));
+			trophy_shape(ImGui::GetWindowDrawList(), pos, size, col);
+			ImGui::GetWindowDrawList()->AddText(ImVec2(pos.x + size, pos.y), col, "Results");
+
+			if (ImGui::IsItemClicked()) {
+				augs::open_url(url);
+			}
+
+			if (results_hovered) {
+				auto tool = scoped_tooltip();
+				text(url);
+			}
+		}
+
+		if (star_hovered) {
+			auto tool = scoped_tooltip();
+			text(favorite ? "Remove from favorites" : "Add to favorites");
+		}
+		else if (row_hovered && !results_hovered && finished) {
+			auto tool = scoped_tooltip();
+			text_disabled("The tournament has finished.");
+		}
+
+		if (row_clicked && !star_hovered && !results_hovered && !finished) {
+			toggle(r);
+		}
+
+		ImGui::NextColumn();
+
+		{
+			auto online = 0;
+			auto max_online = 0;
+
+			for (const auto e : r.entries) {
+				if (e->details_known()) {
+					online += e->heartbeat.num_online;
+					max_online += e->heartbeat.max_online();
+				}
+			}
+
+			const auto players_text = typesafe_sprintf("%x/%x", online, max_online);
+
+			if (online == 0) {
+				text_disabled(players_text);
+			}
+			else {
+				text(players_text);
+			}
+		}
+
+		next_columns(num_columns - 3);
+	};
+
+	auto row_id = 0;
+	auto rows = ::make_browser_rows(server_list);
+
+	if (tournament_match_order) {
+		for (auto& r : rows) {
+			if (r.is_tournament()) {
+				std::stable_sort(r.entries.begin(), r.entries.end(), tournament_match_order);
+			}
+		}
+	}
+
+	for (const auto& r : rows) {
+		if (!r.is_tournament()) {
+			draw_row(r.entries.front(), row_id++, false, false);
+			continue;
+		}
+
+		const auto& first_entry = *r.entries.front();
+		const bool favorite = is_favorite_tournament(r);
+		const bool colored = favorite || first_entry.is_official_server() || first_entry.progress.found_on_internal_network;
+
+		draw_tournament_row(r, row_id++, favorite, colored);
+
+		/*
+			A match the filter is about: shown under its tournament expanded for as long as the filter is.
+		*/
+
+		const bool found_by_filter = list_filter != nullptr && list_filter->IsActive() && std::any_of(
+			r.entries.begin(),
+			r.entries.end(),
+			[&](const auto e) {
+				const auto own = std::string(e->heartbeat.server_name) + " " + std::string(e->heartbeat.current_arena);
+				return list_filter->PassFilter(own.c_str());
+			}
+		);
+
+		/*
+			Collapsed - one of its matches selected: nothing is (no Connect to a match not shown).
+		*/
+
+		const bool expanded = is_expanded(r, favorite) || (found_by_filter && !r.is_finished_tournament());
+
+		for (const auto e : r.entries) {
+			if (expanded) {
+				draw_row(e, row_id++, true, colored);
+			}
+			else if (selected_server.same_server(*e)) {
+				selected_server = {};
+			}
+		}
 	}
 
 	scroll_once_to_selected = false;
@@ -1356,6 +1691,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	advance_list(in);
 
+	cached_favorite_heartbeats.load_once(in.list_cache_path.parent_path() / "favorite_heartbeats.json");
 	update_favorite_only_list(in.favorites);
 
 	if (!show) {
@@ -1497,6 +1833,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	const auto filter_key = connect_target::key_of(filter.InputBuf);
 
+	list_filter = std::addressof(filter);
+
 	auto passes_filter = [&](const server_list_entry& s, const std::string& text) {
 		if (filter_key.has_value()) {
 			return s.get_public_key() == filter_key;
@@ -1505,13 +1843,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		return filter.PassFilter(text.c_str());
 	};
 	local_server_list.clear();
-	tournament_server_list.clear();
 	official_server_list.clear();
 	community_server_list.clear();
 
 	bool has_local_servers = false;
-	bool has_tournament_servers = false;
-	bool has_lan_tournament_servers = false;
 	bool has_official_servers = false;
 	bool has_community_servers = false;
 
@@ -1548,7 +1883,11 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 		}
 
-		const auto effective_name = std::string(s.heartbeat.server_name) + " " + std::string(s.heartbeat.current_arena);
+		const auto effective_name =
+			std::string(s.heartbeat.server_name) + " " +
+			std::string(s.heartbeat.current_arena) + " " +
+			std::string(s.heartbeat.tournament_name)
+		;
 
 		if (!passes_filter(s, effective_name)) {
 			return;
@@ -1557,39 +1896,24 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		target_list.push_back(&s);
 	};
 
+	/*
+		A tournament's matches are in the sections of their servers - drawn under one row there (browser_tournament_rows.h).
+	*/
+
 	for (auto& s : displayed_list()) {
 		const bool is_internal = s.progress.found_on_internal_network;
 
-
-		/*
-			A tournament on the local network (a LAN party) is shown as one too - on the public list
-			only an official server's is, or anyone could dress up a server as a tournament.
-		*/
-
-		if (is_internal && s.heartbeat.is_tournament_server()) {
-			has_tournament_servers = true;
-			has_lan_tournament_servers = true;
-			push_if_passes(s, tournament_server_list);
-		}
-		else if (is_internal) {
+		if (is_internal) {
 			has_local_servers = true;
 			push_if_passes(s, local_server_list);
 		}
+		else if (const bool is_official = s.is_official_server()) {
+			has_official_servers = true;
+			push_if_passes(s, official_server_list);
+		}
 		else {
-			if (const bool is_official = s.is_official_server()) {
-				if (s.heartbeat.is_tournament_server()) {
-					has_tournament_servers = true;
-					push_if_passes(s, tournament_server_list);
-				}
-				else {
-					has_official_servers = true;
-					push_if_passes(s, official_server_list);
-				}
-			}
-			else {
-				has_community_servers = true;
-				push_if_passes(s, community_server_list);
-			}
+			has_community_servers = true;
+			push_if_passes(s, community_server_list);
 		}
 	}
 
@@ -1602,21 +1926,62 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			continue;
 		}
 
-		if (s.heartbeat.is_tournament_server()) {
-			has_tournament_servers = true;
-			has_lan_tournament_servers = true;
-			push_if_passes(s, tournament_server_list);
-		}
-		else {
-			has_local_servers = true;
-			push_if_passes(s, local_server_list);
-		}
+		has_local_servers = true;
+		push_if_passes(s, local_server_list);
 	}
 
 	unlisted_shown.clear();
 
+	/*
+		A remote favorite tournament's match that doesn't answer is not shown - nor the favorite itself, typed in at a
+		match's port gone since, while another match of its tournament answers (update_favorite_only_list).
+	*/
+
+	auto answering_tournaments = std::vector<tournament_group_id>();
+
+	for (const auto* list : { &favorite_only_list, &displayed_list() }) {
+		for (const auto& s : *list) {
+			if (s.progress.responding() || !s.favorite_only) {
+				if (const auto group = ::tournament_group_of(s)) {
+					answering_tournaments.push_back(*group);
+				}
+			}
+		}
+	}
+
+	auto hidden = [&](const server_list_entry& s) {
+		if (s.progress.responding() || !s.gave_up_once) {
+			return false;
+		}
+
+		if (s.range_member) {
+			return true;
+		}
+
+		const auto group = ::tournament_group_of(s);
+		return group.has_value() && found_in(answering_tournaments, *group);
+	};
+
+	/*
+		A tournament with a favorite added by hand among its matches - a favorite also while that match is hidden.
+	*/
+
+	manual_favorite_tournaments.clear();
+
+	for (const auto& s : favorite_only_list) {
+		if (s.is_manual_favorite()) {
+			if (const auto group = ::tournament_group_of(s)) {
+				manual_favorite_tournaments.emplace_back(*group, std::addressof(s));
+			}
+		}
+	}
+
 	for (auto& s : favorite_only_list) {
-		if (!passes_filter(s, std::string(s.heartbeat.server_name))) {
+		if (hidden(s)) {
+			continue;
+		}
+
+		if (!passes_filter(s, std::string(s.heartbeat.server_name) + " " + std::string(s.heartbeat.tournament_name))) {
 			continue;
 		}
 
@@ -1715,12 +2080,22 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		auto sort_entries = [&]() {
 			const auto c = sort_by_column;
 
-			auto sort_by = [&](auto... cmps) {
-				sort_range(local_server_list, make_comparator(cmps...));
-				sort_range(tournament_server_list, make_comparator(cmps...));
-				sort_range(official_server_list, make_comparator(cmps...));
-				sort_range(community_server_list, make_comparator(cmps...));
-				sort_range(unlisted_shown, make_comparator(cmps...));
+			/*
+				A tournament's matches under its row: by the column only, then by the port - never reshuffled by
+				their pings (browser_tournament_rows.h).
+			*/
+
+			auto by_port = [](const T& a, const T& b) {
+				return a->address.port < b->address.port;
+			};
+
+			auto sort_by = [&](auto op1, auto op2, auto op3) {
+				sort_range(local_server_list, make_comparator(op1, op2, op3));
+				sort_range(official_server_list, make_comparator(op1, op2, op3));
+				sort_range(community_server_list, make_comparator(op1, op2, op3));
+				sort_range(unlisted_shown, make_comparator(op1, op2, op3));
+
+				tournament_match_order = make_comparator(op1, by_port, by_port);
 			};
 
 			switch (c) {
@@ -1757,13 +2132,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		Only right after the first opening - never switching the tab under the cursor later.
 	*/
 
-	had_local_servers = has_local_servers || has_lan_tournament_servers;
+	had_local_servers = has_local_servers;
 
 	if (local_tab_precedence_pending && augs::steady_secs() - first_shown_at > 2.0) {
 		local_tab_precedence_pending = false;
 	}
 
-	if (local_tab_precedence_pending && (has_local_servers || has_lan_tournament_servers)) {
+	if (local_tab_precedence_pending && has_local_servers) {
 		local_tab_precedence_pending = false;
 		current_tab = browser_tab::LOCAL;
 	}
@@ -1943,6 +2318,30 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		const bool favorites_tab = current_tab == browser_tab::FAVORITES;
 
+		/*
+			A favorite tournament (its first instance a favorite) - with all its matches.
+		*/
+
+		auto favorite_tournaments = std::vector<tournament_group_id>();
+
+		if (favorites_tab) {
+			const auto first_instance_label = std::string(::make_instance_label(server_instance_type::TOURNAMENT, 1));
+
+			for (const auto* list : { &local_server_list, &official_server_list, &community_server_list }) {
+				for (const auto e : *list) {
+					if (const auto group = ::tournament_group_of(*e)) {
+						if (e->is_manual_favorite() || in.favorites.contains(group->key, first_instance_label)) {
+							favorite_tournaments.push_back(*group);
+						}
+					}
+				}
+			}
+
+			for (const auto& [group, entry] : manual_favorite_tournaments) {
+				favorite_tournaments.push_back(group);
+			}
+		}
+
 		auto shown = [&](const std::vector<server_list_entry*>& list) {
 			if (!favorites_tab) {
 				return list;
@@ -1952,8 +2351,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			for (const auto e : list) {
 				const auto key = e->get_public_key();
+				const auto group = ::tournament_group_of(*e);
 
-				if (key.has_value() && (e->is_manual_favorite() || in.favorites.contains(*key, e->get_instance_label()))) {
+				const bool favorite =
+					(key.has_value() && (e->is_manual_favorite() || in.favorites.contains(*key, e->get_instance_label())))
+					|| (group.has_value() && found_in(favorite_tournaments, *group))
+				;
+
+				if (favorite) {
 					out.push_back(e);
 				}
 			}
@@ -1962,12 +2367,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		const auto locals = shown(local_server_list);
-		const auto tournaments = shown(tournament_server_list);
 		const auto officials = shown(official_server_list);
 		const auto communities = shown(community_server_list);
 
 		const auto local_servers_label = typesafe_sprintf("Local servers (%x)", locals.size());
-		const auto tournament_servers_label = typesafe_sprintf("Ongoing Tournament (%x)", tournaments.size());
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", officials.size());
 		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", communities.size());
 #if !PLATFORM_WEB
@@ -2016,10 +2419,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			if (!locals.empty()) {
 				section(local_servers_label, green, "local", locals, "");
-			}
-
-			if (!tournaments.empty()) {
-				section(tournament_servers_label, cyan, "tournament", tournaments, "");
 			}
 
 			if (!officials.empty()) {
@@ -2074,35 +2473,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		if (t == browser_tab::LOCAL) {
-			/*
-				The local network's tournament matches above its other servers.
-			*/
-
-			auto lan_tournaments = std::vector<server_list_entry*>();
-
-			for (const auto e : tournaments) {
-				if (e->progress.found_on_internal_network) {
-					lan_tournaments.push_back(e);
-				}
-			}
-
-			if (has_lan_tournament_servers) {
-				section(typesafe_sprintf("Ongoing Tournament (%x)", lan_tournaments.size()), cyan, "tournament", lan_tournaments, "");
-			}
-
-			if (has_local_servers || !has_lan_tournament_servers) {
-				section(local_servers_label, green, "local", locals, has_local_servers ? "" : "No servers found on your local network.");
-			}
+			section(local_servers_label, green, "local", locals, has_local_servers ? "" : "No servers found on your local network.");
 		}
 		else if (t == browser_tab::ALL && has_local_servers) {
 			section(local_servers_label, green, "local", locals, "");
 		}
 
 		if (t == browser_tab::ALL) {
-			if (has_tournament_servers) {
-				section(tournament_servers_label, cyan, "tournament", tournaments, "");
-			}
-
 			section(official_servers_label, yellow, "official", officials, has_official_servers ? "" : "No official servers are online at the time.");
 		}
 
@@ -2186,9 +2563,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				&& !ranked_unavailable_reason.empty()
 			;
 
-			auto scope = maybe_disabled_cols({}, !selected_server.is_set() || ranked_unavailable);
+			/*
+				A tournament's finished match refuses everyone.
+			*/
 
-			if (ImGui::Button("Connect") && !ranked_unavailable) {
+			const bool finished = selected_server.heartbeat.is_finished_tournament_match();
+
+			auto scope = maybe_disabled_cols({}, !selected_server.is_set() || ranked_unavailable || finished);
+
+			if (ImGui::Button("Connect") && !ranked_unavailable && !finished) {
 				auto& s = selected_server;
 
 				LOG("Chosen server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);
@@ -3342,6 +3725,14 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 			if (f.manual) {
 				listed_entry->manual_favorite_address = f.address;
 				listed_entry->manual_favorite_name = f.name;
+
+#if BUILD_NATIVE_SOCKETS
+				/*
+					Remembered as the list has it - once its port is gone from the list, the first one is asked.
+				*/
+
+				cached_favorite_heartbeats.remember(*listed_entry, augs::steady_secs());
+#endif
 				continue;
 			}
 
@@ -3357,10 +3748,12 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 		}
 
 		auto entry = server_list_entry();
+		bool seen_before = false;
 
 		for (const auto& old : favorite_only_list) {
-			if (old.unlisted == f.manual && old.meta.server_public_key == f.key && old.get_instance_label() == f.label && old.favorite_address == f.address) {
+			if (!old.range_member && old.unlisted == f.manual && old.meta.server_public_key == f.key && old.get_instance_label() == f.label && old.favorite_address == f.address) {
 				entry = old;
+				seen_before = true;
 			}
 		}
 
@@ -3384,10 +3777,23 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 		*/
 
 		if (resolution.address.has_value()) {
+			const bool first_time_here = entry.address.type == NETCODE_ADDRESS_NONE;
 			entry.address = *resolution.address;
+
+			/*
+				Not answered yet since the game started: what it told last time (favorite_heartbeats.h).
+			*/
+
+			if (!seen_before || (first_time_here && !entry.heartbeat_from_ping)) {
+				cached_favorite_heartbeats.apply_to(entry);
+			}
 		}
 		else if (resolution.failed) {
 			entry.progress.state = server_entry_state::GIVEN_UP;
+		}
+
+		if (entry.heartbeat_from_ping) {
+			cached_favorite_heartbeats.remember(entry, augs::steady_secs());
 		}
 #else
 		entry.progress.state = server_entry_state::GIVEN_UP;
@@ -3424,6 +3830,75 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 
 		new_list.emplace_back(std::move(entry));
 	}
+
+#if BUILD_NATIVE_SOCKETS
+	/*
+		A remote favorite tournament (its answer, or its last one, tells its ports): all its matches asked at once - each
+		a placeholder until it answers, hidden once it doesn't (asked anew by Refresh). Only at its IP, only with its key.
+		So also one typed in at a match's port: once that port is gone (only the final's is left), the first one answers.
+		On the local network the broadcast's discovery does this (lan_servers.h).
+	*/
+
+	const auto num_favorites = new_list.size();
+
+	for (std::size_t i = 0; i < num_favorites; ++i) {
+		const auto source = new_list[i];
+		const auto& d = source.heartbeat;
+
+		if (!d.is_tournament_server() || d.instance_first_port == 0 || d.instance_num_ports == 0) {
+			continue;
+		}
+
+		if (source.address.type == NETCODE_ADDRESS_NONE || ::is_internal(source.address)) {
+			continue;
+		}
+
+		const auto end_port = static_cast<uint32_t>(d.instance_first_port) + std::min(d.instance_num_ports, max_instance_ports_v);
+
+		for (auto port = static_cast<uint32_t>(d.instance_first_port); port < end_port && port <= 65535; ++port) {
+			auto address = source.address;
+			address.port = static_cast<port_type>(port);
+
+			const bool known = on_server_list(address) || std::any_of(new_list.begin(), new_list.end(), [&](const auto& e) {
+				return e.address == address && e.meta.server_public_key == source.meta.server_public_key;
+			});
+
+			if (known) {
+				continue;
+			}
+
+			auto member = server_list_entry();
+
+			for (const auto& old : favorite_only_list) {
+				if (old.range_member && old.address == address && old.meta.server_public_key == source.meta.server_public_key) {
+					member = old;
+				}
+			}
+
+			if (!member.range_member) {
+				member.range_member = true;
+				member.address = address;
+				member.heartbeat.server_name = ::ToString(address);
+				member.heartbeat.ranked_state = d.ranked_state;
+				member.heartbeat.tournament_name = d.tournament_name;
+				member.heartbeat.tournament_stage = d.tournament_stage;
+				member.heartbeat.instance_first_port = d.instance_first_port;
+				member.heartbeat.instance_num_ports = d.instance_num_ports;
+				member.heartbeat.tournament_page_port = d.tournament_page_port;
+			}
+
+			member.favorite_only = true;
+			member.unlisted = source.unlisted;
+			member.meta.is_official = source.meta.is_official;
+			member.meta.server_public_key = source.meta.server_public_key;
+			member.favorite_address = connect_target::without_default_port(::ToString(address));
+
+			new_list.emplace_back(std::move(member));
+		}
+	}
+
+	cached_favorite_heartbeats.save_if_changed(augs::steady_secs());
+#endif
 
 	favorite_only_list = std::move(new_list);
 

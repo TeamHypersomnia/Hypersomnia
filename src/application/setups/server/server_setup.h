@@ -540,7 +540,7 @@ public:
 	/*
 		Optional callback fired once per match the moment the summary is posted (match decided).
 		Used by the tournament coordinator to record per-match results. The instance still
-		runs through the summary intermission afterwards before exiting via shutdown_after_one_match.
+		runs through the summary intermission afterwards, then stays up finished (server_tournament_finished.hpp).
 	*/
 	std::function<void(const messages::match_summary_message&)> on_match_summary;
 
@@ -658,6 +658,24 @@ public:
 
 	port_type lan_first_port = 0;
 	uint16_t lan_num_ports = 0;
+
+	/*
+		A tournament's match (vars.tournament_stage set): its tournament's name, for the browsers.
+	*/
+
+	server_name_type tournament_name;
+
+	/*
+		A tournament's match that finished stays up empty instead of shutting down - its tournament stays one on the
+		browsers' lists. Whoever is still here goes, whoever comes is refused, both told why (::tournament_finished_text).
+		It is closed when its round ends (run_tournament.cpp), the final - when the host stops the tournament.
+	*/
+
+	bool tournament_finished = false;
+
+	bool is_tournament_match() const;
+	void enter_tournament_finished();
+	void disconnect_everyone_from_finished();
 
 	/*
 		Who plays this match - an open match's roster grows as players join.
@@ -798,6 +816,7 @@ public:
 			}
 
 			close_open_match_if_requested();
+			disconnect_everyone_from_finished();
 			check_join_timeout();
 			track_match_start_spectators();
 			publish_live_state_if_its_time();

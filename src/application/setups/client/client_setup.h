@@ -475,12 +475,25 @@ class client_setup :
 						}
 					}
 
-					if (sv_dynamic_vars.shutdown_after_one_match) {
+					/*
+						A tournament's match leaves its server empty once its summary is over - the text as the server
+						tells it to whoever stayed (server_tournament_finished.hpp).
+					*/
+
+					const bool tournament_match = sv_dynamic_vars.tournament_stage >= 0;
+
+					if (tournament_match || sv_dynamic_vars.shutdown_after_one_match) {
 						const auto& ends = step.get_queue<messages::match_summary_ended>();
+
+						const auto concluded_text =
+							tournament_match ?
+							::tournament_finished_text(sv_dynamic_vars.tournament_stage) :
+							std::string("This match has concluded.")
+						;
 
 						for (const auto& ended : ends) {
 							if (ended.is_final) {
-								set_disconnect_reason("This match has concluded.", true);
+								set_disconnect_reason(concluded_text, true);
 								disconnect();
 								break;
 							}
@@ -1115,6 +1128,7 @@ public:
 	}
 
 	std::string get_scoreboard_caption() const;
+	std::string get_scoreboard_stage() const;
 	void do_rcon_gui(bool force = false);
 
 	void request_abandon_ranked_match(ingame_menu_button_type);

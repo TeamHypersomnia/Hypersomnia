@@ -2129,6 +2129,11 @@ work_result work(
 
 			return ::run_tournament(runner_in);
 		}
+#else
+		if (params.is_tournament()) {
+			LOG("ERROR: A tournament runs on the Linux server (Hypersomnia-Headless.AppImage or Docker) - see hypersomnia.io/generator.");
+			return work_result::FAILURE;
+		}
 #endif
 
 		if (num_total == 0) {
@@ -7585,6 +7590,14 @@ work_result work(
 						}
 						else {
 							return false;
+						}
+					}),
+					visit_current_setup([&]<typename S>(const S& setup) {
+						if constexpr(std::is_same_v<client_setup, remove_cref<S>>) {
+							return setup.get_scoreboard_stage();
+						}
+						else {
+							return std::string();
 						}
 					})
 				};

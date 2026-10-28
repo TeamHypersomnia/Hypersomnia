@@ -307,7 +307,19 @@ void arena_scoreboard_gui::draw_gui(
 		*/
 
 		const auto star_w = in.server_is_favorite ? static_cast<int>(window_name_size.y * 1.2f) : 0;
-		const auto caption_x = sz.x / 2 - (star_w + window_name_size.x + speed_caption_size.x) / 2;
+
+		/*
+			A tournament's stage before the name, in the rainbow.
+		*/
+
+		const auto stage_caption =
+			in.scoreboard_stage.empty() ?
+			formatted_string() :
+			rainbow_string(in.scoreboard_stage + "  ", style(in.gui_fonts.gui, white), augs::steady_secs())
+		;
+
+		const auto stage_w = stage_caption.empty() ? 0 : get_text_bbox(stage_caption).x + 1;
+		const auto caption_x = sz.x / 2 - (star_w + stage_w + window_name_size.x + speed_caption_size.x) / 2;
 
 		if (in.server_is_favorite) {
 			const auto star_center = vec2(pen) + vec2(caption_x + star_w / 2.0f, window_name_size.y / 2.0f);
@@ -317,8 +329,8 @@ void arena_scoreboard_gui::draw_gui(
 			::draw_star(o, star_center, star_radius, rgba(255, 200, 0, 255));
 		}
 
-		text_stroked(window_name, col, { caption_x + star_w, 0 });
-		text_stroked(speed_caption, gray, { caption_x + star_w + window_name_size.x, 0 });
+		text_stroked(window_name, col, { caption_x + star_w, 0 }, {}, stage_caption);
+		text_stroked(speed_caption, gray, { caption_x + star_w + stage_w + window_name_size.x, 0 });
 	}
 
 	pen.y += window_name_size.y;

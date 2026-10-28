@@ -1,4 +1,5 @@
 #if HEADLESS
+#include <random>
 #include <algorithm>
 #include <filesystem>
 #include "application/setups/server/tournament/tournament_coordinator.h"
@@ -333,6 +334,7 @@ void tournament_coordinator::pair_open_first_bracket_round() {
 		m.port = port_cursor++;
 		m.map_and_mode = cfg.map_for_bracket_rounds_left(tournament_config::bracket_rounds_for_teams(cfg.num_teams()));
 		m.heartbeat_ranked_type = static_cast<uint8_t>(bracket == 2 ? ranked_server_type::TOURNAMENT_FINALS : ranked_server_type::TOURNAMENT_MID);
+		m.tournament_stage = static_cast<uint8_t>(tournament_config::bracket_rounds_for_teams(bracket) - 1);
 		m.server_name = typesafe_sprintf("Match #%x (any pair)", i + 1);
 
 		state.current_bracket_round_matches.push_back(std::move(m));
@@ -484,6 +486,7 @@ void tournament_coordinator::pair_teams() {
 		m.port = port_cursor++;
 		m.map_and_mode = map_and_mode_for_bracket_round;
 		m.heartbeat_ranked_type = heartbeat_value;
+		m.tournament_stage = static_cast<uint8_t>(tournament_config::bracket_rounds_for_teams(static_cast<uint32_t>(alive_at_bracket_round_start)) - 1);
 		m.server_name = make_server_name_for(m);
 
 		state.current_bracket_round_matches.push_back(std::move(m));
@@ -916,9 +919,10 @@ namespace {
 			static uint32_t run_counter = 0;
 
 			const auto dir = std::filesystem::temp_directory_path() / typesafe_sprintf(
-				"hypersomnia-tournament-test-%x-%x",
+				"hypersomnia-tournament-test-%x-%x-%x",
 				static_cast<uint64_t>(augs::date_time::secs_since_epoch() * 1000.0),
-				run_counter++
+				run_counter++,
+				std::random_device()()
 			);
 
 			std::filesystem::create_directories(dir);

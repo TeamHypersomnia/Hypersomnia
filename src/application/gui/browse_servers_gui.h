@@ -11,12 +11,15 @@
 #include "application/setups/client/client_connect_string.h"
 #include "view/faction_view_settings.h"
 #include "application/gui/server_list_entry.h"
+#include "application/gui/browser_tournament_rows.h"
+#include "application/gui/favorite_heartbeats.h"
 #include "application/gui/browser_tab.h"
 #include "application/gui/unlisted_server_fields.h"
 #include "augs/misc/ed25519.h"
 
 #include <chrono>
 #include <future>
+#include <functional>
 #include <unordered_map>
 #include "application/network/resolve_address_result.h"
 
@@ -157,6 +160,18 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	std::vector<server_list_entry*> unlisted_shown;
 
+	/*
+		The tournaments expanded or collapsed by a click - against their default (a favorite one expanded) -
+		see browser_tournament_rows.h. And the list's filter, while it is drawn: a match it finds is shown expanded.
+	*/
+
+	std::vector<tournament_group_id> toggled_tournaments;
+	std::function<bool(const server_list_entry*, const server_list_entry*)> tournament_match_order;
+	const ImGuiTextFilter* list_filter = nullptr;
+
+	favorite_heartbeats cached_favorite_heartbeats;
+	std::vector<std::pair<tournament_group_id, const server_list_entry*>> manual_favorite_tournaments;
+
 #if BUILD_NATIVE_SOCKETS
 	std::unordered_map<std::string, std::future<resolve_address_result>> favorite_resolutions;
 	std::unordered_map<std::string, std::optional<netcode_address_t>> favorite_resolved;
@@ -234,7 +249,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::string error_message;
 
 	std::vector<server_list_entry*> local_server_list;
-	std::vector<server_list_entry*> tournament_server_list;
 	std::vector<server_list_entry*> official_server_list;
 	std::vector<server_list_entry*> community_server_list;
 

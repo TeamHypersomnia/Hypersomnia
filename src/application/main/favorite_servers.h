@@ -43,6 +43,29 @@ struct favorite_server_entry {
 	// END GEN INTROSPECTOR
 };
 
+/*
+	A favorite's last heartbeat, as it answered a ping - kept between the game's starts (favorite_heartbeats.h): a favorite
+	tournament shows its matches at once, gray until they answer.
+*/
+
+struct favorite_heartbeat_entry {
+	// GEN INTROSPECTOR struct favorite_heartbeat_entry
+	std::string key;
+	std::string address;
+	std::string arena;
+	std::string game_mode;
+	uint8_t ranked_state = 0;
+	std::string tournament_name;
+	int tournament_stage = -1;
+	bool finished = false;
+	uint16_t tournament_page_port = 0;
+	uint16_t instance_first_port = 0;
+	uint16_t instance_num_ports = 0;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const favorite_heartbeat_entry&) const = default;
+};
+
 struct favorite_server {
 	augs::ed25519_public_key_type key = {};
 	std::string label;

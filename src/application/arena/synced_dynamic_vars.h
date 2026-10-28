@@ -72,6 +72,7 @@ struct synced_dynamic_vars {
 	bool force_short_match = false;
 	bool allow_overtime = false;
 	bool shutdown_after_one_match = false;
+	int32_t tournament_stage = -1;
 	augs::maybe<uint32_t> max_team_score;
 	server_ranked_vars ranked;
 	bool is_ranked = false;

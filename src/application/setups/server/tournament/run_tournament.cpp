@@ -26,6 +26,7 @@
 #include "application/setups/server/server_assigned_teams.h"
 #include "application/setups/server/server_slots.h"
 #include "application/network/account_id.h"
+#include "application/network/address_utils.h"
 #if CRASH_RECOVERY
 #include "application/setups/server/crash_recovery/server_recovery_worker.h"
 #endif
@@ -733,6 +734,43 @@ std::string tournament_config::compute_hash() const {
 	return augs::bytes_to_hex(augs::secure_hash(serialized));
 }
 
+/*
+	The most matches a round can have: an open first round - a server per pair of the bracket; listed teams - the first
+	round's (the rest has byes) or the second's. Each takes a game port and a WebRTC port, one after another from
+	the first; the browsers take at most max_instance_ports_v of them as one tournament.
+*/
+
+static bool check_tournament_ports(const tournament_config& cfg, const uint32_t base_port, const uint32_t webrtc_base_port) {
+	auto bracket = 2u;
+
+	while (bracket < cfg.num_teams()) {
+		bracket *= 2;
+	}
+
+	const auto max_matches =
+		cfg.is_open() ?
+		bracket / 2 :
+		std::max(cfg.num_teams() - bracket / 2, bracket / 4)
+	;
+
+	if (max_matches > max_instance_ports_v) {
+		LOG("ERROR: A tournament of %x teams has a round of %x matches - at most %x can be played at once.", cfg.num_teams(), max_matches, max_instance_ports_v);
+		return false;
+	}
+
+	if (base_port + max_matches - 1 > 65535) {
+		LOG("ERROR: The tournament's matches take ports %x-%x - past 65535. Choose a lower first port.", base_port, base_port + max_matches - 1);
+		return false;
+	}
+
+	if (webrtc_base_port + max_matches - 1 > 65535) {
+		LOG("ERROR: The tournament's matches take WebRTC ports %x-%x - past 65535. Choose a lower webrtc_port_range_begin.", webrtc_base_port, webrtc_base_port + max_matches - 1);
+		return false;
+	}
+
+	return true;
+}
+
 work_result run_tournament(const run_tournament_input& in) {
 	auto cfg = in.config;
 
@@ -743,6 +781,10 @@ work_result run_tournament(const run_tournament_input& in) {
 	);
 
 	const auto base_port = in.config_pattern.server_start.port;
+
+	if (!::check_tournament_ports(cfg, base_port, in.config_pattern.server.webrtc_port_range_begin)) {
+		return work_result::FAILURE;
+	}
 
 	/*
 		The live page: http://<this server>:<its first port>/ - the game's port number, but TCP.
@@ -894,7 +936,22 @@ work_result run_tournament(const run_tournament_input& in) {
 			page_server->wait_until_ready();
 			served_page_port = page_port;
 
-			LOG("Tournament: the live page is at http://<this server>:%x/ (TCP %x).", page_port, page_port);
+			/*
+				Where to find it on the local network - a first-time host doesn't know the machine's address.
+			*/
+
+			if (const auto lan = ::get_internal_network_address()) {
+				auto game = *lan;
+				game.port = static_cast<port_type>(base_port);
+
+				auto page = *lan;
+				page.port = page_port;
+
+				LOG_HIGHLIGHTED("Tournament: on the local network at %x - the live page: http://%x/ (TCP %x).", ::ToString(game), ::ToString(page), page_port);
+			}
+			else {
+				LOG("Tournament: the live page is at http://<this server>:%x/ (TCP %x).", page_port, page_port);
+			}
 		}
 		else {
 			LOG("Tournament: the live page could not take TCP port %x - not served.", page_port);
@@ -948,7 +1005,7 @@ work_result run_tournament(const run_tournament_input& in) {
 		The per-bracket-round runner. Builds one server_setup per match, all in this
 		process as separate threads, just like the ranked instances.
 		Each instance is a TOURNAMENT one (ranked, label t1, t2...) with the ranked vars and:
-		    - vars.shutdown_after_one_match = true (graceful exit after summary intermission)
+		    - vars.tournament_stage (finished: stays up empty until the round ends - server_tournament_finished.hpp)
 		    - per-match assigned_teams (team_a -> RESISTANCE, team_b -> METROPOLIS)
 		    - per-match arena/mode from tournament_config.arenas
 		    - per-match server_name from coordinator
@@ -967,9 +1024,14 @@ work_result run_tournament(const run_tournament_input& in) {
 	std::function<bool(tournament_match&, const account_id_string&, const account_id_string&)> claim_listed_nickname;
 	std::function<int64_t()> current_bracket_round_deadline;
 
-	deps.run_bracket_round = [&](
+	/*
+		hold_until_interrupted: the final after the tournament's end - finished, up until Ctrl+C.
+	*/
+
+	auto launch_matches = [&](
 		std::vector<tournament_match>& matches,
-		tournament_commit_match_result_fn commit
+		tournament_commit_match_result_fn commit,
+		const bool hold_until_interrupted
 	) {
 		std::atomic<bool> any_failure = false;
 
@@ -977,12 +1039,32 @@ work_result run_tournament(const run_tournament_input& in) {
 			A port used again in this bracket round: the last bracket round's final score there isn't this match's live one.
 		*/
 
-		{
+		if (!hold_until_interrupted) {
 			std::scoped_lock lk(page_lk);
 
 			for (const auto& m : matches) {
 				page_live.erase(m.port);
 			}
+		}
+
+		auto is_resolved = [](const tournament_match& m) {
+			return m.result.has_value() || m.closed_empty;
+		};
+
+		/*
+			The round ends once every match is decided and its server finished - a finished one stays up empty until then
+			(server_tournament_finished.hpp), so the browsers keep the whole tournament. Decided before a crash: started
+			finished - all of them: the round ends at once.
+		*/
+
+		const auto unresolved = std::make_shared<std::atomic<int>>(static_cast<int>(std::count_if(
+			matches.begin(),
+			matches.end(),
+			[&](const auto& m) { return !is_resolved(m); }
+		)));
+
+		if (*unresolved == 0 && !hold_until_interrupted) {
+			return;
 		}
 
 		auto bracket_round_should_interrupt = [&in]() {
@@ -1056,17 +1138,6 @@ work_result run_tournament(const run_tournament_input& in) {
 		for (auto& match : matches) {
 			const auto this_match_index = match_index++;
 
-			if (match.result.has_value()) {
-				/*
-					Carried over from a previous (crashed) session: this match already
-					concluded and was persisted. No instance to spawn. The coordinator
-					owns wiping the per-port recovery file (already done above its call
-					to run_bracket_round), so nothing to do here.
-				*/
-
-				continue;
-			}
-
 			auto this_config = in.config_pattern;
 
 			this_config.server_start.port = match.port;
@@ -1081,7 +1152,17 @@ work_result run_tournament(const run_tournament_input& in) {
 			this_config.server.game_mode = tournament_game_mode;
 			this_config.server.map_cycle_game_mode_always = tournament_game_mode;
 			this_config.server.server_name = match.server_name;
-			this_config.server.shutdown_after_one_match = true;
+			this_config.server.tournament_stage = match.tournament_stage;
+
+			/*
+				Decided already: never resumes from (nor writes) the port's recovery file - it starts finished.
+			*/
+
+			const bool starts_finished = is_resolved(match);
+
+			if (starts_finished) {
+				this_config.server.ranked.dump_server_recovery_state_every_round = false;
+			}
 
 			/*
 				The round's map only - the default cycle would change it while the server waits for its players.
@@ -1154,12 +1235,29 @@ work_result run_tournament(const run_tournament_input& in) {
 			roster.open_team_size = match.open_team_size;
 
 			/*
-				RCON's "reset to defaults" brings back the match's own settings - its arena, overtime, shutdown, cycle.
+				RCON's "reset to defaults" brings back the match's own settings - its arena, overtime, stage, cycle.
 			*/
 
 			auto canon_server_vars = this_config.server;
 
 			auto* match_ptr = &match;
+
+			/*
+				Counted as decided once - the round may end once none is left.
+			*/
+
+			const auto counted = std::make_shared<std::atomic<bool>>(starts_finished);
+
+			auto match_commit = [commit, unresolved, counted](
+				tournament_match& m,
+				const tournament_match_outcome& outcome
+			) {
+				commit(m, outcome);
+
+				if (!counted->exchange(true)) {
+					unresolved->fetch_sub(1);
+				}
+			};
 
 			/*
 				Each match owns its own thread end-to-end: bind retry, server_setup
@@ -1177,7 +1275,12 @@ work_result run_tournament(const run_tournament_input& in) {
 				roster = std::move(roster),
 				bracket_round_should_interrupt,
 				on_instance_exit,
-				commit,
+				commit = tournament_commit_match_result_fn(match_commit),
+				unresolved,
+				counted,
+				hold_until_interrupted,
+				starts_finished,
+				tournament_name = server_name_type(page_cfg.name),
 				close_bracket_round,
 				bracket_round_deadline,
 				open_bracket_round_players,
@@ -1266,6 +1369,7 @@ work_result run_tournament(const run_tournament_input& in) {
 				server_ptr->heartbeat_reported_bracket_round_type = static_cast<ranked_server_type>(match_ptr->heartbeat_ranked_type);
 
 				server_ptr->tournament_page_port = served_page_port;
+				server_ptr->tournament_name = tournament_name;
 
 				/*
 					The bracket round's matches are on the consecutive ports from the base one.
@@ -1273,6 +1377,10 @@ work_result run_tournament(const run_tournament_input& in) {
 
 				server_ptr->lan_first_port = base_port;
 				server_ptr->lan_num_ports = num_matches;
+
+				if (starts_finished) {
+					server_ptr->enter_tournament_finished();
+				}
 
 				/*
 					The round's timeout: a match of known teams decided by who came (server_join_timeout.hpp) -
@@ -1508,7 +1616,24 @@ work_result run_tournament(const run_tournament_input& in) {
 					typesafe_sprintf("[T%x] ", match_ptr->port)
 				};
 
-				on_instance_exit(::dedicated_server_worker(worker_in, bracket_round_should_interrupt));
+				auto round_over_here = [bracket_round_should_interrupt, unresolved, hold_until_interrupted, server_raw]() {
+					if (bracket_round_should_interrupt()) {
+						return true;
+					}
+
+					return !hold_until_interrupted && unresolved->load() <= 0 && server_raw->tournament_finished;
+				};
+
+				on_instance_exit(::dedicated_server_worker(worker_in, round_over_here));
+
+				/*
+					Gone without a result (e.g. shut down from the admin panel): nothing to wait for here any more -
+					the coordinator then stops the tournament with an error.
+				*/
+
+				if (!counted->exchange(true)) {
+					unresolved->fetch_sub(1);
+				}
 			});
 		}
 
@@ -1521,15 +1646,34 @@ work_result run_tournament(const run_tournament_input& in) {
 		}
 	};
 
+	deps.run_bracket_round = [&](
+		std::vector<tournament_match>& matches,
+		tournament_commit_match_result_fn commit
+	) {
+		launch_matches(matches, std::move(commit), false);
+	};
+
 	/*
 		Over: stay up rather than quit - a container would only be started again and again (restart: unless-stopped) -
 		with the live page showing the results.
 	*/
 
-	auto idle_until_interrupted = [&in]() {
-		while (!(in.handle_sigint && in.handle_sigint())) {
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-		}
+	/*
+		The final stays on the list, finished - the browsers show the tournament over (FINISHED, not expandable).
+		Its name is never shown there; its port is the first one, as a favorite tournament is.
+	*/
+
+	auto idle_until_interrupted = [&]() {
+		auto final_match = tournament_match();
+		final_match.port = static_cast<uint16_t>(base_port);
+		final_match.server_name = "Final";
+		final_match.map_and_mode = page_cfg.maps.empty() ? std::string("de_cyberaqua") : page_cfg.maps.back();
+		final_match.heartbeat_ranked_type = static_cast<uint8_t>(ranked_server_type::TOURNAMENT_FINALS);
+		final_match.tournament_stage = 0;
+		final_match.result = tournament_match_result();
+
+		auto matches = std::vector<tournament_match> { final_match };
+		launch_matches(matches, [](tournament_match&, const tournament_match_outcome&) {}, true);
 	};
 
 	auto coordinator = tournament_coordinator(
@@ -1564,6 +1708,16 @@ work_result run_tournament(const run_tournament_input& in) {
 		::post_tournament_results(in.config_pattern.server_private.tournament_results_webhook_url, results_json, page_signer, in.handle_sigint);
 	};
 
+	/*
+		The final back on the list at once - the webhook may take its time meanwhile.
+	*/
+
+	auto publish_and_stay = [&]() {
+		auto publishing = std::thread(publish_results);
+		idle_until_interrupted();
+		publishing.join();
+	};
+
 	if (!coordinator.run()) {
 		if (const auto played = tournament_state::load(coordinator.completed_archive)) {
 			{
@@ -1571,11 +1725,13 @@ work_result run_tournament(const run_tournament_input& in) {
 				page_state = *played;
 			}
 
-			publish_results();
+			page_finished = true;
+			publish_and_stay();
 		}
-
-		page_finished = true;
-		idle_until_interrupted();
+		else {
+			page_finished = true;
+			idle_until_interrupted();
+		}
 	}
 	else if (coordinator.aborted) {
 		/*
@@ -1595,9 +1751,8 @@ work_result run_tournament(const run_tournament_input& in) {
 		return work_result::FAILURE;
 	}
 	else if (!(in.handle_sigint && in.handle_sigint())) {
-		publish_results();
 		LOG("Tournament: over - the live page shows the results. Ctrl+C (or stopping the service) to quit.");
-		idle_until_interrupted();
+		publish_and_stay();
 	}
 
 	if (page_server) {

@@ -46,6 +46,12 @@ struct draw_setup_gui_input {
 
 	const bool server_is_favorite;
 
+	/*
+		A tournament's match: its stage (e.g. SEMIFINALS) in the rainbow before the name - empty otherwise.
+	*/
+
+	const std::string scoreboard_stage;
+
 	auto get_drawer() const {
 		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };
 	}

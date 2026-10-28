@@ -87,6 +87,11 @@ struct server_heartbeat {
 	int32_t secs_until_next_event = -1;
 	instance_label_type instance_label;
 	uint16_t tournament_page_port = 0;
+	server_name_type tournament_name;
+	int8_t tournament_stage = -1;
+	bool finished = false;
+	uint16_t instance_first_port = 0;
+	uint16_t instance_num_ports = 0;
 	heartbeat_nonce_type ack_nonce = {};
 	std::optional<server_request_signature> signature;
 	// END GEN INTROSPECTOR
@@ -152,6 +157,23 @@ struct server_heartbeat {
 			|| t == ranked_server_type::TOURNAMENT_MID
 			|| t == ranked_server_type::TOURNAMENT_SEMIFINALS
 			|| t == ranked_server_type::TOURNAMENT_FINALS;
+	}
+
+	/*
+		A tournament's match that finished: empty, refuses everyone - up until its round ends (the final - until the host
+		stops the tournament).
+	*/
+
+	bool is_finished_tournament_match() const {
+		return is_tournament_server() && finished;
+	}
+
+	/*
+		The whole tournament over: only its final is left, finished.
+	*/
+
+	bool is_finished_tournament() const {
+		return is_finished_tournament_match() && tournament_stage == 0;
 	}
 
 	bool operator==(const server_heartbeat&) const = default;
