@@ -379,7 +379,7 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 	}
 
 	/*
-		--tournament-spectator-slots <places per match> - 6 by default.
+		--tournament-spectator-slots <places per round> - 16 by default, split between the round's matches.
 	*/
 
 	if (!params.tournament_spectator_slots.empty()) {
@@ -1197,7 +1197,13 @@ work_result run_tournament(const run_tournament_input& in) {
 					match.team_a_player_ids.size() + match.team_b_player_ids.size()
 				);
 
-				const auto places = std::clamp(max_server_slots_v - players, 0, static_cast<int>(in.config.spectator_places));
+				/*
+					The round's places split between its matches - at least 1 on each, unless there are none at all.
+				*/
+
+				const auto budget = static_cast<int>(in.config.spectator_places);
+				const auto per_match = budget == 0 ? 0 : std::max(1, budget / static_cast<int>(matches.size()));
+				const auto places = std::clamp(max_server_slots_v - players, 0, per_match);
 				this_config.server_start.slots = std::min(max_server_slots_v, players + places);
 				return static_cast<uint32_t>(places);
 			}();

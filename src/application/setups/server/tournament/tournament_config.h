@@ -61,12 +61,13 @@ struct tournament_config {
 	uint32_t next_bracket_rounds_max_wait_secs = 15 * 60;
 
 	/*
-		How many others may watch each match at once (--tournament-spectator-slots) - the teams out or waiting. Every
-		connection takes RAM and upload on the server playing it. The match's players always get in, the admins and
-		the spectator account have their own places. Not part of the tournament's identity.
+		How many others may watch a round's matches at once (--tournament-spectator-slots) - the teams out or waiting -
+		split between its matches: 16 with 8 matches is 2 on each, the final has all 16. 0: nobody watches; otherwise at
+		least 1 on each. Every place takes RAM and upload on the server playing it. The match's players always get in,
+		the admins and the spectator account have their own places. Not part of the tournament's identity.
 	*/
 
-	uint32_t spectator_places = 6;
+	uint32_t spectator_places = 16;
 
 	/*
 		The tournament's name (--tournament-name) - on its page and in its results. Part of its identity (compute_hash):
