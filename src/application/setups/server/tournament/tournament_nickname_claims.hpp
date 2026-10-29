@@ -10,14 +10,56 @@
 	True: the claim is handled (taken, or refused and kicked).
 */
 
+/*
+	A listed nickname, whatever the case it's typed in ("Bob" takes "bob") - its placeholder as the roster has it.
+*/
+
+std::optional<std::string> server_setup::find_listed_nickname(const std::string& nickname) const {
+	if (nickname.empty()) {
+		return std::nullopt;
+	}
+
+	const auto wanted = ::to_lowercase(nickname);
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		(void)faction;
+
+		if (begins_with(id, nickname_account_id_prefix_v) && ::to_lowercase(::account_id_to_nickname(id)) == wanted) {
+			return id;
+		}
+	}
+
+	return std::nullopt;
+}
+
+/*
+	The listed nicknames still to come on this match - named in the refusal of someone whose nickname isn't one of them.
+*/
+
+std::string server_setup::unclaimed_listed_nicknames() const {
+	auto out = std::string();
+
+	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
+		(void)faction;
+
+		if (begins_with(id, nickname_account_id_prefix_v)) {
+			out += (out.empty() ? "" : ", ") + ::account_id_to_nickname(id);
+		}
+	}
+
+	return out;
+}
+
 bool server_setup::claim_listed_nickname(const client_id_type client_id, const server_client_state& c) {
 	const auto& nickname = c.get_nickname();
-	const auto placeholder = ::nickname_to_account_id(nickname);
-	const auto found = assigned_teams.id_to_faction.find(placeholder);
+	const auto listed = find_listed_nickname(nickname);
 
-	if (nickname.empty() || found == assigned_teams.id_to_faction.end()) {
+	if (!listed.has_value()) {
 		return false;
 	}
+
+	const auto placeholder = *listed;
+	const auto found = assigned_teams.id_to_faction.find(placeholder);
 
 	if (on_listed_nickname_claimed && !on_listed_nickname_claimed(placeholder, c.authenticated_id)) {
 		LOG("Tournament: %x may not take the listed nickname %x - taken, or the account plays under another one.", c.authenticated_id, nickname);

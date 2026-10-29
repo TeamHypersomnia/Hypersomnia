@@ -4547,8 +4547,22 @@ void server_setup::advance_clients_state() {
 						);
 
 						const auto reason = [&]() {
-							if (found_in(claimed_nicknames, c.get_nickname())) {
+							const auto lowered = ::to_lowercase(c.get_nickname());
+
+							const bool taken = std::any_of(claimed_nicknames.begin(), claimed_nicknames.end(), [&](const auto& claimed) {
+								return ::to_lowercase(claimed) == lowered;
+							});
+
+							if (taken) {
 								return typesafe_sprintf("Your nickname: '%x'\nis already taken in this tournament!", c.get_nickname());
+							}
+
+							/*
+								A match of listed nicknames: a typo is the likely reason - say which ones it waits for.
+							*/
+
+							if (const auto listed = unclaimed_listed_nicknames(); !listed.empty()) {
+								return typesafe_sprintf("Your nickname '%x' isn't on this match's list:\n%x", c.get_nickname(), listed);
 							}
 
 							return is_open_match() ? std::string("This match is full - join another one.") : std::string(rejoin_wrong_match_reason_v);

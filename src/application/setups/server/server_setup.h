@@ -606,6 +606,8 @@ public:
 	std::function<bool(const std::string& placeholder, const std::string& account)> on_listed_nickname_claimed;
 	std::vector<std::string> claimed_nicknames;
 	bool claim_listed_nickname(client_id_type, const server_client_state&);
+	std::optional<std::string> find_listed_nickname(const std::string& nickname) const;
+	std::string unclaimed_listed_nicknames() const;
 
 	/*
 		A tournament round's timeout (server_join_timeout.hpp): from bracket_round_deadline (seconds since the epoch, 0: none)

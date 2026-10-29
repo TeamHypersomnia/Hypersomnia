@@ -161,7 +161,7 @@ bool server_setup::may_play_here(const server_client_state& c) const {
 		return has_unclaimed_listed_nicknames();
 	}
 
-	return found_in(assigned_teams.id_to_faction, ::nickname_to_account_id(c.get_nickname()));
+	return find_listed_nickname(c.get_nickname()).has_value();
 }
 
 /*
