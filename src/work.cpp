@@ -4682,7 +4682,14 @@ work_result work(
 		if (!changelog_auto_open_checked) {
 			changelog_auto_open_checked = true;
 
-			if (::should_show_changelog(changelog, config.last_seen_changelog_version)) {
+			/*
+				Not when this start joins a server (a /game/ link, --connect): the changelog would hold the join until
+				closed - it opens on the next start, still not acknowledged.
+			*/
+
+			const bool joining = params.should_connect || client_start_requested;
+
+			if (!joining && ::should_show_changelog(changelog, config.last_seen_changelog_version)) {
 #if PLATFORM_WEB
 				/*
 					A CrazyGames player who has not even left the tutorial yet is new - the release is acknowledged
