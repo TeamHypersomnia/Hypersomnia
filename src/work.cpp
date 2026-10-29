@@ -1041,10 +1041,21 @@ work_result work(
 #if PLATFORM_WEB
 	LOG("Nothing to self-update on the Web.");
 #else
+	/*
+		A tournament started again in the middle of it (after a crash, a restart of its service): never another version
+		halfway - a new tournament updates as any start.
+	*/
+
+	WEBSTATIC const bool tournament_in_progress = params.is_tournament() && augs::exists(USER_DIR / "tournament.ongoing.json");
+
+	if (tournament_in_progress && config.self_update.update_on_launch && !params.no_update_on_launch) {
+		LOG("A tournament is in progress - no update on launch until it's over.");
+	}
+
 	WEBSTATIC const bool should_run_self_updater = 
 		params.update_once_now ||
 		params.only_check_update_availability_and_quit ||
-		(config.self_update.update_on_launch && !params.no_update_on_launch)
+		(config.self_update.update_on_launch && !params.no_update_on_launch && !tournament_in_progress)
 	;
 
 	if (should_run_self_updater) {
@@ -1112,7 +1123,7 @@ work_result work(
 		if (params.no_update_on_launch) {
 			LOG("Skipping update check due to --no-update-on-launch flag.");
 		}
-		else {
+		else if (!tournament_in_progress) {
 			LOG("Skipping update check due to update_on_launch = false.");
 		}
 	}
