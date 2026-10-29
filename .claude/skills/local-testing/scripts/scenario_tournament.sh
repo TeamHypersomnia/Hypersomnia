@@ -213,7 +213,7 @@ start_server() {
 	SERVER_RUN=$((SERVER_RUN + 1))
 	SRV=$T/server$SERVER_RUN.out
 	(cd $REPO/hypersomnia && exec env "${envs[@]}" timeout 600 $BIN --appdata-dir $T/server $GAME_TEST_FLAGS "$@" > $SRV 2>&1) &
-	wait_log "server listening on\|played to the end already\|ERROR:" 30
+	QUIET=1 wait_log "server listening on\|played to the end already\|ERROR:" 30
 }
 
 # The server's own process (under the subshell and timeout) - by its appdata dir
@@ -310,7 +310,13 @@ wait_log() {
 		sleep 1
 	done
 
-	echo "FAIL  $CASE: timeout waiting for: $1" | tee -a $RESULTS
+	# QUIET=1: only a wait, no FAIL of its own (start_server - a server waiting for a map may print none of them)
+	if [ -n "$QUIET" ]; then
+		echo "  (timeout waiting for: $1)"
+	else
+		echo "FAIL  $CASE: timeout waiting for: $1" | tee -a $RESULTS
+	fi
+
 	return 1
 }
 

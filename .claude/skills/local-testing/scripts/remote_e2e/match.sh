@@ -58,9 +58,10 @@ start)
 EOF
 
 	cd $E/hypersomnia
-	# Tournament mode puts the two accounts on the teams: --tournament-teams
+	# Tournament mode puts the two accounts on the teams: --tournament-teams. A new name every run: the same settings
+	# under the same name would be "played to the end already" - only its finished final stands up.
 	setsid nohup timeout 600 $E/Hypersomnia --dedicated-server --appdata-dir $E/server --no-update-on-launch --no-open-logs \
-		--tournament-teams "$2; $3" --tournament-maps "de_cyberaqua bomb_defusal" > $E/server.out 2>&1 < /dev/null &
+		--tournament-teams "$2; $3" --tournament-maps "de_cyberaqua bomb_defusal" --tournament-name "e2e $(date +%s)" > $E/server.out 2>&1 < /dev/null &
 	echo $! > $E/server.pid
 	sleep 6
 	grep -hE "Tournament|listening|heartbeat through UDP" $E/server.out | head -4

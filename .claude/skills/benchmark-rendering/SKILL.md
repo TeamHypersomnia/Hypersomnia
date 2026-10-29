@@ -60,7 +60,10 @@ One run with alternating phases cancels out scene, thermal and clock differences
   report the CPU sum, not just FPS.
 - Uncapped already: `vsync_mode` is `OFF` in `default_config.json`, and `max_fps` is disabled (`OFF_max_fps` in runtime prefs).
   Verify if the numbers look capped (e.g. exactly 60/144/400 FPS).
-- Launch with cwd = `hypersomnia/`: `cd hypersomnia && timeout 76 ../build/current/Hypersomnia /range > <scratchpad>/bench.txt 2>&1`.
+- **On the user's screen, deliberately:** the one exception to running test games under Xvfb - the real GPU and window
+  are what's measured. Still silent and never opening a failure log in the user's editor: source
+  `.claude/skills/local-testing/scripts/test_env.sh` first and pass `$GAME_TEST_FLAGS`.
+- Launch with cwd = `hypersomnia/`: `cd hypersomnia && timeout 76 ../build/current/Hypersomnia /range $GAME_TEST_FLAGS > <scratchpad>/bench.txt 2>&1`.
   From the repo root the game fails to read its config and litters the root with empty `cache/`, `user/`, `logs/`.
 - LOG output goes to stdout, so it lands in the redirected file even when `timeout` kills the game.
 - The user allows launching and killing the game by yourself for benchmarks.
@@ -124,9 +127,10 @@ FPS and GPU averages say nothing about judder. Use `smoothness/` next to this fi
 - Use the same scratchpad copy of the map for both builds (3.0.0 loads HEAD's map json fine) and restore
   its `editor_view.json` before every run.
 
-**Another build (e.g. a release tag):** `git worktree add /home/pbc/Hypersomnia_<tag> <tag>`, then copy the submodule
-directories from the main checkout instead of cloning (`git ls-tree -r <tag> | awk '$2=="commit"{print $4}'`; compare
-with HEAD first) and delete the `.git` files inside the copies, or every git command in the worktree fails.
+**Another build (e.g. a release tag):** `git worktree add "$(git rev-parse --show-toplevel)-<tag>" <tag>` (next to the
+repo, as `~/Hypersomnia-<tag>`), then copy the submodule directories from the main checkout instead of cloning
+(`git ls-tree -r <tag> | awk '$2=="commit"{print $4}'`; compare with HEAD first) with `rsync -a --exclude=.git` - a
+copied `.git` file would make every git command in the worktree fail.
 Build with `BUILD_FOLDER_SUFFIX=fast cmake/build.sh RelWithDebInfo x64 -DGENERATE_DEBUG_INFORMATION=0`, then `ninja`
 in `build/current` (~15 min, run it in the background). Copy `hypersomnia/user/runtime_prefs.json` into the worktree.
 Before commit a5c684fd5 `--edit` falls through to the project selector: add the `break;` after `launch_editor(params.editor_target);`.
@@ -180,11 +184,12 @@ Suspicious FPS values are the round ones: 60, 144, 165, 240, 400, or anything ex
    - wraps each frame's GL commands in a `GL_TIME_ELAPSED` query (ring of 8, read back 8 frames later),
    - logs cumulative averages after every WITH+WITHOUT cycle as `BENCH cycles=...`.
 
-3. **Build** with the `build` MCP tool.
+3. **Build** in the worktree's own build folder (`nice -n 19 ninja -C build/<config>`) - the MCP tools build the main
+   checkout's `build/current`, not the worktree.
 
 4. **Run** ~76 s (8 s warmup + ~11 cycles), then grep:
    ```
-   cd hypersomnia && (vblank_mode=0 timeout 76 ../build/current/Hypersomnia /range > <scratchpad>/bench.txt 2>&1); grep -E "BENCH|GL error|Launched mode" <scratchpad>/bench.txt
+   cd hypersomnia && (vblank_mode=0 timeout 76 ../build/current/Hypersomnia /range $GAME_TEST_FLAGS > <scratchpad>/bench.txt 2>&1); grep -E "BENCH|GL error|Launched mode" <scratchpad>/bench.txt
    ```
    Wait until the diff stabilizes over the last few cycles. The first cycle is noisy.
 

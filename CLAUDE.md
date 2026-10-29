@@ -355,9 +355,12 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 
 - Code separation: when a new feature needs code in several places of existing files, put all of it in one header
   named after the feature and leave only short calls at those places - even if the calls must pass a few arguments.
-  Don't merge existing headers into one; only keep what a feature adds out of the files it touches.
-  Example: the dedicated server's config check at start lives in `src/application/setups/server/server_config_check.h`
-  (`check_server_config`, `check_tournament_maps`); `work.cpp` has only the two calls.
+  Whatever a feature puts into existing code is moved out aggressively. Don't merge existing headers into one; only
+  keep what a feature adds out of the files it touches.
+  Example: checking a dedicated server's config at start (unknown keys, wrong types, bad admin profiles, a tournament's
+  maps and game modes) first went into `work.cpp` as about 120 lines in two places. Now it is all in
+  `src/application/setups/server/server_config_check.h` (`check_server_config`, `check_tournament_maps`), and `work.cpp`
+  keeps only two calls that pass in the config layers, the default config path, the admins and the flags.
 
 - Separate generic algorithmic logic (BFS, A*, sorting, etc.) into `augs/algorithm/` headers. Game-specific code should call these generic functions with appropriate parameters. This keeps algorithms reusable and testable independent of game code.
 

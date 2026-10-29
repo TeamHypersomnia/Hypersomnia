@@ -26,7 +26,11 @@ and favorite scripts take the headless server as `BIN` and the client as `CLIENT
    a top-level key is silently ignored. Every test server needs
    `"server": { "notified_server_list": "127.0.0.1:18430", "suppress_new_community_server_webhook": true }`.
    Check `Sending heartbeat through UDP to` in the server log before anything long. A miss lists the test server
-   publicly and posts "new server" notifications to the community channels.
+   publicly and posts "new server" notifications to the community channels. A server hosted from the client
+   (`/host`, Host a server in a UI test) uses the client's config - give it a fresh `--appdata-dir` with that conf.d.
+   The generator's scripts tested for real (Docker, a VPS) are made to list the server, so conf.d doesn't apply: block
+   the master on that machine first (iptables DROP to 57.128.242.21 for UDP and TCP other than 80/443 - the same IP
+   serves the downloads - in OUTPUT, FORWARD and DOCKER-USER).
 2. **Never use the `build` MCP or `cmake/build.sh`.** Both work on `build/current`, which the user's builds use;
    `build.sh` also re-points the symlink. Configure with plain `cmake` into `build/<Config>-x64-clang-claude[-suffix]`
    and build there with `nice -n 19 ninja -j10`. Generated sources go into the build dir, so parallel builds don't clash.
@@ -48,9 +52,14 @@ and favorite scripts take the headless server as `BIN` and the client as `CLIENT
    `ALSOFT_DRIVERS=null`, `VISUAL=true`, and `$GAME_TEST_FLAGS` = `--no-update-on-launch --mute --no-open-logs`)
    and passes `$GAME_TEST_FLAGS` to every game it starts - a new script does the same, a game started by hand too
    (`. .claude/skills/local-testing/scripts/test_env.sh` first). Firefox profiles get `user_pref("media.volume_scale", "0.0");`.
+   No window on the user's screen either: every game started for a test - `--unit-tests-only` too - under `xvfb-run -a`
+   or a private `Xvfb :NN` (the one exception: benchmark-rendering, which measures the real GPU).
 7. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
    Work only in `~/yojimbo-test`, restart only by your own PIDs, and verify afterwards that the production processes still
    have their old uptime (`ps -eo etime,args | grep Hypersomnia-Headless`).
+8. **Short timeouts, look every minute.** Every test command gets an aggressive `timeout` (seconds, not minutes); a
+   background shell is checked about every minute, builds excepted. Never pipe a script that backgrounds a server into
+   `tail`/`head` - the server keeps the pipe open and it hangs; redirect to a file.
 
 ## Scenarios (scripts/)
 
