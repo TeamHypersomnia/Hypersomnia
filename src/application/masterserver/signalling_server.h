@@ -484,6 +484,17 @@ private:
 					);
 				}
 
+				/*
+					Said why before closing - "unreachable through the masterserver" would be wrong.
+				*/
+
+				const auto why =
+					from_this_address >= max_web_peers_per_address ?
+					std::string("Too many players are joining at once from your network.\nTry again in a moment.") :
+					std::string("The masterserver is busy.\nTry again in a moment.")
+				;
+
+				ws->send(nlohmann::json({ { "refused", why } }).dump());
 				ws->close();
 				return;
 			}

@@ -187,7 +187,7 @@ struct webrtc_client_detail {
 				Closed before the connection was made: nothing more will come - not a wait without end.
 			*/
 
-			if (!self->is_ready()) {
+			if (!self->is_ready() && !self->is_error()) {
 				self->set_message(unreachable_through_masterserver_v);
 				self->set_error();
 			}
@@ -209,6 +209,16 @@ struct webrtc_client_detail {
 
 			const auto message_str = std::get<std::string>(data);
 			auto message = nlohmann::json::parse(message_str);
+
+			/*
+				The masterserver refused to negotiate (e.g. too many joining at once from one network) - it says why.
+			*/
+
+			if (message.is_object() && message.contains("refused") && message["refused"].is_string()) {
+				self->set_message(message["refused"].get<std::string>());
+				self->set_error();
+				return;
+			}
 
 			if (message.contains("id") && message["id"].is_string()) {
 				const auto sender_id = message["id"].get<std::string>();
