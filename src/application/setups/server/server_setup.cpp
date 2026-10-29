@@ -822,11 +822,14 @@ public:
 		pc_metas.erase(id);
 	}
 
-	void disconnect(const client_id id) {
+	void disconnect(const client_id id, const bool notify_game = true) {
 		/*
 			Safe disconnect - allows us to deinit the peer connection
 			because of literally any reason - onclose, onstatechange,
 			our server's kick logic etc.
+
+			notify_game: false when the game itself disconnected the client - no "channel closed" note comes back to it
+			(kept 10 s, it would drop a new client that gets the same id meanwhile).
 
 			Map removal happens under a lock and destruction happens outside of the lock -
 			which means it won't ever deadlock in case other destruction logic called "disconnect" again.
@@ -855,10 +858,12 @@ public:
 				if (preserve_dc || preserve_pc) {
 					set_message("Disconnected client: " + std::to_string(id));
 
-					std::scoped_lock lock(packets_lk);
+					if (notify_game) {
+						std::scoped_lock lock(packets_lk);
 
-					/* Push a disconnect packet for this client */
-					received_packets.push({ id, {}, true });
+						/* Push a disconnect packet for this client */
+						received_packets.push({ id, {}, true });
+					}
 				}
 				else {
 					set_message("Empty disconnect: " + std::to_string(id));
@@ -4284,7 +4289,7 @@ void server_setup::unset_client(const client_id_type& id) {
 				LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
 
 				const auto client_webrtc_id = get_client_address(id).GetPort();
-				webrtc_server->disconnect(client_webrtc_id);
+				webrtc_server->disconnect(client_webrtc_id, false);
 			}
 			else {
 				LOG("Not a WebRTC client.");
