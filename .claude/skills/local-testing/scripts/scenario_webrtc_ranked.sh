@@ -1,6 +1,6 @@
 #!/bin/bash
 # Native client over WebRTC to a local official ranked server joined by its WebRTC alias, the same path a browser takes.
-# The client's cert comes from the broker (BROKER_URL, BROKER_PUBLIC_KEY - see broker.sh); without one, ranked refuses it.
+# The client's cert comes from the broker (BROKER_URL, BROKER_PUBLIC_KEY - see broker.sh); a self-signed one is taken too.
 # Everything on localhost.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 . "$(dirname "$0")/test_env.sh"

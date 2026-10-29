@@ -22,7 +22,7 @@ step() { echo "--- $1"; }
 fail() { echo "FAIL: $1"; failed=$((failed + 1)); }
 
 step "production before (for the uptime check at the end)"
-PROD_BEFORE=$(ssh arena 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | cut -d" " -f1'; ssh arenaus 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | cut -d" " -f1')
+PROD_BEFORE=$(ssh arena 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | awk "{print \$1}"'; ssh arenaus 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | awk "{print \$1}"')
 
 step "upload"
 HEADLESS=$REPO/build/Release-x64-ubuntu22-headless/Hypersomnia
@@ -89,7 +89,7 @@ for p in $(pgrep -f "Xvfb :79"); do kill $p; done
 ssh arena 'bash ~/yojimbo-test/e2e/community.sh stop' > /dev/null 2>&1
 
 step "production untouched"
-PROD_AFTER=$(ssh arena 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | cut -d" " -f1'; ssh arenaus 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | cut -d" " -f1')
+PROD_AFTER=$(ssh arena 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | awk "{print \$1}"'; ssh arenaus 'ps -eo etimes,args | grep [H]ypersomnia-Headless | head -1 | awk "{print \$1}"')
 paste <(echo "$PROD_BEFORE") <(echo "$PROD_AFTER") | while read before after; do
 	[ "$after" -ge "$before" ] || echo "a production process restarted"
 done | grep -q restarted && fail "production restarted" || echo "    production uptimes only grew"

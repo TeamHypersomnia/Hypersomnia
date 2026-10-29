@@ -3,6 +3,8 @@
 # (the game under Xvfb), a match ended by its loser's game killed. Each case in its own fresh directory, a PASS/FAIL
 # table at the end. CASES="..." runs some only (default: all). BIN / CLIENT_BIN: the headless server / the client.
 #
+#   budget_nick_case    "alice; Bob; carol; dave", --tournament-spectator-slots 4: 2 on each of the 2 matches; Alice and bob
+#                       take their listed nicknames whatever the case; an unlisted nickname is told the match's list
 #   finished_servers    "alice; bob; carol; dave", a local master: a decided match's server stays up empty (finished on the
 #                       list, a newcomer refused with "Match finished..."), the round waits for the other match; the final
 #                       stays finished on the list after the end and after a restart ("The tournament has finished.")
@@ -115,7 +117,7 @@ REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
-ALL="finished_servers map_download_retry_typo tournament_custom_late custom_live custom_star custom_broken maps_folder_move tournament_custom_missing custom_maps tournament_custom_map kept_map_not_in_cycle map_download_retry map_catalogue_deadline map_download_and_quit map_download_cycle map_download bomb_always open_long_names round1_off five_teams_walkovers crash_renews_deadline crash_in_break open_deadline_spectator break_timeout open_choice open_same_nick watch_limit_final crash_nobody_back_listed crash_nobody_back_open watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams password_known"
+ALL="finished_servers budget_nick_case map_download_retry_typo tournament_custom_late custom_live custom_star custom_broken maps_folder_move tournament_custom_missing custom_maps tournament_custom_map kept_map_not_in_cycle map_download_retry map_catalogue_deadline map_download_and_quit map_download_cycle map_download bomb_always open_long_names round1_off five_teams_walkovers crash_renews_deadline crash_in_break open_deadline_spectator break_timeout open_choice open_same_nick watch_limit_final crash_nobody_back_listed crash_nobody_back_open watch_limit nick_claim open_nick_taken spectator_live watch_others quick_rejoin walkover_b open_after_played avatars page_json teams_bye open_auto_close open_leave teams_2v2 teams_accounts crash_mid_match crash_in_freeze crash_between crash_open page_heartbeat join_timeout_listed join_timeout_equal join_timeout_open open_one_place open_admin_elsewhere admin_live admission_allowed admission_full watch_limit_admins claim_twice mixed_teams password_known"
 CASES=${CASES:-$ALL}
 # SHARD=0, 1, ...: run several suites at once (CASES split between them) - each on its own ports and X displays
 SHARD=${SHARD:-0}
@@ -435,6 +437,23 @@ case_finished_servers() {
 	check "restarted over: the final finished on the list" list "len(P($A))==1 and P($A)[0]['finished'] and P($A)[0]['tournament_stage']==0"
 	finish_case
 	stop_master
+}
+
+case_budget_nick_case() {
+	new_case budget_nick_case
+	# alice listed as "alice", joins as "Alice"; bob listed as "Bob", joins as "bob"; mallory isn't listed
+	player alice Alice; player bob bob; player mallory Zed
+	start_server -- --tournament-teams "alice; Bob; carol; dave" --tournament-spectator-slots 4
+	wait_count "server listening on" 2 30
+	check "a round of 2 matches, 4 to watch: 2 players + 2 on each" bash -c "[ \$(grep -c 'connections for 4 slots' $SRV) -ge 2 ]"
+	client alice $PORT; sleep 2; client bob $PORT
+	wait_count "takes the listed nickname" 2 90
+	check "Alice takes alice, bob takes Bob - the case doesn't matter" bash -c "grep -q 'takes the listed nickname Alice' $SRV && grep -q 'takes the listed nickname bob' $SRV"
+	wait_count "Starting ranked" 1 90
+	NO_TEAM=1 client mallory $((PORT + 1))
+	sleep 15
+	check "a nickname not on the list: told which ones the match waits for" in_client_log mallory "isn't on this match's list"
+	finish_case
 }
 
 # ---------- the cases ----------

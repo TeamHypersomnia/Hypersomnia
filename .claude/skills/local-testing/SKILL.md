@@ -30,6 +30,8 @@ and favorite scripts take the headless server as `BIN` and the client as `CLIENT
 2. **Never use the `build` MCP or `cmake/build.sh`.** Both work on `build/current`, which the user's builds use;
    `build.sh` also re-points the symlink. Configure with plain `cmake` into `build/<Config>-x64-clang-claude[-suffix]`
    and build there with `nice -n 19 ninja -j10`. Generated sources go into the build dir, so parallel builds don't clash.
+   Two agents never build in one folder, nor edit one checkout at once - each its own worktree (`~/Hypersomnia-<name>`)
+   with its own `build/`; one full build on the machine at a time (a second one runs it out of RAM).
    **While implementing and testing, build and test only `build/Debug-x64-clang-claude`** (the fast Debug native one,
    no debug info - like the user's `cmkdf`). The Steam, headless, web and CrazyGames variants only when the change touches
    their code (`#if` paths, headless-only sources, web or Steam APIs) - and even then only once, literally at the end of

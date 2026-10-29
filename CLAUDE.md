@@ -12,6 +12,11 @@ A `build` MCP server is available with four tools:
 
 Prefer `build_file` to verify edits to a specific file before running a full `build`.
 
+The MCP tools build `build/current` - the user's own build (a symlink they choose). Use them only for code the user is
+about to run themselves. Anything you build to test goes into a folder of your own, as the `local-testing` skill says;
+several agents at once: each in its own worktree with its own build folder, and only one full build on the machine at
+a time (31 GB, no swap - more freeze the desktop).
+
 # Running a map
 
 From `hypersomnia/` (the game reads its config relative to the working directory):
