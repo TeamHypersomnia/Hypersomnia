@@ -924,6 +924,73 @@ static void name_column_row(const std::function<void()> content) {
 	next_columns(num_columns - 2);
 }
 
+#if PLATFORM_LINUX && !PLATFORM_WEB
+/*
+	Below the community servers, only in the native Linux build (Steam or not) - the ones who would host a 24/7 server.
+	"Click here!" looks like a changelog link and opens the server config generator.
+*/
+
+static void host_server_invitation_row() {
+	using namespace augs::imgui;
+
+	ImGui::Separator();
+
+	name_column_row([&]() {
+		/*
+			Wider than the name column - drawn over the next columns, which are empty in this row.
+		*/
+
+		const auto window_lt = ImGui::GetWindowPos();
+		const auto window_rb = ImVec2(window_lt.x + ImGui::GetWindowWidth(), window_lt.y + ImGui::GetWindowHeight());
+		ImGui::PushClipRect(window_lt, window_rb, false);
+
+		ImGui::TextUnformatted("Want to host your 24/7 server?");
+		ImGui::SameLine();
+
+		const auto link_col = rgba(130, 190, 255, 255);
+		const auto link_text = "Click here!";
+		const auto url = "https://hypersomnia.io/generator";
+		const auto pos = vec2(ImGui::GetCursorScreenPos());
+		const auto size = vec2(ImGui::CalcTextSize(link_text));
+		const auto draw_list = ImGui::GetWindowDrawList();
+
+		/*
+			A light rectangle behind it while hovered, stronger while held - drawn before the text, so under it.
+		*/
+
+		const auto pad = vec2(4, 1);
+		const auto rect_lt = ImVec2(pos - pad);
+		const auto rect_rb = ImVec2(pos + size + pad);
+
+		const bool hovered = ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(rect_lt, rect_rb);
+
+		if (hovered) {
+			const auto rect_col = ImGui::IsMouseDown(0) ? ImGuiCol_HeaderActive : ImGuiCol_HeaderHovered;
+			draw_list->AddRectFilled(rect_lt, rect_rb, ImGui::GetColorU32(rect_col), 2.0f);
+		}
+
+		{
+			auto sc = scoped_text_color(link_col);
+			ImGui::TextUnformatted(link_text);
+		}
+
+		const auto underline_y = pos.y + size.y;
+		draw_list->AddLine(ImVec2(pos.x, underline_y), ImVec2(pos.x + size.x, underline_y), ImGui::GetColorU32(link_col));
+
+		if (hovered) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+			ImGui::SetTooltip("%s", url);
+
+			if (ImGui::IsMouseClicked(0)) {
+				augs::open_url(url);
+			}
+		}
+
+		ImGui::PopClipRect();
+	});
+}
+#endif
+
 
 
 void browse_servers_gui_state::select_server(const server_list_entry& s) {
@@ -2484,7 +2551,22 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		if (t == browser_tab::ALL) {
+#if PLATFORM_LINUX && !PLATFORM_WEB
+			/*
+				With no community server online the invitation takes the place of "No community servers".
+			*/
+
+			if (has_community_servers) {
+				section(community_servers_label, orange, "community", communities, "");
+			}
+			else {
+				header_or_separator(community_servers_label, orange);
+			}
+
+			::host_server_invitation_row();
+#else
 			section(community_servers_label, orange, "community", communities, has_community_servers ? "" : "No community servers are online at the time.");
+#endif
 		}
 	};
 
