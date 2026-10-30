@@ -752,6 +752,8 @@ void test_scene_setup::restart_mode() {
 				local_player_id = mode.add_player(input, nickname, player_faction);
 				viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 
+				std::vector<std::pair<vec2, mode_player_id>> range_opponents;
+
 				for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
 					if (!p.scene_entity_id.is_set()) {
 						continue;
@@ -782,6 +784,37 @@ void test_scene_setup::restart_mode() {
 						mode.teleport_to_next_spawn(input, new_id, opponent_id);
 						mode.find(new_id)->allow_respawn = false;
 						opponents[p.unique_name] = opponent_id;
+
+						if (const auto spawn = cosm[p.scene_entity_id]) {
+							range_opponents.emplace_back(spawn.get_logic_transform().pos, new_id);
+						}
+					}
+				}
+
+				/*
+					Some rifles to test the gore on: the top half of the leftmost column of the range's opponents holds a Baka47.
+				*/
+				if (!range_opponents.empty()) {
+					const auto leftmost_x = std::min_element(range_opponents.begin(), range_opponents.end(), [](const auto& a, const auto& b) {
+						return a.first.x < b.first.x;
+					})->first.x;
+
+					const auto column_width = 50.f;
+
+					std::vector<std::pair<vec2, mode_player_id>> column;
+
+					for (const auto& o : range_opponents) {
+						if (o.first.x - leftmost_x < column_width) {
+							column.push_back(o);
+						}
+					}
+
+					std::sort(column.begin(), column.end(), [](const auto& a, const auto& b) {
+						return a.first.y < b.first.y;
+					});
+
+					for (std::size_t i = 0; i < (column.size() + 1) / 2; ++i) {
+						mode.find(column[i].second)->round_start_weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 					}
 				}
 

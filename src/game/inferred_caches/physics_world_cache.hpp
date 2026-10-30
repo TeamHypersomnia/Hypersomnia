@@ -101,6 +101,21 @@ const components::sentience* find_bot_owner_sentience(const E& handle) {
 	return nullptr;
 }
 
+/*
+	A standing corpse doesn't bounce off walls - it would fly back the way it was pushed.
+*/
+
+template <class E>
+real32 calc_restitution(const E& handle, const invariants::fixtures& colliders_data) {
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		if (!sentience->is_conscious()) {
+			return 0.f;
+		}
+	}
+
+	return colliders_data.restitution;
+}
+
 inline filter_type calc_standard_character_filter(const components::sentience& sentience) {
 	return
 		sentience.is_conscious() ?
@@ -491,7 +506,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	fixdef.density = handle.calc_density(connection, colliders_data);
 
 	fixdef.friction = colliders_data.friction;
-	fixdef.restitution = colliders_data.restitution;
+	fixdef.restitution = ::calc_restitution(handle, colliders_data);
 	fixdef.isSensor = colliders_data.sensor;
 	fixdef.filter = calc_filters(handle);
 
@@ -944,7 +959,7 @@ void physics_world_cache::specific_infer_colliders(const E& handle) {
 			const bool rebuild_filters = compared.GetFilterData() != chosen_filters;
 
 			for (auto& f : cache.constructed_fixtures) {
-				f.get()->SetRestitution(colliders_data.restitution);
+				f.get()->SetRestitution(::calc_restitution(handle, colliders_data));
 				f.get()->SetFriction(colliders_data.friction);
 				f.get()->SetSensor(chosen_sensor);
 

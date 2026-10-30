@@ -39,6 +39,8 @@ static void delete_with_held_items_except(const entity_flavour_id drop_instead, 
 			q.push_back(sentience->detached.head);
 			q.push_back(sentience->detached.arm_upper);
 			q.push_back(sentience->detached.arm_lower);
+			q.push_back(sentience->detached.leg_upper);
+			q.push_back(sentience->detached.leg_lower);
 			q.push_back(sentience->detached.lying_corpse);
 		}
 

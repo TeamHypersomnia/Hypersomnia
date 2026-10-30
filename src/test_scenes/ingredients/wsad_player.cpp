@@ -297,15 +297,27 @@ namespace test_flavours {
 			sentience.detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD);
 			sentience.detached_flavours.arm_upper = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_ARM_TOP);
 			sentience.detached_flavours.arm_lower = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_ARM_BOTTOM);
+			sentience.detached_flavours.leg_upper = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_LEG_TOP);
+			sentience.detached_flavours.leg_lower = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_LEG_BOTTOM);
 			sentience.base_detached_head_speed = -8000.f;
 			sentience.base_detached_arm_speed = -1000.f;
 
 			sentience.lying_corpse_flavour = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS);
 			sentience.lying_corpse_noarm_flavour = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM);
 			sentience.lying_corpse_noarms_flavour = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS);
+			sentience.lying_corpse_legless.noleg = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOLEG);
+			sentience.lying_corpse_legless.noleg_other = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOLEG_OTHER);
+			sentience.lying_corpse_legless.nolegs = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOLEGS);
+			sentience.lying_corpse_noarm_legless.noleg = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM_NOLEG);
+			sentience.lying_corpse_noarm_legless.noleg_other = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM_NOLEG_OTHER);
+			sentience.lying_corpse_noarm_legless.nolegs = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM_NOLEGS);
+			sentience.lying_corpse_noarms_legless.noleg = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS_NOLEG);
+			sentience.lying_corpse_noarms_legless.noleg_other = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS_NOLEG_OTHER);
+			sentience.lying_corpse_noarms_legless.nolegs = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS_NOLEGS);
 
 			sentience.corpse_head_image = to_image_id(test_scene_image_id::METROPOLIS_TORSO_CORPSE_HEAD);
 			sentience.corpse_head_splatter_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER);
+			sentience.corpse_head_splatter_less_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER_LESS);
 			sentience.corpse_body_splatter_image = to_image_id(test_scene_image_id::CORPSE_BODY_SPLATTER);
 
 			sentience.detached_head_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DETACHED_HEAD_FIRE);
@@ -517,15 +529,27 @@ namespace test_flavours {
 			meta.get<invariants::sentience>().detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD);
 			meta.get<invariants::sentience>().detached_flavours.arm_upper = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_ARM_TOP);
 			meta.get<invariants::sentience>().detached_flavours.arm_lower = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_ARM_BOTTOM);
+			meta.get<invariants::sentience>().detached_flavours.leg_upper = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_LEG_TOP);
+			meta.get<invariants::sentience>().detached_flavours.leg_lower = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_LEG_BOTTOM);
 			meta.get<invariants::sentience>().detached_head_particles.modifier.color = rgba(192, 0, 0, 255);
 			meta.get<invariants::sentience>().corpse_catch_fire_particles.modifier.color = rgba(192, 0, 0, 255);
 
 			meta.get<invariants::sentience>().lying_corpse_flavour = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE);
 			meta.get<invariants::sentience>().lying_corpse_noarm_flavour = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM);
 			meta.get<invariants::sentience>().lying_corpse_noarms_flavour = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS);
+			meta.get<invariants::sentience>().lying_corpse_legless.noleg = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOLEG);
+			meta.get<invariants::sentience>().lying_corpse_legless.noleg_other = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOLEG_OTHER);
+			meta.get<invariants::sentience>().lying_corpse_legless.nolegs = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOLEGS);
+			meta.get<invariants::sentience>().lying_corpse_noarm_legless.noleg = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM_NOLEG);
+			meta.get<invariants::sentience>().lying_corpse_noarm_legless.noleg_other = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM_NOLEG_OTHER);
+			meta.get<invariants::sentience>().lying_corpse_noarm_legless.nolegs = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM_NOLEGS);
+			meta.get<invariants::sentience>().lying_corpse_noarms_legless.noleg = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS_NOLEG);
+			meta.get<invariants::sentience>().lying_corpse_noarms_legless.noleg_other = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS_NOLEG_OTHER);
+			meta.get<invariants::sentience>().lying_corpse_noarms_legless.nolegs = to_entity_flavour_id(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS_NOLEGS);
 
 			meta.get<invariants::sentience>().corpse_head_image = to_image_id(test_scene_image_id::RESISTANCE_TORSO_CORPSE_HEAD);
 			meta.get<invariants::sentience>().corpse_head_splatter_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER);
+			meta.get<invariants::sentience>().corpse_head_splatter_less_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER_LESS);
 			meta.get<invariants::sentience>().corpse_body_splatter_image = to_image_id(test_scene_image_id::CORPSE_BODY_SPLATTER);
 
 

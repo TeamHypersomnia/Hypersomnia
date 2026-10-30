@@ -38,6 +38,7 @@
 #include "game/detail/damage_origin.hpp"
 #include "game/detail/weapon_like.h"
 #include "game/detail/sentience/sentience_logic.h"
+#include "game/detail/sentience/corpse_limbs.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/sentience/tool_getters.h"
@@ -49,6 +50,8 @@
 #include "game/components/decal_component.h"
 #include "game/detail/sentience/gore/blood_splatter.hpp"
 #include "game/detail/sentience/gore/idle_splatter.hpp"
+#include "game/detail/sentience/gore/lying_corpse_stump_splatters.h"
+#include "game/detail/physics/motion_axis.h"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -262,6 +265,8 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 					spawn_splatters_at(sentience.detached.arm_upper);
 					spawn_splatters_at(sentience.detached.arm_lower);
+					spawn_splatters_at(sentience.detached.leg_upper);
+					spawn_splatters_at(sentience.detached.leg_lower);
 
 					--sentience.pending_arm_splatters;
 				}
@@ -296,104 +301,9 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				}
 			}
 
-			/*
-				Lying corpse gore splatters at detached body part positions.
-				Triggered when the lying corpse's velocity drops below 100,
-				multiple rounds per body part at random intervals seeded from when_knocked_out.step.
-			*/
-			{
-				const bool has_pending_lying_gore =
-					sentience.pending_lying_gore_head > 0 ||
-					sentience.pending_lying_gore_shoulder > 0 ||
-					sentience.pending_lying_gore_secondary_shoulder > 0 ||
-					sentience.pending_lying_gore_center > 0
-				;
-
-				if (has_pending_lying_gore && sentience.has_exploded) {
-					const auto lying_corpse_id = sentience.detached.lying_corpse;
-
-					if (const auto lying_corpse = cosm[lying_corpse_id]) {
-						const auto vel = lying_corpse.get_effective_velocity();
-						constexpr real32 settle_vel = 100.f;
-
-						if (vel.length_sq() < settle_vel * settle_vel) {
-							if (!sentience.when_lying_corpse_settled.was_set()) {
-								sentience.when_lying_corpse_settled = now;
-							}
-
-							const auto passed_secs = cosm.get_clock().get_passed_secs(sentience.when_lying_corpse_settled);
-							const auto base_seed = sentience.when_knocked_out.step;
-
-							const auto corpse_pos = lying_corpse.get_logic_transform().pos;
-							const auto corpse_rotation = lying_corpse.get_logic_transform().rotation;
-							const auto corpse_facing = vec2::from_degrees(corpse_rotation);
-							const auto corpse_perp = corpse_facing.perpendicular_cw();
-
-							const auto corpse_image_id = lying_corpse.template get<invariants::sprite>().image_id;
-							auto corpse_torso = cosm.get_logical_assets().get_offsets(corpse_image_id).torso;
-
-							const bool corpse_flipped = [&]() {
-								if (const auto flips = lying_corpse.calc_flip_flags()) {
-									return flips->vertically;
-								}
-								return false;
-							}();
-
-							if (corpse_flipped) {
-								/*
-									Don't use flip_vertically() here because it swaps
-									shoulder and secondary_shoulder, breaking the mapping
-									between pending_lying_gore_shoulder/secondary_shoulder
-									and the actual corpse sprite offsets.
-								*/
-								corpse_torso.head.flip_vertically();
-								corpse_torso.shoulder.flip_vertically();
-								corpse_torso.secondary_shoulder.flip_vertically();
-							}
-
-							auto calc_world_pos = [&](const transformi& offset) {
-								const auto local = vec2(offset.pos);
-								return corpse_pos + corpse_facing * local.x + corpse_perp * local.y;
-							};
-
-							auto try_spawn_gore = [&](int& pending, const int total_rounds, const transformi& offset, const uint32_t part_index, const int splats_per_round, const float spread) {
-								if (pending <= 0) {
-									return;
-								}
-
-								/*
-									Per-part random delay: 0.3s-0.8s base offset + 0.4s between rounds.
-									Seeded from (base_seed, part_index) for deterministic variation.
-								*/
-								const auto part_delay = ((base_seed * 7u + part_index * 13u) % 500u) / 1000.f + 0.3f;
-								const auto completed = total_rounds - pending;
-								const auto trigger_time = part_delay + completed * 0.4f;
-
-								if (passed_secs >= trigger_time) {
-									auto access = allocate_new_entity_access();
-									auto rng = cosm.get_rng_for(subject);
-
-									const auto world_pos = calc_world_pos(offset);
-
-									for (int i = 0; i < splats_per_round; ++i) {
-										const auto random_offset = vec2::from_degrees(rng.randval(0.f, 360.f)) * rng.randval(3.f, spread);
-										::spawn_blood_splatter(access, rng, step, subject, world_pos + random_offset, world_pos, rng.randval(0.3f, 0.6f));
-									}
-
-									--pending;
-								}
-							};
-
-							try_spawn_gore(sentience.pending_lying_gore_head, 5, corpse_torso.head, 0u, 3, 20.f);
-							try_spawn_gore(sentience.pending_lying_gore_shoulder, 3, corpse_torso.shoulder, 1u, 2, 15.f);
-							try_spawn_gore(sentience.pending_lying_gore_secondary_shoulder, 3, corpse_torso.secondary_shoulder, 2u, 2, 15.f);
-
-							const auto center_offset = transformi();
-							try_spawn_gore(sentience.pending_lying_gore_center, 3, center_offset, 3u, 2, 15.f);
-						}
-					}
-				}
-			}
+			::handle_lying_corpse_stump_splatters(allocate_new_entity_access(), step, subject, sentience, now);
+			::constrain_to_motion_axis(subject);
+			::constrain_to_motion_axis(cosm[sentience.detached.lying_corpse]);
 
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();
@@ -628,9 +538,23 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				::spawn_blood_splatters(access, step, subject, h.point_of_impact, impact_dir, amount, params);
 			}
 
+			/*
+				Blown up or cut into the body - its lying corpse shows a splatter over it.
+			*/
+			if (amount > 0 && !h.origin.circumstances.headshot && (h.from_explosion || ::is_melee_damage(cosm, h.origin))) {
+				sentience.got_body_blasted_or_cut = true;
+			}
+
 			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
 				sentience.time_of_last_received_hit = cosm.get_timestamp();
+
+				/*
+					Only what got through to the health - a headshot the shield took whole leaves no blood.
+				*/
+				if (h.origin.circumstances.headshot) {
+					sentience.got_bloody_headshot = true;
+				}
 
 				const auto prev_consciousness = consciousness.value;
 
@@ -819,10 +743,10 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 						}
 
 						/*
-							NOARMS corpses cannot lose any more arms,
+							Corpses without any limbs cannot lose any more,
 							so further damage has no effect.
 						*/
-						if (owner_sentience->arms_queued_for_detach >= 2) {
+						if (owner_sentience->num_limbs_detached() >= max_detached_limbs_v) {
 							return false;
 						}
 
@@ -857,6 +781,7 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 	event_template.origin = d.origin;
 	event_template.source_adversity = d.type;
 	event_template.head_transform = d.head_transform;
+	event_template.from_explosion = d.from_explosion;
 
 	auto& is_headshot = event_template.origin.circumstances.headshot;
 

@@ -1,4 +1,7 @@
 #include "game/detail/sentience/sentience_logic.h"
+#include "game/detail/sentience/corpse_limbs.h"
+#include "game/detail/sentience/death_drop_falls.h"
+#include "game/detail/decals/character_gunshot_decal.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/stateless_systems/driver_system.h"
@@ -8,6 +11,8 @@
 #include "game/detail/explosive/detonate.h"
 #include "game/detail/sentience/gore/blood_splatter.hpp"
 #include "game/detail/sentience/gore/idle_splatter.hpp"
+#include "game/detail/sentience/gore/lying_corpse_stump_splatters.h"
+#include "game/detail/physics/motion_axis.h"
 #include "game/messages/pure_color_highlight_message.h"
 #include "game/messages/start_particle_effect.h"
 #include "game/detail/view_input/sound_effect_input.h"
@@ -15,9 +20,7 @@
 
 #include "augs/log.h"
 
-static constexpr real32 arm_detach_damage_offset = 90.f;
-
-static void try_detach_arms(
+static void try_detach_limbs(
 	const allocate_new_entity_access access,
 	const logic_step step,
 	const entity_handle subject,
@@ -31,26 +34,10 @@ static void try_detach_arms(
 		return;
 	}
 
-	/* Cap: max 2 arms total */
-	if (sentience.arms_queued_for_detach >= 2) {
-		return;
-	}
-
 	const auto& health = sentience.get<health_meter_instance>();
-	const auto current_health = health.value;
+	const auto limbs_should_be_detached = ::calc_limbs_that_should_be_detached(sentience, health.value);
 
-	const bool was_headshot_kill = sentience.knockout_origin.circumstances.headshot;
-	const auto base = was_headshot_kill ? sentience.health_value_at_death : 0.f;
-
-	const auto effective_offset = sentience.has_exploded ? arm_detach_damage_offset * 1.5f : arm_detach_damage_offset;
-	const auto threshold_1 = base - effective_offset;
-	const auto threshold_2 = base - effective_offset * 2.f;
-
-	const int arms_should_be_detached = 
-		current_health <= threshold_2 ? 2 :
-		current_health <= threshold_1 ? 1 : 0;
-
-	if (arms_should_be_detached <= sentience.arms_queued_for_detach) {
+	if (limbs_should_be_detached <= sentience.num_limbs_detached()) {
 		return;
 	}
 
@@ -58,44 +45,55 @@ static void try_detach_arms(
 		return;
 	}
 
+	const auto& cosm = subject.get_cosmos();
 	const auto subject_transform = subject.get_logic_transform();
 
 	/*
-		Use character facing to determine which arm is upper vs lower and which
-		direction each arm flies. perp_cw of facing-right = screen-down, so negate
-		to get screen-up. This stays constant regardless of which side the bullet
-		comes from, so upper arm always flies up and lower arm always flies down
-		relative to the character's orientation.
+		Once lying, the hit is placed on the lying corpse - the dead character stays where it stood.
 	*/
-	const auto facing_up = -vec2::from_degrees(subject_transform.rotation).perpendicular_cw();
+	const auto lying_corpse = sentience.has_exploded ? cosm[sentience.detached.lying_corpse] : cosm[entity_id()];
 
-	auto determine_arm_is_upper = [&]() -> bool {
-		if (point_of_impact.is_nonzero()) {
-			const auto body_center = subject_transform.pos;
-			const auto to_impact = point_of_impact - body_center;
-			const auto dot = to_impact.dot(facing_up);
-			return dot < 0;
+	const auto hit_limb = [&]() {
+		if (lying_corpse && point_of_impact.is_nonzero()) {
+			return ::calc_hit_limb_lying(lying_corpse.get_logic_transform(), point_of_impact);
 		}
-		return true;
-	};
 
-	/* Only detach one arm per call (fix for one-shot peeling off two arms) */
-	const int currently_queued = sentience.arms_queued_for_detach;
-	const bool is_first_arm = (currently_queued == 0);
+		return ::calc_hit_limb_standing(subject_transform, subject.get_logical_size().y / 2, point_of_impact);
+	}();
+
+	/* Only detach one limb per call (fix for one-shot peeling off two arms) */
+	const auto chosen = ::choose_limb_to_detach(sentience, hit_limb);
+
+	if (!chosen.has_value()) {
+		return;
+	}
+
+	const bool is_leg = chosen->is_leg;
+	const bool is_upper = chosen->is_upper;
+
+	const auto limb_flavour = [&]() {
+		const auto& f = sentience_def.detached_flavours;
+
+		if (is_leg && f.leg_upper.is_set()) {
+			return is_upper ? f.leg_lower : f.leg_upper;
+		}
+
+		return is_upper ? f.arm_lower : f.arm_upper;
+	}();
 
 	/*
-		First arm direction is determined by impact position.
-		Second arm always goes in the opposite direction of the first.
+		Upper limbs always fly up and lower limbs always fly down
+		relative to the character's orientation, regardless of which side the bullet comes from.
 	*/
-	const bool is_upper = is_first_arm ? determine_arm_is_upper() : !sentience.first_arm_queued_as_upper;
+	const auto body_rotation = lying_corpse ? lying_corpse.get_logic_transform().rotation : subject_transform.rotation;
+	const auto facing_up = -vec2::from_degrees(body_rotation).perpendicular_cw();
 	const auto fly_direction = is_upper ? facing_up : -facing_up;
-	const auto arm_flavour = is_upper ? sentience_def.detached_flavours.arm_lower : sentience_def.detached_flavours.arm_upper;
 
 	/* Damage-based speed scaling: 0 damage = 0%, 100 damage = 100% of base speed */
 	const auto damage_ratio = repro::sqrt(std::min(1.0f, damage_amount / 100.0f));
 	const auto arm_velocity = fly_direction * (sentience_def.base_detached_arm_speed * damage_ratio);
 	auto arm_transform = subject_transform;
-	arm_transform.pos = point_of_impact;
+	arm_transform.pos = point_of_impact.is_nonzero() ? point_of_impact : subject_transform.pos;
 
 	const auto typed_subject_id = subject.get_id();
 	const auto head_effect = sentience_def.detached_head_particles;
@@ -108,24 +106,24 @@ static void try_detach_arms(
 	const auto arm_detach_sound = sentience_def.arm_detach_sound;
 
 	/* Increment immediately to prevent duplicate spawns before post_construction fires */
-	if (is_first_arm) {
-		sentience.first_arm_queued_as_upper = is_upper;
+	if (is_leg) {
+		(is_upper ? sentience.leg_upper_queued_for_detach : sentience.leg_lower_queued_for_detach) = true;
 	}
-	sentience.arms_queued_for_detach++;
-	
-	/*
-		Only award coins for arm detachment if the damage comes from a different faction.
-		This prevents players from teamkilling to get the award from detaching arms (gore).
-	*/
-	const auto victim_faction = subject.get_official_faction();
+	else {
+		if (sentience.arms_queued_for_detach == 0) {
+			sentience.first_arm_queued_as_upper = is_upper;
+		}
 
-	if (origin.sender.faction_of_sender != victim_faction || victim_faction == faction_type::SPECTATOR) {
+		sentience.arms_queued_for_detach++;
+	}
+	
+	if (::is_gore_award_deserved(subject, origin)) {
 		sentience.coins_on_body += 500;
 	}
 
 	cosmic::queue_create_entity(
 		step,
-		arm_flavour,
+		limb_flavour,
 		[arm_transform, arm_velocity, typed_subject_id](const auto& typed_entity, auto&) {
 			typed_entity.set_logic_transform(arm_transform);
 
@@ -135,19 +133,23 @@ static void try_detach_arms(
 			rigid_body.get_special().during_cooldown_ignore_collision_with = typed_subject_id;
 		},
 
-		[head_effect, typed_subject_id, is_upper, access, arm_splatter_origin, fly_direction, arm_detach_sound](const auto& typed_entity, const logic_step step) {
+		[head_effect, typed_subject_id, is_leg, is_upper, access, arm_splatter_origin, fly_direction, arm_detach_sound](const auto& typed_entity, const logic_step step) {
 			if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 				auto& s = typed_subject.template get<components::sentience>();
+				auto& d = s.detached;
 
-				if (is_upper) {
-					s.detached.arm_upper = typed_entity;
+				if (is_leg) {
+					(is_upper ? d.leg_upper : d.leg_lower) = typed_entity;
 				}
 				else {
-					s.detached.arm_lower = typed_entity;
+					(is_upper ? d.arm_upper : d.arm_lower) = typed_entity;
 				}
 
+				/*
+					Two rounds of splatters at all detached limbs, restarted by every new one.
+				*/
 				s.when_arms_detached = step.get_cosmos().get_timestamp();
-				s.pending_arm_splatters += 2;
+				s.pending_arm_splatters = 2;
 			}
 
 			const auto predictability = 
@@ -232,7 +234,6 @@ void handle_corpse_damage(
 		sentience.last_corpse_damage_direction = impact_direction;
 	}
 
-	auto& health = sentience.get<health_meter_instance>();
 	auto& when_ignited = sentience.when_corpse_catched_fire;
 
 	const auto& cosm = subject.get_cosmos();
@@ -262,15 +263,6 @@ void handle_corpse_damage(
 		}
 	};
 
-	const auto damage_past_breaking_point = -health.value - sentience_def.damage_required_for_corpse_explosion;
-	const bool is_ignited = when_ignited.was_set();
-
-	if (damage_past_breaking_point > 0 && !sentience.has_exploded) {
-		if (!is_ignited) {
-			ignite_corpse();
-		}
-	}
-
 	/*
 		Post a damage highlight on the lying corpse so
 		the hit flash is visible on the physical body.
@@ -288,56 +280,82 @@ void handle_corpse_damage(
 		}
 	}
 
-	const auto prev_arms_queued = sentience.arms_queued_for_detach;
+	/*
+		Health, not is_dead() - for the killing hit, when_knocked_out is only set after this.
+	*/
+	const bool corpse_standing = !sentience.get<health_meter_instance>().is_positive() && !sentience.has_exploded;
 
-	try_detach_arms(access, step, subject, sentience, sentience_def, point_of_impact, damage_amount, origin);
+	if (corpse_standing) {
+		::keep_corpse_standing_after_hit(cosm, sentience, origin);
+	}
+
+	const auto prev_limbs_queued = sentience.num_limbs_detached();
 
 	/*
-		If an arm was just detached while the lying corpse already exists,
-		replace it with the correct sprite variant (noarm/noarms).
+		Not in the step it has fallen in - its lying corpse is only queued to be created, so it couldn't be replaced
+		with one without the limb: the limb would be gone from the state, yet still drawn.
+	*/
+	const bool lying_corpse_queued = sentience.has_exploded && cosm[sentience.detached.lying_corpse].dead();
+
+	if (!lying_corpse_queued) {
+		try_detach_limbs(access, step, subject, sentience, sentience_def, point_of_impact, damage_amount, origin);
+	}
+
+	/*
+		A standing corpse catches fire only past the damage that tears off all its limbs - see corpse_limbs.h.
+	*/
+	const auto damage_past_breaking_point = ::calc_corpse_damage_past_limbs(sentience, sentience.get<health_meter_instance>().value) - sentience_def.damage_required_for_corpse_explosion;
+
+	if (damage_past_breaking_point > 0 && !sentience.has_exploded && !when_ignited.was_set()) {
+		ignite_corpse();
+
+		/*
+			A burning corpse always explodes.
+		*/
+		if (::is_gore_award_deserved(subject, origin)) {
+			sentience.coins_on_body += corpse_explosion_coins_v;
+		}
+	}
+
+	/*
+		If a limb was just detached while the lying corpse already exists,
+		replace it with the correct sprite variant.
 	*/
 	const auto new_arms = sentience.arms_queued_for_detach;
 
-	if (new_arms != prev_arms_queued && sentience.detached.lying_corpse.is_set()) {
+	if (sentience.num_limbs_detached() != prev_limbs_queued && sentience.detached.lying_corpse.is_set()) {
 		sentience.when_lying_corpse_replaced = cosm.get_timestamp();
 
 		const auto lying_corpse = cosm[sentience.detached.lying_corpse];
 
 		if (lying_corpse) {
-			const auto new_flavour = [&]() {
-				if (new_arms >= 2) {
-					return sentience_def.lying_corpse_noarms_flavour;
-				}
-				if (new_arms >= 1) {
-					return sentience_def.lying_corpse_noarm_flavour;
-				}
-				return sentience_def.lying_corpse_flavour;
+			const auto old_flip = [&]() {
+				auto result = flip_flags();
+				lying_corpse.dispatch([&](const auto& typed) {
+					if (const auto* geo = typed.get().template find<components::overridden_geo>()) {
+						result = geo->flip;
+					}
+				});
+				return result;
 			}();
+
+			/*
+				Recompute flip based on current arm detachment state.
+				Same logic as the initial lying corpse spawn.
+			*/
+			const bool should_flip = [&]() {
+				if (new_arms == 1) {
+					return sentience.should_flip_tattered_sprite();
+				}
+				return old_flip.vertically;
+			}();
+
+			const auto new_flavour = ::calc_lying_corpse_flavour(sentience_def, sentience, should_flip);
 
 			if (new_flavour.is_set()) {
 				const auto old_transform = lying_corpse.get_logic_transform();
 				const auto old_velocity = lying_corpse.get_effective_velocity();
-
-				const auto old_flip = [&]() {
-					auto result = flip_flags();
-					lying_corpse.dispatch([&](const auto& typed) {
-						if (const auto* geo = typed.get().template find<components::overridden_geo>()) {
-							result = geo->flip;
-						}
-					});
-					return result;
-				}();
-
-				/*
-					Recompute flip based on current arm detachment state.
-					Same logic as the initial lying corpse spawn.
-				*/
-				const bool should_flip = [&]() {
-					if (new_arms == 1) {
-						return sentience.should_flip_tattered_sprite();
-					}
-					return old_flip.vertically;
-				}();
+				const auto old_only_moves_along = lying_corpse.get_special_physics().only_moves_along;
 
 				const auto typed_subject_id = subject.get_id();
 				const auto old_lying_corpse_id = lying_corpse.get_id();
@@ -376,32 +394,16 @@ void handle_corpse_damage(
 
 				step.queue_deletion_of(lying_corpse, "Replacing lying corpse with updated arm variant");
 
-				/*
-					Update pending gore splatters for the newly detached arm(s).
-				*/
-				if (new_arms >= 1 && prev_arms_queued < 1) {
-					sentience.pending_lying_gore_shoulder = 3;
-				}
-
-				if (new_arms >= 2 && prev_arms_queued < 2) {
-					sentience.pending_lying_gore_secondary_shoulder = 3;
-				}
-
-				/*
-					Reset the settlement timer so gore dripping re-evaluates
-					with the new corpse.
-				*/
-				sentience.when_lying_corpse_settled = {};
-
 				cosmic::queue_create_entity(
 					step,
 					new_flavour,
-					[old_transform, old_velocity, should_flip, typed_subject_id](const auto& typed_entity, auto& agg) {
+					[old_transform, old_velocity, old_only_moves_along, should_flip, typed_subject_id](const auto& typed_entity, auto& agg) {
 						typed_entity.set_logic_transform(old_transform);
 
 						const auto& rigid_body = typed_entity.template get<components::rigid_body>();
 						rigid_body.set_velocity(old_velocity);
 						rigid_body.set_angular_velocity(0.f);
+						rigid_body.get_special().only_moves_along = old_only_moves_along;
 
 						if (should_flip) {
 							if (auto* geo = agg.template find<components::overridden_geo>()) {
@@ -414,11 +416,14 @@ void handle_corpse_damage(
 						}
 					},
 
-					[typed_subject_id, old_lying_corpse_id, head_detached, head_effect, corpse_head_offset](const auto& typed_entity, const logic_step step) {
+					[typed_subject_id, old_lying_corpse_id, head_detached, head_effect, corpse_head_offset, mirrored = should_flip != old_flip.vertically](const auto& typed_entity, const logic_step step) {
 						if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 							auto& s = typed_subject.template get<components::sentience>();
 							s.detached.lying_corpse = typed_entity;
+							::start_lying_corpse_stump_splatters(s);
 						}
+
+						::move_character_decals_onto(step, old_lying_corpse_id, typed_entity, false, mirrored);
 
 						/*
 							Send a white highlight for the replacement lying corpse.
@@ -512,57 +517,25 @@ void handle_corpse_detonation(
 
 		const auto lying_transform = transformr(subject_pos, lying_rotation);
 
-		/*
-			Set up pending gore splatter counts regardless of gentle/violent detonation.
-			These will be spawned later in sentience_system.cpp when the lying corpse velocity drops below 100.
-		*/
-		{
-			const bool head_detached = sentience.detached.head.is_set() || sentience.knockout_origin.circumstances.headshot;
-			const int num_arms_for_gore = sentience.num_arms_detached();
-
-			if (head_detached) {
-				sentience.pending_lying_gore_head = 5;
-			}
-
-			if (num_arms_for_gore >= 1) {
-				sentience.pending_lying_gore_shoulder = 3;
-			}
-
-			if (num_arms_for_gore >= 2) {
-				sentience.pending_lying_gore_secondary_shoulder = 3;
-			}
-
-			if (!head_detached && num_arms_for_gore == 0) {
-				sentience.pending_lying_gore_center = 3;
-			}
-		}
-
 		/* Choose the lying corpse flavour based on how many arms are detached */
 		const auto num_arms = sentience.num_arms_detached();
-		const auto corpse_flavour = [&]() {
-			if (num_arms >= 2) {
-				return sentience_def.lying_corpse_noarms_flavour;
+
+		/*
+			Flip logic:
+			- Exactly 1 arm detached: use tattered flip (mirrors the standing corpse).
+			- 0 or 2 arms detached: random 50/50 based on when_knocked_out.step for variety.
+		*/
+		const bool should_flip = [&]() {
+			if (num_arms == 1) {
+				return sentience.should_flip_tattered_sprite();
 			}
-			if (num_arms >= 1) {
-				return sentience_def.lying_corpse_noarm_flavour;
-			}
-			return sentience_def.lying_corpse_flavour;
+			return sentience.when_knocked_out.step % 2 == 0;
 		}();
+
+		const auto corpse_flavour = ::calc_lying_corpse_flavour(sentience_def, sentience, should_flip);
 
 		if (corpse_flavour.is_set()) {
 			const auto typed_subject_id = subject.get_id();
-
-			/*
-				Flip logic:
-				- Exactly 1 arm detached: use tattered flip (mirrors the standing corpse).
-				- 0 or 2 arms detached: random 50/50 based on when_knocked_out.step for variety.
-			*/
-			const bool should_flip = [&]() {
-				if (num_arms == 1) {
-					return sentience.should_flip_tattered_sprite();
-				}
-				return sentience.when_knocked_out.step % 2 == 0;
-			}();
 
 			/*
 				Lying corpse inherits velocity from the tattered corpse.
@@ -611,8 +584,14 @@ void handle_corpse_detonation(
 				[lying_transform, lying_velocity, should_flip, typed_subject_id](const auto& typed_entity, auto& agg) {
 					typed_entity.set_logic_transform(lying_transform);
 
+					/*
+						From now on it slides only head first, the way it lies - see motion_axis.h.
+					*/
+					const auto only_moves_along = -vec2::from_degrees(lying_transform.rotation);
+
 					const auto& rigid_body = typed_entity.template get<components::rigid_body>();
-					rigid_body.set_velocity(lying_velocity);
+					rigid_body.get_special().only_moves_along = only_moves_along;
+					rigid_body.set_velocity(::project_onto_motion_axis(lying_velocity, only_moves_along));
 					rigid_body.set_angular_velocity(0.f);
 
 					if (should_flip) {
@@ -630,7 +609,10 @@ void handle_corpse_detonation(
 					if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 						auto& s = typed_subject.template get<components::sentience>();
 						s.detached.lying_corpse = typed_entity;
+						::start_lying_corpse_stump_splatters(s);
 					}
+
+					::move_character_decals_onto(step, typed_subject_id, typed_entity, true);
 
 					/*
 						Send a white highlight for the lying corpse when it first appears.
@@ -690,10 +672,18 @@ void handle_corpse_detonation(
 	};
 
 	const auto& when_ignited = sentience.when_corpse_catched_fire;
-	const auto damage_past_breaking_point = accumulated_corpse_damage - sentience_def.damage_required_for_corpse_explosion;
+	const auto damage_past_breaking_point = ::calc_corpse_damage_past_limbs(sentience, health.value) - sentience_def.damage_required_for_corpse_explosion;
 	const bool is_ignited = when_ignited.was_set();
 
-	if (is_ignited) {
+	/*
+		Dropped at once (snipers and heavy pistols) or no longer kept up by hits - see corpse_limbs.h.
+		If already burning (e.g. after a sniper headshot), it explodes right away.
+	*/
+	if (sentience.is_dead() && (sentience.corpse_fell_at_once || ::has_standing_corpse_time_run_out(cosm, sentience))) {
+		const bool gentle = !is_ignited;
+		spawn_lying_corpse(gentle);
+	}
+	else if (is_ignited) {
 		const auto secs_simulated_by_damaging = (damage_past_breaking_point * 2) / 1000.f;
 		const auto passed_secs = clk.get_passed_secs(when_ignited);
 
@@ -707,7 +697,12 @@ void handle_corpse_detonation(
 			: IDLE_SPLATTER_MAX_CORPSE_DRIPS
 		;
 
-		if (sentience.idle_blood_drip_count >= max_drips) {
+		/*
+			Not while gun hits keep it standing - see corpse_limbs.h.
+		*/
+		const bool kept_standing_by_hits = sentience.when_corpse_kept_standing.was_set();
+
+		if (!kept_standing_by_hits && sentience.idle_blood_drip_count >= max_drips) {
 			/*
 				The tattered corpse has bled out.
 				Gently fall to the ground without any explosion effects.
@@ -737,9 +732,15 @@ void perform_knockout(
 		auto& sentience = typed_subject.template get<components::sentience>();
 		auto& sentience_def = typed_subject.template get<invariants::sentience>();
 		
+		const auto held_items = typed_subject.get_wielded_items();
+
 		if (typed_subject.template get<components::item_slot_transfers>().allow_drop_and_pick) {
 			if (const auto* const container = typed_subject.template find<invariants::container>()) {
 				drop_from_all_slots(*container, entity_handle(typed_subject), sentience_def.drop_distance_on_knockout, step);
+			}
+
+			if (!sentience.template get<health_meter_instance>().is_positive()) {
+				::start_dropped_on_death_falls(step, held_items);
 			}
 		}
 		else {
@@ -780,6 +781,13 @@ void perform_knockout(
 
 			if (direction.is_nonzero()) {
 				sentience.last_corpse_damage_direction = direction;
+
+				/*
+					The standing corpse slides on only forward along the direction it was killed in -
+					still free to turn - see motion_axis.h.
+				*/
+				typed_subject.get_special_physics().only_moves_along = vec2(direction).normalize();
+				::constrain_to_motion_axis(typed_subject);
 			}
 		}
 
@@ -879,7 +887,7 @@ void perform_knockout(
 		}
 
 		if (sentience.is_dead()) {
-			try_detach_arms(allocate_new_entity_access(), step, typed_subject, sentience, sentience_def, point_of_impact, damage_amount, origin);
+			try_detach_limbs(allocate_new_entity_access(), step, typed_subject, sentience, sentience_def, point_of_impact, damage_amount, origin);
 		}
 	});
 }

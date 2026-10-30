@@ -61,6 +61,11 @@ struct common_assets {
 	typed_entity_flavour_id<decal_decoration> blood_splatter_1;
 	typed_entity_flavour_id<decal_decoration> blood_splatter_2;
 	typed_entity_flavour_id<decal_decoration> blood_splatter_3;
+	typed_entity_flavour_id<decal_decoration> character_gunshot_decal_1;
+	typed_entity_flavour_id<decal_decoration> character_gunshot_decal_2;
+	typed_entity_flavour_id<decal_decoration> character_gunshot_drip_1;
+	typed_entity_flavour_id<decal_decoration> character_gunshot_drip_2;
+	typed_entity_flavour_id<decal_decoration> character_gunshot_drip_3;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_1;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_2;
 	typed_entity_flavour_id<decal_decoration> blood_footstep_1_weak;

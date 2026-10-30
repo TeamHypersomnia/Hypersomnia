@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/sentience/gore/blood_splatter.hpp"
+#include "game/detail/decals/character_gunshot_decal.h"
 #include "game/components/sentience_component.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
@@ -65,6 +66,13 @@ inline void handle_idle_blood_splatter(
 	}
 
 	/*
+		Not under a lying corpse - the blood would show through it.
+	*/
+	if (sentience.has_exploded) {
+		return;
+	}
+
+	/*
 		Calculate drip interval:
 		At IDLE_SPLATTER_HP_THRESHOLD HP: IDLE_SPLATTER_MAX_INTERVAL_MS
 		At 0% HP (or corpse): IDLE_SPLATTER_MIN_INTERVAL_MS (or IDLE_SPLATTER_CORPSE_INTERVAL_MS for corpses)
@@ -116,7 +124,10 @@ inline void handle_idle_blood_splatter(
 	const auto random_start_offset = rng.random_point_in_ring(IDLE_SPLATTER_MIN_OFFSET_START, IDLE_SPLATTER_MAX_OFFSET_START);
 	const auto random_offset = rng.random_point_in_ring(IDLE_SPLATTER_MIN_OFFSET, IDLE_SPLATTER_MAX_OFFSET);
 
-	const auto splatter_start = pos + random_start_offset;
+	/*
+		From its newest bullet hole if it has any.
+	*/
+	const auto splatter_start = ::find_newest_character_hole_pos(subject, sentience).value_or(pos + random_start_offset);
 	const auto splatter_pos = splatter_start + random_offset;
 
 	/*

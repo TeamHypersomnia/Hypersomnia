@@ -21,6 +21,7 @@
 #include "game/detail/decals/decal_geometry.h"
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/physics/physics_queries.h"
+#include "game/detail/physics/world_polygon.h"
 #include "game/detail/visible_entities.hpp"
 #include "game/detail/decals/for_each_decal_in_box.hpp"
 #include "game/inferred_caches/find_physics_cache.h"
@@ -144,25 +145,6 @@ inline vec2i to_decal_sprite_size(const vec2 size) {
 /* How far outside a fixture an impact point may land and still be attributed to it. */
 inline constexpr real32 MAX_IMPACT_ATTRIBUTION_DISTANCE_PX = 10.f;
 
-inline auto get_world_polygon_px(const b2Fixture& fixture, const si_scaling si) {
-	augs::constant_size_vector<vec2, b2_maxPolygonVertices> result;
-
-	const auto* const shape = fixture.GetShape();
-
-	if (shape->GetType() != b2Shape::e_polygon) {
-		return result;
-	}
-
-	const auto& poly = static_cast<const b2PolygonShape&>(*shape);
-	const auto& xf = fixture.GetBody()->GetTransform();
-
-	for (int v = 0; v < poly.GetVertexCount(); ++v) {
-		result.push_back(si.get_pixels(static_cast<vec2>(b2Mul(xf, poly.GetVertex(v)))));
-	}
-
-	return result;
-}
-
 /*
 	Finds the convex fixture of the surface entity whose boundary
 	is the closest to the given impact point. Robust against impacts
@@ -200,6 +182,18 @@ const b2Fixture* find_fixture_of_impact(
 	}
 
 	return best_fixture;
+}
+
+/*
+	A weapon may dictate its mark's scale outright;
+	zero means it is derived from the damage instead.
+*/
+inline real32 calc_gunshot_decal_size_mult(const real32 damage_amount, const real32 custom_decal_scale) {
+	if (custom_decal_scale > 0.f) {
+		return std::min(custom_decal_scale, MAX_CUSTOM_GUNSHOT_DECAL_SCALE);
+	}
+
+	return std::clamp(damage_amount / GUNSHOT_DECAL_BASELINE_DAMAGE, MIN_GUNSHOT_DECAL_SCALE, MAX_GUNSHOT_DECAL_SCALE);
 }
 
 struct nearby_decal {
@@ -516,15 +510,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 		return std::nullopt;
 	}
 
-	/*
-		A weapon may dictate its mark's scale outright;
-		zero means it is derived from the damage instead.
-	*/
-	const auto size_mult =
-		custom_decal_scale > 0.f ?
-		std::min(custom_decal_scale, MAX_CUSTOM_GUNSHOT_DECAL_SCALE) :
-		std::clamp(damage_amount / GUNSHOT_DECAL_BASELINE_DAMAGE, MIN_GUNSHOT_DECAL_SCALE, MAX_GUNSHOT_DECAL_SCALE)
-	;
+	const auto size_mult = ::calc_gunshot_decal_size_mult(damage_amount, custom_decal_scale);
 
 	const auto desired_size = original_size * size_mult * rng.randval(0.9f, 1.1f);
 

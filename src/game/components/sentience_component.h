@@ -123,22 +123,27 @@ namespace components {
 		augs::stepped_timestamp when_arms_detached;
 		int pending_arm_splatters = 0;
 		int pending_head_splatters = 0;
+		int pending_stump_splatters = 0;
 		real32 health_value_at_death = 0.f;
 		int arms_queued_for_detach = 0;
 		int idle_blood_drip_count = 0;
 		vec2 last_corpse_damage_direction;
+		vec2 newest_hole_offset;
 		bool first_arm_queued_as_upper = false;
 		bool corpse_fall_sound_played = false;
 		bool is_bot = false;
-		pad_bytes<1> pad3;
+		bool leg_upper_queued_for_detach = false;
+		bool leg_lower_queued_for_detach = false;
+		bool corpse_fell_at_once = false;
+		bool got_bloody_headshot = false;
+		bool got_body_blasted_or_cut = false;
 
-		int pending_lying_gore_head = 0;
-		int pending_lying_gore_shoulder = 0;
-		int pending_lying_gore_secondary_shoulder = 0;
-		int pending_lying_gore_center = 0;
-		augs::stepped_timestamp when_lying_corpse_settled;
 		augs::stepped_timestamp when_lying_corpse_replaced;
+		augs::stepped_timestamp when_lying_corpse_settled;
 		augs::stepped_timestamp when_bot_item_knocked;
+		augs::stepped_timestamp when_corpse_kept_standing;
+		real32 corpse_kept_standing_secs = 0.f;
+		real32 corpse_standing_least_secs = 0.f;
 
 		faction_type official_faction = faction_type::SPECTATOR;
 		// END GEN INTROSPECTOR
@@ -206,6 +211,14 @@ namespace components {
 
 		int num_arms_detached() const {
 			return arms_queued_for_detach;
+		}
+
+		int num_legs_detached() const {
+			return int(leg_upper_queued_for_detach) + int(leg_lower_queued_for_detach);
+		}
+
+		int num_limbs_detached() const {
+			return num_arms_detached() + num_legs_detached();
 		}
 
 		bool should_flip_tattered_sprite() const {
@@ -327,6 +340,7 @@ namespace invariants {
 
 		assets::image_id corpse_head_image;
 		assets::image_id corpse_head_splatter_image;
+		assets::image_id corpse_head_splatter_less_image;
 		assets::image_id corpse_body_splatter_image;
 		vec2i corpse_head_offset = { -20, 0 };
 		vec2i corpse_arm_upper_offset = { 0, -15 };
@@ -335,6 +349,10 @@ namespace invariants {
 		body_part_flavour lying_corpse_flavour;
 		body_part_flavour lying_corpse_noarm_flavour;
 		body_part_flavour lying_corpse_noarms_flavour;
+
+		lying_corpse_legless_flavours lying_corpse_legless;
+		lying_corpse_legless_flavours lying_corpse_noarm_legless;
+		lying_corpse_legless_flavours lying_corpse_noarms_legless;
 
 		augs::constant_size_vector<constrained_entity_flavour_id<invariants::touch_collectible>, 4> coin_flavours;
 		// END GEN INTROSPECTOR

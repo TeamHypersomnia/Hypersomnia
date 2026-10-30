@@ -322,6 +322,11 @@ void load_test_scene_sentience_properties(
 		assets.blood_splatter_1 = to_entity_flavour_id(test_decal_decorations::BLOOD_SPLATTER_1);
 		assets.blood_splatter_2 = to_entity_flavour_id(test_decal_decorations::BLOOD_SPLATTER_2);
 		assets.blood_splatter_3 = to_entity_flavour_id(test_decal_decorations::BLOOD_SPLATTER_3);
+		assets.character_gunshot_decal_1 = to_entity_flavour_id(test_decal_decorations::CHARACTER_GUNSHOT_DECAL_1);
+		assets.character_gunshot_decal_2 = to_entity_flavour_id(test_decal_decorations::CHARACTER_GUNSHOT_DECAL_2);
+		assets.character_gunshot_drip_1 = to_entity_flavour_id(test_decal_decorations::CHARACTER_GUNSHOT_DRIP_1);
+		assets.character_gunshot_drip_2 = to_entity_flavour_id(test_decal_decorations::CHARACTER_GUNSHOT_DRIP_2);
+		assets.character_gunshot_drip_3 = to_entity_flavour_id(test_decal_decorations::CHARACTER_GUNSHOT_DRIP_3);
 		assets.blood_footstep_1 = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_1);
 		assets.blood_footstep_2 = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_2);
 		assets.blood_footstep_1_weak = to_entity_flavour_id(test_decal_decorations::BLOOD_FOOTSTEP_1_WEAK);

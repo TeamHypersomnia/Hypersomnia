@@ -27,6 +27,13 @@ struct specific_draw_input {
 	}
 };
 
+struct owned_decals;
+
 struct draw_renderable_input : specific_draw_input {
 	const interpolation_system& interp;
+
+	/*
+		If set, standing corpses drawn with this input draw their bullet holes under their heads.
+	*/
+	const owned_decals* decals = nullptr;
 };

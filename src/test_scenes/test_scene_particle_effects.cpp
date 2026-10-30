@@ -5833,6 +5833,11 @@ void load_test_scene_particle_effects(
 
 			em.should_gore_remap = true;
 
+			/*
+				Starts as an already spread spray rather than from a single point.
+			*/
+			em.prewarm_ms = 120.f;
+
 			effect.emissions.push_back(em);
 		}
 	}

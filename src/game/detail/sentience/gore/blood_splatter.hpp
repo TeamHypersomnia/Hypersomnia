@@ -12,6 +12,8 @@
 inline constexpr unsigned BLOOD_SPLATTER_NUM_VARIANTS = 3;
 /* Baseline distance for blood burst velocity scaling */
 inline constexpr real32 BLOOD_BURST_BASELINE_DISTANCE = 50.f;
+/* The burst starts this far ahead of the impact, so it doesn't lag behind the pushed character */
+inline constexpr real32 BLOOD_BURST_FORWARD_OFFSET = 15.f;
 
 /*
 	Spawns a single blood splatter at an exact position with specified size.
@@ -75,9 +77,11 @@ inline void spawn_blood_splatter(
 		/* Direction from burst origin towards the splatter position */
 		const auto burst_degrees = offset.is_nonzero() ? offset.degrees() : 0.f;
 		
+		const auto burst_start = offset.is_nonzero() ? burst_origin + vec2(offset).set_length(BLOOD_BURST_FORWARD_OFFSET) : burst_origin;
+
 		burst_effect.start(
 			step,
-			particle_effect_start_input::orbit_absolute(cosm[subject], transformr(burst_origin, burst_degrees)),
+			particle_effect_start_input::orbit_absolute(cosm[subject], transformr(burst_start, burst_degrees)),
 			always_predictable_v
 		);
 	}

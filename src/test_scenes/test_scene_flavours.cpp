@@ -517,6 +517,11 @@ namespace test_flavours {
 		make_detached_arm(test_plain_sprited_bodies::DETACHED_METROPOLIS_ARM_TOP, test_scene_image_id::METROPOLIS_GORE_ARM_TOP);
 		make_detached_arm(test_plain_sprited_bodies::DETACHED_METROPOLIS_ARM_BOTTOM, test_scene_image_id::METROPOLIS_GORE_ARM_BOTTOM);
 
+		make_detached_arm(test_plain_sprited_bodies::DETACHED_RESISTANCE_LEG_TOP, test_scene_image_id::RESISTANCE_GORE_LEG_TOP);
+		make_detached_arm(test_plain_sprited_bodies::DETACHED_RESISTANCE_LEG_BOTTOM, test_scene_image_id::RESISTANCE_GORE_LEG_BOTTOM);
+		make_detached_arm(test_plain_sprited_bodies::DETACHED_METROPOLIS_LEG_TOP, test_scene_image_id::METROPOLIS_GORE_LEG_TOP);
+		make_detached_arm(test_plain_sprited_bodies::DETACHED_METROPOLIS_LEG_BOTTOM, test_scene_image_id::METROPOLIS_GORE_LEG_BOTTOM);
+
 		auto make_lying_corpse_flavour = [&](
 			const test_plain_sprited_bodies id,
 			const test_scene_image_id image
@@ -543,6 +548,25 @@ namespace test_flavours {
 		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE, test_scene_image_id::RESISTANCE_TORSO_CORPSE);
 		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARM);
 		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARMS);
+
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOLEG, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOLEG);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOLEG_OTHER, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOLEG_OTHER);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOLEGS, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOLEGS);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM_NOLEG, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOARM_NOLEG);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM_NOLEG_OTHER, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOARM_NOLEG_OTHER);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARM_NOLEGS, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOARM_NOLEGS);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS_NOLEG, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOARMS_NOLEG);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS_NOLEG_OTHER, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOARMS_NOLEG_OTHER);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_METROPOLIS_NOARMS_NOLEGS, test_scene_image_id::METROPOLIS_TORSO_CORPSE_NOARMS_NOLEGS);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOLEG, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOLEG);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOLEG_OTHER, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOLEG_OTHER);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOLEGS, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOLEGS);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM_NOLEG, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARM_NOLEG);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM_NOLEG_OTHER, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARM_NOLEG_OTHER);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARM_NOLEGS, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARM_NOLEGS);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS_NOLEG, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARMS_NOLEG);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS_NOLEG_OTHER, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARMS_NOLEG_OTHER);
+		make_lying_corpse_flavour(test_plain_sprited_bodies::LYING_CORPSE_RESISTANCE_NOARMS_NOLEGS, test_scene_image_id::RESISTANCE_TORSO_CORPSE_NOARMS_NOLEGS);
 
 		{
 			auto& meta = get_test_flavour(flavours, test_touch_collectibles::GOLD_COIN);

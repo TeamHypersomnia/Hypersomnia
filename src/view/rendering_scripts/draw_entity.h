@@ -3,6 +3,7 @@
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/sprite.hpp"
 #include "augs/build_settings/compiler_defines.h"
+#include "augs/math/convex_polygon.h"
 
 #include "game/enums/render_layer.h"
 
@@ -23,12 +24,18 @@
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/frame_calculation.h"
 #include "game/detail/calc_trace_scaling.h"
+#include "game/detail/physics/world_polygon.h"
+#include "game/inferred_caches/find_physics_cache.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"
+#include "view/rendering_scripts/owned_decals.h"
 #include "game/components/torso_component.hpp"
+
+template <class H>
+void draw_standing_corpse_decals(const owned_decals&, const H& corpse, const draw_renderable_input&);
 
 /*
 	Collapse a round's neon tail the moment it is turned, instead of fading it out
@@ -510,7 +517,10 @@ FORCE_INLINE void specific_entity_drawer(
 				const bool is_dead = sentience.is_dead();
 				const bool is_lying_corpse = is_dead && sentience.has_exploded;
 
-				if (!is_lying_corpse) {
+				/*
+					Corpses never show legs - standing ones would show them still walking.
+				*/
+				if (!is_dead) {
 					const auto leg_anim = torso.calc_leg_anim(velocity, face_degrees + stance_offsets.strafe_facing_offset);
 
 					if (const auto animation = logicals.find(leg_anim.id);
@@ -665,6 +675,10 @@ FORCE_INLINE void specific_entity_drawer(
 					}
 
 					draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees + body_rotation });
+
+					if (!is_neon && in.decals != nullptr) {
+						::draw_standing_corpse_decals(*in.decals, typed_handle, in);
+					}
 
 					draw_standing_head = true;
 					head_flip = sentience.should_flip_tattered_sprite();
@@ -907,5 +921,116 @@ FORCE_INLINE void draw_border(
 ) {
 	handle.constrained_dispatch<entities_with_renderables>([&in, &borders](const auto typed_handle) {
 		specific_draw_border(typed_handle, in, std::forward<B>(borders));
+	});
+}
+
+/*
+	Bullet holes are drawn only by corpses - a living character's arms move with every animation frame
+	and the holes would float where they were, see character_gunshot_decal.h.
+
+	A standing corpse draws only those wholly within its colliders as they are now:
+	one hit while holding a rifle may be out in the air once the rifle has fallen from its hands.
+*/
+
+template <class H, class F>
+void for_each_decal_within_standing_corpse(const owned_decals& decals, const H& corpse, F&& callback) {
+	if (decals.cosm == nullptr) {
+		return;
+	}
+
+	const auto& cosm = *decals.cosm;
+	const auto si = cosm.get_si();
+
+	std::vector<std::vector<vec2>> body_polygons;
+
+	if (const auto* const cache = ::find_colliders_cache(corpse)) {
+		for (const auto& fp : cache->constructed_fixtures) {
+			auto polygon = ::get_world_polygon_px(*fp.get(), si);
+
+			if (polygon.size() >= 3) {
+				body_polygons.emplace_back(polygon.begin(), polygon.end());
+			}
+		}
+	}
+
+	auto within_body = [&](const vec2 p) {
+		for (const auto& polygon : body_polygons) {
+			if (augs::is_within_convex_polygon(polygon, p)) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	decals.for_each_of(corpse.get_id(), [&](const entity_id decal_id) {
+		cosm[decal_id].template dispatch_on_having_all<components::decal>([&](const auto& typed_decal) {
+			const auto pos = typed_decal.get_logic_transform().pos;
+			const auto radius = typed_decal.get_logical_size().length() / 2;
+
+			if (!within_body(pos)) {
+				return;
+			}
+
+			for (int i = 0; i < 8; ++i) {
+				if (!within_body(pos + vec2::from_degrees(45.f * i) * radius)) {
+					return;
+				}
+			}
+
+			callback(typed_decal);
+		});
+	});
+}
+
+template <class H>
+void draw_standing_corpse_decals(const owned_decals& decals, const H& corpse, const draw_renderable_input& in) {
+	::for_each_decal_within_standing_corpse(decals, corpse, [&](const auto& typed_decal) {
+		::specific_draw_entity(typed_decal, in);
+	});
+}
+
+template <class H>
+void draw_standing_corpse_decal_neons(const owned_decals& decals, const H& handle, const draw_renderable_input& in) {
+	if (const auto* const sentience = handle.template find<components::sentience>()) {
+		if (sentience->is_dead() && !sentience->has_exploded) {
+			::for_each_decal_within_standing_corpse(decals, handle, [&](const auto& typed_decal) {
+				::specific_draw_neon_map(typed_decal, in);
+			});
+		}
+	}
+}
+
+/*
+	The bullet holes attached to a lying corpse - all of them, as they were fitted into it when it fell.
+*/
+inline void draw_owned_decals(const owned_decals& decals, const entity_id owner, const draw_renderable_input& in) {
+	if (decals.cosm == nullptr) {
+		return;
+	}
+
+	const auto& cosm = *decals.cosm;
+
+	decals.for_each_of(owner, [&](const entity_id decal_id) {
+		cosm[decal_id].dispatch_on_having_all<components::decal>([&](const auto& typed_decal) {
+			::specific_draw_entity(typed_decal, in);
+		});
+	});
+}
+
+/*
+	Their neon maps - glowing like blood does.
+*/
+inline void draw_owned_decal_neons(const owned_decals& decals, const entity_id owner, const draw_renderable_input& in) {
+	if (decals.cosm == nullptr) {
+		return;
+	}
+
+	const auto& cosm = *decals.cosm;
+
+	decals.for_each_of(owner, [&](const entity_id decal_id) {
+		cosm[decal_id].dispatch_on_having_all<components::decal>([&](const auto& typed_decal) {
+			::specific_draw_neon_map(typed_decal, in);
+		});
 	});
 }

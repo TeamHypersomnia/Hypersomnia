@@ -186,7 +186,8 @@ public:
 	auto make_draw_renderable_input() const {
 		return draw_renderable_input {
 			{ make_specific_draw_input() },
-			get_interpolation_system()
+			get_interpolation_system(),
+			nullptr
 		};
 	}
 

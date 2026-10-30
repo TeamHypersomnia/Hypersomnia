@@ -24,6 +24,12 @@ enum class render_layer {
 		so that they are visible above every physical body, including FOREGROUND walls.
 	*/
 	SURFACE_DECALS,
+	/*
+		Bullet holes of characters - not drawn on their own, but by their owners:
+		only a lying corpse draws them, over its body and under its head.
+		See owned_decals.h.
+	*/
+	CHARACTER_DECALS,
 
 	DIM_WANDERING_PIXELS,
 	CONTINUOUS_SOUNDS,

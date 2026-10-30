@@ -59,13 +59,20 @@ void for_each_corpse_head_overlay(
 		: sentience_def.corpse_head_splatter_image
 	;
 
+	/*
+		Shot in the head but killed by something else - a lesser splatter under the head still on it.
+	*/
+	if (should_draw_head && sentience.got_bloody_headshot && sentience_def.corpse_head_splatter_less_image.is_set()) {
+		callback(calc_overlay(sentience_def.corpse_head_splatter_less_image));
+	}
+
 	if (head_or_splatter.is_set()) {
 		callback(calc_overlay(head_or_splatter));
 	}
 
 	/*
-		Body splatter: only for intact corpses
-		(not headshotted, head attached, both arms attached).
+		Body splatter: only for corpses blown up or cut into the body,
+		intact (not headshotted, head attached, both arms attached).
 	*/
 
 	const bool both_arms_intact =
@@ -73,7 +80,14 @@ void for_each_corpse_head_overlay(
 		&& !sentience.detached.arm_lower.is_set()
 	;
 
-	if (const bool should_draw_body_splatter = !was_headshot && !head_detached && both_arms_intact) {
+	const bool should_draw_body_splatter =
+		sentience.got_body_blasted_or_cut
+		&& !was_headshot
+		&& !head_detached
+		&& both_arms_intact
+	;
+
+	if (should_draw_body_splatter) {
 		const auto body_splatter = sentience_def.corpse_body_splatter_image;
 
 		if (body_splatter.is_set()) {

@@ -386,6 +386,7 @@ void standard_explosion_input::instantiate(
 					if (is_yet_unaffected) {
 						messages::damage_message damage_msg;
 						damage_msg.type = this->type;
+						damage_msg.from_explosion = true;
 						damage_msg.origin.cause = cause;
 						damage_msg.origin.copy_sender_from(subject);
 						damage_msg.subject = victim;
