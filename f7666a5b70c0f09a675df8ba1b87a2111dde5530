@@ -1,0 +1,1 @@
+Audited: audit test-infra (2026-10-31, /home/pbc/Downloads/audyty/test-infra/raporty/audyt-test-infra-2026-10-31.md) as the uncommitted diff; the fixes after it (in this commit) not re-audited, tested (regression.sh 16/16, tournament suite, slot_reuse)
