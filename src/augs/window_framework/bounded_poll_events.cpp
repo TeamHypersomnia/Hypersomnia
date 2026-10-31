@@ -59,7 +59,15 @@ static void release_keys_left_down(GLFWwindow* const window) {
 			| (static_cast<LPARAM>(1) << 31)
 		;
 
-		SendMessageW(handle, WM_KEYUP, static_cast<WPARAM>(k.virtual_key), key_up);
+		/*
+			Straight to the procedure of GLFW's window class, past whatever subclassed the window or hooks its messages,
+			e.g. an overlay that blocks the game's input while it is open (Steam's opens with Shift+Tab) -
+			like GLFW, which passes the release straight to its key input.
+		*/
+
+		const auto glfw_window_procedure = reinterpret_cast<WNDPROC>(GetClassLongPtrW(handle, GCLP_WNDPROC));
+
+		CallWindowProcW(glfw_window_procedure, handle, WM_KEYUP, static_cast<WPARAM>(k.virtual_key), key_up);
 	}
 }
 

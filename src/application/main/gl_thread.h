@@ -7,6 +7,7 @@
 #include <optional>
 #include <exception>
 
+#include "augs/log.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/timing/timer.h"
 #include "augs/misc/measurements.h"
@@ -299,16 +300,42 @@ void run_with_gl_thread(augs::window& window, window_thread_bridge& bridge, F&& 
 
 /*
 	frame: one frame of rendering, false once the game quits.
+
+	False if either loop failed. The error is logged here - whatever work() doesn't catch would end the game
+	without a saved log - and the logic is let out of the trade it waits for, or the exit would hang.
 */
 
 template <class F>
-void run_main_loop(augs::window& window, window_thread_bridge& bridge, const bool window_thread, F&& frame) {
-	if (window_thread) {
-		::run_with_gl_thread(window, bridge, std::forward<F>(frame));
+bool run_main_loop(
+	augs::window& window,
+	window_thread_bridge& bridge,
+	game_frame_buffer_swapper& swapper,
+	const bool window_thread,
+	F&& frame
+) {
+	auto failed = [&swapper](const char* const what) {
+		LOG("The main loop failed: %x", what);
+		swapper.abort();
+
+		return false;
+	};
+
+	try {
+		if (window_thread) {
+			::run_with_gl_thread(window, bridge, std::forward<F>(frame));
+		}
+		else {
+			while (frame()) {}
+		}
 	}
-	else {
-		while (frame()) {}
+	catch (const std::exception& err) {
+		return failed(err.what());
 	}
+	catch (...) {
+		return failed("an exception of an unknown type");
+	}
+
+	return true;
 }
 
 /*

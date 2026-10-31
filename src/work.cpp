@@ -8936,18 +8936,12 @@ work_result work(
 #endif
 
 #else
-	try {
-		::run_main_loop(window, window_bridge, window_thread, [&]() {
-			return main_loop_iter(main_loop_in_ptr);
-		});
-	}
-	catch (...) {
-		/*
-			The logic waits for a trade that won't come - let it out, or the exit would hang before the error is logged.
-		*/
+	const bool main_loop_succeeded = ::run_main_loop(window, window_bridge, buffer_swapper, window_thread, [&]() {
+		return main_loop_iter(main_loop_in_ptr);
+	});
 
-		buffer_swapper.abort();
-		throw;
+	if (!main_loop_succeeded) {
+		return work_result::FAILURE;
 	}
 #endif
 
