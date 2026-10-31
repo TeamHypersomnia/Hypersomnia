@@ -34,7 +34,7 @@ void detonate(const detonate_input in, const bool destroy_subject) {
 
 	const auto subject = cosm[in.subject];
 
-	e.explosion.instantiate(step, in.location, damage_cause(subject));
+	e.explosion.instantiate(step, in.location, damage_cause(subject), in.predictability);
 
 	if (destroy_subject) {
 		step.queue_deletion_of(subject, "Detonation");

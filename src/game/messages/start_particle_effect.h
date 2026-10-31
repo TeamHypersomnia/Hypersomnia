@@ -26,14 +26,4 @@ namespace messages {
 		std::optional<vec2> match_orbit_offset;
 		std::optional<assets::particle_effect_id> match_effect_id;
 	};
-
-	struct change_particle_effect : predicted_message {
-		using predicted_message::predicted_message;
-		std::optional<entity_id> match_chased_subject;
-		std::optional<vec2> match_orbit_offset;
-		std::optional<assets::particle_effect_id> match_effect_id;
-
-		entity_id new_target;
-		transformr new_offset;
-	};
 }

@@ -51,6 +51,7 @@
 #include "game/detail/sentience/gore/blood_splatter.hpp"
 #include "game/detail/sentience/gore/idle_splatter.hpp"
 #include "game/detail/sentience/gore/lying_corpse_stump_splatters.h"
+#include "game/detail/view_input/death_effect_predictability.h"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -229,7 +230,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					sound.start(
 						step,
 						sound_effect_start_input::at_listener(subject),
-						::calc_death_effect_predictability(step.get_settings().effect_prediction.body_drop_sounds)
+						::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.body_drop_sounds, subject.get_id())
 					);
 				}
 
@@ -582,17 +583,25 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				}
 			}
 
-			::handle_corpse_damage(
-				access,
-				step,
-				subject,
-				sentience,
-				sentience_def,
-				h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero,
-				h.point_of_impact,
-				h.damage.total(),
-				h.origin
-			);
+			/*
+				Only a body that died - the local player whose death the server confirms (local_player_death CONFIRM)
+				stays alive in the predicted steps with its health at or below zero, and must not burn or explode there.
+			*/
+			const bool is_corpse = sentience.when_knocked_out.was_set() || h.special_result == messages::health_event::result_type::DEATH;
+
+			if (is_corpse) {
+				::handle_corpse_damage(
+					access,
+					step,
+					subject,
+					sentience,
+					sentience_def,
+					h.impact_velocity.is_nonzero() ? h.impact_velocity.normalize() : vec2::zero,
+					h.point_of_impact,
+					h.damage.total(),
+					h.origin
+				);
+			}
 
 			break;
 		}

@@ -21,6 +21,11 @@ struct absolute_or_local {
 	*/
 	bool chase_sprite_back = false;
 
+	/*
+		The target is a character: once it lies, on the neck of its lying corpse instead (see lying_corpse_neck.h).
+	*/
+	bool on_lying_corpse_neck = false;
+
 	template <class C, class I>
 	auto find_transform(C& cosm, I& interp) {
 		return find_transform_impl(*this, cosm, interp);
@@ -34,7 +39,7 @@ struct absolute_or_local {
 	bool operator==(const absolute_or_local& b) const = default;
 
 	auto hash() const {
-		return augs::hash_multiple(target, offset, face_velocity, chase_velocity, chase_sprite_back);
+		return augs::hash_multiple(target, offset, face_velocity, chase_velocity, chase_sprite_back, on_lying_corpse_neck);
 	}
 };
 

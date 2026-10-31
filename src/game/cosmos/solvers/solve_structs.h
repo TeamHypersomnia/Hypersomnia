@@ -9,6 +9,7 @@ struct solve_result {
 struct solve_settings {
 	effect_prediction_settings effect_prediction;
 	entity_id disable_knockouts;
+	entity_id confirmed_death_of;
 	bool simulate_decorative_organisms = true;
 	bool play_transfer_sounds = true;
 	bool drop_weapons_if_empty = true;

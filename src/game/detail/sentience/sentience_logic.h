@@ -57,6 +57,9 @@ void resurrect(const logic_step step, const E& typed_handle, const float spawn_p
 	sentience.got_body_blasted = false;
 	sentience.got_body_cut = false;
 	sentience.corpse_stands_until = {};
+	sentience.corpse_fall_sound_played = false;
+	sentience.coins_on_body = 0;
+	sentience.killing_volley_fired = {};
 	sentience.corpse_standing_least_secs = 0.f;
 	sentience.idle_blood_drip_count = 0;
 	sentience.last_corpse_damage_direction = vec2::zero;

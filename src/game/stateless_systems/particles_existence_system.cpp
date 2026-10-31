@@ -24,6 +24,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/standard_explosion.h"
+#include "game/detail/view_input/death_effect_predictability.h"
 
 void particles_existence_system::displace_streams(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -293,7 +294,9 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 		auto predictability = destroyed ? never_predictable_v : always_predictable_v;
 
-		if (step.get_settings().effect_prediction.death_particles == effect_prediction_type::PREDICT) {
+		if (step.get_settings().effect_prediction.death_particles == effect_prediction_type::PREDICT
+			&& !::is_confirmed_death_of(step.get_settings(), h.subject)
+		) {
 			predictability = always_predictable_v;
 		}
 

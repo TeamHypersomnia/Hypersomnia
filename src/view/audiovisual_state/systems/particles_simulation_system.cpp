@@ -448,35 +448,6 @@ void particles_simulation_system::update_effects_from_messages(
 			}
 		}
 	}
-
-	{
-		const auto& events = step.get_queue<messages::change_particle_effect>();
-
-		for (auto& e : events) {
-			for (auto& c : orbital_emissions) {
-				if (const auto& m = e.match_chased_subject) {
-					if (*m != c.chasing.target) {
-						continue;
-					}
-				}
-
-				if (const auto m = e.match_orbit_offset) {
-					if (*m != c.chasing.offset.pos) {
-						continue;
-					}
-				}
-
-				if (const auto m = e.match_effect_id) {
-					if (*m != c.original.input.id) {
-						continue;
-					}
-				}
-
-				c.chasing.target = e.new_target;
-				c.chasing.offset = e.new_offset;
-			}
-		}
-	}
 }
 
 template <class F>

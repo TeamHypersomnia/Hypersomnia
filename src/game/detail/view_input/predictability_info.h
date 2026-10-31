@@ -56,7 +56,7 @@ struct effect_prediction_settings {
 	// GEN INTROSPECTOR struct effect_prediction_settings
 	effect_prediction_type death_particles = effect_prediction_type::PREDICT;
 	effect_prediction_type death_sounds = effect_prediction_type::CONFIRM;
-	effect_prediction_type item_drop_sounds = effect_prediction_type::PREDICT;
+	effect_prediction_type item_drop_sounds = effect_prediction_type::CONFIRM;
 	effect_prediction_type body_drop_sounds = effect_prediction_type::CONFIRM;
 	// END GEN INTROSPECTOR
 
@@ -130,9 +130,5 @@ struct predictability_info {
 #define predictable_only_by(x) predictability_info::only_by(x)
 
 /*
-	The predictability of an effect of a killed player, by its setting.
+	calc_death_effect_predictability is in death_effect_predictability.h.
 */
-
-inline predictability_info calc_death_effect_predictability(const effect_prediction_type t) {
-	return t == effect_prediction_type::PREDICT ? always_predictable_v : never_predictable_v;
-}

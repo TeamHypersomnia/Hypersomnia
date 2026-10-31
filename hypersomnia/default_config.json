@@ -670,7 +670,7 @@
         "effect_prediction": {
             "death_particles": "PREDICT",
             "death_sounds": "CONFIRM",
-            "item_drop_sounds": "PREDICT",
+            "item_drop_sounds": "CONFIRM",
             "body_drop_sounds": "CONFIRM"
         },
         "simulate_decorative_organisms_during_reconciliation": false

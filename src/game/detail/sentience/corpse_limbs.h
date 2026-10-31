@@ -141,6 +141,27 @@ bool is_melee_damage(const C& cosm, const damage_origin& origin) {
 }
 
 /*
+	The pellets fired together with the one that killed pass through the standing corpse - the death throws the body
+	into a spin, so they would hit it on random sides and tear off the limbs there. The same shooter's missiles
+	fired in the same step as the killing one - missiles with no shooter (e.g. the editor's Missile nodes, all fired
+	as the round starts) are never one volley.
+*/
+
+inline bool is_rest_of_killing_volley(
+	const components::sentience& sentience,
+	const augs::stepped_timestamp when_fired,
+	const damage_origin& origin
+) {
+	return
+		sentience.is_dead()
+		&& sentience.killing_volley_fired.was_set()
+		&& when_fired == sentience.killing_volley_fired
+		&& origin.sender.capability_of_sender.is_set()
+		&& origin.sender.capability_of_sender == sentience.knockout_origin.sender.capability_of_sender
+	;
+}
+
+/*
 	Called for every hit of a standing corpse, the killing one too.
 */
 

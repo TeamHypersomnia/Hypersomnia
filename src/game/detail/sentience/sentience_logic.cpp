@@ -18,6 +18,7 @@
 #include "game/messages/pure_color_highlight_message.h"
 #include "game/messages/start_particle_effect.h"
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/death_effect_predictability.h"
 #include "game/components/owner_component.h"
 
 #include "augs/log.h"
@@ -95,12 +96,12 @@ static void try_detach_limbs(
 	}();
 
 	/*
-		Upper limbs always fly up and lower limbs always fly down
-		relative to the character's orientation, regardless of which side the bullet comes from.
+		A limb flies off away from the body, on its own side - whichever side the bullet came from.
+		The upper side is the body's +y (see the top of corpse_limbs.h), opposite to facing_up.
 	*/
 	const auto body_rotation = lying_corpse ? lying_corpse.get_logic_transform().rotation : subject_transform.rotation;
 	const auto facing_up = -vec2::from_degrees(body_rotation).perpendicular_cw();
-	const auto fly_direction = is_upper ? facing_up : -facing_up;
+	const auto fly_direction = is_upper ? -facing_up : facing_up;
 
 	/* Damage-based speed scaling: 0 damage = 0%, 100 damage = 100% of base speed */
 	const auto damage_ratio = repro::sqrt(std::min(1.0f, damage_amount / 100.0f));
@@ -165,7 +166,7 @@ static void try_detach_limbs(
 				s.pending_arm_splatters = 2;
 			}
 
-			const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
+			const auto predictability = ::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.death_particles, typed_subject_id);
 
 			head_effect.start(
 				step,
@@ -192,7 +193,7 @@ static void try_detach_limbs(
 				Play the arm detach sound from the dead player's perspective.
 			*/
 			if (arm_detach_sound.id.is_set()) {
-				const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_sounds);
+				const auto predictability = ::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.death_sounds, typed_subject_id);
 
 				arm_detach_sound.start(
 					step,
@@ -244,6 +245,12 @@ void handle_corpse_damage(
 	const auto& cosm = subject.get_cosmos();
 	const auto now = cosm.get_timestamp();
 
+	/*
+		The fire and the explosion it leads to are effects of the death, played by its settings -
+		so that the fire doesn't come a ping after the explosion of a kill that is predicted.
+	*/
+	const auto& prediction = step.get_settings().effect_prediction;
+
 	auto ignite_corpse = [&]() {
 		when_ignited = now;
 
@@ -253,7 +260,7 @@ void handle_corpse_damage(
 			effect.start(
 				step,
 				particle_effect_start_input::orbit_local(subject, { vec2::zero, 180 } ),
-				never_predictable_v
+				::calc_death_effect_predictability(step.get_settings(), prediction.death_particles, subject.get_id())
 			);
 		}
 
@@ -263,7 +270,7 @@ void handle_corpse_damage(
 			effect.start(
 				step,
 				sound_effect_start_input::at_listener(subject),
-				never_predictable_v
+				::calc_death_effect_predictability(step.get_settings(), prediction.death_sounds, subject.get_id())
 			);
 		}
 	};
@@ -364,38 +371,6 @@ void handle_corpse_damage(
 				const auto typed_subject_id = subject.get_id();
 				const auto old_lying_corpse_id = lying_corpse.get_id();
 
-				/*
-					Precompute the head offset for the replacement corpse sprite
-					so we can retarget the detached_head_particles stream.
-				*/
-				const bool head_detached =
-					sentience.detached.head.is_set()
-					|| sentience.knockout_origin.circumstances.headshot
-				;
-
-				const auto head_effect = sentience_def.detached_head_particles;
-
-				const auto corpse_head_offset = [&]() {
-					if (head_detached && head_effect.id.is_set()) {
-						const auto corpse_image_id = cosm.on_flavour(
-							new_flavour,
-							[](const auto& f) { return f.get_image_id(); }
-						);
-
-						if (corpse_image_id.is_set()) {
-							auto head_off = cosm.get_logical_assets().get_offsets(corpse_image_id).torso.head;
-
-							if (should_flip) {
-								head_off.flip_vertically();
-							}
-
-							return head_off;
-						}
-					}
-
-					return transformi();
-				}();
-
 				step.queue_deletion_of(lying_corpse, "Replacing lying corpse with updated arm variant");
 
 				cosmic::queue_create_entity(
@@ -419,14 +394,14 @@ void handle_corpse_damage(
 						}
 					},
 
-					[typed_subject_id, old_lying_corpse_id, head_detached, head_effect, corpse_head_offset, mirrored = should_flip != old_flip.vertically, layout = sentience_def.corpse_layout](const auto& typed_entity, const logic_step step) {
+					[typed_subject_id, old_lying_corpse_id, layout = sentience_def.corpse_layout](const auto& typed_entity, const logic_step step) {
 						if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 							auto& s = typed_subject.template get<components::sentience>();
 							s.detached.lying_corpse = typed_entity;
 							::start_lying_corpse_stump_splatters(s);
 						}
 
-						::move_character_decals_onto(step, old_lying_corpse_id, typed_entity, layout, false, mirrored);
+						::move_character_decals_onto(step, old_lying_corpse_id, typed_entity, layout, false);
 
 						/*
 							Send a white highlight for the replacement lying corpse.
@@ -442,22 +417,6 @@ void handle_corpse_damage(
 							step.post_message(msg);
 						}
 
-						/*
-							Retarget the detached_head_particles stream
-							from the old lying corpse to the replacement.
-						*/
-						if (head_detached && head_effect.id.is_set()) {
-							const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
-
-							messages::change_particle_effect change;
-							change.predictability = predictability;
-							change.match_chased_subject = old_lying_corpse_id;
-							change.match_effect_id = head_effect.id;
-							change.new_target = typed_entity;
-							change.new_offset = { vec2(corpse_head_offset.pos), corpse_head_offset.rotation + 180.f };
-
-							step.post_message(change);
-						}
 					}
 				);
 			}
@@ -492,11 +451,15 @@ void handle_corpse_detonation(
 		const auto subject_transform = subject.get_logic_transform();
 
 		if (!gentle) {
+			/*
+				Played by the death's settings, like the fire that led to it.
+			*/
 			::detonate({
 				step,
 				subject,
 				sentience_def.corpse_explosion,
-				subject.get_logic_transform()
+				subject.get_logic_transform(),
+				::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.death_particles, subject.get_id())
 			}, false);
 
 			/* Spawn blood splatters in all directions based on accumulated corpse damage */
@@ -553,34 +516,6 @@ void handle_corpse_detonation(
 			}();
 			const auto lying_velocity = tattered_velocity + damage_push;
 
-			/*
-				Precompute the head offset for the lying corpse sprite
-				so we can retarget the detached_head_particles stream.
-			*/
-			const bool head_detached = sentience.detached.head.is_set() || sentience.knockout_origin.circumstances.headshot;
-			const auto head_effect = sentience_def.detached_head_particles;
-
-			const auto corpse_head_offset = [&]() {
-				if (head_detached && head_effect.id.is_set()) {
-					const auto corpse_image_id = cosm.on_flavour(
-						corpse_flavour,
-						[](const auto& f) { return f.get_image_id(); }
-					);
-
-					if (corpse_image_id.is_set()) {
-						auto head_off = cosm.get_logical_assets().get_offsets(corpse_image_id).torso.head;
-
-						if (should_flip) {
-							head_off.flip_vertically();
-						}
-
-						return head_off;
-					}
-				}
-
-				return transformi();
-			}();
-
 			cosmic::queue_create_entity(
 				step,
 				corpse_flavour,
@@ -605,7 +540,7 @@ void handle_corpse_detonation(
 					}
 				},
 
-				[typed_subject_id, gentle, head_detached, head_effect, corpse_head_offset, layout = sentience_def.corpse_layout](const auto& typed_entity, const logic_step step) {
+				[typed_subject_id, gentle, layout = sentience_def.corpse_layout](const auto& typed_entity, const logic_step step) {
 					if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 						auto& s = typed_subject.template get<components::sentience>();
 						s.detached.lying_corpse = typed_entity;
@@ -638,24 +573,6 @@ void handle_corpse_detonation(
 						}
 
 						step.post_message(msg);
-					}
-
-					/*
-						Retarget the detached_head_particles stream from the tattered corpse
-						to the lying corpse with the correct head offset.
-					*/
-					if (head_detached && head_effect.id.is_set()) {
-						const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
-
-						messages::change_particle_effect change;
-						change.predictability = predictability;
-						change.match_chased_subject = typed_subject_id;
-						change.match_orbit_offset = vec2::zero;
-						change.match_effect_id = head_effect.id;
-						change.new_target = typed_entity;
-						change.new_offset = { vec2(corpse_head_offset.pos), corpse_head_offset.rotation + 180.f };
-
-						step.post_message(change);
 					}
 				}
 			);
@@ -829,7 +746,7 @@ void perform_knockout(
 							s.pending_head_splatters = 2;
 						}
 
-						const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
+						const auto predictability = ::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.death_particles, typed_subject_id);
 
 						head_effect.start(
 							step,
@@ -837,9 +754,15 @@ void perform_knockout(
 							predictability
 						);
 
+						/*
+							From the neck of the standing body - and of the lying corpse once it falls (see lying_corpse_neck.h).
+						*/
+						auto at_neck = particle_effect_start_input::orbit_local(typed_subject_id, { vec2::zero, 180 } );
+						at_neck.positioning.on_lying_corpse_neck = true;
+
 						head_effect.start(
 							step,
-							particle_effect_start_input::orbit_local(typed_subject_id, { vec2::zero, 180 } ),
+							at_neck,
 							predictability
 						);
 

@@ -464,8 +464,8 @@ namespace test_flavours {
 			sentience.corpse_catch_fire_sound.modifier.reference_distance = 1000.f;
 
 			sentience.corpse_fall_sound.id = to_sound_id(test_scene_sound_id::CORPSE_FALL);
-			sentience.corpse_fall_sound.modifier.max_distance = 3500.f;
-			sentience.corpse_fall_sound.modifier.reference_distance = 800.f;
+			sentience.corpse_fall_sound.modifier.max_distance = floor_drop_sound_max_distance_v;
+			sentience.corpse_fall_sound.modifier.reference_distance = floor_drop_sound_reference_distance_v;
 
 			sentience.arm_detach_sound.id = to_sound_id(test_scene_sound_id::GORE_DETACH);
 			sentience.arm_detach_sound.modifier.max_distance = 3500.f;

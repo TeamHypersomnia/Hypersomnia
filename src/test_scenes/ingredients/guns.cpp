@@ -137,7 +137,7 @@ static void set_magazine_floor_hit_sounds(invariants::item& item) {
 }
 
 /*
-	Weapons hit the floor with two sounds, the second quieter and lower.
+	Weapons hit the floor with two sounds, the second quieter and lower - heard as far as a falling corpse.
 */
 
 static void set_weapon_floor_hit_sounds(invariants::item& item) {
@@ -148,6 +148,11 @@ static void set_weapon_floor_hit_sounds(invariants::item& item) {
 	item.floor_hit_sounds[1].id = to_sound_id(test_scene_sound_id::WEAPON_FLOOR_HIT_SECOND);
 	item.floor_hit_sounds[1].modifier.gain = 0.7f;
 	item.floor_hit_sounds[1].modifier.pitch = 1.0f;
+
+	for (auto& sound : item.floor_hit_sounds) {
+		sound.modifier.max_distance = floor_drop_sound_max_distance_v;
+		sound.modifier.reference_distance = floor_drop_sound_reference_distance_v;
+	}
 }
 
 namespace test_flavours {

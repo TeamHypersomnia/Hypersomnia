@@ -17,6 +17,7 @@
 #include "game/components/hand_fuse_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/predictability_info.h"
+#include "game/detail/view_input/death_effect_predictability.h"
 #include "game/detail/shell_params.h"
 
 /*
@@ -283,12 +284,13 @@ void play_floor_hit_sound(
 	start.shell_ejected_by = shell_ejected_by;
 
 	/*
-		A gun falling from dead hands - by effect_prediction.item_drop_sounds, predicted by default:
-		its first clatter comes well after the death, and a mispredicted death is corrected by then.
+		A gun falling from dead hands - by effect_prediction.item_drop_sounds, confirmed by default: an important cue,
+		heard at the same time as the body hitting the floor (body_drop_sounds), never lost to a correction.
+		Who dropped it is not kept, so it doesn't count the local player's confirmed death.
 	*/
 	const auto predictability =
 		fall.dropped_on_death
-		? ::calc_death_effect_predictability(step.get_settings().effect_prediction.item_drop_sounds)
+		? ::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.item_drop_sounds, entity_id())
 		: always_predictable_v
 	;
 

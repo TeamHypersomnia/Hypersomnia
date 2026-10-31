@@ -9,7 +9,7 @@
 #                e.g. "baka47_round,baka47_round,baka47_round,ao44_round" to finish off the standing corpse with another gun
 #   SHOTS        how many rounds, in a column across the body (y from -34 to 34), 220 px apart - default 14
 #   ACROSS       the column's span across the body, "from:to" in px - default -34:34; e.g. -44:-36 only its edge
-#   PELLETS=N    instead: N volleys of 9 shotgun pellets at random spots across the body (SEED)
+#   PELLETS=N    instead: N volleys of 9 shotgun pellets at random spots across the body (SEED), within ACROSS
 #   DIR          degrees the shots come from (0: from +x, in front of the character) - default 0
 #   START        how far the first shot starts, px (they fly 4000 px/s) - default 300; e.g. 6000 at SPEED=0.1
 #                for the hits to come after the game has loaded (~6 s), so that the standing corpse is on the frames
@@ -66,7 +66,7 @@ missiles = []
 if pellets:
 	for v in range(pellets):
 		for k in range(9):
-			missiles.append((start + v * 450 + random.uniform(0, 30), random.uniform(-32, 32), 'shotgun_red_round', random.uniform(-2, 2)))
+			missiles.append((start + v * 450 + random.uniform(0, 30), random.uniform(across_from, across_to), 'shotgun_red_round', random.uniform(-2, 2)))
 else:
 	for i in range(shots):
 		across = across_from + (across_to - across_from) * (i / max(1, shots - 1))

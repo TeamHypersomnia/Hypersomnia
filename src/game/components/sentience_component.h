@@ -115,6 +115,7 @@ namespace components {
 
 		entity_id ignore_bullet;
 		augs::stepped_timestamp ignore_bullet_when_born;
+		augs::stepped_timestamp killing_volley_fired;
 		augs::stepped_timestamp time_of_last_blood_drip;
 
 		entity_id last_damaging_gun;

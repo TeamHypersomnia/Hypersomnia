@@ -17,6 +17,7 @@
 	- The Awka, Hunter, Deagle, Ao44 and ELON rocket launcher drop it at once.
 - **Gore: bullet holes.**
 	- Bodies carry the holes you put in them.
+	- When the body falls, they stay where you shot it - an arm, a shoulder, the chest.
 	- Blood runs from them.
 - **Gore: stumps bleed.**
 	- Blood pools where a head, arm or leg was torn off.
@@ -50,6 +51,7 @@
 - **The mouse is free whenever a window pops up over the game.**
 	- E.g. the question whether a Steam account is yours, as the shooting range starts.
 - **Gore off: all blood is green**, also on torn off limbs and head splatters.
+- **Your own death shows its blood again** - the burst and the stream from the neck were lost with "Local player death: Confirm".
 - **Joining from a link** no longer waits behind the changelog.
 - **Browser players** refused for too many joins at once are now told why.
 - **Browser players** are no longer dropped right after joining for no reason.

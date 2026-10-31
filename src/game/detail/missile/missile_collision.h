@@ -5,6 +5,7 @@
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/detail/decals/spawn_decals.hpp"
 #include "game/detail/decals/character_gunshot_decal.h"
+#include "game/detail/sentience/corpse_limbs.h"
 #include "game/detail/decals/penetration_fatigue.h"
 #include "game/detail/physics/calc_penetrability.hpp"
 #include "game/stateless_systems/sentience_system.h"
@@ -373,11 +374,19 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 				return std::nullopt;
 			}
 
+			if (::is_rest_of_killing_volley(*sentience, missile.when_fired, damage_msg.origin)) {
+				return std::nullopt;
+			}
+
 			const auto missile_pos = point;
 			const auto head_transform = ::calc_head_transform(surface_handle);
 			const auto head_radius = sentience_def->head_hitbox_radius * missile.head_radius_multiplier_of_sender;
 
-			if (head_transform.has_value()) {
+			/*
+				No headshots on corpses - the damage counts them as hits on the body (see process_damage_message),
+				and so must the hole they leave.
+			*/
+			if (head_transform.has_value() && ::sentient_and_alive(surface_handle)) {
 				const auto head_pos = head_transform->pos;
 
 				::draw_headshot_debug_lines(missile_pos, impact_dir, head_pos, head_radius);
@@ -413,6 +422,11 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			sentience->ignore_bullet_when_born = missile.when_fired;
 
 			if (just_died) {
+				/*
+					The rest of its volley passes through the corpse - see is_rest_of_killing_volley.
+				*/
+				sentience->killing_volley_fired = missile.when_fired;
+
 				/*
 					When character receives damage that kills him, subtract as much health
 					from the corpse as if it was hit by that bullet yet another time.

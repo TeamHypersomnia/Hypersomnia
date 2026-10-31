@@ -326,9 +326,16 @@ class client_setup :
 			}
 		});
 
+		const bool confirm_local_death = in.lag_compensation.local_player_death == effect_prediction_type::CONFIRM;
+
 		const auto referential_solve_settings = [&]() {
 			solve_settings out;
 			out.effect_prediction = in.lag_compensation.effect_prediction;
+
+			if (confirm_local_death) {
+				out.confirmed_death_of = get_viewed_character();
+			}
+
 			return out;
 		}();
 
@@ -336,8 +343,9 @@ class client_setup :
 			solve_settings out;
 			out.effect_prediction = in.lag_compensation.effect_prediction;
 
-			if (in.lag_compensation.local_player_death == effect_prediction_type::CONFIRM) {
+			if (confirm_local_death) {
 				out.disable_knockouts = get_viewed_character();
+				out.confirmed_death_of = get_viewed_character();
 			}
 
 			out.simulate_decorative_organisms = in.lag_compensation.simulate_decorative_organisms_during_reconciliation;
@@ -420,7 +428,6 @@ class client_setup :
 				callback(q.get_queue<M::start_temporary_light>());
 				callback(q.get_queue<M::start_particle_effect>());
 				callback(q.get_queue<M::stop_particle_effect>());
-				callback(q.get_queue<M::change_particle_effect>());
 
 				callback(q.get_queue<M::start_sound_effect>());
 				callback(q.get_queue<M::stop_sound_effect>());

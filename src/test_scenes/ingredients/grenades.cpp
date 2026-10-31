@@ -27,6 +27,8 @@ inventory_space_type to_space_units(const std::string& s);
 static void set_dropped_grenade_floor_hit_sounds(invariants::item& item) {
 	for (auto& sound : item.floor_hit_sounds) {
 		sound.id = to_sound_id(test_scene_sound_id::GRENADE_FLOOR_HIT_FIRST);
+		sound.modifier.max_distance = floor_drop_sound_max_distance_v;
+		sound.modifier.reference_distance = floor_drop_sound_reference_distance_v;
 	}
 
 	item.floor_hit_sounds[1].modifier.pitch = 0.85f;

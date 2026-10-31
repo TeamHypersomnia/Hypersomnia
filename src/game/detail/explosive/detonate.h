@@ -3,6 +3,7 @@
 #include "game/cosmos/step_declaration.h"
 #include "augs/math/transform.h"
 #include "game/cosmos/entity_id_declaration.h"
+#include "game/detail/view_input/predictability_info.h"
 
 namespace invariants {
 	struct explosive;
@@ -15,6 +16,7 @@ struct detonate_input {
 	const entity_id& subject;
 	const invariants::explosive& explosive;
 	const transformr location;
+	const predictability_info predictability = always_predictable_v;
 };
 
 void detonate(detonate_input, bool destroy_subject = true);

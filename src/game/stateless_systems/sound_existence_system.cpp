@@ -29,6 +29,7 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "augs/misc/randomization.h"
 #include "game/detail/calc_ammo_info.hpp"
+#include "game/detail/view_input/death_effect_predictability.h"
 
 void play_collision_sound(
 	const real32 strength,
@@ -459,7 +460,9 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			continue;
 		}
 
-		if (step.get_settings().effect_prediction.death_sounds == effect_prediction_type::PREDICT) {
+		if (step.get_settings().effect_prediction.death_sounds == effect_prediction_type::PREDICT
+			&& !::is_confirmed_death_of(step.get_settings(), h.subject)
+		) {
 			predictability = always_predictable_v;
 		}
 

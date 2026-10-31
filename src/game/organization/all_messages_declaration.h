@@ -23,7 +23,6 @@ namespace messages {
 	struct start_temporary_light;
 	struct start_particle_effect;
 	struct stop_particle_effect;
-	struct change_particle_effect;
 	struct start_sound_effect;
 	struct start_multi_sound_effect;
 	struct stop_sound_effect;
@@ -78,7 +77,6 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::start_temporary_light,
 	messages::start_particle_effect,
 	messages::stop_particle_effect,
-	messages::change_particle_effect,
 
 	messages::start_sound_effect,
 	messages::start_multi_sound_effect,

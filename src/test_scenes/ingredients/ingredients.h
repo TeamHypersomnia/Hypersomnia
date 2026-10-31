@@ -24,6 +24,14 @@
 
 #include "view/viewables/image_cache.h"
 
+/*
+	How far things hitting the floor are heard - a falling corpse, and the weapons and grenades dropped
+	(thrown grenades keep their own, louder cue).
+*/
+
+inline constexpr float floor_drop_sound_max_distance_v = 3500.f;
+inline constexpr float floor_drop_sound_reference_distance_v = 800.f;
+
 namespace ingredients {
 
 }

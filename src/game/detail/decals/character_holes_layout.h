@@ -36,8 +36,8 @@
 	the sprite's own outline, not the convex parts.
 	Drips are made anew whenever the holes move.
 
-	When a lying corpse is replaced by one with fewer limbs, the holes keep their places on the body -
-	mirrored across its length if the new sprite is flipped the other way.
+	When a lying corpse is replaced by one with fewer limbs, the holes keep their places on the body as they are
+	shown - the new sprite's flip is chosen so that the missing limbs show on their own side.
 
 	Either way a hole has to end up within the corpse's outline, at least lying_corpse_decal_margin_v from its edge -
 	otherwise it is moved towards its shoulder (on an arm) or the chest a little, and if that is not enough,
@@ -144,8 +144,7 @@ void move_character_decals_onto(
 	const entity_id previous_owner,
 	const E& new_owner,
 	const corpse_body_layout& layout,
-	const bool from_standing,
-	const bool mirrored = false
+	const bool from_standing
 ) {
 	auto& cosm = step.get_cosmos();
 
@@ -385,13 +384,7 @@ void move_character_decals_onto(
 					return on_arm(augs::interp(arm_middle, layout.lying_arm_to, t));
 				}
 
-				auto on_previous = vec2(state.attachment_offset.pos);
-
-				if (mirrored) {
-					on_previous.y = -on_previous.y;
-				}
-
-				return on_previous;
+				return vec2(state.attachment_offset.pos);
 			}();
 
 			for (int pull = 0; pull < max_pull && !fits(local) && local != anchor; ++pull) {
