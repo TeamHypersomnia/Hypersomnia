@@ -2,6 +2,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
+#include <chrono>
 #include <utility>
 #include <optional>
 #include <exception>
@@ -12,19 +13,20 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/window_framework/event.h"
 #include "augs/window_framework/window.h"
+#include "application/main/game_frame_buffer.h"
 
 /*
 	Rendering on a thread of its own, the window on the main thread.
 
 	Only the thread that created the window can take its messages, and GLFW wants that to be the main thread.
-	When the main thread executed GL too, a slow message pump stalled whole frames - the logic waits for the buffer
-	swap as well. On Windows a mouse hook of another program can make every mouse message cost ~1 ms (GLFW #2684).
+	So the main thread only takes the window's messages and applies what the game wants of the window
+	(settings, cursor), sleeping in between. The GL thread executes the renderer's commands, swaps the window's buffers
+	and trades frame buffers with the logic. At every trade it takes whatever input came so far, never waiting for it -
+	a slow message pump only delays the input, never the frames. Such a pump happens on Windows, where a mouse hook
+	of another program can make every mouse message cost ~1 ms (GLFW #2684).
 
-	Now the main thread only takes the window's messages and applies what the game wants of the window
-	(cursor, settings), sleeping in between. The GL thread executes the renderer's commands, swaps the window's buffers
-	and trades frame buffers with the logic. It never waits for the window: at every trade it takes whatever input came so far.
-
-	The web build keeps all of it on its one main loop.
+	Where the window system forbids it (window::supports_gl_thread - macOS, Wayland) and on the web,
+	the main thread does both, one after the other.
 */
 
 struct window_requests {
@@ -32,8 +34,6 @@ struct window_requests {
 	bool clip_cursor = false;
 	bool pause_cursor = false;
 	std::optional<vec2i> cursor_pos;
-
-	bool operator==(const window_requests&) const = default;
 };
 
 inline void apply_window_requests(augs::window& window, const window_requests& requests) {
@@ -59,8 +59,8 @@ class window_thread_bridge {
 	double pump_secs = 0.0;
 
 	std::mutex requests_lk;
-	std::optional<window_requests> requests;
-	std::optional<vec2i> cursor_pos;
+	window_requests requests;
+	unsigned requests_version = 0;
 
 	std::atomic<bool> gl_thread_finished = false;
 	std::exception_ptr gl_thread_error;
@@ -81,7 +81,7 @@ public:
 	}
 
 	/*
-		The GL thread, before every trade with the logic.
+		The GL thread, at every trade with the logic.
 		The pump's time is measured per frame: summed over all the pumps since the last frame.
 	*/
 
@@ -96,47 +96,60 @@ public:
 	}
 
 	/*
-		The GL thread, in the synced op - the logic waits meanwhile, so what it requested can be read.
-		Wakes the window thread only for a change.
+		The GL thread, at every trade - copies and wakes the window thread only for a change.
 	*/
 
-	void post_requests(window_requests new_requests) {
-		bool wake_window_thread = false;
-
+	void post_requests(
+		const augs::window_settings& settings,
+		const bool clip_cursor,
+		const bool pause_cursor,
+		const std::optional<vec2i> cursor_pos
+	) {
 		{
 			auto lock = std::scoped_lock(requests_lk);
 
-			if (new_requests.cursor_pos.has_value()) {
-				cursor_pos = std::exchange(new_requests.cursor_pos, std::nullopt);
-				wake_window_thread = true;
+			const bool changed =
+				requests_version == 0
+				|| cursor_pos.has_value()
+				|| requests.clip_cursor != clip_cursor
+				|| requests.pause_cursor != pause_cursor
+				|| !(requests.settings == settings)
+			;
+
+			if (!changed) {
+				return;
 			}
 
-			if (!requests.has_value() || !(*requests == new_requests)) {
-				requests = std::move(new_requests);
-				wake_window_thread = true;
+			requests.settings = settings;
+			requests.clip_cursor = clip_cursor;
+			requests.pause_cursor = pause_cursor;
+
+			if (cursor_pos.has_value()) {
+				requests.cursor_pos = cursor_pos;
 			}
+
+			++requests_version;
 		}
 
-		if (wake_window_thread) {
-			window.post_empty_event();
-		}
+		window.post_empty_event();
 	}
 
 	/*
-		The window thread. False until the GL thread first posts - the window keeps its settings meanwhile.
+		The window thread. Copies the requests only when newer than taken_version, and returns their version -
+		0 until the GL thread first posts, so the window keeps its settings meanwhile.
 	*/
 
-	bool take_requests(window_requests& into) {
+	unsigned take_requests(window_requests& into, const unsigned taken_version) {
 		auto lock = std::scoped_lock(requests_lk);
 
-		if (!requests.has_value()) {
-			return false;
+		if (requests_version != taken_version) {
+			into.settings = requests.settings;
+			into.clip_cursor = requests.clip_cursor;
+			into.pause_cursor = requests.pause_cursor;
+			into.cursor_pos = std::exchange(requests.cursor_pos, std::nullopt);
 		}
 
-		into = *requests;
-		into.cursor_pos = std::exchange(cursor_pos, std::nullopt);
-
-		return true;
+		return requests_version;
 	}
 
 	void finish_gl_thread(const std::exception_ptr error) {
@@ -160,18 +173,54 @@ inline void run_window_loop(augs::window& window, window_thread_bridge& bridge) 
 	auto new_input = augs::local_entropy();
 	auto requests = window_requests();
 
+	auto applied_version = 0u;
+	auto applied_when_active = false;
+	auto since_applied = augs::timer();
+
+	auto pump = [&]() {
+		const auto pump_timer = augs::timer();
+
+		new_input.clear();
+		window.collect_entropy(new_input);
+
+		bridge.push_input(new_input, window.get_screen_size(), pump_timer.get<std::chrono::seconds>());
+	};
+
 	for (;;) {
-		{
-			const auto pump_timer = augs::timer();
+		pump();
 
-			new_input.clear();
-			window.collect_entropy(new_input);
+		/*
+			Applied again on a new focus, and now and then in case a cursor grab failed.
+		*/
 
-			bridge.push_input(new_input, window.get_screen_size(), pump_timer.get<std::chrono::seconds>());
-		}
+		const auto version = bridge.take_requests(requests, applied_version);
 
-		if (bridge.take_requests(requests)) {
+		const bool should_apply =
+			version != 0 && (
+				version != applied_version
+				|| window.is_active() != applied_when_active
+				|| since_applied.get<std::chrono::milliseconds>() >= 100.0
+			)
+		;
+
+		if (should_apply) {
 			::apply_window_requests(window, requests);
+
+			/*
+				A warp happens once - not again when the same requests are applied later.
+			*/
+
+			requests.cursor_pos = std::nullopt;
+
+			applied_version = version;
+			applied_when_active = window.is_active();
+			since_applied.reset();
+
+			/*
+				Whatever the window answered with (e.g. its new size) - before sleeping, as nothing might wake us for it.
+			*/
+
+			pump();
 		}
 
 		if (bridge.is_gl_thread_finished()) {
@@ -196,21 +245,29 @@ void run_with_gl_thread(augs::window& window, window_thread_bridge& bridge, F&& 
 
 	augs::window::set_current_to_none();
 
-	auto gl_thread = std::thread([&window, &bridge, &gl_frame]() {
-		auto error = std::exception_ptr();
-
+	auto gl_thread = [&]() {
 		try {
-			window.set_as_current();
+			return std::thread([&window, &bridge, &gl_frame]() {
+				auto error = std::exception_ptr();
 
-			while (gl_frame()) {}
+				try {
+					window.set_as_current();
+
+					while (gl_frame()) {}
+				}
+				catch (...) {
+					error = std::current_exception();
+				}
+
+				augs::window::set_current_to_none();
+				bridge.finish_gl_thread(error);
+			});
 		}
 		catch (...) {
-			error = std::current_exception();
+			window.set_as_current();
+			throw;
 		}
-
-		augs::window::set_current_to_none();
-		bridge.finish_gl_thread(error);
-	});
+	}();
 
 	auto window_error = std::exception_ptr();
 
@@ -238,4 +295,56 @@ void run_with_gl_thread(augs::window& window, window_thread_bridge& bridge, F&& 
 	}
 
 	bridge.rethrow_gl_thread_error();
+}
+
+/*
+	frame: one frame of rendering, false once the game quits.
+*/
+
+template <class F>
+void run_main_loop(augs::window& window, window_thread_bridge& bridge, const bool window_thread, F&& frame) {
+	if (window_thread) {
+		::run_with_gl_thread(window, bridge, std::forward<F>(frame));
+	}
+	else {
+		while (frame()) {}
+	}
+}
+
+/*
+	In the synced op: the logic waits, and the buffer of its next frame is the write buffer by now.
+
+	With the window on its own thread, the logic gets the input that came until this moment,
+	and the window thread gets what the logic wants of the window.
+	Otherwise the input was collected before the trade, and the window is changed right away.
+*/
+
+inline void sync_window_with_logic(
+	augs::window& window,
+	window_thread_bridge& bridge,
+	const bool window_thread,
+	const game_frame_buffer& finished,
+	game_frame_buffer& next,
+	augs::time_measurements& pump_time
+) {
+	if (window_thread) {
+		next.screen_size = bridge.take_input(next.new_window_entropy, pump_time);
+
+		bridge.post_requests(
+			finished.new_settings,
+			finished.should_clip_cursor,
+			finished.should_pause_cursor,
+			window.take_requested_cursor_pos()
+		);
+	}
+	else {
+		auto requests = window_requests();
+
+		requests.settings = finished.new_settings;
+		requests.clip_cursor = finished.should_clip_cursor;
+		requests.pause_cursor = finished.should_pause_cursor;
+		requests.cursor_pos = window.take_requested_cursor_pos();
+
+		::apply_window_requests(window, requests);
+	}
 }

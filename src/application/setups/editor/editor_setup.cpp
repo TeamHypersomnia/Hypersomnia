@@ -3699,7 +3699,7 @@ bool editor_setup::can_transform_nodes() const {
 }
 
 void editor_setup::warp_cursor_to_center(augs::window& window) {
-	const auto screen_center = window.get_screen_size() / 2;
+	const auto screen_center = vec2i(ImGui::GetIO().DisplaySize) / 2;
 	ImGui::GetIO().MousePos = ImVec2(screen_center);
 	window.request_cursor_pos(screen_center);
 	warp_cursor_once = true;

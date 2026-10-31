@@ -89,9 +89,16 @@ public:
 		synchronized_op();
 	}
 
+	void abort() {}
+
+	bool is_aborted() const {
+		return false;
+	}
+
 #else
 	std::atomic<bool> already_waiting = false;
 	std::atomic<bool> swap_complete = false;
+	std::atomic<bool> aborted = false;
 
 	std::mutex swapper_m;
 	std::mutex waiter_m;
@@ -182,8 +189,25 @@ public:
 
 		{
 			std::unique_lock<std::mutex> lk(waiter_m);
-			waiter_cv.wait(lk, [this]{ return swap_complete.load(); });
+			waiter_cv.wait(lk, [this]{ return swap_complete.load() || aborted.load(); });
 		}
+	}
+
+	/*
+		The rendering loop ended with an error and will swap no more - lets the logic out of wait_swap for good.
+	*/
+
+	void abort() {
+		{
+			std::scoped_lock lk(waiter_m);
+			aborted.store(true);
+		}
+
+		waiter_cv.notify_all();
+	}
+
+	bool is_aborted() const {
+		return aborted.load();
 	}
 #endif
 };

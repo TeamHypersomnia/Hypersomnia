@@ -355,19 +355,26 @@ namespace augs {
 			}
 		};
 
+#if PLATFORM_WINDOWS
+		augs::bounded_poll_events(window, 2.0);
+#else
+		glfwPollEvents();
+#endif
+
+		/*
+			After the pump that delivered the request (WM_CLOSE, WM_QUIT) - the window's thread may sleep right after it.
+			One close event per request - it collects far more often than once per frame.
+		*/
+
 		if (glfwWindowShouldClose(window)) {
 			LOG("GLFW: glfwWindowShouldClose returned true.");
 
 			event::change ch;
 			ch.msg = event::message::close;
 			handle_event(ch);
-		}
 
-#if PLATFORM_WINDOWS
-		augs::bounded_poll_events(window, 2.0);
-#else
-		glfwPollEvents();
-#endif
+			glfwSetWindowShouldClose(window, GLFW_FALSE);
+		}
 
 		using namespace event;
 
@@ -532,12 +539,18 @@ namespace augs {
 			return;
 		}
 
-		std::lock_guard<std::mutex> lock(clipboard_mutex);
+		/*
+			Not under the lock: on X11 this waits for the clipboard's owner to answer,
+			and the logic thread locks it to read the snapshot.
+		*/
 
 		const auto clip = glfwGetClipboardString(platform->window);
 
 		if (clip != nullptr) {
-			clipboard_snapshot = std::string(clip);
+			auto new_snapshot = std::string(clip);
+
+			std::lock_guard<std::mutex> lock(clipboard_mutex);
+			clipboard_snapshot = std::move(new_snapshot);
 		}
 	}
 #endif
@@ -765,6 +778,24 @@ namespace augs {
 
 	void window::post_empty_event() const {
 		glfwPostEmptyEvent();
+	}
+
+	bool window::supports_gl_thread() const {
+#if PLATFORM_MACOS
+		/*
+			GLFW calls [NSOpenGLContext update] on this thread on resizes and moves, without the context's lock.
+		*/
+
+		return false;
+#elif PLATFORM_LINUX && (GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 4))
+		/*
+			Wayland: GLFW resizes and rescales the surface on this thread, which the GL thread's swaps commit.
+		*/
+
+		return glfwGetPlatform() != GLFW_PLATFORM_WAYLAND;
+#else
+		return true;
+#endif
 	}
 
 	window::~window() {

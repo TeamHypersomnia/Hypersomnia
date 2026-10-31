@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <atomic>
+#include <thread>
 
 #if PLATFORM_UNIX
 /*
@@ -116,10 +118,16 @@ namespace augs {
 
 		/*
 			How many times the window got the focus back - compared, so that no return is missed by a frame
-			that never saw it inactive.
+			that never saw it inactive. Read by the logic thread.
 		*/
 
-		uint32_t times_activated = 0;
+		std::atomic<uint32_t> times_activated = 0;
+
+		/*
+			The thread that created the window - the only one allowed to take its messages and change it.
+		*/
+
+		std::thread::id owner_thread = std::this_thread::get_id();
 
 		bool cursor_clipping = false;
 		bool cursor_visible = true;
@@ -162,6 +170,8 @@ namespace augs {
 
 		std::optional<vsync_type> applied_vsync;
 
+		void set(vsync_type);
+
 		void set_cursor_visible_impl(bool flag); 
 		bool set_cursor_clipping_impl(bool flag); 
 
@@ -183,7 +193,6 @@ namespace augs {
 		bool swap_buffers();
 
 		void set_mouse_pos_paused(const bool);
-		bool is_mouse_pos_paused() const;
 
 		void set_cursor_pos(vec2i);
 
@@ -202,6 +211,19 @@ namespace augs {
 
 		void wait_events();
 		void post_empty_event() const;
+
+		/*
+			Whether the window's messages may be taken on its thread while another thread renders with its GL context
+			(gl_thread.h). Not where the window system changes the context or the surface from the window's thread
+			without locking it.
+		*/
+
+		bool supports_gl_thread() const;
+
+		bool is_on_owner_thread() const {
+			return std::this_thread::get_id() == owner_thread;
+		}
+
 		void sync_back_into(window_settings&);
 		window_settings get_current_settings() const;
 
@@ -216,13 +238,11 @@ namespace augs {
 
 		bool is_active() const;
 		uint32_t get_times_activated() const {
-			return times_activated;
+			return times_activated.load();
 		}
 		xywhi get_display() const;
 
 		int get_refresh_rate();
-
-		void set(vsync_type);
 
 		struct file_dialog_filter {
 			std::string description;

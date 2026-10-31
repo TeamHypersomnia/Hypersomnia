@@ -106,9 +106,9 @@ int performance_settings::get_default_num_pool_workers() {
 	const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
 
 	/*
-		rendering_threads is the GL thread, main_threads the one running the game logic.
-		The real main thread - the window's (gl_thread.h) - is left out:
-		it sleeps until a window message comes.
+		rendering_threads is the thread running GL, main_threads the one running the game logic.
+		When GL has a thread of its own (gl_thread.h), the window's thread is left out: it waits for window messages
+		almost all the time (on Linux it checks every millisecond) - a negligible load.
 	*/
 
 	const auto audio_threads = 1;

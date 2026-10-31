@@ -22,7 +22,11 @@ void save_log_and_terminate() {
 	}
 
 #if !HEADLESS
-	if (augs::window::current_exists()) {
+	/*
+		Only the window's own thread may change it - an ensure can fail on any.
+	*/
+
+	if (augs::window::current_exists() && augs::window::get_current().is_on_owner_thread()) {
 		augs::window::get_current().set_cursor_clipping(false);
 		augs::window::get_current().set_cursor_visible(true);
 	}

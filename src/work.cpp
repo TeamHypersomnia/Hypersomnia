@@ -7759,7 +7759,11 @@ work_result work(
 			};
 
 			auto draw_non_menu_cursor = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
-				const bool should_draw_our_cursor = viewing_config.window.draws_own_cursor() && !window.is_mouse_pos_paused();
+				/*
+					What this frame asked of the window - the window's own state belongs to the main thread.
+				*/
+
+				const bool should_draw_our_cursor = viewing_config.window.draws_own_cursor() && !get_write_buffer().should_pause_cursor;
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
 				auto get_drawer = [&]() {
@@ -8459,7 +8463,7 @@ work_result work(
 
 #if WEB_SINGLETHREAD
 #else
-		while (!should_quit) 
+		while (!should_quit && !buffer_swapper.is_aborted()) 
 #endif
 		{
 			auto extract_num_total_drawn_triangles = [&]() {
@@ -8561,6 +8565,7 @@ work_result work(
 	WEBSTATIC renderer_backend_result rendering_result;
 
 	WEBSTATIC window_thread_bridge window_bridge(window);
+	WEBSTATIC const bool window_thread = window.supports_gl_thread();
 
 	WEBSTATIC auto game_main_thread_synced_op = [&]() {
 		auto scope = measure_scope(game_thread_performance.synced_op);
@@ -8570,31 +8575,21 @@ work_result work(
 			It will eat from the window input vector that is later passed to the game and other GUIs.	
 		*/
 	
-		{
-			const auto& read_buffer = get_read_buffer();
-			const auto& new_settings = read_buffer.new_settings;
+		::sync_window_with_logic(
+			window,
+			window_bridge,
+			window_thread,
+			get_read_buffer(),
+			get_write_buffer(),
+			render_thread_performance.local_entropy
+		);
 
-			/*
-				Vsync needs the GL context, the rest of the window is the main thread's (gl_thread.h).
-				The newest screen size is in the write buffer by now - it was the read buffer before the swap.
-			*/
+		/*
+			Vsync needs the GL context, so it is set here and not with the rest of the window.
+		*/
 
-			window.apply_vsync(new_settings.vsync_mode);
-			configurables.apply_screen_size(get_write_buffer().screen_size);
-
-			auto requests = window_requests {
-				new_settings,
-				read_buffer.should_clip_cursor,
-				read_buffer.should_pause_cursor,
-				window.take_requested_cursor_pos()
-			};
-
-#if PLATFORM_WEB
-			::apply_window_requests(window, requests);
-#else
-			window_bridge.post_requests(std::move(requests));
-#endif
-		}
+		window.apply_vsync(get_read_buffer().new_settings.vsync_mode);
+		configurables.apply_screen_size(get_write_buffer().screen_size);
 
 		/*
 			Update fonts only after the new requested size
@@ -8650,7 +8645,7 @@ work_result work(
 
 	struct main_loop_input {
 		augs::window& window;
-		window_thread_bridge& window_bridge;
+		const bool window_thread;
 		game_frame_buffer_swapper& buffer_swapper;
 		augs::graphics::renderer_backend& renderer_backend;
 		augs::thread_pool& thread_pool;
@@ -8667,7 +8662,7 @@ work_result work(
 
 	WEBSTATIC auto main_loop_in = main_loop_input {
 		window,
-		window_bridge,
+		window_thread,
 		buffer_swapper,
 		renderer_backend,
 		thread_pool,
@@ -8703,7 +8698,8 @@ work_result work(
 		auto& thread_pool = mi.thread_pool;
 		auto& renderer_backend = mi.renderer_backend;
 		auto& window = mi.window;
-		auto& window_bridge = mi.window_bridge;
+		const auto window_thread = mi.window_thread;
+		(void)window_thread;
 
 		auto& this_frame_timer = mi.this_frame_timer;
 		(void)this_frame_timer;
@@ -8717,25 +8713,15 @@ work_result work(
 
 		auto collect_window_entropy = [&]() {
 			auto& read_buffer = get_read_buffer();
-			auto& next_entropy = read_buffer.new_window_entropy;
-
-#if PLATFORM_WEB
-			(void)window_bridge;
 
 			auto scope = measure_scope(render_thread_performance.local_entropy);
 
+			auto& next_entropy = read_buffer.new_window_entropy;
 			next_entropy.clear();
 
 			window.collect_entropy(next_entropy);
 
 			read_buffer.screen_size = window.get_screen_size();
-#else
-			/*
-				The main thread takes the window's messages - whatever came so far, never waiting for it.
-			*/
-
-			read_buffer.screen_size = window_bridge.take_input(next_entropy, render_thread_performance.local_entropy);
-#endif
 		};
 
 		auto swap_window_buffers = [&]() {
@@ -8871,7 +8857,13 @@ work_result work(
 		}
 
 #if !PLATFORM_WEB
-		collect_window_entropy();
+		/*
+			With the window on its own thread, the input is taken at the trade (gl_thread.h).
+		*/
+
+		if (!window_thread) {
+			collect_window_entropy();
+		}
 
 		{
 			auto scope = measure_scope(render_thread_performance.render_help);
@@ -8944,9 +8936,19 @@ work_result work(
 #endif
 
 #else
-	::run_with_gl_thread(window, window_bridge, [&]() {
-		return main_loop_iter(main_loop_in_ptr);
-	});
+	try {
+		::run_main_loop(window, window_bridge, window_thread, [&]() {
+			return main_loop_iter(main_loop_in_ptr);
+		});
+	}
+	catch (...) {
+		/*
+			The logic waits for a trade that won't come - let it out, or the exit would hang before the error is logged.
+		*/
+
+		buffer_swapper.abort();
+		throw;
+	}
 #endif
 
 	return game_thread_result;

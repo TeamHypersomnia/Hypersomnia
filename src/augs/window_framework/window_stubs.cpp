@@ -95,6 +95,10 @@ namespace augs {
 	void window::wait_events() {}
 	void window::post_empty_event() const {}
 
+	bool window::supports_gl_thread() const {
+		return false;
+	}
+
 	window::~window() {
 
 	}

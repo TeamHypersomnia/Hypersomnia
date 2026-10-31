@@ -1063,6 +1063,10 @@ namespace augs {
 
 	void window::post_empty_event() const {}
 
+	bool window::supports_gl_thread() const {
+		return true;
+	}
+
 	window::~window() {
 		destroy();
 	}

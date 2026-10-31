@@ -102,17 +102,21 @@ namespace augs {
 		if (ch.msg == message::activate
 			|| ch.msg == message::click_activate
 		) {
+#if PLATFORM_LINUX || PLATFORM_MACOS
+#if USE_GLFW
+			/*
+				Before counting the activation - the logic reads the clipboard when it sees a new one.
+			*/
+
+			refresh_clipboard_snapshot();
+#endif
+#endif
+
 			if (!active) {
 				++times_activated;
 			}
 
 			active = true;
-
-#if PLATFORM_LINUX || PLATFORM_MACOS
-#if USE_GLFW
-			refresh_clipboard_snapshot();
-#endif
-#endif
 
 #if PLATFORM_LINUX
 			/*
@@ -315,10 +319,6 @@ namespace augs {
 		set_cursor_visible_impl(flag);
 
 		cursor_visible = flag;
-	}
-
-	bool window::is_mouse_pos_paused() const {
-		return mouse_pos_paused;
 	}
 
 	bool window::is_active() const {
