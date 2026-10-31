@@ -71,6 +71,85 @@ static void release_keys_left_down(GLFWwindow* const window) {
 	}
 }
 
+/*
+	The other thing glfwPollEvents does after its loop: it puts the hidden cursor of the disabled mode back at
+	the window's center, so that a click lands in the window even if another program takes away GLFW's clip
+	(ClipCursor is one setting for the whole desktop). Each such move is one more mouse message - the very thing
+	that is slow on some machines. Instead, like SDL's relative mouse mode, the cursor is clipped to one pixel
+	at the window's center, so it cannot move at all; the raw mouse motion the game reads does not depend on it.
+
+	The clip is checked right after the cursor gets disabled and then every 100 ms, as anything can take it away
+	(SDL2 checks every 3 s, SDL3 only on window events). A pixel that GLFW does not release is released here.
+*/
+
+static void lock_disabled_cursor(GLFWwindow* const window) {
+	static auto lock = RECT();
+	static auto locked = false;
+	static auto last_check = LARGE_INTEGER();
+
+	const auto handle = glfwGetWin32Window(window);
+
+	const bool should_lock =
+		glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED
+		&& GetActiveWindow() == handle
+		&& !IsIconic(handle)
+	;
+
+	if (!should_lock) {
+		if (locked) {
+			locked = false;
+
+			auto current = RECT();
+
+			if (GetClipCursor(&current) && EqualRect(&current, &lock)) {
+				ClipCursor(nullptr);
+			}
+		}
+
+		return;
+	}
+
+	auto now = LARGE_INTEGER();
+	auto frequency = LARGE_INTEGER();
+
+	QueryPerformanceCounter(&now);
+	QueryPerformanceFrequency(&frequency);
+
+	const bool check_due = !locked || now.QuadPart - last_check.QuadPart >= frequency.QuadPart / 10;
+
+	if (!check_due) {
+		return;
+	}
+
+	last_check = now;
+
+	auto client = RECT();
+
+	if (!GetClientRect(handle, &client) || IsRectEmpty(&client)) {
+		return;
+	}
+
+	auto center = POINT { (client.left + client.right) / 2, (client.top + client.bottom) / 2 };
+	ClientToScreen(handle, &center);
+
+	/*
+		Over Remote Desktop the cursor wobbles by a pixel - SDL leaves it 2 pixels of room there.
+	*/
+
+	const LONG remote_desktop_room = GetSystemMetrics(SM_REMOTESESSION) ? 2 : 0;
+
+	lock = RECT { center.x - remote_desktop_room, center.y, center.x + 1 + remote_desktop_room, center.y + 1 };
+	locked = true;
+
+	auto current = RECT();
+
+	if (GetClipCursor(&current) && EqualRect(&current, &lock)) {
+		return;
+	}
+
+	ClipCursor(&lock);
+}
+
 namespace augs {
 	void bounded_poll_events(GLFWwindow* const window, const double budget_ms) {
 		LARGE_INTEGER frequency;
@@ -105,6 +184,7 @@ namespace augs {
 		}
 
 		::release_keys_left_down(window);
+		::lock_disabled_cursor(window);
 	}
 
 	void wait_for_messages() {

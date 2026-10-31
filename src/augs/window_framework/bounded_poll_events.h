@@ -17,7 +17,8 @@ namespace augs {
 		so whatever is left is dispatched the next time and nothing is lost.
 
 		After the loop it releases a Shift or Win key that Windows sent no key up for (both Shifts held, Win+V),
-		like glfwPollEvents. It skips re-centering the disabled cursor - not needed as raw mouse motion is always on Windows.
+		like glfwPollEvents. Instead of re-centering the disabled cursor after every loop like glfwPollEvents
+		(one more mouse message each time), it locks it to the window's center like SDL.
 	*/
 
 	void bounded_poll_events(GLFWwindow* window, double budget_ms);
