@@ -16,9 +16,8 @@ namespace augs {
 		Mouse moves are coalesced by the system and raw input waits in the queue,
 		so whatever is left is dispatched the next time and nothing is lost.
 
-		Skipped from glfwPollEvents after its loop:
-		- re-centering the disabled cursor - not needed as raw mouse motion is always on Windows,
-		- releasing a Shift or Win key that Windows sent no key up for (both Shifts held, Win+V).
+		After the loop it releases a Shift or Win key that Windows sent no key up for (both Shifts held, Win+V),
+		like glfwPollEvents. It skips re-centering the disabled cursor - not needed as raw mouse motion is always on Windows.
 	*/
 
 	void bounded_poll_events(GLFWwindow* window, double budget_ms);
