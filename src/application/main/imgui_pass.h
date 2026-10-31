@@ -15,6 +15,14 @@ namespace augs {
 	class delta;
 }
 
+/*
+	The settings window stays open, but isn't drawn over a game being played, if the player chose so (hide_settings_ingame).
+*/
+
+inline bool is_settings_hidden_ingame(const bool hide_settings_ingame, const bool has_gameplay_setup, const bool ingame_menu_active) {
+	return hide_settings_ingame && has_gameplay_setup && !ingame_menu_active;
+}
+
 void perform_imgui_pass(
 	augs::window& window,
 	const augs::local_entropy& window_inputs,

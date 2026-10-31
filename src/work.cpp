@@ -6732,13 +6732,16 @@ work_result work(
 					launch_setup(activity_type::MAIN_MENU);
 				}
 #else
-				if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
-					if (!config.skip_tutorial) {
-						launch_setup(activity_type::TUTORIAL);
-					}
-					else {
-						launch_setup(config.get_last_activity());
-					}
+				/*
+					A new player starts in the tutorial, whatever launch_at_startup says.
+					Anything launched after it sets skip_tutorial - from then on the main menu (or the last activity).
+				*/
+
+				if (!config.skip_tutorial) {
+					launch_setup(activity_type::TUTORIAL);
+				}
+				else if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
+					launch_setup(config.get_last_activity());
 				}
 				else {
 					launch_setup(activity_type::MAIN_MENU);
@@ -7017,10 +7020,28 @@ work_result work(
 					game_gui_mode = true;
 				}
 
+				/*
+					Any modal shown (e.g. "This key is linked to a Steam account - is it yours?" coming up as the shooting
+					range starts), the changelog or the settings drawn over the game need the cursor - free, never locked
+					by gameplay. Not the ones still open but not drawn (settings hidden in game, a modal of theirs).
+				*/
+
+				const bool settings_shown =
+					settings_gui.is_open()
+					&& !::is_settings_hidden_ingame(config.session.hide_settings_ingame, has_current_setup(), ingame_menu.show)
+				;
+
+				const bool window_needs_cursor =
+					ImGui::GetTopMostAndVisiblePopupModal() != nullptr
+					|| changelog_window.is_open()
+					|| settings_shown
+				;
+
 				const bool in_direct_gameplay =
 					!game_gui_mode
 					&& has_current_setup()
 					&& !ingame_menu.show
+					&& !window_needs_cursor
 				;
 
 				/*
@@ -7282,7 +7303,7 @@ work_result work(
 									No menu hotkeys behind a modal (e.g. Add a server, with no text field active).
 								*/
 
-								const bool modal_open = ImGui::GetTopMostPopupModal() != nullptr;
+								const bool modal_open = ImGui::GetTopMostAndVisiblePopupModal() != nullptr;
 
 								if (main_menu_gui.show && !settings_gui.key_damaged && !modal_open) {
 									main_menu_gui.control(create_menu_context(main_menu_gui), e, do_main_menu_option);
