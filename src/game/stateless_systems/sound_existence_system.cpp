@@ -460,9 +460,16 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			continue;
 		}
 
-		if (step.get_settings().effect_prediction.death_sounds == effect_prediction_type::PREDICT
-			&& !::is_confirmed_death_of(step.get_settings(), h.subject)
-		) {
+		/*
+			The death (and loss of consciousness) sounds of the local player whose death the server confirms
+			never play in a predicted step - its shield break does, as itself.
+		*/
+		const bool unpredicted_for_local_player =
+			::is_confirmed_death_of(step.get_settings(), h.subject)
+			&& h.special_result != messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION
+		;
+
+		if (step.get_settings().effect_prediction.death_sounds == effect_prediction_type::PREDICT && !unpredicted_for_local_player) {
 			predictability = always_predictable_v;
 		}
 

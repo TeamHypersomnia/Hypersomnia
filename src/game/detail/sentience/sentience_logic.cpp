@@ -31,6 +31,23 @@ void delete_holes_of_resurrected(const logic_step step, const entity_id characte
 	::delete_holes_attached_to(step, character);
 }
 
+/*
+	The stream from the neck after a headshot follows the character itself (see lying_corpse_neck.h) -
+	it must not go on spurting from it alive again.
+*/
+
+void stop_neck_stream_of_resurrected(const logic_step step, const entity_id character) {
+	if (const auto handle = step.get_cosmos()[character]) {
+		if (const auto sentience_def = handle.find<invariants::sentience>()) {
+			auto stop = messages::stop_particle_effect(always_predictable_v);
+			stop.match_chased_subject = character;
+			stop.match_orbit_offset = vec2::zero;
+			stop.match_effect_id = sentience_def->detached_head_particles.id;
+			step.post_message(stop);
+		}
+	}
+}
+
 static void try_detach_limbs(
 	const allocate_new_entity_access access,
 	const logic_step step,
@@ -454,13 +471,31 @@ void handle_corpse_detonation(
 			/*
 				Played by the death's settings, like the fire that led to it.
 			*/
+			const auto explosion_predictability = ::calc_death_effect_predictability(
+				step.get_settings(),
+				step.get_settings().effect_prediction.death_particles,
+				subject.get_id()
+			);
+
 			::detonate({
 				step,
 				subject,
 				sentience_def.corpse_explosion,
 				subject.get_logic_transform(),
-				::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.death_particles, subject.get_id())
+				explosion_predictability
 			}, false);
+
+			/*
+				The fire that led to it goes out with it - it burns on the dead character, which stays where it stood
+				while the lying corpse is thrown away.
+			*/
+			{
+				auto stop = messages::stop_particle_effect(explosion_predictability);
+				stop.match_chased_subject = subject.get_id();
+				stop.match_orbit_offset = vec2::zero;
+				stop.match_effect_id = sentience_def.corpse_catch_fire_particles.id;
+				step.post_message(stop);
+			}
 
 			/* Spawn blood splatters in all directions based on accumulated corpse damage */
 			::spawn_blood_splatters_omnidirectional(access, step, subject, subject_pos, accumulated_corpse_damage);

@@ -11,6 +11,7 @@
 class allocate_new_entity_access;
 
 void delete_holes_of_resurrected(const logic_step step, const entity_id character);
+void stop_neck_stream_of_resurrected(const logic_step step, const entity_id character);
 
 template <class E>
 void resurrect(const logic_step step, const E& typed_handle, const float spawn_protection_ms = 0.0f) {
@@ -38,6 +39,7 @@ void resurrect(const logic_step step, const E& typed_handle, const float spawn_p
 	}
 
 	::delete_holes_of_resurrected(step, typed_handle.get_id());
+	::stop_neck_stream_of_resurrected(step, typed_handle.get_id());
 
 	sentience.detached = {};
 	sentience.when_corpse_catched_fire = {};

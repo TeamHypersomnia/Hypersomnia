@@ -8,6 +8,8 @@
 #                - default baka47_round; a comma-separated list goes round the shots in turn,
 #                e.g. "baka47_round,baka47_round,baka47_round,ao44_round" to finish off the standing corpse with another gun
 #   SHOTS        how many rounds, in a column across the body (y from -34 to 34), 220 px apart - default 14
+#   RESPAWN_MS   when the character respawns - default 100000 (never in a run: it would stand up on its own corpse);
+#                e.g. 1000 to see what a resurrection leaves behind
 #   ACROSS       the column's span across the body, "from:to" in px - default -34:34; e.g. -44:-36 only its edge
 #   PELLETS=N    instead: N volleys of 9 shotgun pellets at random spots across the body (SEED), within ACROSS
 #   DIR          degrees the shots come from (0: from +x, in front of the character) - default 0
@@ -36,6 +38,7 @@ SEED=${SEED:-1}
 PORTAL=${PORTAL:-0}
 START=${START:-300}
 ACROSS=${ACROSS:--34:34}
+RESPAWN_MS=${RESPAWN_MS:-100000}
 SPEED=${SPEED:-0.1}
 FRAMES=${FRAMES:-40}
 EVERY=${EVERY:-0.3}
@@ -53,9 +56,9 @@ if [ ! -e "/tmp/.X${XDISPLAY#:}-lock" ]; then
 	sleep 1
 fi
 
-python3 - "$T/$NAME/$NAME.json" "$NAME" "$FIREARM" "$ROUND" "$SHOTS" "$PELLETS" "$DIR" "$SEED" "$PORTAL" "$START" "$ACROSS" <<'PY'
+python3 - "$T/$NAME/$NAME.json" "$NAME" "$FIREARM" "$ROUND" "$SHOTS" "$PELLETS" "$DIR" "$SEED" "$PORTAL" "$START" "$ACROSS" "$RESPAWN_MS" <<'PY'
 import json, sys, math, random
-out, name, firearm, round_type, shots, pellets, direction, seed, portal, start, across_span = sys.argv[1:]
+out, name, firearm, round_type, shots, pellets, direction, seed, portal, start, across_span, respawn_ms = sys.argv[1:]
 across_from, across_to = map(float, across_span.split(':'))
 shots, pellets, direction, start = int(shots), int(pellets), float(direction), float(start)
 random.seed(int(seed))
@@ -104,7 +107,7 @@ project = {
 	"settings": { "default_server_mode": "quick_test", "ambient_light_color": [51, 93, 98, 255] },
 	"playtesting": { "mode": "quick_test" },
 	"game_modes": { "quick_test": {
-		"respawn_time_ms": 100000,
+		"respawn_time_ms": int(respawn_ms),
 		"equipment": { "metropolis": equipment, "resistance": equipment }
 	} },
 	"layers": [ { "id": "Layer 1", "nodes": [n["id"] for n in reversed(nodes)] } ],

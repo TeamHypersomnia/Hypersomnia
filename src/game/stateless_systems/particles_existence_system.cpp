@@ -294,8 +294,12 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 		auto predictability = destroyed ? never_predictable_v : always_predictable_v;
 
+		/*
+			Every health event of the local player whose death the server confirms happens in a predicted step too -
+			the killing hit as a plain hit (its knockout is what the prediction leaves out), a shield break as itself.
+		*/
 		if (step.get_settings().effect_prediction.death_particles == effect_prediction_type::PREDICT
-			&& !::is_confirmed_death_of(step.get_settings(), h.subject)
+			|| ::is_confirmed_death_of(step.get_settings(), h.subject)
 		) {
 			predictability = always_predictable_v;
 		}
