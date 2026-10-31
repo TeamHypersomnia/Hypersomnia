@@ -6,10 +6,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
-- randomized waypoints in absence of any
-	- we have multitude of maps, it will be a bother to create waypoints for all right away
-	- chyba bedziemy forsowac to i tak, bo te waypointy chujowo beda wygladaly
-- zaimast tego warny jak nie ma waypointow na site i innych spotow ale to potem mozna po wydaniu
+- osobna sesja (testy i buildy, z audytu .claude - ~/Downloads/claude-audit/01-tournament-tests.md, 02-netcode-tests.md):
+  - ccache wspolny dla worktree (CCACHE_BASEDIR=$HOME, -DCMAKE_CXX_COMPILER_LAUNCHER=ccache) + globalny lock na buildy (flock, max 1-2 ninje naraz) + skrypt build_claude.sh <config> [worktree] w local-testing; sudo pacman -S ccache
+  - scenario_slot_reuse.sh - ciche odmowy (bug nr 1): 1-2 sloty, SIGKILL / timeout / kick, rejoin tym samym kluczem, UDP + WebRTC, gracz po meczu ranked, potem ktos nowy musi wejsc; ewentualnie scenario_master_restart.sh
+  - suite turniejow szybciej (~90 -> ~50 min): sleepy -> polling (wait_page, wait_list, wait_client_log), wait_live zamiast sleep 5 po Starting ranked, terminy rund z JSON-a strony live zamiast czekania, trap sprzatajacy po Ctrl+C, scalenie zdublowanych case'ow, SHARD dzielacy CASES sam
+  - podzial local-testing SKILL.md na rdzen + pliki referencyjne (~200 linii mniej przy kazdym zaladowaniu)
 
 - Better keyboard mapping
 	- hotbar_button_0 -> hotbar 0
