@@ -1,7 +1,7 @@
 #pragma once
 #include "game/detail/transform_copying.h"
 #include "game/detail/calc_trace_scaling.h"
-#include "game/detail/sentience/lying_corpse_neck.h"
+#include "game/detail/sentience/lying_corpse_anchor.h"
 
 /*
 	The offset to compose with the chased target's transform.
@@ -49,10 +49,8 @@ std::optional<transformr> find_transform_impl(S& self, C& cosm, I& interp) {
 		const auto target_handle = cosm[self.target];
 
 		if (target_handle) {
-			if (self.on_lying_corpse_neck) {
-				if (const auto neck = ::find_lying_corpse_neck(target_handle, interp)) {
-					return *neck;
-				}
+			if (const auto on_corpse = ::find_on_lying_corpse(target_handle, self.on_lying_corpse, self.offset, interp)) {
+				return *on_corpse;
 			}
 
 			if (auto target_transform = target_handle.find_viewing_transform(interp)) {

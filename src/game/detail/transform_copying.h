@@ -3,6 +3,7 @@
 #include <variant>
 #include <optional>
 #include "game/cosmos/entity_id.h"
+#include "game/enums/lying_corpse_anchor.h"
 #include "game/components/transform_component.h"
 
 template <class S, class C, class I>
@@ -22,9 +23,9 @@ struct absolute_or_local {
 	bool chase_sprite_back = false;
 
 	/*
-		The target is a character: once it lies, on the neck of its lying corpse instead (see lying_corpse_neck.h).
+		The target is a character: once it lies, on its lying corpse instead (see lying_corpse_anchor.h).
 	*/
-	bool on_lying_corpse_neck = false;
+	lying_corpse_anchor on_lying_corpse = lying_corpse_anchor::NONE;
 
 	template <class C, class I>
 	auto find_transform(C& cosm, I& interp) {
@@ -39,7 +40,7 @@ struct absolute_or_local {
 	bool operator==(const absolute_or_local& b) const = default;
 
 	auto hash() const {
-		return augs::hash_multiple(target, offset, face_velocity, chase_velocity, chase_sprite_back, on_lying_corpse_neck);
+		return augs::hash_multiple(target, offset, face_velocity, chase_velocity, chase_sprite_back, on_lying_corpse);
 	}
 };
 

@@ -32,18 +32,20 @@ void delete_holes_of_resurrected(const logic_step step, const entity_id characte
 }
 
 /*
-	The stream from the neck after a headshot follows the character itself (see lying_corpse_neck.h) -
-	it must not go on spurting from it alive again.
+	The stream from the neck after a headshot and the fire of an ignited corpse follow the character itself
+	(see lying_corpse_anchor.h) - they must not go on from it alive again.
 */
 
-void stop_neck_stream_of_resurrected(const logic_step step, const entity_id character) {
+void stop_corpse_effects_of_resurrected(const logic_step step, const entity_id character) {
 	if (const auto handle = step.get_cosmos()[character]) {
 		if (const auto sentience_def = handle.find<invariants::sentience>()) {
-			auto stop = messages::stop_particle_effect(always_predictable_v);
-			stop.match_chased_subject = character;
-			stop.match_orbit_offset = vec2::zero;
-			stop.match_effect_id = sentience_def->detached_head_particles.id;
-			step.post_message(stop);
+			for (const auto effect_id : { sentience_def->detached_head_particles.id, sentience_def->corpse_catch_fire_particles.id }) {
+				auto stop = messages::stop_particle_effect(always_predictable_v);
+				stop.match_chased_subject = character;
+				stop.match_orbit_offset = vec2::zero;
+				stop.match_effect_id = effect_id;
+				step.post_message(stop);
+			}
 		}
 	}
 }
@@ -274,9 +276,15 @@ void handle_corpse_damage(
 		{
 			const auto& effect = sentience_def.corpse_catch_fire_particles;
 
+			/*
+				On the standing body - and on the lying corpse once it falls, flying with it (see lying_corpse_anchor.h).
+			*/
+			auto on_body = particle_effect_start_input::orbit_local(subject, { vec2::zero, 180 } );
+			on_body.positioning.on_lying_corpse = lying_corpse_anchor::MIDDLE;
+
 			effect.start(
 				step,
-				particle_effect_start_input::orbit_local(subject, { vec2::zero, 180 } ),
+				on_body,
 				::calc_death_effect_predictability(step.get_settings(), prediction.death_particles, subject.get_id())
 			);
 		}
@@ -471,31 +479,13 @@ void handle_corpse_detonation(
 			/*
 				Played by the death's settings, like the fire that led to it.
 			*/
-			const auto explosion_predictability = ::calc_death_effect_predictability(
-				step.get_settings(),
-				step.get_settings().effect_prediction.death_particles,
-				subject.get_id()
-			);
-
 			::detonate({
 				step,
 				subject,
 				sentience_def.corpse_explosion,
 				subject.get_logic_transform(),
-				explosion_predictability
+				::calc_death_effect_predictability(step.get_settings(), step.get_settings().effect_prediction.death_particles, subject.get_id())
 			}, false);
-
-			/*
-				The fire that led to it goes out with it - it burns on the dead character, which stays where it stood
-				while the lying corpse is thrown away.
-			*/
-			{
-				auto stop = messages::stop_particle_effect(explosion_predictability);
-				stop.match_chased_subject = subject.get_id();
-				stop.match_orbit_offset = vec2::zero;
-				stop.match_effect_id = sentience_def.corpse_catch_fire_particles.id;
-				step.post_message(stop);
-			}
 
 			/* Spawn blood splatters in all directions based on accumulated corpse damage */
 			::spawn_blood_splatters_omnidirectional(access, step, subject, subject_pos, accumulated_corpse_damage);
@@ -790,10 +780,10 @@ void perform_knockout(
 						);
 
 						/*
-							From the neck of the standing body - and of the lying corpse once it falls (see lying_corpse_neck.h).
+							From the neck of the standing body - and of the lying corpse once it falls (see lying_corpse_anchor.h).
 						*/
 						auto at_neck = particle_effect_start_input::orbit_local(typed_subject_id, { vec2::zero, 180 } );
-						at_neck.positioning.on_lying_corpse_neck = true;
+						at_neck.positioning.on_lying_corpse = lying_corpse_anchor::NECK;
 
 						head_effect.start(
 							step,
