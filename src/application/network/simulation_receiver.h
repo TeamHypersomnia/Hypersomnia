@@ -30,6 +30,9 @@ struct steps_unpacking_result {
 	bool should_repredict = false;
 	bool malicious_server = false;
 	bool desync = false;
+	uint32_t desync_step = 0;
+	uint32_t desync_expected_hash = 0;
+	uint32_t desync_actual_hash = 0;
 	std::size_t total_accepted = static_cast<std::size_t>(-1);
 };
 
@@ -219,6 +222,12 @@ public:
 							   	*received_hash,
 							   	client_state_hash
 							);
+
+							if (!result.desync) {
+								result.desync_step = static_cast<uint32_t>(step_number);
+								result.desync_expected_hash = *received_hash;
+								result.desync_actual_hash = client_state_hash;
+							}
 
 							result.desync = true;
 						}

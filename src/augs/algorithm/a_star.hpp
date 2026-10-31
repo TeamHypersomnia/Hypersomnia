@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <optional>
 #include <queue>
 #include <vector>
@@ -32,9 +33,20 @@ namespace augs {
 	struct astar_queue_node {
 		Id id;
 		float f_cost;
+		uint32_t push_index;
 
 		bool operator>(const astar_queue_node& other) const {
-			return f_cost > other.f_cost;
+			if (f_cost != other.f_cost) {
+				return f_cost > other.f_cost;
+			}
+
+			/*
+				Equal costs are popped in the order they were pushed.
+				Otherwise the heap's implementation decides - libc++ and MSVC STL pop equal elements differently,
+				so bots would take other paths on Windows than on the Linux server (a desync).
+			*/
+
+			return push_index > other.push_index;
 		}
 	};
 
@@ -78,7 +90,8 @@ namespace augs {
 
 		const auto start_h = heuristic(start);
 		set_g_cost(start, 0.0f);
-		open_set.push({ start, start_h });
+		auto num_pushed = static_cast<uint32_t>(0);
+		open_set.push({ start, start_h, num_pushed++ });
 
 		while (!open_set.empty()) {
 			const auto current = open_set.top();
@@ -122,7 +135,7 @@ namespace augs {
 					set_parent(neighbor, current_id);
 
 					const auto h = heuristic(neighbor);
-					open_set.push({ neighbor, tentative_g + h });
+					open_set.push({ neighbor, tentative_g + h, num_pushed++ });
 				}
 
 				return callback_result::CONTINUE;
@@ -170,7 +183,8 @@ namespace augs {
 
 		const auto start_h = heuristic(start);
 		set_g_cost(start, 0.0f);
-		open_set.push({ start, start_h });
+		auto num_pushed = static_cast<uint32_t>(0);
+		open_set.push({ start, start_h, num_pushed++ });
 
 		while (!open_set.empty()) {
 			const auto current = open_set.top();
@@ -211,7 +225,7 @@ namespace augs {
 					set_parent(neighbor, current_id);
 
 					const auto h = heuristic(neighbor);
-					open_set.push({ neighbor, tentative_g + h });
+					open_set.push({ neighbor, tentative_g + h, num_pushed++ });
 				}
 
 				return callback_result::CONTINUE;

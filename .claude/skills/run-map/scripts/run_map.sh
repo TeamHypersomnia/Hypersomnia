@@ -9,7 +9,7 @@
 #   SECS         how long (default 180); KEEP=1 returns at once and leaves everything running (pids in <dir>/*.pid)
 #   SERVER_EXTRA more JSON fields of "server", e.g. ', "bot_difficulty": "HARD"'
 #   CONF_EXTRA   more top-level JSON fields for both the server and the client, e.g. ', "debug": { "log_solvable_hashes": true }'
-#   BIN, PORT, SCRATCH, LOG_GREP (printed from the server log at the end), LOG_TAIL
+#   BIN, CLIENT_BIN (the client's binary, default BIN), PORT, SCRATCH, LOG_GREP (printed from the server log at the end), LOG_TAIL
 #
 # Prints the run dir (server log <dir>/srv.out, client log <dir>/c.out). Heartbeats go to 127.0.0.1:1, never production.
 . "$(dirname "$0")/../../local-testing/scripts/test_env.sh"
@@ -21,6 +21,7 @@ PORT=${PORT:-10091}
 CLIENT=${CLIENT:-spectator}
 BOTS_JSON=$([ "$BOTS" = 1 ] && echo true || echo false)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
+CLIENT_BIN=${CLIENT_BIN:-$BIN}
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 T=$S/map_${MAP}_$(date +%s)
 
@@ -53,8 +54,8 @@ echo $! > $T/srv.pid
 sleep 6
 
 case "$CLIENT" in
-	spectator) CLIENT_RUN="xvfb-run -a $BIN" ;;
-	display) CLIENT_RUN="$BIN" ;;
+	spectator) CLIENT_RUN="xvfb-run -a $CLIENT_BIN" ;;
+	display) CLIENT_RUN="$CLIENT_BIN" ;;
 	*) CLIENT_RUN="" ;;
 esac
 

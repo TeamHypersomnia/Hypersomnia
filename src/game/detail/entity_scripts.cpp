@@ -225,7 +225,16 @@ std::vector<entity_id> get_closest_hostiles(
 		real32 dist = 0.f;
 
 		bool operator<(const hostile_entry& b) const {
-			return dist < b.dist;
+			if (dist != b.dist) {
+				return dist < b.dist;
+			}
+
+			/*
+				A full order: entries of one entity end up next to each other for remove_duplicates_from_sorted,
+				and equal distances don't fall to std::sort, which orders them differently on each standard library.
+			*/
+
+			return s < b.s;
 		}
 
 		bool operator==(const hostile_entry& b) const {

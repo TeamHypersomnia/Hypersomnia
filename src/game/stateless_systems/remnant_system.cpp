@@ -232,7 +232,12 @@ void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 
 		const auto num_deleted = kept.size() - MAX_KEPT_REMNANTS_HARD_LIMIT;
 
-		std::nth_element(
+		/*
+			Sorted, not just partitioned: the deletions free pool slots in this order, so it decides the ids of later entities -
+			the order nth_element leaves differs between standard libraries.
+		*/
+
+		std::partial_sort(
 			kept.begin(),
 			kept.begin() + num_deleted,
 			kept.end(),

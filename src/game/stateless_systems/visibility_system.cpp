@@ -9,6 +9,7 @@
 #include "augs/math/math.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/algorithm_templates.h"
+#include "augs/algorithm/sort_near_equal_runs.h"
 #include "augs/misc/simple_pair.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/debug_drawing_settings.h"
@@ -141,6 +142,12 @@ std::vector<vec2> visibility_information_response::get_world_polygon(
 	return output;
 }
 
+/*
+	Vertices whose angles differ by at most this count as collinear.
+*/
+
+static constexpr real32 collinear_angle_epsilon_v = 0.00001f;
+
 struct target_vertex {
 	real32 angle;
 	vec2 pos;
@@ -148,14 +155,24 @@ struct target_vertex {
 	int vision_extends = 0;
 	real32 dist_sq;
 
-	bool operator<(const target_vertex& b) const {
-		const auto diff = angle - b.angle;
-
-		if (augs::is_epsilon(diff, 0.00001f)) {
-			return dist_sq > b.dist_sq;
+	static bool farther_first(const target_vertex& a, const target_vertex& b) {
+		if (a.dist_sq != b.dist_sq) {
+			return a.dist_sq > b.dist_sq;
 		}
 
-		return diff < 0;
+		if (a.pos.x != b.pos.x) {
+			return a.pos.x < b.pos.x;
+		}
+
+		return a.pos.y < b.pos.y;
+	}
+
+	bool operator<(const target_vertex& b) const {
+		if (angle != b.angle) {
+			return angle < b.angle;
+		}
+
+		return farther_first(*this, b);
 	}
 
 	bool operator==(const target_vertex& b) const {
@@ -488,7 +505,21 @@ void visibility_system::calc_visibility(
 		return b;
 	}();
 
+	/*
+		Collinear vertices go from the farthest (see below). Sorted in two passes, since "collinear" is equality
+		within an epsilon - not transitive, so as std::sort's comparator it would order vertices differently
+		on each standard library, and explosions are occluded by this visibility (a desync between platforms).
+	*/
+
 	sort_range(all_vertices_transformed);
+
+	augs::sort_near_equal_runs(
+		all_vertices_transformed,
+		[](const target_vertex& v) { return v.angle; },
+		collinear_angle_epsilon_v,
+		target_vertex::farther_first
+	);
+
 	remove_duplicates_from_sorted(all_vertices_transformed);
 
 	/*
@@ -516,7 +547,7 @@ void visibility_system::calc_visibility(
 				return 
 					!other.is_on_a_bound
 					&& other.vision_extends != 0
-					&& augs::is_epsilon(other.angle - v.angle, 0.00001f)
+					&& augs::is_epsilon(other.angle - v.angle, collinear_angle_epsilon_v)
 				;
 			};
 

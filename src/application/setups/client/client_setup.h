@@ -51,6 +51,7 @@
 #include "steam_integration_callbacks.h"
 #include "application/gui/ingame_menu_button_type.h"
 #include "application/main/identity_session.h"
+#include "application/network/desync_dump.h"
 #include "game/messages/hud_message.h"
 
 #include "steam_rich_presence_pairs.h"
@@ -133,6 +134,7 @@ class client_setup :
 	bool list_key_mismatch = false;
 
 	bool now_resyncing = false;
+	desync_dump desync_diagnostics;
 	bool schedule_disconnect = false;
 
 	arena_player_metas player_metas;
@@ -583,6 +585,13 @@ class client_setup :
 				}
 
 				if (result.desync && !now_resyncing) {
+					desync_diagnostics.on_desync(
+						referential_arena,
+						result.desync_step,
+						result.desync_expected_hash,
+						result.desync_actual_hash
+					);
+
 					special_request(special_client_request::RESYNC_ARENA);
 					now_resyncing = true;
 				}

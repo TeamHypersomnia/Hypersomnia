@@ -303,6 +303,10 @@ message_handler_result client_setup::handle_payload(
 
 		const bool was_resyncing = now_resyncing;
 
+		if (was_resyncing) {
+			desync_diagnostics.before_resync_snapshot(get_arena_handle(client_arena_type::REFERENTIAL));
+		}
+
 		now_resyncing = false;
 
 		uint32_t read_client_id;
@@ -331,6 +335,10 @@ message_handler_result client_setup::handle_payload(
 
 		LOG("Received initial state from the server at step: %x.", scene.world.get_timestamp().step);
 		LOG("Received client id: %x", client_player_id.value);
+
+		if (was_resyncing) {
+			desync_diagnostics.after_resync_snapshot(get_arena_handle(client_arena_type::REFERENTIAL));
+		}
 
 		state = client_state_type::IN_GAME;
 

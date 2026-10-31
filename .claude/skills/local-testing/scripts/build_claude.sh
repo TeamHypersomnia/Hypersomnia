@@ -10,7 +10,10 @@
 #
 # One build on the machine at a time: it waits for the machine's build lock (wait_build_slot in lib.sh - any other ninja
 # running counts too). ccache when installed (sudo pacman -S ccache): one cache for every worktree
-# (CCACHE_BASEDIR=$HOME), so a fresh worktree builds in minutes. JOBS (10), CMAKE_ARGS (more -D flags), TARGET (ninja's target, default all).
+# (CCACHE_BASEDIR=$HOME), so a fresh worktree builds in minutes. JOBS (10), CMAKE_ARGS (more -D flags),
+# TARGET (ninja's target, default all), SUFFIX (a folder of its own for a variant), e.g. the STL that breaks ties
+# like the Windows client's MSVC STL: SUFFIX=libstdcxx CMAKE_ARGS="-DPREFER_LIBCXX=0 -DHAVE_WFUNCTION_EFFECTS=0"
+# (HAVE_WFUNCTION_EFFECTS=0 drops the bundled OpenAL's -Werror that fails with libstdc++).
 set -e
 CONFIG=$1
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -26,7 +29,7 @@ case "$CONFIG" in
 	*) echo "usage: build_claude.sh debug|headless|release|steam [worktree]"; exit 2 ;;
 esac
 
-B=$TREE/build/$DIR
+B=$TREE/build/$DIR${SUFFIX:+-$SUFFIX}
 mkdir -p $B
 
 # A fresh worktree has empty submodules: copied from the main checkout when at the same commits (no .git - a copied .git

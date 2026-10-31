@@ -469,8 +469,8 @@ private:
 	uint8_t spawn_reshuffle_counter = 0;
 
 	std::map<mode_player_id, player_type> players;
-	std::unordered_map<mode_player_id, player_type> suspended_players;
-	std::unordered_map<mode_player_id, player_type> abandoned_players;
+	std::map<mode_player_id, player_type> suspended_players;
+	std::map<mode_player_id, player_type> abandoned_players;
 
 	arena_mode_round_state current_round;
 

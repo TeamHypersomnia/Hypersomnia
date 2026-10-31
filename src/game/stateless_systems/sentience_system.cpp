@@ -257,7 +257,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 							auto rng = cosm.get_rng_for(arm_id);
 
 							for (int i = 0; i < 3; ++i) {
-								const auto offset = vec2::from_degrees(rng.randval(0.f, 360.f)) * rng.randval(5.f, 25.f);
+								const auto offset = rng.random_point_in_ring(5.f, 25.f);
 								::spawn_blood_splatter(access, rng, step, arm, arm_pos + offset, arm_pos, rng.randval(0.3f, 0.7f));
 							}
 						}
@@ -291,7 +291,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 							auto rng = cosm.get_rng_for(sentience.detached.head);
 
 							for (int i = 0; i < 3; ++i) {
-								const auto offset = vec2::from_degrees(rng.randval(0.f, 360.f)) * rng.randval(5.f, 25.f);
+								const auto offset = rng.random_point_in_ring(5.f, 25.f);
 								::spawn_blood_splatter(access, rng, step, head, head_pos + offset, head_pos, rng.randval(0.5f, 1.2f));
 							}
 						}
@@ -851,7 +851,11 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 				}
 			}
 
-			sort_range(owners);
+			/*
+				Stable: equal damage keeps whoever hit first - std::sort orders ties differently on each standard library.
+			*/
+
+			stable_sort_range(owners);
 		};
 
 		auto& health = s.get<health_meter_instance>();
