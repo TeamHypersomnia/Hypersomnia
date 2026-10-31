@@ -30,6 +30,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/gun/gun_math.h"
+#include "game/detail/gun/missile_multipliers.h"
 #include "game/detail/gun/shell_offset.h"
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
@@ -726,10 +727,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 										{
 											auto& missile = round_entity.template get<components::missile>();
-											missile.power_multiplier_of_sender = gun_def.damage_multiplier;
-											missile.headshot_multiplier_of_sender = gun_def.headshot_multiplier;
-											missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
-											missile.decal_scale_of_sender = gun_def.gunshot_decal_scale;
+											::set_missile_multipliers_of_gun(missile, gun_def);
 											missile.when_fired = cosm.get_timestamp();
 											missile.rng_seed = ::calc_next_round_seed(cosm, gun_entity);
 										}
@@ -936,10 +934,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 													{
 														auto& missile = round_entity.template get<components::missile>();
-														missile.power_multiplier_of_sender = gun_def.damage_multiplier;
-														missile.headshot_multiplier_of_sender = gun_def.headshot_multiplier;
-														missile.head_radius_multiplier_of_sender = gun_def.head_radius_multiplier;
-														missile.decal_scale_of_sender = gun_def.gunshot_decal_scale;
+														::set_missile_multipliers_of_gun(missile, gun_def);
 														missile.when_fired = cosm.get_timestamp();
 														missile.rng_seed = ::calc_next_round_seed(cosm, gun_entity);
 

@@ -51,7 +51,6 @@
 #include "game/detail/sentience/gore/blood_splatter.hpp"
 #include "game/detail/sentience/gore/idle_splatter.hpp"
 #include "game/detail/sentience/gore/lying_corpse_stump_splatters.h"
-#include "game/detail/physics/motion_axis.h"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -230,7 +229,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					sound.start(
 						step,
 						sound_effect_start_input::at_listener(subject),
-						never_predictable_v
+						::calc_death_effect_predictability(step.get_settings().effect_prediction.body_drop_sounds)
 					);
 				}
 
@@ -302,8 +301,6 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			::handle_lying_corpse_stump_splatters(allocate_new_entity_access(), step, subject, sentience, now);
-			::constrain_to_motion_axis(subject);
-			::constrain_to_motion_axis(cosm[sentience.detached.lying_corpse]);
 
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();
@@ -539,10 +536,15 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			}
 
 			/*
-				Blown up or cut into the body - its lying corpse shows a splatter over it.
+				Blown up or cut into the body - its lying corpse shows a splatter of each over it.
 			*/
-			if (amount > 0 && !h.origin.circumstances.headshot && (h.from_explosion || ::is_melee_damage(cosm, h.origin))) {
-				sentience.got_body_blasted_or_cut = true;
+			if (amount > 0 && !h.origin.circumstances.headshot) {
+				if (h.from_explosion) {
+					sentience.got_body_blasted = true;
+				}
+				else if (::is_melee_damage(cosm, h.origin)) {
+					sentience.got_body_cut = true;
+				}
 			}
 
 			if (!was_dead_already && amount > 0) {

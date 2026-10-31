@@ -35,6 +35,7 @@
 #include "game/stateless_systems/remnant_system.h"
 #include "game/stateless_systems/portal_system.h"
 #include "game/stateless_systems/decal_system.h"
+#include "game/detail/physics/corpse_physics.h"
 
 #include "game/organization/all_messages_includes.h"
 
@@ -231,6 +232,8 @@ void standard_solve(const logic_step step) {
 		step.flush_create_entity_requests();
 		demolitions_system().advance_cascade_explosions(step);
 	}
+
+	::constrain_corpses_to_motion_axes(cosm);
 
 	{
 		listener.during_step = true;

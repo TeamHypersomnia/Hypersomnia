@@ -71,27 +71,23 @@ void for_each_corpse_head_overlay(
 	}
 
 	/*
-		Body splatter: only for corpses blown up or cut into the body,
-		intact (not headshotted, head attached, both arms attached).
+		Body splatters: only for corpses blown up or cut into the body that kept everything -
+		not headshotted, head attached, no limb torn off (whatever tore it off - one sword hit that takes a leg too).
+		One for a blast, one for a cut - both if it got both.
 	*/
 
-	const bool both_arms_intact =
-		!sentience.detached.arm_upper.is_set()
-		&& !sentience.detached.arm_lower.is_set()
-	;
-
-	const bool should_draw_body_splatter =
-		sentience.got_body_blasted_or_cut
-		&& !was_headshot
+	const bool kept_everything =
+		!was_headshot
 		&& !head_detached
-		&& both_arms_intact
+		&& sentience.num_limbs_detached() == 0
 	;
 
-	if (should_draw_body_splatter) {
-		const auto body_splatter = sentience_def.corpse_body_splatter_image;
-
-		if (body_splatter.is_set()) {
-			callback(calc_overlay(body_splatter));
+	auto draw_body_splatter = [&](const bool got_it, const assets::image_id image) {
+		if (got_it && kept_everything && image.is_set()) {
+			callback(calc_overlay(image));
 		}
-	}
+	};
+
+	draw_body_splatter(sentience.got_body_blasted, sentience_def.corpse_body_blast_splatter_image);
+	draw_body_splatter(sentience.got_body_cut, sentience_def.corpse_body_splatter_image);
 }

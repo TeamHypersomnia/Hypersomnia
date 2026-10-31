@@ -395,29 +395,12 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			}
 
 			const bool was_conscious_before = sentience->is_conscious();
-			const auto health_before = sentience->template get<health_meter_instance>().value;
-			const auto limbs_before = sentience->num_limbs_detached();
+			const auto before_hit = ::character_before_hit(*sentience);
 
 			sentience_system().process_damage_message(damage_msg, step);
 			damage_msg.processed = true;
 
-			/*
-				Only of bullets - not of rockets and the like, which explode - and not when the shield took the whole hit,
-				nor on headshots, nor when the hit tore off a limb. Knives leave none, they don't come through here.
-			*/
-			const bool lost_health = sentience->template get<health_meter_instance>().value < health_before;
-			const bool tore_off_limb = sentience->num_limbs_detached() > limbs_before;
-			const bool explodes = [&]() {
-				if (const auto* const explosive = typed_missile.template find<invariants::explosive>()) {
-					return explosive->is_set();
-				}
-
-				return false;
-			}();
-
-			if (lost_health && !tore_off_limb && !explodes && !damage_msg.origin.circumstances.headshot) {
-				::spawn_character_gunshot_decal(step, surface_handle, point, impact_dir, missile, damage_msg.damage.base);
-			}
+			::leave_character_gunshot_decal(step, surface_handle, typed_missile, missile, before_hit, damage_msg, point, impact_dir);
 
 			const bool is_conscious_now = sentience->is_conscious();
 			const bool just_died = was_conscious_before && !is_conscious_now;

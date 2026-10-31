@@ -10,6 +10,8 @@
 #include "game/detail/melee/thrown_melee_bounce.h"
 #include "game/detail/inventory/item_falling.h"
 #include "game/detail/physics/infer_damping.hpp"
+#include "game/detail/physics/corpse_physics.h"
+#include "game/detail/physics/stance_shape.h"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
@@ -99,21 +101,6 @@ const components::sentience* find_bot_owner_sentience(const E& handle) {
 	}
 
 	return nullptr;
-}
-
-/*
-	A standing corpse doesn't bounce off walls - it would fly back the way it was pushed.
-*/
-
-template <class E>
-real32 calc_restitution(const E& handle, const invariants::fixtures& colliders_data) {
-	if (const auto sentience = handle.template find<components::sentience>()) {
-		if (!sentience->is_conscious()) {
-			return 0.f;
-		}
-	}
-
-	return colliders_data.restitution;
 }
 
 inline filter_type calc_standard_character_filter(const components::sentience& sentience) {
@@ -736,47 +723,24 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				const image_shape_type* non_standard_shape = nullptr;
 
 				/*
-					The raw, unflipped body_rotation of the stance frame.
-					The mirroring in from_convex_partition negates it implicitly,
-					as flip(rotate(r, v)) == rotate(-r, flip(v)).
+					See stance_shape.h.
 				*/
 				real32 stance_shape_rotation = 0.f;
 
 				const auto additional_rotation = [&]() {
-					const auto& typed_self = handle;
+					if (handle.template find<invariants::torso>() != nullptr) {
+						const bool mirrored = handle.only_secondary_holds_item();
+						const auto stance = ::find_stance_shape(handle, ::calc_collider_stance_id(handle), mirrored);
 
-					if (const auto torso = typed_self.template find<invariants::torso>()) {
-						const bool consider_reloading = true;
-						const auto stance = torso->calc_stance(typed_self, typed_self.get_wielded_items(), consider_reloading);
+						if (stance.found_frame) {
+							non_standard_shape = stance.shape;
+							stance_shape_rotation = stance.shape_rotation;
 
-						const auto& logicals = cosm.get_logical_assets();
-
-						if (const auto anim = logicals.find(stance.carry)) {
-							if (anim->frames.size() > 0) {
-								auto& offsets = logicals.get_offsets(anim->frames[0].image_id);
-
-								if (!offsets.non_standard_shape.empty()) {
-									non_standard_shape = &offsets.non_standard_shape;
-									stance_shape_rotation = offsets.torso.body_rotation;
-								}
-
-								auto considered_offsets = offsets.torso;
-
-								if (typed_self.only_secondary_holds_item()) {
-									considered_offsets.flip_vertically();
-
-									/*
-										Mirror the custom collider shape as well,
-										as the torso sprite is drawn flipped.
-									*/
-									flips.vertically = !flips.vertically;
-								}
-
-								considered_offsets.apply_body_rotation();
-
-								const auto stance_rotation = considered_offsets.back.rotation;
-								return stance_rotation;
+							if (mirrored) {
+								flips.vertically = !flips.vertically;
 							}
+
+							return stance.box_rotation;
 						}
 					}
 

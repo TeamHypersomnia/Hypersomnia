@@ -666,10 +666,12 @@
     },
 
     "lag_compensation": {
-        "confirm_local_character_death": true,
+        "local_player_death": "CONFIRM",
         "effect_prediction": {
-            "predict_death_particles": true,
-            "predict_death_sounds": false
+            "death_particles": "PREDICT",
+            "death_sounds": "CONFIRM",
+            "item_drop_sounds": "PREDICT",
+            "body_drop_sounds": "CONFIRM"
         },
         "simulate_decorative_organisms_during_reconciliation": false
     },

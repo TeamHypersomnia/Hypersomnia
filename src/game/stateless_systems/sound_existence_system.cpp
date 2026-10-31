@@ -459,7 +459,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			continue;
 		}
 
-		if (step.get_settings().effect_prediction.predict_death_sounds) {
+		if (step.get_settings().effect_prediction.death_sounds == effect_prediction_type::PREDICT) {
 			predictability = always_predictable_v;
 		}
 

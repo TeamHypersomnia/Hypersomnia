@@ -12,6 +12,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/game_notification.h"
 #include "game/messages/abrupt_position_change.h"
+#include "game/detail/physics/corpse_physics.h"
 
 auto calc_unit_progress_per_step(const augs::delta& dt, const real32 time_ms) {
 	const auto seconds_to_complete = time_ms / 1000;
@@ -310,6 +311,8 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 					const bool should_set_rotation_to_new_vel = is_missile_like;
 					const bool should_only_redirect_velocity = typed_contacted_entity.template has<components::missile>();
 
+					const bool turned_corpse = ::turn_corpse_to_portal_exit(typed_contacted_entity, final_transform, portal_exit_direction);
+
 					if (const bool is_sentient = typed_contacted_entity.template has<components::sentience>()) {
 						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
 
@@ -329,7 +332,7 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						if (should_set_rotation_to_new_vel) {
 							final_transform.rotation = rigid_body.get_velocity().degrees();
 						}
-						else {
+						else if (!turned_corpse) {
 							rigid_body.apply_angular(impulses.object_exit_angular_impulse);
 						}
 					}

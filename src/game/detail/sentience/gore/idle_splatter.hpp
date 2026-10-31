@@ -1,6 +1,6 @@
 #pragma once
+#include <optional>
 #include "game/detail/sentience/gore/blood_splatter.hpp"
-#include "game/detail/decals/character_gunshot_decal.h"
 #include "game/components/sentience_component.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
@@ -28,6 +28,23 @@ inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET = 20.f;
 
 inline constexpr real32 IDLE_SPLATTER_MIN_OFFSET_START = 20.f;
 inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET_START = 30.f;
+
+/*
+	Where the character's newest hole is now (none: zero offset) - the blood dripping from the body runs from it.
+*/
+
+template <class E>
+std::optional<vec2> find_newest_character_hole_pos(const E& character, const components::sentience& sentience) {
+	if (sentience.newest_hole_offset.is_zero()) {
+		return std::nullopt;
+	}
+
+	if (const auto character_transform = character.find_logic_transform()) {
+		return (*character_transform * transformr(sentience.newest_hole_offset)).pos;
+	}
+
+	return std::nullopt;
+}
 
 /*
 	Handles periodic blood dripping for low-HP characters and corpses.
@@ -62,13 +79,6 @@ inline void handle_idle_blood_splatter(
 
 	/* Limit blood drips for dead characters to avoid infinite splatters */
 	if (sentience.is_dead() && sentience.idle_blood_drip_count >= IDLE_SPLATTER_MAX_CORPSE_DRIPS) {
-		return;
-	}
-
-	/*
-		Not under a lying corpse - the blood would show through it.
-	*/
-	if (sentience.has_exploded) {
 		return;
 	}
 

@@ -39,10 +39,25 @@ public:
 	}
 };
 
+/*
+	Whether an effect of a killed player plays as soon as the client predicts the death,
+	or only once the server confirms it.
+*/
+
+enum class effect_prediction_type {
+	// GEN INTROSPECTOR enum class effect_prediction_type
+	CONFIRM,
+	PREDICT,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct effect_prediction_settings {
 	// GEN INTROSPECTOR struct effect_prediction_settings
-	bool predict_death_particles = false;
-	bool predict_death_sounds = false;
+	effect_prediction_type death_particles = effect_prediction_type::CONFIRM;
+	effect_prediction_type death_sounds = effect_prediction_type::CONFIRM;
+	effect_prediction_type item_drop_sounds = effect_prediction_type::PREDICT;
+	effect_prediction_type body_drop_sounds = effect_prediction_type::CONFIRM;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const effect_prediction_settings& b) const = default;
@@ -113,3 +128,11 @@ struct predictability_info {
 #define never_predictable_v predictability_info::never()
 #define always_predictable_v predictability_info::always()
 #define predictable_only_by(x) predictability_info::only_by(x)
+
+/*
+	The predictability of an effect of a killed player, by its setting.
+*/
+
+inline predictability_info calc_death_effect_predictability(const effect_prediction_type t) {
+	return t == effect_prediction_type::PREDICT ? always_predictable_v : never_predictable_v;
+}

@@ -11,6 +11,7 @@
 #include "test_scenes/test_scene_flavours.h"
 
 #include "application/arena/build_arena_from_editor_project.h"
+#include "application/arena/missile_node_shot.h"
 #include "application/setups/editor/detail/has_custom_scene_flavour_id.h"
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/create_entity.hpp"
@@ -460,7 +461,8 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				}
 				else if constexpr(std::is_same_v<node_type, editor_missile_node>) {
 					/*
-						Fired once, as the round starts, flying in the direction of the node's rotation.
+						Fired once, as the round starts, flying in the direction of the node's rotation -
+						as if from its gun, see missile_node_shot.h.
 					*/
 					const auto missile_transform = typed_node.get_transform();
 					const auto speed = typed_node.editable.speed;
@@ -478,6 +480,8 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 									auto& missile = round_entity.template get<components::missile>();
 									missile.when_fired = scene.world.get_timestamp();
 									missile.rng_seed = seed;
+
+									::set_missile_node_shot_by_its_gun(scene.world, round_entity);
 
 									round_entity.template get<components::rigid_body>().set_velocity(missile_transform.get_direction() * speed);
 								}

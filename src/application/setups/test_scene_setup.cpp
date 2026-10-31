@@ -45,6 +45,38 @@ static std::optional<item_flavour_id> test_enemy_weapon;//= to_entity_flavour_id
 using portal_marker = editor_area_marker_node;
 
 /*
+	Some rifles to test the gore on: the top half of the leftmost column of the range's opponents holds a Baka47.
+*/
+
+static void give_rifles_to_range_column(test_mode& mode, const std::vector<std::pair<vec2, mode_player_id>>& range_opponents) {
+	if (range_opponents.empty()) {
+		return;
+	}
+
+	const auto leftmost_x = std::min_element(range_opponents.begin(), range_opponents.end(), [](const auto& a, const auto& b) {
+		return a.first.x < b.first.x;
+	})->first.x;
+
+	const auto column_width = 50.f;
+
+	std::vector<std::pair<vec2, mode_player_id>> column;
+
+	for (const auto& o : range_opponents) {
+		if (o.first.x - leftmost_x < column_width) {
+			column.push_back(o);
+		}
+	}
+
+	std::sort(column.begin(), column.end(), [](const auto& a, const auto& b) {
+		return a.first.y < b.first.y;
+	});
+
+	for (std::size_t i = 0; i < (column.size() + 1) / 2; ++i) {
+		mode.find(column[i].second)->round_start_weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+	}
+}
+
+/*
 	Testing: when 1, the tutorial starts right on the finish screen
 	(the one congratulating on completing the basic tutorial),
 	so the advanced tutorial can be tested right away.
@@ -791,32 +823,7 @@ void test_scene_setup::restart_mode() {
 					}
 				}
 
-				/*
-					Some rifles to test the gore on: the top half of the leftmost column of the range's opponents holds a Baka47.
-				*/
-				if (!range_opponents.empty()) {
-					const auto leftmost_x = std::min_element(range_opponents.begin(), range_opponents.end(), [](const auto& a, const auto& b) {
-						return a.first.x < b.first.x;
-					})->first.x;
-
-					const auto column_width = 50.f;
-
-					std::vector<std::pair<vec2, mode_player_id>> column;
-
-					for (const auto& o : range_opponents) {
-						if (o.first.x - leftmost_x < column_width) {
-							column.push_back(o);
-						}
-					}
-
-					std::sort(column.begin(), column.end(), [](const auto& a, const auto& b) {
-						return a.first.y < b.first.y;
-					});
-
-					for (std::size_t i = 0; i < (column.size() + 1) / 2; ++i) {
-						mode.find(column[i].second)->round_start_weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
-					}
-				}
+				::give_rifles_to_range_column(mode, range_opponents);
 
 				const auto new_id = local_player_id;
 				auto player = mode.find(new_id);

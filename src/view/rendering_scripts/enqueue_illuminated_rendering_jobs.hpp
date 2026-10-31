@@ -993,7 +993,9 @@ void enqueue_illuminated_rendering_jobs(
 				*/
 
 				visible.for_each<render_layer::LYING_CORPSES>(cosm, [&](const auto& handle) {
-					::draw_owned_decals(decals, handle.get_id(), corpses_in);
+					decals.for_each_of(handle.get_id(), [&](const auto& typed_decal) {
+						::specific_draw_entity(typed_decal, corpses_in);
+					});
 				});
 
 				for_each_visible_head_overlay([&](const auto& sprite, const auto& input) {
@@ -1011,7 +1013,9 @@ void enqueue_illuminated_rendering_jobs(
 				>();
 
 				visible.for_each<render_layer::LYING_CORPSES>(cosm, [&](const auto& handle) {
-					::draw_owned_decal_neons(decals, handle.get_id(), corpse_neons_in);
+					decals.for_each_of(handle.get_id(), [&](const auto& typed_decal) {
+						::specific_draw_neon_map(typed_decal, corpse_neons_in);
+					});
 				});
 			};
 
@@ -1046,7 +1050,10 @@ void enqueue_illuminated_rendering_jobs(
 
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle, const std::optional<rgba> shield_glow_color = std::nullopt) {
 			::specific_draw_neon_map(handle, drawing_in);
-			::draw_standing_corpse_decal_neons(decals, handle, drawing_in);
+
+			decals.for_each_within_standing_corpse(handle, [&](const auto& typed_decal) {
+				::specific_draw_neon_map(typed_decal, drawing_in);
+			});
 
 			::draw_character_glow(
 				handle, 

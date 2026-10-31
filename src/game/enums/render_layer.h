@@ -26,7 +26,7 @@ enum class render_layer {
 	SURFACE_DECALS,
 	/*
 		Bullet holes of characters - not drawn on their own, but by their owners:
-		only a lying corpse draws them, over its body and under its head.
+		only corpses draw them, over their bodies and under their heads.
 		See owned_decals.h.
 	*/
 	CHARACTER_DECALS,

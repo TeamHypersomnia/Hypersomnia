@@ -136,13 +136,14 @@ namespace components {
 		bool leg_lower_queued_for_detach = false;
 		bool corpse_fell_at_once = false;
 		bool got_bloody_headshot = false;
-		bool got_body_blasted_or_cut = false;
+		bool got_body_blasted = false;
+		bool got_body_cut = false;
+		pad_bytes<3> pad3;
 
 		augs::stepped_timestamp when_lying_corpse_replaced;
 		augs::stepped_timestamp when_lying_corpse_settled;
 		augs::stepped_timestamp when_bot_item_knocked;
-		augs::stepped_timestamp when_corpse_kept_standing;
-		real32 corpse_kept_standing_secs = 0.f;
+		augs::stepped_timestamp corpse_stands_until;
 		real32 corpse_standing_least_secs = 0.f;
 
 		faction_type official_faction = faction_type::SPECTATOR;
@@ -259,6 +260,28 @@ namespace components {
 
 using remnant_flavour_id = constrained_entity_flavour_id<invariants::remnant>;
 
+/*
+	Where the parts of the body are in a character's sprites, in pixels - for the holes moving
+	from the standing body onto the lying corpse (character_gunshot_decal.h) and for the blood
+	from the lying corpse's leg stumps (lying_corpse_stump_splatters.h).
+	The standing body faces +x; the lying corpse's head is at -x, its legs at +x.
+*/
+
+struct corpse_body_layout {
+	// GEN INTROSPECTOR struct corpse_body_layout
+	real32 standing_torso_front = 22.f;
+	real32 standing_shoulder_from = 30.f;
+	real32 standing_shoulders_half_width = 41.f;
+	real32 lying_chest = -35.f;
+	real32 lying_arm_from = -30.f;
+	real32 lying_arm_to = -8.f;
+	real32 lying_arm_across = 30.f;
+	real32 lying_shoulders_half_width = 38.f;
+	vec2 lying_top_leg_stump = vec2(8.f, -8.f);
+	vec2 lying_bottom_leg_stump = vec2(16.f, 15.f);
+	// END GEN INTROSPECTOR
+};
+
 struct corpse_remnant_def {
 	// GEN INTROSPECTOR struct corpse_remnant_def
 	vec2 offset;
@@ -342,9 +365,11 @@ namespace invariants {
 		assets::image_id corpse_head_splatter_image;
 		assets::image_id corpse_head_splatter_less_image;
 		assets::image_id corpse_body_splatter_image;
+		assets::image_id corpse_body_blast_splatter_image;
 		vec2i corpse_head_offset = { -20, 0 };
 		vec2i corpse_arm_upper_offset = { 0, -15 };
 		vec2i corpse_arm_lower_offset = { 0, 15 };
+		corpse_body_layout corpse_layout;
 
 		body_part_flavour lying_corpse_flavour;
 		body_part_flavour lying_corpse_noarm_flavour;

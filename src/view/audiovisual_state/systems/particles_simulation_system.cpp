@@ -825,9 +825,10 @@ void particles_simulation_system::advance_visible_streams(
 				as if the effect had started that much earlier.
 			*/
 			if (const auto prewarm_ms = instance.source_emission.prewarm_ms;
-				prewarm_ms > 0.f && !instance.has_previous_chased_pos
+				prewarm_ms > 0.f && !instance.prewarm_applied
 			) {
 				considered_delta = augs::delta::from_milliseconds(considered_delta.in_milliseconds() + prewarm_ms);
+				instance.prewarm_applied = true;
 			}
 
 			const auto dt_secs = considered_delta.in_seconds();

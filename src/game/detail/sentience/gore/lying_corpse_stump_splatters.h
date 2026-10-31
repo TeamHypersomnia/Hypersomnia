@@ -5,6 +5,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
 #include "game/detail/sentience/gore/blood_splatter.hpp"
+#include "game/detail/sentience/lying_corpse_flip.h"
 
 /*
 	Blood from the stumps of a lying corpse - where its head, arms or legs were torn off - in a few rounds
@@ -20,14 +21,6 @@ inline constexpr real32 lying_corpse_stump_round_interval_secs_v = 0.4f;
 inline constexpr int lying_corpse_stump_splats_per_round_v = 2;
 inline constexpr real32 lying_corpse_stump_spread_v = 15.f;
 inline constexpr real32 lying_corpse_stump_spread_degrees_v = 60.f;
-
-/*
-	The leg stumps in the lying corpse's image (legs at +x) - the top and the bottom one,
-	where the legless sprites are cut. The arms' and the head's are the image's own torso offsets.
-*/
-
-inline const auto lying_corpse_image_top_leg_stump_v = vec2(8.f, -8.f);
-inline const auto lying_corpse_image_bottom_leg_stump_v = vec2(16.f, 15.f);
 
 inline bool has_lying_corpse_stumps(const components::sentience& sentience) {
 	return
@@ -52,6 +45,8 @@ inline void start_lying_corpse_stump_splatters(components::sentience& sentience)
 	the head's at -x, the arms' to their side, the legs' at +x.
 	The image's top missing arm is its shoulder, the second one its secondary shoulder;
 	which leg is missing at the image's top depends on the flip - see calc_lying_corpse_flavour.
+	The arms' and the head's stumps are the image's own torso offsets; the legs' where the legless sprites are cut
+	(corpse_body_layout).
 */
 
 struct lying_corpse_stump {
@@ -60,17 +55,15 @@ struct lying_corpse_stump {
 };
 
 template <class E>
-std::vector<lying_corpse_stump> calc_lying_corpse_stumps(const components::sentience& sentience, const E& lying_corpse) {
+std::vector<lying_corpse_stump> calc_lying_corpse_stumps(
+	const components::sentience& sentience,
+	const corpse_body_layout& layout,
+	const E& lying_corpse
+) {
 	const auto& cosm = lying_corpse.get_cosmos();
 	const auto& torso = cosm.get_logical_assets().get_offsets(lying_corpse.get_image_id()).torso;
 
-	const bool flipped = [&]() {
-		if (const auto flips = lying_corpse.calc_flip_flags()) {
-			return flips->vertically;
-		}
-
-		return false;
-	}();
+	const bool flipped = ::is_lying_corpse_flipped(lying_corpse);
 
 	std::vector<lying_corpse_stump> in_image;
 
@@ -91,15 +84,14 @@ std::vector<lying_corpse_stump> calc_lying_corpse_stumps(const components::senti
 		in_image.push_back({ vec2(torso.secondary_shoulder.pos), vec2(0, 1) });
 	}
 
-	const bool image_top_leg_missing = flipped ? sentience.leg_upper_queued_for_detach : sentience.leg_lower_queued_for_detach;
-	const bool image_bottom_leg_missing = flipped ? sentience.leg_lower_queued_for_detach : sentience.leg_upper_queued_for_detach;
+	const auto missing_legs = ::calc_image_missing_legs(sentience, flipped);
 
-	if (image_top_leg_missing) {
-		in_image.push_back({ lying_corpse_image_top_leg_stump_v, vec2(1, 0) });
+	if (missing_legs.top) {
+		in_image.push_back({ layout.lying_top_leg_stump, vec2(1, 0) });
 	}
 
-	if (image_bottom_leg_missing) {
-		in_image.push_back({ lying_corpse_image_bottom_leg_stump_v, vec2(1, 0) });
+	if (missing_legs.bottom) {
+		in_image.push_back({ layout.lying_bottom_leg_stump, vec2(1, 0) });
 	}
 
 	const auto corpse_transform = lying_corpse.get_logic_transform();
@@ -159,9 +151,10 @@ void handle_lying_corpse_stump_splatters(
 	}
 
 	auto rng = cosm.get_rng_for(subject);
+	const auto& layout = subject.template get<invariants::sentience>().corpse_layout;
 
 	lying_corpse.dispatch([&](const auto& typed_corpse) {
-		for (const auto& stump : ::calc_lying_corpse_stumps(sentience, typed_corpse)) {
+		for (const auto& stump : ::calc_lying_corpse_stumps(sentience, layout, typed_corpse)) {
 			for (int i = 0; i < lying_corpse_stump_splats_per_round_v; ++i) {
 				const auto degrees = stump.outwards.degrees() + rng.randval(-lying_corpse_stump_spread_degrees_v, lying_corpse_stump_spread_degrees_v);
 				const auto offset = vec2::from_degrees(degrees) * rng.randval(3.f, lying_corpse_stump_spread_v);

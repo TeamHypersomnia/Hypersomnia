@@ -37,6 +37,8 @@ void start_dropped_on_death_falls(const logic_step step, const C& held_items) {
 				cosm.get_nontemporal_rng_seed_for(typed_item),
 				cosm.get_timestamp()
 			);
+
+			fall.dropped_on_death = true;
 		});
 	}
 }

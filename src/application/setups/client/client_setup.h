@@ -336,7 +336,7 @@ class client_setup :
 			solve_settings out;
 			out.effect_prediction = in.lag_compensation.effect_prediction;
 
-			if (in.lag_compensation.confirm_local_character_death) {
+			if (in.lag_compensation.local_player_death == effect_prediction_type::CONFIRM) {
 				out.disable_knockouts = get_viewed_character();
 			}
 

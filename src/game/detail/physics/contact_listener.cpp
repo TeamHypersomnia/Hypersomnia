@@ -23,7 +23,6 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/item_falling.h"
-#include "game/detail/physics/motion_axis.h"
 #include "game/enums/filters.h"
 #include "game/components/remnant_component.h"
 
@@ -604,9 +603,6 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
 	auto& sys = get_sys();
 	const auto si = cosm.get_si();
-
-	::constrain_body_to_motion_axis(cosm, *contact->GetFixtureA()->GetBody());
-	::constrain_body_to_motion_axis(cosm, *contact->GetFixtureB()->GetBody());
 
 	messages::collision_message msgs[2];
 

@@ -12,13 +12,21 @@
 #include "game/detail/sentience/gore/blood_splatter.hpp"
 #include "game/detail/sentience/gore/idle_splatter.hpp"
 #include "game/detail/sentience/gore/lying_corpse_stump_splatters.h"
-#include "game/detail/physics/motion_axis.h"
+#include "game/detail/physics/corpse_physics.h"
 #include "game/messages/pure_color_highlight_message.h"
 #include "game/messages/start_particle_effect.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/owner_component.h"
 
 #include "augs/log.h"
+
+/*
+	See character_gunshot_decal.h.
+*/
+
+void delete_holes_of_resurrected(const logic_step step, const entity_id character) {
+	::delete_holes_attached_to(step, character);
+}
 
 static void try_detach_limbs(
 	const allocate_new_entity_access access,
@@ -61,8 +69,11 @@ static void try_detach_limbs(
 		return ::calc_hit_limb_standing(subject_transform, subject.get_logical_size().y / 2, point_of_impact);
 	}();
 
-	/* Only detach one limb per call (fix for one-shot peeling off two arms) */
-	const auto chosen = ::choose_limb_to_detach(sentience, hit_limb);
+	/*
+		One limb per hit, never two. Legs only for a character with detached leg flavours.
+	*/
+	const bool has_legs = sentience_def.detached_flavours.leg_upper.is_set() && sentience_def.detached_flavours.leg_lower.is_set();
+	const auto chosen = ::choose_limb_to_detach(sentience, hit_limb, has_legs);
 
 	if (!chosen.has_value()) {
 		return;
@@ -74,7 +85,7 @@ static void try_detach_limbs(
 	const auto limb_flavour = [&]() {
 		const auto& f = sentience_def.detached_flavours;
 
-		if (is_leg && f.leg_upper.is_set()) {
+		if (is_leg) {
 			return is_upper ? f.leg_lower : f.leg_upper;
 		}
 
@@ -152,11 +163,7 @@ static void try_detach_limbs(
 				s.pending_arm_splatters = 2;
 			}
 
-			const auto predictability = 
-				step.get_settings().effect_prediction.predict_death_particles 
-				? always_predictable_v
-				: never_predictable_v
-			;
+			const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
 
 			head_effect.start(
 				step,
@@ -183,11 +190,7 @@ static void try_detach_limbs(
 				Play the arm detach sound from the dead player's perspective.
 			*/
 			if (arm_detach_sound.id.is_set()) {
-				const auto predictability =
-					step.get_settings().effect_prediction.predict_death_particles
-					? always_predictable_v
-					: never_predictable_v
-				;
+				const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
 
 				arm_detach_sound.start(
 					step,
@@ -355,7 +358,6 @@ void handle_corpse_damage(
 			if (new_flavour.is_set()) {
 				const auto old_transform = lying_corpse.get_logic_transform();
 				const auto old_velocity = lying_corpse.get_effective_velocity();
-				const auto old_only_moves_along = lying_corpse.get_special_physics().only_moves_along;
 
 				const auto typed_subject_id = subject.get_id();
 				const auto old_lying_corpse_id = lying_corpse.get_id();
@@ -397,13 +399,12 @@ void handle_corpse_damage(
 				cosmic::queue_create_entity(
 					step,
 					new_flavour,
-					[old_transform, old_velocity, old_only_moves_along, should_flip, typed_subject_id](const auto& typed_entity, auto& agg) {
+					[old_transform, old_velocity, should_flip, typed_subject_id](const auto& typed_entity, auto& agg) {
 						typed_entity.set_logic_transform(old_transform);
 
 						const auto& rigid_body = typed_entity.template get<components::rigid_body>();
 						rigid_body.set_velocity(old_velocity);
 						rigid_body.set_angular_velocity(0.f);
-						rigid_body.get_special().only_moves_along = old_only_moves_along;
 
 						if (should_flip) {
 							if (auto* geo = agg.template find<components::overridden_geo>()) {
@@ -444,11 +445,7 @@ void handle_corpse_damage(
 							from the old lying corpse to the replacement.
 						*/
 						if (head_detached && head_effect.id.is_set()) {
-							const auto predictability =
-								step.get_settings().effect_prediction.predict_death_particles
-								? always_predictable_v
-								: never_predictable_v
-							;
+							const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
 
 							messages::change_particle_effect change;
 							change.predictability = predictability;
@@ -585,13 +582,10 @@ void handle_corpse_detonation(
 					typed_entity.set_logic_transform(lying_transform);
 
 					/*
-						From now on it slides only head first, the way it lies - see motion_axis.h.
+						From now on it slides only head first, the way it lies - see corpse_physics.h.
 					*/
-					const auto only_moves_along = -vec2::from_degrees(lying_transform.rotation);
-
 					const auto& rigid_body = typed_entity.template get<components::rigid_body>();
-					rigid_body.get_special().only_moves_along = only_moves_along;
-					rigid_body.set_velocity(::project_onto_motion_axis(lying_velocity, only_moves_along));
+					rigid_body.set_velocity(::project_onto_motion_axis(lying_velocity, ::calc_lying_corpse_motion_axis(lying_transform)));
 					rigid_body.set_angular_velocity(0.f);
 
 					if (should_flip) {
@@ -645,11 +639,7 @@ void handle_corpse_detonation(
 						to the lying corpse with the correct head offset.
 					*/
 					if (head_detached && head_effect.id.is_set()) {
-						const auto predictability =
-							step.get_settings().effect_prediction.predict_death_particles
-							? always_predictable_v
-							: never_predictable_v
-						;
+						const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
 
 						messages::change_particle_effect change;
 						change.predictability = predictability;
@@ -700,7 +690,7 @@ void handle_corpse_detonation(
 		/*
 			Not while gun hits keep it standing - see corpse_limbs.h.
 		*/
-		const bool kept_standing_by_hits = sentience.when_corpse_kept_standing.was_set();
+		const bool kept_standing_by_hits = sentience.corpse_stands_until.was_set();
 
 		if (!kept_standing_by_hits && sentience.idle_blood_drip_count >= max_drips) {
 			/*
@@ -784,11 +774,12 @@ void perform_knockout(
 
 				/*
 					The standing corpse slides on only forward along the direction it was killed in -
-					still free to turn - see motion_axis.h.
+					still free to turn - see corpse_physics.h.
 				*/
-				typed_subject.get_special_physics().only_moves_along = vec2(direction).normalize();
 				::constrain_to_motion_axis(typed_subject);
 			}
+
+			::reveal_holes_of_the_dead(step, typed_subject);
 		}
 
 		if (sentience.is_dead() && origin.circumstances.headshot) {
@@ -832,11 +823,7 @@ void perform_knockout(
 							s.pending_head_splatters = 2;
 						}
 
-						const auto predictability = 
-							step.get_settings().effect_prediction.predict_death_particles 
-							? always_predictable_v
-							: never_predictable_v
-						;
+						const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
 
 						head_effect.start(
 							step,

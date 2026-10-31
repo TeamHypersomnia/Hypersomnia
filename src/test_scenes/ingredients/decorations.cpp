@@ -981,7 +981,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, ids.second, white);
 
 			invariants::decal decal_def;
-			decal_def.is_gunshot_decal = true;
+			decal_def.is_character_decal = true;
 			meta.set(decal_def);
 		}
 

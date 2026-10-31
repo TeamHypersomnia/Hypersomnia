@@ -282,7 +282,17 @@ void play_floor_hit_sound(
 
 	start.shell_ejected_by = shell_ejected_by;
 
-	effect.start(step, start, always_predictable_v);
+	/*
+		A gun falling from dead hands - by effect_prediction.item_drop_sounds, predicted by default:
+		its first clatter comes well after the death, and a mispredicted death is corrected by then.
+	*/
+	const auto predictability =
+		fall.dropped_on_death
+		? ::calc_death_effect_predictability(step.get_settings().effect_prediction.item_drop_sounds)
+		: always_predictable_v
+	;
+
+	effect.start(step, start, predictability);
 }
 
 /*

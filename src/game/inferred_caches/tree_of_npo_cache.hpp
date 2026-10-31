@@ -3,6 +3,7 @@
 #include "game/detail/calc_render_layer.h"
 #include "game/cosmos/find_cache.h"
 #include "game/inferred_caches/is_grid_organism.h"
+#include "game/detail/decals/living_character_holes.h"
 
 template <class E>
 auto* find_tree_of_npo_cache(const E& handle) {
@@ -32,6 +33,10 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 	static_assert(!is_physical);
 
 	const auto layer = ::calc_render_layer(handle);
+
+	if (::is_hole_of_living_character(handle)) {
+		return std::nullopt;
+	}
 
 	if (const auto aabb = handle.find_aabb()) {
 		tree_of_npo_node_input result;
@@ -88,7 +93,10 @@ void tree_of_npo_cache::specific_infer_cache_for(const E& handle) {
 		}
 	}
 	else {
-		// TODO: delete cache?
+		/*
+			No longer in the tree - e.g. a hole whose character was resurrected.
+		*/
+		cache.clear(*this);
 	}
 }
 

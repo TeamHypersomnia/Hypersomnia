@@ -319,6 +319,7 @@ namespace test_flavours {
 			sentience.corpse_head_splatter_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER);
 			sentience.corpse_head_splatter_less_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER_LESS);
 			sentience.corpse_body_splatter_image = to_image_id(test_scene_image_id::CORPSE_BODY_SPLATTER);
+			sentience.corpse_body_blast_splatter_image = to_image_id(test_scene_image_id::CORPSE_BODY_BLAST_SPLATTER);
 
 			sentience.detached_head_particles.id = to_particle_effect_id(test_scene_particle_effect_id::DETACHED_HEAD_FIRE);
 			sentience.detached_head_particles.modifier.color = rgba(192, 0, 0, 255);
@@ -551,6 +552,7 @@ namespace test_flavours {
 			meta.get<invariants::sentience>().corpse_head_splatter_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER);
 			meta.get<invariants::sentience>().corpse_head_splatter_less_image = to_image_id(test_scene_image_id::CORPSE_HEAD_SPLATTER_LESS);
 			meta.get<invariants::sentience>().corpse_body_splatter_image = to_image_id(test_scene_image_id::CORPSE_BODY_SPLATTER);
+			meta.get<invariants::sentience>().corpse_body_blast_splatter_image = to_image_id(test_scene_image_id::CORPSE_BODY_BLAST_SPLATTER);
 
 
 			{

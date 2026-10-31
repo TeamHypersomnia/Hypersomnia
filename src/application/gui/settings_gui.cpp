@@ -4406,23 +4406,28 @@ void settings_gui_state::perform(
 								revertable_slider(SCOPE_CFG_NVP(misprediction_smoothing_multiplier), 0.f, 3.f);
 							}
 
-							{
-								auto& scope_cfg = config.lag_compensation;
-								revertable_checkbox(SCOPE_CFG_NVP(confirm_local_character_death));
-
-								augs::introspect(
-									[&](const std::string& label, auto& field){
-										revertable_checkbox(format_field_name(label), field);
-									},
-									scope_cfg.effect_prediction
-								); 
-							}
 						}
-
 
 						{
 							auto& scope_cfg = config.lag_compensation;
 							revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
+						}
+
+						ImGui::Separator();
+
+						text_color("Prediction settings", yellow);
+
+						ImGui::Separator();
+
+						{
+							auto& lag = config.lag_compensation;
+							auto& effects = lag.effect_prediction;
+
+							revertable_enum("Local player death", lag.local_player_death);
+							revertable_enum("Death particles of killed players", effects.death_particles);
+							revertable_enum("Death sounds of killed players", effects.death_sounds);
+							revertable_enum("Item drop sounds of killed players", effects.item_drop_sounds);
+							revertable_enum("Body drop sounds of killed players", effects.body_drop_sounds);
 						}
 
 						ImGui::Separator();

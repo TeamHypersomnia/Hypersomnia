@@ -1503,6 +1503,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.exploding_rings);
 
 	renderer.call_triangles(D::EXPLODING_RINGS);
+
+	/*
+		Thunders use the highlights' shader - the rings' one would discard them.
+	*/
+	set_shader(shaders.pure_color_highlight);
 	renderer.call_triangles(D::THUNDERS);
 
 	set_shader(shaders.standard);

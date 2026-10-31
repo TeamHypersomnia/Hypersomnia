@@ -6,6 +6,7 @@
 #include "augs/math/transform.h"
 #include "augs/math/repro_math.h"
 #include "game/components/sentience_component.h"
+#include "game/detail/sentience/lying_corpse_flip.h"
 #include "game/components/gun_component.h"
 #include "game/components/melee_component.h"
 #include "game/detail/damage_origin.h"
@@ -31,7 +32,8 @@ inline constexpr int max_detached_limbs_v = 4;
 inline constexpr real32 leg_zone_half_width_ratio_v = 0.6f;
 
 /*
-	Snipers and heavy pistols (invariants::gun::corpse_falls_at_once) drop a standing corpse at once.
+	The snipers (not the Bulldup), heavy pistols and the rocket launcher (invariants::gun::corpse_falls_at_once)
+	drop a standing corpse at once.
 */
 
 template <class C>
@@ -72,7 +74,7 @@ bool falls_corpse_at_once(const C& cosm, const damage_origin& origin) {
 
 /*
 	Measured in real time, like the fire rates are - so it is the same at any game speed.
-	As it played out at the default speed of 0.75 when it was measured in logic time: 1.2 / 0.75.
+	1.2 intervals of the gun at the default game speed of 0.75.
 */
 
 inline constexpr real32 standing_corpse_shot_interval_mult_v = 1.2f / 0.75f;
@@ -151,14 +153,21 @@ void keep_corpse_standing_after_hit(const C& cosm, components::sentience& sentie
 
 	const auto interval_ms = ::find_damaging_gun_shot_interval_ms(cosm, origin);
 	const auto clk = cosm.get_clock().get_real_clock();
+	const auto step_secs = clk.dt.in_seconds();
 
 	const auto secs_left = [&]() {
-		if (!sentience.when_corpse_kept_standing.was_set()) {
+		if (!sentience.corpse_stands_until.was_set()) {
 			return std::numeric_limits<real32>::max();
 		}
 
-		return sentience.corpse_kept_standing_secs - clk.get_passed_secs(sentience.when_corpse_kept_standing);
+		const auto steps_left = static_cast<int64_t>(sentience.corpse_stands_until.step) - static_cast<int64_t>(clk.now.step);
+		return static_cast<real32>(steps_left) * step_secs;
 	}();
+
+	auto stand_for = [&](const real32 secs) {
+		sentience.corpse_stands_until = clk.now;
+		sentience.corpse_stands_until.step += static_cast<uint32_t>(repro::ceil(secs / step_secs));
+	};
 
 	if (!interval_ms.has_value()) {
 		if (::is_melee_damage(cosm, origin)) {
@@ -169,8 +178,7 @@ void keep_corpse_standing_after_hit(const C& cosm, components::sentience& sentie
 			Not a gun nor a knife - an explosion.
 		*/
 		if (secs_left > standing_corpse_after_explosion_secs_v) {
-			sentience.when_corpse_kept_standing = clk.now;
-			sentience.corpse_kept_standing_secs = standing_corpse_after_explosion_secs_v;
+			stand_for(standing_corpse_after_explosion_secs_v);
 		}
 
 		return;
@@ -189,19 +197,18 @@ void keep_corpse_standing_after_hit(const C& cosm, components::sentience& sentie
 		sentience.corpse_standing_least_secs + standing_corpse_least_secs_per_hit_v
 	);
 
-	if (!sentience.when_corpse_kept_standing.was_set() || given_secs > secs_left) {
-		sentience.when_corpse_kept_standing = clk.now;
-		sentience.corpse_kept_standing_secs = given_secs;
+	if (!sentience.corpse_stands_until.was_set() || given_secs > secs_left) {
+		stand_for(given_secs);
 	}
 }
 
 template <class C>
 bool has_standing_corpse_time_run_out(const C& cosm, const components::sentience& sentience) {
-	if (!sentience.when_corpse_kept_standing.was_set()) {
+	if (!sentience.corpse_stands_until.was_set()) {
 		return false;
 	}
 
-	return cosm.get_clock().get_real_clock().get_passed_secs(sentience.when_corpse_kept_standing) >= sentience.corpse_kept_standing_secs;
+	return cosm.get_clock().now >= sentience.corpse_stands_until;
 }
 
 /*
@@ -244,8 +251,8 @@ inline int calc_limbs_that_should_be_detached(const components::sentience& senti
 
 /*
 	Damage past the point where a stream of hits has torn off all limbs, from the same base.
-	A standing corpse catches fire only damage_required_for_corpse_explosion past it,
-	so that all its limbs always come off first.
+	A standing corpse catches fire only damage_required_for_corpse_explosion past it -
+	as one hit tears off at most one limb, a single huge one can ignite a corpse with limbs still on.
 */
 
 inline real32 calc_corpse_damage_past_limbs(const components::sentience& sentience, const real32 current_health) {
@@ -275,7 +282,7 @@ inline bool is_limb_queued(const components::sentience& sentience, const corpse_
 	the same kind on the other side, then the other kind.
 */
 
-inline std::optional<corpse_limb> choose_limb_to_detach(const components::sentience& sentience, const corpse_limb hit) {
+inline std::optional<corpse_limb> choose_limb_to_detach(const components::sentience& sentience, const corpse_limb hit, const bool has_legs) {
 	const corpse_limb order[] = {
 		hit,
 		{ hit.is_leg, !hit.is_upper },
@@ -284,6 +291,10 @@ inline std::optional<corpse_limb> choose_limb_to_detach(const components::sentie
 	};
 
 	for (const auto& candidate : order) {
+		if (candidate.is_leg && !has_legs) {
+			continue;
+		}
+
 		if (!is_limb_queued(sentience, candidate)) {
 			return candidate;
 		}
@@ -348,22 +359,21 @@ inline body_part_flavour calc_lying_corpse_flavour(
 		sentience_def.lying_corpse_flavour
 	;
 
-	const bool image_top_leg_missing = flipped ? sentience.leg_upper_queued_for_detach : sentience.leg_lower_queued_for_detach;
-	const bool image_bottom_leg_missing = flipped ? sentience.leg_lower_queued_for_detach : sentience.leg_upper_queued_for_detach;
+	const auto missing_legs = ::calc_image_missing_legs(sentience, flipped);
 
 	auto or_with_legs = [&](const body_part_flavour f) {
 		return f.is_set() ? f : with_legs;
 	};
 
-	if (image_top_leg_missing && image_bottom_leg_missing) {
+	if (missing_legs.top && missing_legs.bottom) {
 		return or_with_legs(legless.nolegs);
 	}
 
-	if (image_top_leg_missing) {
+	if (missing_legs.top) {
 		return or_with_legs(legless.noleg);
 	}
 
-	if (image_bottom_leg_missing) {
+	if (missing_legs.bottom) {
 		return or_with_legs(legless.noleg_other);
 	}
 
