@@ -8,6 +8,7 @@
 . "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
+. "$HERE/lib.sh"
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 # A fresh directory every run - never removed recursively
 T=$S/admin_$(date +%s)
@@ -15,7 +16,10 @@ BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 PORT=18720
 STEAM_ID=steam_7656119000000$(printf '%04d' $((RANDOM % 10000)))
 [ -n "$BROKER_URL" ] && [ -n "$BROKER_PUBLIC_KEY" ] || { echo "start broker.sh and export BROKER_URL, BROKER_PUBLIC_KEY"; exit 1; }
+if ss -tuln | grep -q ":$PORT "; then echo "port $PORT busy, abort"; exit 1; fi
+DISP=$(free_display 96)
 mkdir -p $T/alice/user/.keys $T/alice/user/conf.d
+cleanup_on_exit $T
 echo "hypersomnia-key-v1:$(openssl rand -hex 32)" > $T/alice/user/.keys/account.key
 ID_A=$(python3 - $T/alice/user/.keys/account.key <<'PY'
 import sys
@@ -38,21 +42,23 @@ cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
 
 start_client() {
 	local out=$1; shift
-	(cd $REPO/hypersomnia && DISPLAY=:96 setsid timeout 120 $BIN "$@" --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/$out 2>&1 < /dev/null &)
+	(cd $REPO/hypersomnia && DISPLAY=:$DISP setsid timeout 120 $BIN "$@" --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/$out 2>&1 < /dev/null &)
 }
+# its --connect comes before --appdata-dir: matched by the dir alone
 stop_client() {
 	for p in $(pgrep -f -- "--appdata-dir $T/alice "); do kill $p; done
-	sleep 2
+	wait_until 10 gone "--appdata-dir $T/alice "
 }
 
-(setsid Xvfb :96 -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &)
-sleep 1
+timeout 300 Xvfb :$DISP -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &
+cleanup_also $!
+wait_until 5 test -e /tmp/.X$DISP-lock
 start_client first.out
-for i in $(seq 1 40); do grep -q "identity cert for steam_" $T/first.out 2>/dev/null && break; sleep 1; done
+wait_until 40 grep -q "identity cert for steam_" $T/first.out
 sleep 2
 for i in $(seq 1 10); do
 	[ -f $T/alice/user/.keys/steam_cert.json ] && break
-	DISPLAY=:96 python3 "$HERE/xinput.py" click 493 472
+	DISPLAY=:$DISP python3 "$HERE/xinput.py" click 493 472
 	sleep 1
 done
 echo "first start: steam_cert.json: $([ -f $T/alice/user/.keys/steam_cert.json ] && echo yes || echo no)"
@@ -69,15 +75,15 @@ run_case() {
   "server_private": { "identity_broker_public_keys": ["$BROKER_PUBLIC_KEY"], "server_password": "secretpw", "admin_profiles": $profiles } }
 J
 	(cd $REPO/hypersomnia && setsid timeout 60 $BIN --dedicated-server --appdata-dir $D $GAME_TEST_FLAGS > $D.out 2>&1 < /dev/null &)
-	sleep 6
+	wait_listening $D.out
 	start_client $name.out --connect 127.0.0.1:$PORT
-	sleep 15
+	# decided: told the password is wrong, or in the game
+	wait_until 30 grep -a -q -E "Wrong password|Adding alice to game state" $D.out
 	echo "== case $name: $(grep -a -c 'Wrong password' $D.out) wrong password, $(grep -a -c 'Authenticated' $D.out) authenticated"
 	stop_client
 	for p in $(pgrep -f -- "--appdata-dir $D "); do kill $p; done
-	sleep 2
+	wait_until 10 gone "--appdata-dir $D "
 }
 
 run_case A "[ { \"account\": \"$STEAM_ID\", \"rcon\": \"MASTER_RCON\" } ]"
 run_case B "[ { \"account\": \"$STEAM_ID\", \"rcon\": \"MASTER_RCON\" }, { \"account\": \"$ID_A\", \"rcon\": \"MASTER_RCON\" } ]"
-for p in $(pgrep -f -- "Xvfb :96"); do kill $p; done

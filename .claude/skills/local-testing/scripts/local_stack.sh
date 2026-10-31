@@ -9,14 +9,16 @@ export VISUAL=true
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
-T=$S/local_stack
+# Each start in a fresh directory (never removed recursively); stop finds them all by the prefix
+TS=$S/local_stack
+T=$TS.$(date +%s)
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 WEB_BUILD=${1:-$REPO/build/Release-Web-clang-claude-web}
 HOURS=${2:-2}
 
 stop() {
-	for p in $(pgrep -f "^(timeout [0-9]+ )?(nice -n 10 )?$BIN --.* --appdata-dir $T/"); do kill $p; done
-	for p in $(pgrep -f "webserve.py $T/web"); do kill $p; done
+	for p in $(pgrep -f "^(timeout [0-9]+ )?(nice -n 10 )?$BIN --.* --appdata-dir $TS\.[0-9]+/"); do kill $p; done
+	for p in $(pgrep -f "webserve.py $TS\.[0-9]+/web"); do kill $p; done
 	"$HERE/broker.sh" stop
 }
 
@@ -33,7 +35,6 @@ for port in 18000 18410 18420 18430 10002 10004 8765 13500; do
 	if ss -tulpn 2>/dev/null | grep -q ":$port\b"; then echo "port $port busy, abort"; exit 1; fi
 done
 
-rm -rf $T
 mkdir -p $T/official_servers.d
 eval "$(OFFICIAL_SERVERS_DIR=$T/official_servers.d "$HERE/broker.sh" start | grep -E '^BROKER_(URL|PUBLIC_KEY)=')"
 

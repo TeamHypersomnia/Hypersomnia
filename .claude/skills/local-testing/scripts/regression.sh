@@ -1,6 +1,6 @@
 #!/bin/bash
 # The regression suite after any change to networking, accounts, servers or the site: every check below, one after
-# another, in a fresh scratch directory, then a PASS/FAIL table. Exit code 0 only if all passed. About 15 minutes.
+# another, in a fresh scratch directory, then a PASS/FAIL table. Exit code 0 only if all passed. About 13 minutes.
 #
 #   regression.sh                 the local checks
 #   SOAK=1 regression.sh          + the netcode soak (~9000 connections, ~35 min)
@@ -10,10 +10,11 @@
 #
 # Builds first: the Debug build in build/Debug-x64-clang-claude (BIN=...). REMOTE also needs the Ubuntu 22.04 headless
 # build and the web build (build_headless_ubuntu2204.sh, build_web.sh) - it uploads them.
-# Uses ports 13500 (the scratch site), 18000-18760 and 19000-19760; checks they are free.
+# Uses ports 13500 (the scratch site), 17000-17260, 18000-18760 and 19000-19760; checks they are free.
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
-export ALSOFT_DRIVERS=null VISUAL=true
+. "$HERE/test_env.sh"
+BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 # Short: the clients' downloaded maps lie deep inside, and the game refuses too long paths ("Absolute resolved file path
 # is too long") - a scratchpad under /tmp/claude-.../ is already too long for the ranked corners.
 ROOT=${SCRATCH_ROOT:-/tmp/hsreg}
@@ -35,7 +36,8 @@ run() {
 	local name=$1 secs=$2; shift 2
 	echo "=== $name"
 	local start=$(date +%s)
-	( cd $HERE && timeout $secs "$@" ) > $LOG/$name.log 2>&1
+	# SIGTERM at the time (the scenario's own cleanup runs then), SIGKILL 20 s later if it still hangs
+	( cd $HERE && timeout --kill-after=20 $secs "$@" ) > $LOG/$name.log 2>&1
 	LAST_EXIT=$?
 	LAST_SECS=$(( $(date +%s) - start ))
 }
@@ -54,11 +56,15 @@ check() {
 has() { grep -a -q -E "$2" "$LOG/$1.log"; }
 count_is() { [ "$(grep -a -c -E "$2" "$LOG/$1.log")" = "$3" ]; }
 
-for port in 13500 18000 18410 18420 18430 18710 18720 10002; do
+for port in 13500 18000 18410 18420 18430 18710 18720 10002 10040 10042 10070 10080 17000 17100 17110; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port is busy - stop what uses it first"; exit 1; fi
 done
 
 # --- the scratch site (broker, match reports) ---
+
+# Ctrl+C or a kill: the scratch site stopped too - left on 13500 it fails the next run's port check
+trap 'timeout 60 $HERE/broker.sh stop > /dev/null 2>&1' EXIT
+trap 'exit 130' INT TERM
 
 openssl rand -hex 32 > $SCRATCH/session_secret
 export SESSION_SECRET=$(cat $SCRATCH/session_secret)
@@ -70,6 +76,11 @@ printf 'BROKER_URL=%s\nBROKER_PUBLIC_KEY=%s\n' "$BROKER_URL" "$BROKER_PUBLIC_KEY
 SITE=$SCRATCH/broker_site
 
 # --- the checks ---
+
+if wanted unit_tests; then
+	run unit_tests 300 bash -c "cd $REPO/hypersomnia && xvfb-run -d $BIN --unit-tests-only $GAME_TEST_FLAGS"
+	check unit_tests [ $LAST_EXIT = 0 ]
+fi
 
 if wanted netcode; then
 	run netcode 600 bash -c "Y=$REPO/src/3rdparty/yojimbo; cd $SCRATCH && printf 'void netcode_test(void);int netcode_init(void);void netcode_term(void);int main(void){netcode_init();netcode_test();netcode_term();return 0;}' > nct.c && clang -O1 -DNETCODE_ENABLE_TESTS=1 -DNETCODE_DEBUG=1 -I\$Y/netcode -I\$Y/include nct.c \$Y/netcode/netcode.c -lsodium -lm -o nctest && stdbuf -oL ./nctest"
@@ -92,13 +103,15 @@ if wanted link_flow; then
 fi
 
 if wanted password_limit; then
-	run password_limit 300 ./scenario_password_limit.sh
-	check password_limit bash -c "grep -a -q -E '5 \(reason=Wrong password' $LOG/password_limit.log && grep -a -q -E '2 \(reason=Too many wrong passwords' $LOG/password_limit.log"
+	run password_limit 400 ./scenario_password_limit.sh
+	check password_limit bash -c "grep -a -q -E '5 \(reason=Wrong password' $LOG/password_limit.log && grep -a -q -E '2 \(reason=Too many wrong passwords' $LOG/password_limit.log && grep -a -q -E '^lan: (Wrong password|SKIP)' $LOG/password_limit.log"
 fi
 
 if wanted keys; then
 	run keys 400 ./scenario_keys.sh
-	check keys count_is keys "Authenticated" 3
+	# in, not only authenticated (a server could still refuse after it): the public vars came to all three; the official
+	# two listed as such; account.key private
+	check keys bash -c "[ \$(grep -a -c 'Authenticated' $LOG/keys.log) = 3 ] && [ \$(grep -a -c 'Received initial public vars' $LOG/keys.log) = 3 ] && [ \$(grep -a -c 'official= True' $LOG/keys.log) = 2 ] && [ \$(grep -a -c ': 600\$' $LOG/keys.log) = 3 ]"
 fi
 
 if wanted admin; then
@@ -110,6 +123,34 @@ fi
 if wanted ranked_report; then
 	run ranked_report 400 ./scenario_ranked_report.sh
 	check ranked_report has ranked_report "delivered \(HTTP 200\)"
+fi
+
+if wanted outage; then
+	run outage 200 ./scenario_outage.sh
+	# no masterserver, no broker: a self-signed cert plays casual and ranked
+	check outage bash -c "[ \$(grep -a -c 'Received initial state' $LOG/outage.log) = 2 ]"
+fi
+
+if wanted webrtc_ranked; then
+	run webrtc_ranked 200 ./scenario_webrtc_ranked.sh
+	check webrtc_ranked has webrtc_ranked "=== result: in over WebRTC"
+fi
+
+if wanted webrtc_crowd; then
+	run webrtc_crowd 240 ./scenario_webrtc_crowd.sh 6
+	check webrtc_crowd bash -c "grep -a -A1 'started together: in game' $LOG/webrtc_crowd.log | tail -1 | grep -q '^6\$' && grep -a -A1 'refused for too many' $LOG/webrtc_crowd.log | tail -1 | grep -q '^0\$'"
+fi
+
+if wanted handshake_limit; then
+	run handshake_limit 200 bash -c "./soak/build_soak.sh && ./soak/scenario_handshake_limit.sh"
+	# hit from the LAN address, the same address in again a moment later, loopback never limited (or no LAN address)
+	check handshake_limit bash -c "grep -a -q '^SKIP: no LAN address' $LOG/handshake_limit.log || { grep -a -q -E 'refusals logged: [1-9]' $LOG/handshake_limit.log && grep -a -q 'done: 10 cycles, 10 connected, 0 abandoned mid-handshake, 0 failed' $LOG/handshake_limit.log && grep -a -q 'done: 200 cycles, 200 connected, 0 abandoned mid-handshake, 0 failed' $LOG/handshake_limit.log; }"
+fi
+
+# servers never quietly stop taking players: real games on a server of 1 slot, every way of leaving
+if wanted slot_reuse; then
+	run slot_reuse 1500 ./scenario_slot_reuse.sh
+	check slot_reuse has slot_reuse "^[1-9][0-9]* passed, 0 failed$"
 fi
 
 for c in broker_down unlink; do
@@ -133,8 +174,6 @@ if [ -n "$REMOTE" ] && wanted remote; then
 	run remote 1800 ./remote_e2e/regression_remote.sh
 	check remote has remote "^REMOTE: all passed"
 fi
-
-timeout 60 $HERE/broker.sh stop > /dev/null 2>&1
 
 # --- the table ---
 

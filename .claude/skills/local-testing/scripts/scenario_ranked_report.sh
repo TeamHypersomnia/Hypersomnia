@@ -19,6 +19,7 @@
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
+. "$HERE/lib.sh"
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 # A fresh directory every run - never removed recursively
 T=$S/ranked_report_$(date +%s)
@@ -27,23 +28,10 @@ BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 if ss -tuln | grep -q ":10060 "; then echo "port 10060 busy, abort"; exit 1; fi
 
 mkdir -p $T/server/user/conf.d $T/server/user/downloads/maps
+cleanup_on_exit $T
 
 # The test map: a copy of de_cyberaqua with tiny rules
-A=$T/server/user/downloads/maps/de_e2e_short
-cp -r $REPO/hypersomnia/content/arenas/de_cyberaqua $A
-mv $A/de_cyberaqua.json $A/de_e2e_short.json
-rm -f $A/last_saved.json $A/editor_view.json
-python3 - $A/de_e2e_short.json ${MAX_TEAM_SCORE:-2} ${ROUND_TIME:-5} <<'PY'
-import json, sys
-p = sys.argv[1]
-d = json.load(open(p))
-d['meta']['name'] = 'de_e2e_short'
-d['game_modes']['bomb_defusal'].update({
-	'max_team_score': int(sys.argv[2]), 'warmup_time': 0, 'freeze_time': 1, 'buy_time': 1,
-	'round_time': int(sys.argv[3]), 'round_end_time': 1.0, 'default_bot_quota': 0
-})
-json.dump(d, open(p, 'w'), indent=1)
-PY
+short_ranked_map $T/server/user/downloads/maps ${MAX_TEAM_SCORE:-2} ${ROUND_TIME:-5}
 
 account_id() {
 	mkdir -p $T/$1/user/.keys
@@ -78,7 +66,7 @@ KEY=$($BIN --dedicated-server --print-server-key --appdata-dir $T/server 2>/dev/
 [ -z "$UNOFFICIAL" ] && echo "$KEY" > $S/broker_site/private/official_servers.d/e2e
 
 timeout 180 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
-sleep 8
+wait_listening $T/server.out
 
 AVATAR_JSON=""
 [ -n "$AVATAR" ] && AVATAR_JSON=", \"avatar_image_path\": \"$AVATAR\""
@@ -92,11 +80,14 @@ done
 
 # Each client in its own Xvfb, clicking Auto-assign (the faction window's button at 585,430 in 1280x720) a few times as it loads
 DISPLAYS=""
-for c in alice:86 bob:87; do
+D_A=$(free_display 86)
+D_B=$(free_display $((D_A + 1)))
+for c in alice:$D_A bob:$D_B; do
 	name=${c%%:*}; d=${c##*:}
-	Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 &
+	timeout 300 Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 &
 	DISPLAYS="$DISPLAYS $!"
-	sleep 1
+	cleanup_also $!
+	wait_until 5 test -e /tmp/.X$d-lock
 	CBIN=$BIN
 	[ "$name" = bob ] && [ -n "$STEAM_BOB" ] && CBIN=$REPO/build/Debug-x64-clang-claude-steam/Hypersomnia
 
@@ -116,11 +107,13 @@ J
 	fi
 done
 
+# Auto-assign until the match starts (at most 6 tries, 5 s apart)
 for t in 1 2 3 4 5 6; do
-	sleep 5
-	for d in 86 87; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
-	[ $t = 4 ] && for d in 86 87; do DISPLAY=:$d import -window root $T/joined_$d.png; done
+	wait_until 5 grep -q "Starting ranked\.$" $T/server.out && break
+	for d in $D_A $D_B; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
 done
+
+for d in $D_A $D_B; do DISPLAY=:$d import -window root $T/joined_$d.png; done
 
 if [ -n "$REJOIN" ]; then
 	kill -9 $(pgrep -f "^$BIN --connect 127.0.0.1:10060 --appdata-dir $T/alice ")
@@ -128,9 +121,9 @@ if [ -n "$REJOIN" ]; then
 	sleep ${REJOIN_AFTER:-5}
 	# No --connect: user/ranked_match.json brings the game back to the match by itself, on the account it was played on
 	echo "alice's ranked_match.json: $(cat $T/alice/user/ranked_match.json 2>/dev/null | sed 's/key_[0-9a-f]\{56\}/key_.../')"
-	(cd $REPO/hypersomnia && DISPLAY=:86 timeout 150 $BIN --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/alice_rejoin.out 2>&1 &)
+	(cd $REPO/hypersomnia && DISPLAY=:$D_A timeout 150 $BIN --appdata-dir $T/alice $GAME_TEST_FLAGS --mute > $T/alice_rejoin.out 2>&1 &)
 	echo "alice rejoins at $(date +%T)"
-	for t in 4 8 12; do sleep 4; DISPLAY=:86 import -window root $T/rejoin_$t.png; done
+	for t in 4 8 12; do sleep 4; DISPLAY=:$D_A import -window root $T/rejoin_$t.png; done
 fi
 
 for i in $(seq 1 140); do
@@ -140,9 +133,9 @@ done
 
 if [ -n "$ALICE_FROM_MENU" ]; then
 	sleep 3
-	DISPLAY=:86 python3 "$HERE/xinput.py" key Escape; sleep 2
-	DISPLAY=:86 python3 "$HERE/xinput.py" click 179 613; sleep 6
-	DISPLAY=:86 import -window root $T/alice_menu_after.png
+	DISPLAY=:$D_A python3 "$HERE/xinput.py" key Escape; sleep 2
+	DISPLAY=:$D_A python3 "$HERE/xinput.py" click 179 613; sleep 6
+	DISPLAY=:$D_A import -window root $T/alice_menu_after.png
 	echo "alice's leaderboards downloads (2 expected - at start and after the ranked match): $(grep -c 'Launching future_response' $T/alice.out)"
 fi
 

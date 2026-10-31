@@ -9,12 +9,13 @@
 #   that account. unlink - nothing holds the Steam cert for the match any more: alice rejoins with it only if she connects
 #   before the broker says the key is unlinked; otherwise the server refuses her key account (an accepted loss, two rare events).
 # Needs broker.sh running (BROKER_URL, BROKER_PUBLIC_KEY exported, SCRATCH as for broker.sh).
-# Resources: port 18710 (+ WebRTC 19710-19715), broker proxy 13710, displays :96 :97.
+# Resources: port 18710 (+ WebRTC 19710-19715), broker proxy 13710, the first two free displays from :96.
 # Usage: CASE=unlink|broker_down [ROUND_TIME=15] scenario_ranked_corners.sh
 . "$(dirname "$0")/test_env.sh"
 umask 077
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
+. "$HERE/lib.sh"
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 # A fresh directory every run - never removed recursively
 T=$S/ranked_corners_${CASE:-unlink}_$(date +%s)
@@ -24,24 +25,14 @@ PROXY=13710
 STEAM_ID=steam_7656119000000$(printf '%04d' $((RANDOM % 10000)))
 [ -n "$BROKER_URL" ] && [ -n "$BROKER_PUBLIC_KEY" ] || { echo "start broker.sh and export BROKER_URL, BROKER_PUBLIC_KEY"; exit 1; }
 for p in $PORT $PROXY; do if ss -tuln | grep -q ":$p "; then echo "port $p busy, abort"; exit 1; fi; done
+# alice's and bob's displays: the first two free from 96
+D_A=$(free_display 96)
+D_B=$(free_display $((D_A + 1)))
 
 mkdir -p $T/server/user/conf.d $T/server/user/downloads/maps
+cleanup_on_exit $T
 
-A=$T/server/user/downloads/maps/de_e2e_short
-cp -r $REPO/hypersomnia/content/arenas/de_cyberaqua $A
-mv $A/de_cyberaqua.json $A/de_e2e_short.json
-rm -f $A/last_saved.json $A/editor_view.json
-python3 - $A/de_e2e_short.json 2 ${ROUND_TIME:-15} <<'PY'
-import json, sys
-p = sys.argv[1]
-d = json.load(open(p))
-d['meta']['name'] = 'de_e2e_short'
-d['game_modes']['bomb_defusal'].update({
-	'max_team_score': int(sys.argv[2]), 'warmup_time': 0, 'freeze_time': 1, 'buy_time': 1,
-	'round_time': int(sys.argv[3]), 'round_end_time': 1.0, 'default_bot_quota': 0
-})
-json.dump(d, open(p, 'w'), indent=1)
-PY
+short_ranked_map $T/server/user/downloads/maps 2 ${ROUND_TIME:-15}
 
 account_id() {
 	mkdir -p $T/$1/user/.keys
@@ -81,11 +72,12 @@ KEY=$($BIN --dedicated-server --print-server-key --appdata-dir $T/server 2>/dev/
 echo "$KEY" > $S/broker_site/private/official_servers.d/corners
 
 # The broker as alice sees it: a proxy that can be stopped
-(setsid python3 "$HERE/identity_ui/slow_broker.py" $PROXY 0 > $T/proxy.out 2>&1 < /dev/null &)
-sleep 1
+timeout 400 python3 "$HERE/identity_ui/slow_broker.py" $PROXY 0 > $T/proxy.out 2>&1 < /dev/null &
+cleanup_also $!
+wait_until 10 bash -c "ss -tln | grep -q ':$PROXY '"
 
 timeout 300 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
-sleep 8
+wait_listening $T/server.out
 
 mkdir -p $T/alice/user/conf.d $T/bob/user/conf.d
 echo "{ \"identity_broker_url\": \"http://127.0.0.1:$PROXY\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"alice\" },
@@ -97,41 +89,43 @@ start_client() {
 	(cd $REPO/hypersomnia && DISPLAY=:$d setsid timeout 280 $BIN "$@" --appdata-dir $T/$name $GAME_TEST_FLAGS --mute > $T/$out 2>&1 < /dev/null &)
 }
 
-for d in 96 97; do (setsid Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &); done
-sleep 1
+for d in $D_A $D_B; do
+	timeout 400 Xvfb :$d -screen 0 1280x720x24 > /dev/null 2>&1 < /dev/null &
+	cleanup_also $!
+	wait_until 5 test -e /tmp/.X$d-lock
+done
 
 # alice first gets her Steam cert (the proxy is up) - a key put in by hand is asked about once (as an import) -
 # and only then joins, as the Steam account
 # Settings where identity_ui's screenshots have them - the modal's [Link] at 493,472
 cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
-start_client alice 96 alice_first.out
+start_client alice $D_A alice_first.out
 # The game asks whether the Steam account linked elsewhere is hers - [Link] (centered modal) saves steam_cert.json
-for i in $(seq 1 40); do grep -q "identity cert for steam_" $T/alice_first.out 2>/dev/null && break; sleep 1; done
+wait_until 40 grep -q "identity cert for steam_" $T/alice_first.out
 sleep 2
 for i in $(seq 1 10); do
 	[ -f $T/alice/user/.keys/steam_cert.json ] && break
-	DISPLAY=:96 python3 "$HERE/xinput.py" click 493 472
+	DISPLAY=:$D_A python3 "$HERE/xinput.py" click 493 472
 	sleep 1
 done
 echo "alice's first start: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice_first.out | tail -1), steam_cert.json: $([ -f $T/alice/user/.keys/steam_cert.json ] && echo yes || echo no)"
 for p in $(pgrep -f -- "Hypersomnia --appdata-dir $T/alice "); do kill $p; done
-sleep 2
-start_client alice 96 alice.out --connect 127.0.0.1:$PORT
-start_client bob 97 bob.out --connect 127.0.0.1:$PORT
+wait_until 10 gone "Hypersomnia --appdata-dir $T/alice "
+start_client alice $D_A alice.out --connect 127.0.0.1:$PORT
+start_client bob $D_B bob.out --connect 127.0.0.1:$PORT
 
 # Auto-assign in the faction window until the match starts (at most 6 tries, 5 s apart)
 for t in 1 2 3 4 5 6; do
-	sleep 5
-	for d in 96 97; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
-	grep -q "Starting ranked\.$" $T/server.out && break
+	wait_until 5 grep -q "Starting ranked\.$" $T/server.out && break
+	for d in $D_A $D_B; do DISPLAY=:$d python3 "$HERE/xinput.py" click 585 430; done
 done
 
-for i in $(seq 1 30); do grep -q "Starting ranked\.$" $T/server.out && break; sleep 1; done
+wait_until 30 grep -q "Starting ranked\.$" $T/server.out
 # the rejoin record is written every 10 s of a match - killed before it, there is nothing to rejoin
-for i in $(seq 1 25); do [ -s $T/alice/user/ranked_match.json ] && break; sleep 1; done
+wait_until 25 test -s $T/alice/user/ranked_match.json
 echo "alice's cert: $(grep -o 'identity cert for [a-z_0-9]*' $T/alice.out | tail -1)"
 echo "alice's ranked_match.json: $(cat $T/alice/user/ranked_match.json 2>/dev/null)"
-DISPLAY=:96 import -window root $T/live.png
+DISPLAY=:$D_A import -window root $T/live.png
 
 case ${CASE:-unlink} in
 unlink)
@@ -148,17 +142,17 @@ for p in $(pgrep -f -- "Hypersomnia --connect 127.0.0.1:$PORT --appdata-dir $T/a
 echo "alice killed at $(date +%T)"
 # REJOIN_AFTER=0: back before the server counts her as gone - told "match in progress" at first, the rejoin tries again
 sleep ${REJOIN_AFTER:-5}
-start_client alice 96 alice_rejoin.out
+start_client alice $D_A alice_rejoin.out
 echo "alice started again at $(date +%T)"
-for t in 4 8 12 16; do sleep 4; DISPLAY=:96 import -window root $T/rejoin_$t.png; done
+for t in 4 8 12 16; do sleep 4; DISPLAY=:$D_A import -window root $T/rejoin_$t.png; done
 
 # STRANGER=1: someone not in the match tries to join it - told the match is in progress
 if [ -n "$STRANGER" ]; then
 	mkdir -p $T/carol/user/conf.d
 	echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"carol\" } }" > $T/carol/user/conf.d/test.json
-	start_client carol 97 carol.out --connect 127.0.0.1:$PORT
-	sleep 15
-	DISPLAY=:97 import -window root $T/stranger.png
+	start_client carol $D_B carol.out --connect 127.0.0.1:$PORT
+	wait_until 30 grep -q "A match is being played there" $T/carol.out
+	DISPLAY=:$D_B import -window root $T/stranger.png
 	echo "=== the stranger: $(grep -ao 'A match is being played there[^.]*' $T/carol.out | head -1)"
 fi
 
@@ -174,7 +168,4 @@ grep -hE "Authenticated|Starting ranked|abandon|delivered|refused|ERROR" $T/serv
 echo "=== site (alice's Steam account $STEAM_ID, alice's key ${ID_A:0:12}…, bob ${ID_B:0:12}…)"
 "$HERE/broker.sh" sql "SELECT account_id, round(mmr,2) AS mmr, matches_won, matches_lost FROM mmr_team WHERE account_id IN ('$ID_A', '$ID_B', '$STEAM_ID')"
 
-for p in $(pgrep -f -- "--appdata-dir $T/"); do kill $p; done
-for p in $(lsof -ti tcp:$PROXY -sTCP:LISTEN); do kill $p; done
-for d in 96 97; do for p in $(pgrep -f "^Xvfb :$d "); do kill $p; done; done
 rm -f $S/broker_site/private/official_servers.d/corners

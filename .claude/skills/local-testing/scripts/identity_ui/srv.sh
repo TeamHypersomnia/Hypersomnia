@@ -3,13 +3,16 @@
 #   SERVER_EXTRA / PRIVATE_EXTRA: more JSON fields for "server" / "server_private", each starting with a comma, e.g.
 #   PRIVATE_EXTRA=', "admin_profiles": [ { "account": "key_..", "rcon": "RCON" } ]'
 . "$(dirname "$0")/../test_env.sh"
+. "$(dirname "$0")/../lib.sh"
 S=${SCRATCH_ROOT:-/tmp/hypersomnia-ui}
 BIN=${BIN:-$(cd "$(dirname "$0")/../../../../.." && pwd)/build/Debug-x64-clang-claude/Hypersomnia}
 eval "$(cat $S/nettest/broker_env)"
 cmd=$1; name=$2; port=$3; when=${4:-NEVER}
-T=$S/srv/$name
-if [ "$cmd" = stop ]; then for p in $(pgrep -f "^$BIN --dedicated-server --appdata-dir $T "); do kill $p; done; exit; fi
-rm -rf $T; mkdir -p $T/user/conf.d
+# every start a fresh dir - a new server key (never removed recursively); stop finds them by the prefix
+if [ "$cmd" = stop ]; then for p in $(pgrep -f "^$BIN --dedicated-server --appdata-dir $S/srv/$name\.[0-9]+ "); do kill $p; done; exit; fi
+T=$S/srv/$name.$(date +%s%N)
+mkdir -p $T/user/conf.d
+echo "server dir: $T, log: $T.out"
 # BROKER_KEYS_JSON='[]': a server trusting no broker
 broker_keys=${BROKER_KEYS_JSON:-"[\"$BROKER_PUBLIC_KEY\"]"}
 cat > $T/user/conf.d/test.json <<J
@@ -19,4 +22,4 @@ cat > $T/user/conf.d/test.json <<J
   "server_private": { "identity_broker_public_keys": $broker_keys ${PRIVATE_EXTRA:-} } }
 J
 (cd $(cd "$(dirname "$0")/../../../../.." && pwd)/hypersomnia && setsid timeout ${SECS:-3000} $BIN --dedicated-server --appdata-dir $T $GAME_TEST_FLAGS > $T.out 2>&1 < /dev/null &)
-sleep 5
+wait_listening $T.out

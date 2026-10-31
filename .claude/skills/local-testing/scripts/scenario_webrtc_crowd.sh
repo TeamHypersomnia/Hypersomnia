@@ -5,6 +5,7 @@
 . "$(dirname "$0")/test_env.sh"
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../../../.." && pwd)
+. "$HERE/lib.sh"
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 T=$S/webrtc_crowd
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
@@ -16,6 +17,7 @@ done
 
 # a fresh folder each run (never rm -rf)
 T=$T.$(date +%s%N)
+cleanup_on_exit $T
 mk() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 mk ms <<J
 { "masterserver": { "ip": "127.0.0.1", "signalling_server_port": 18000, "first_udp_command_port": 18430, "num_udp_command_ports": 1,
@@ -29,7 +31,7 @@ J
 
 cd $REPO/hypersomnia
 timeout 300 $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
-sleep 3
+wait_until 20 curl -sf --max-time 1 http://127.0.0.1:18420/server_list_json
 timeout 290 $BIN --dedicated-server --appdata-dir $T/srv $GAME_TEST_FLAGS > $T/srv.out 2>&1 &
 
 ID=""
@@ -39,21 +41,24 @@ import json,sys
 for e in json.load(sys.stdin):
     if e['name']=='WebRTC crowd' and e.get('browser_connect_string'): print(e['browser_connect_string'])" 2>/dev/null)
 	[ -n "$ID" ] && break
-	sleep 2
+	sleep 1
 done
 [ -n "$ID" ] || { echo "the server never showed up"; exit 1; }
 
 for i in $(seq 1 $N); do
 	mk c$i <<J
 { "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:18420/server_list", "webrtc_signalling_server_url": "ws://127.0.0.1:18000",
-  "client": { "nickname": "crowd$i" } }
+  "window": { "fullscreen": false, "size": [480, 270] }, "client": { "nickname": "crowd$i" } }
 J
-	timeout 90 xvfb-run -a $BIN --connect rtc:$ID --appdata-dir $T/c$i $GAME_TEST_FLAGS --mute > $T/c$i.out 2>&1 &
+	# small and on few threads: N Debug games at once must not starve each other
+	LP_NUM_THREADS=2 timeout 90 xvfb-run -d -s "-screen 0 640x360x24" $BIN --connect rtc:$ID --appdata-dir $T/c$i $GAME_TEST_FLAGS --mute > $T/c$i.out 2>&1 &
 done
-wait $(jobs -p | tail -n $N) 2>/dev/null
-sleep 2
+
+in_game() { grep -l "Received initial state" $T/c*.out 2>/dev/null | wc -l; }
+all_in() { [ $(in_game) -ge $N ]; }
+wait_until 80 all_in
 
 echo "=== $N clients started together: in game"
-grep -l "Received initial state" $T/c*.out | wc -l
+in_game
+echo "=== refused for too many at once (0 expected)"
 grep -hcE "connected no game client in time|Max clients" $T/srv.out
-for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done

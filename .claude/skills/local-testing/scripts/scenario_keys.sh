@@ -6,7 +6,9 @@
 # A failing game opens its failure log with $VISUAL - never in the user's editor
 export VISUAL=true
 umask 077
-REPO=$(cd "$(dirname "$0")/../../../.." && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd)
+REPO=$(cd "$HERE/../../../.." && pwd)
+. "$HERE/lib.sh"
 S=${SCRATCH:-/tmp/hypersomnia-nettest}
 mkdir -p $S
 # A fresh directory every run - never removed recursively
@@ -17,13 +19,13 @@ GAME=$REPO/hypersomnia
 BROKER_URL=${BROKER_URL:-}
 BROKER_PUBLIC_KEY=${BROKER_PUBLIC_KEY:-}
 
-for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
-sleep 1
 mkdir -p $T/official_servers.d
 
 for port in 18000 18410 18420 18430 10000 10002 10004; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port is busy - aborting"; exit 1; fi
 done
+
+[ -z "$KEEP_RUNNING" ] && cleanup_on_exit $T
 
 mkconf() { mkdir -p $T/$1/user/conf.d; cat > $T/$1/user/conf.d/test.json; }
 
@@ -70,11 +72,14 @@ EOF
 }
 
 timeout ${MS_SECS:-200} $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
-sleep 3
+wait_until 20 curl -sf --max-time 1 http://127.0.0.1:18420/server_list_json
 for s in casual_de ranked_pl community; do
 	timeout ${SERVER_SECS:-190} nice -n 10 $BIN --dedicated-server --appdata-dir $T/$s $GAME_TEST_FLAGS > $T/$s.out 2>&1 &
 done
-sleep 12
+# all three on the list (the first heartbeat ~10 s after a start), the official ones already known as such (the master
+# rescans official_servers.d every ~40 s - it was there before it started)
+list_has_3() { [ "$(curl -s --max-time 2 http://127.0.0.1:18420/server_list_json | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))' 2>/dev/null)" = 3 ]; }
+wait_until 30 list_has_3 || echo "  (not all three on the list after 30 s)"
 
 echo "=== heartbeat targets"
 grep -h "Sending heartbeat through UDP to" $T/casual_de.out $T/ranked_pl.out $T/community.out | awk '{print $7}' | sort | uniq -c
@@ -88,15 +93,19 @@ client_conf c_casual
 client_conf c_ranked
 client_conf c_community
 
+# run_client <name> <address> <secs> - until it plays (or is refused), at most <secs>
 run_client() {
-	timeout $3 xvfb-run -a nice -n 10 $BIN --connect $2 --appdata-dir $T/$1 $GAME_TEST_FLAGS --mute > $T/$1.out 2>&1
+	timeout $3 xvfb-run -d nice -n 10 $BIN --connect $2 --appdata-dir $T/$1 $GAME_TEST_FLAGS --mute > $T/$1.out 2>&1 &
+	wait_until $3 grep -q -E "Received initial state|connect failed|last_disconnect_reason|Reason" $T/$1.out
+	for p in $(pgrep -f -- "^$BIN --connect .*--appdata-dir $T/$1 "); do kill $p; done
+	wait_until 10 gone "^$BIN --connect .*--appdata-dir $T/$1 "
 }
 
-run_client c_casual 127.0.0.1:10000 ${CLIENT_SECS:-20} &
+run_client c_casual 127.0.0.1:10000 ${CLIENT_SECS:-40} &
 P1=$!
-run_client c_ranked 127.0.0.1:10002 ${CLIENT_SECS:-20} &
+run_client c_ranked 127.0.0.1:10002 ${CLIENT_SECS:-40} &
 P2=$!
-run_client c_community 127.0.0.1:10004 ${CLIENT_SECS:-20} &
+run_client c_community 127.0.0.1:10004 ${CLIENT_SECS:-40} &
 P3=$!
 wait $P1 $P2 $P3
 
@@ -118,6 +127,6 @@ done
 
 if [ -z "$KEEP_RUNNING" ]; then
 	for p in $(pgrep -f "^$BIN .*--appdata-dir $T/"); do kill $p; done
-	sleep 1
-	echo "=== leftover: $(pgrep -fc "^$BIN")"
+	wait_until 15 gone "^$BIN .*--appdata-dir $T/"
+	echo "=== leftover: $(pgrep -fc "^$BIN .*--appdata-dir $T/")"
 fi
