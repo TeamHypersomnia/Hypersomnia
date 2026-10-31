@@ -11,6 +11,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
+#include "augs/misc/timing/timer.h"
 #include "augs/window_framework/bounded_poll_events.h"
 
 /*
@@ -60,9 +61,9 @@ static void release_keys_left_down(GLFWwindow* const window) {
 		;
 
 		/*
-			Straight to the procedure of GLFW's window class, past whatever subclassed the window or hooks its messages,
-			e.g. an overlay that blocks the game's input while it is open (Steam's opens with Shift+Tab) -
-			like GLFW, which passes the release straight to its key input.
+			Straight to the procedure of GLFW's window class, past whatever subclassed the window or hooks its messages
+			(e.g. an overlay that blocks the game's input while it is open) - like GLFW, which passes the release
+			straight to its key input.
 		*/
 
 		const auto glfw_window_procedure = reinterpret_cast<WNDPROC>(GetClassLongPtrW(handle, GCLP_WNDPROC));
@@ -76,22 +77,26 @@ static void release_keys_left_down(GLFWwindow* const window) {
 	the window's center, so that a click lands in the window even if another program takes away GLFW's clip
 	(ClipCursor is one setting for the whole desktop). Each such move is one more mouse message - the very thing
 	that is slow on some machines. Instead, like SDL's relative mouse mode, the cursor is clipped to one pixel
-	at the window's center, so it cannot move at all; the raw mouse motion the game reads does not depend on it.
+	at the window's center, so it cannot move at all. The game then reads raw mouse motion, which does not depend
+	on where the cursor is - without raw motion the cursor is left alone.
 
-	The clip is checked right after the cursor gets disabled and then every 100 ms, as anything can take it away
-	(SDL2 checks every 3 s, SDL3 only on window events). A pixel that GLFW does not release is released here.
+	Like SDL3, the clip is checked again after a pump that saw the cursor move, which a pinned cursor cannot,
+	and also every 100 ms (SDL2 checks every 3 s). A pixel that GLFW does not release is released here.
+	Like SDL, only the foreground window locks: a window can be active in its own thread while another program
+	is in front.
 */
 
-static void lock_disabled_cursor(GLFWwindow* const window) {
+static void lock_disabled_cursor(GLFWwindow* const window, const bool cursor_moved) {
 	static auto lock = RECT();
 	static auto locked = false;
-	static auto last_check = LARGE_INTEGER();
+	static auto since_check = augs::timer();
 
 	const auto handle = glfwGetWin32Window(window);
 
 	const bool should_lock =
 		glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED
-		&& GetActiveWindow() == handle
+		&& glfwGetInputMode(window, GLFW_RAW_MOUSE_MOTION) == GLFW_TRUE
+		&& GetForegroundWindow() == handle
 		&& !IsIconic(handle)
 	;
 
@@ -109,19 +114,13 @@ static void lock_disabled_cursor(GLFWwindow* const window) {
 		return;
 	}
 
-	auto now = LARGE_INTEGER();
-	auto frequency = LARGE_INTEGER();
-
-	QueryPerformanceCounter(&now);
-	QueryPerformanceFrequency(&frequency);
-
-	const bool check_due = !locked || now.QuadPart - last_check.QuadPart >= frequency.QuadPart / 10;
+	const bool check_due = !locked || cursor_moved || since_check.get<std::chrono::milliseconds>() >= 100.0;
 
 	if (!check_due) {
 		return;
 	}
 
-	last_check = now;
+	since_check.reset();
 
 	auto client = RECT();
 
@@ -136,7 +135,7 @@ static void lock_disabled_cursor(GLFWwindow* const window) {
 		Over Remote Desktop the cursor wobbles by a pixel - SDL leaves it 2 pixels of room there.
 	*/
 
-	const LONG remote_desktop_room = GetSystemMetrics(SM_REMOTESESSION) ? 2 : 0;
+	const auto remote_desktop_room = static_cast<LONG>(GetSystemMetrics(SM_REMOTESESSION) ? 2 : 0);
 
 	lock = RECT { center.x - remote_desktop_room, center.y, center.x + 1 + remote_desktop_room, center.y + 1 };
 	locked = true;
@@ -161,6 +160,7 @@ namespace augs {
 		const auto budget_ticks = static_cast<LONGLONG>(budget_ms * static_cast<double>(frequency.QuadPart) / 1000.0);
 
 		MSG msg;
+		auto cursor_moved = false;
 
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (msg.message == WM_QUIT) {
@@ -171,6 +171,10 @@ namespace augs {
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
 			}
 			else {
+				if (msg.message == WM_MOUSEMOVE) {
+					cursor_moved = true;
+				}
+
 				TranslateMessage(&msg);
 				DispatchMessageW(&msg);
 			}
@@ -184,7 +188,7 @@ namespace augs {
 		}
 
 		::release_keys_left_down(window);
-		::lock_disabled_cursor(window);
+		::lock_disabled_cursor(window, cursor_moved);
 	}
 
 	void wait_for_messages() {
