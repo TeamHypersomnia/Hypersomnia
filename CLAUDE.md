@@ -361,6 +361,10 @@ From `hypersomnia/` (the game reads its config relative to the working directory
   maps and game modes) first went into `work.cpp` as about 120 lines in two places. Now it is all in
   `src/application/setups/server/server_config_check.h` (`check_server_config`, `check_tournament_maps`), and `work.cpp`
   keeps only two calls that pass in the config layers, the default config path, the admins and the flags.
+  The same goes for tests and test tooling: test-only code (a test map's node behavior, debug hooks, test helpers)
+  goes into its own header or script, included only where it is needed - never spread over the files it tests.
+  Example: the editor's Missile node fires as if from its gun via `src/application/arena/missile_node_shot.h`,
+  `build_arena_from_editor_project.hpp` keeps one call.
 
 - Separate generic algorithmic logic (BFS, A*, sorting, etc.) into `augs/algorithm/` headers. Game-specific code should call these generic functions with appropriate parameters. This keeps algorithms reusable and testable independent of game code.
 

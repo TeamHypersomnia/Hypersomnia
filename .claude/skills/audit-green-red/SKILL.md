@@ -37,9 +37,13 @@ Same format as the `audit-gameplay` template, with two extra fields per item:
 `[color, severity, title, where, problem, fix, state]` - `color` is `"g"` or `"r"`, `state` is `"fixed"` or `"todo"`.
 For `fixed` items, the fix field says what was changed.
 
-Also set the title, the header line (date, scope) and a new `DONE_KEY` per audit. Numbers are unique across the whole report, Top included
-(see `audit-gameplay`'s Report format) - never repeat a number; the chat summary uses the same numbers. Order the items in each system
-red first (most severe first), then green. `TOP` = the worst red findings.
+Also set the title, the header line (date, scope) and a new `DONE_KEY` per audit. There is no `TOP`: the first tab,
+"Czerwone", lists every red finding by itself. The script numbers the findings: the red ones 1 to R through the systems
+in order, then the green ones - so the reds always read 1, 2, 3... with no gaps, and one number names one finding.
+The chat summary uses the same numbers. Order the items in each system most severe first.
+
+A red finding the user has settled stays red with its state - `fixed` when done, `todo` while open; when listing
+the findings the user hasn't answered yet, publish a report of just those (they get 1..x again).
 
 Write it in the user's language. Save it to `~/Downloads/audit-<topic>.html` and open it (`firefox <path> &`).
 In the chat: counts (green fixed / red to decide) and the red findings one line each.
