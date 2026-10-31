@@ -8,6 +8,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
@@ -1054,11 +1055,16 @@ namespace augs {
 
 	void window::wait_events() {
 		/*
-			XCB has no wait that another thread could interrupt, so poll every millisecond -
-			this backend is only for development builds.
+			Until something comes on the X connection, like glfwWaitEvents - collect_entropy has emptied the queue.
+			At most a millisecond: the GL thread's swaps read the connection too and can pull our events into the queue
+			without waking this poll. post_empty_event is not needed then either.
 		*/
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		auto connection_fd = pollfd();
+		connection_fd.fd = xcb_get_file_descriptor(connection);
+		connection_fd.events = POLLIN;
+
+		poll(&connection_fd, 1, 1);
 	}
 
 	void window::post_empty_event() const {}
