@@ -3,6 +3,8 @@
 # a community one (an open round 1 for 8 - 4 matches, "Community Cup") and a casual server; a client opens Browse servers
 # (Settings-sized window, imgui_big.ini) and a screenshot is taken. KEEP_RUNNING=1 leaves everything up for clicking
 # (DISPLAY=:$DISP, xinput.py) - stop it with "scenario_browser_tournaments.sh stop".
+#   ONLY_COMMUNITY=listed|open: only the community tournament (the generator's screenshots) - 8 teams by nicknames, or
+#   an open round 1 for 8 (any pair).
 #   FAVORITES='[...]': the client's favorite_servers.json; KEY_OF_OFFICIAL / KEY_OF_COMMUNITY in it are replaced
 #   by the servers' keys.
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -12,6 +14,8 @@ BIN=${BIN:-$REPO/build/Debug-x64-clang-claude-headless/Hypersomnia}
 CLIENT_BIN=${CLIENT_BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 S=${SCRATCH:-/tmp/hypersomnia-nettest}/browser_tournaments
 DISP=${DISP:-:997}
+# SCREEN=1600x900: a bigger window (the generator's screenshots - long match names whole)
+SCREEN=${SCREEN:-1280x720}
 P_OFFICIAL=19400; P_COMMUNITY=19420; P_CASUAL=19440
 
 if [ "$1" = "stop" ]; then
@@ -54,14 +58,22 @@ echo "$OFFICIAL_KEY" > $S/official_servers.d/official
 SECS=${KEEP_RUNNING:+1800}; SECS=${SECS:-240}
 timeout $SECS $BIN --masterserver --appdata-dir $S/ms $GAME_TEST_FLAGS > $S/ms.out 2>&1 &
 sleep 3
-timeout $SECS $BIN --appdata-dir $S/official $GAME_TEST_FLAGS --tournament-teams "alice; bob; carol; dave" --tournament-name "Official Cup" > $S/official.out 2>&1 &
-timeout $SECS env HYPERSOMNIA_TOURNAMENT=8 $BIN --appdata-dir $S/community $GAME_TEST_FLAGS --tournament-name "Community Cup" > $S/community.out 2>&1 &
-timeout $SECS $BIN --dedicated-server --appdata-dir $S/casual $GAME_TEST_FLAGS > $S/casual.out 2>&1 &
+if [ -z "$ONLY_COMMUNITY" ]; then
+	timeout $SECS $BIN --appdata-dir $S/official $GAME_TEST_FLAGS --tournament-teams "alice; bob; carol; dave" --tournament-name "Official Cup" > $S/official.out 2>&1 &
+	timeout $SECS $BIN --dedicated-server --appdata-dir $S/casual $GAME_TEST_FLAGS > $S/casual.out 2>&1 &
+fi
+
+if [ "$ONLY_COMMUNITY" = listed ]; then
+	timeout $SECS $BIN --appdata-dir $S/community $GAME_TEST_FLAGS --tournament-name "Community Cup" \
+		--tournament-teams "Billan; Saper; Fajfer; Janusz; Kartezjan; Lopa; Litwin; Shuncio" > $S/community.out 2>&1 &
+else
+	timeout $SECS env HYPERSOMNIA_TOURNAMENT=8 $BIN --appdata-dir $S/community $GAME_TEST_FLAGS --tournament-name "Community Cup" > $S/community.out 2>&1 &
+fi
 sleep 12
 
 mkconf eve <<EOF
 { "identity_broker_url": "http://127.0.0.1:1", "server_list_provider": "http://127.0.0.1:18420/server_list",
-  "window": { "fullscreen": false, "size": [1280, 720] }, "client": { "nickname": "eve" } }
+  "window": { "fullscreen": false, "size": [${SCREEN%x*}, ${SCREEN#*x}] }, "client": { "nickname": "eve" } }
 EOF
 cp $HERE/identity_ui/imgui_big.ini $S/eve/user/imgui.ini
 
@@ -69,12 +81,13 @@ if [ -n "$FAVORITES" ]; then
 	echo "$FAVORITES" | sed "s/KEY_OF_OFFICIAL/$OFFICIAL_KEY/g; s/KEY_OF_COMMUNITY/$COMMUNITY_KEY/g" > $S/eve/user/favorite_servers.json
 fi
 
-Xvfb $DISP -screen 0 1280x720x24 > /dev/null 2>&1 &
+Xvfb $DISP -screen 0 ${SCREEN}x24 > /dev/null 2>&1 &
 sleep 2
 env DISPLAY=$DISP LP_NUM_THREADS=2 timeout $SECS $CLIENT_BIN --appdata-dir $S/eve $GAME_TEST_FLAGS > $S/eve.out 2>&1 &
 sleep 40
 DISPLAY=$DISP python3 $HERE/xinput.py key Escape; sleep 3
-DISPLAY=$DISP python3 $HERE/xinput.py click 190 497; sleep 12
+# Browse servers: 223 px above the bottom, whatever the window's height
+DISPLAY=$DISP python3 $HERE/xinput.py click 190 $((${SCREEN#*x} - 223)); sleep 12
 DISPLAY=$DISP import -window root $S/browse.png
 
 curl -s http://127.0.0.1:18420/server_list_json > $S/list.json

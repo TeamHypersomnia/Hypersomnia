@@ -8,6 +8,7 @@
 #include "application/main/favorite_servers.h"
 #include "application/gui/browse_servers_gui.h"
 #include "augs/misc/imgui/simple_popup.h"
+#include "augs/misc/imgui/text_link.h"
 #include "augs/misc/imgui/long_input_text_with_dots.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
@@ -947,44 +948,7 @@ static void host_server_invitation_row() {
 		ImGui::TextUnformatted("Want to host your 24/7 server?");
 		ImGui::SameLine();
 
-		const auto link_col = rgba(130, 190, 255, 255);
-		const auto link_text = "Click here!";
-		const auto url = "https://hypersomnia.io/generator";
-		const auto pos = vec2(ImGui::GetCursorScreenPos());
-		const auto size = vec2(ImGui::CalcTextSize(link_text));
-		const auto draw_list = ImGui::GetWindowDrawList();
-
-		/*
-			A light rectangle behind it while hovered, stronger while held - drawn before the text, so under it.
-		*/
-
-		const auto pad = vec2(4, 1);
-		const auto rect_lt = ImVec2(pos - pad);
-		const auto rect_rb = ImVec2(pos + size + pad);
-
-		const bool hovered = ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(rect_lt, rect_rb);
-
-		if (hovered) {
-			const auto rect_col = ImGui::IsMouseDown(0) ? ImGuiCol_HeaderActive : ImGuiCol_HeaderHovered;
-			draw_list->AddRectFilled(rect_lt, rect_rb, ImGui::GetColorU32(rect_col), 2.0f);
-		}
-
-		{
-			auto sc = scoped_text_color(link_col);
-			ImGui::TextUnformatted(link_text);
-		}
-
-		const auto underline_y = pos.y + size.y;
-		draw_list->AddLine(ImVec2(pos.x, underline_y), ImVec2(pos.x + size.x, underline_y), ImGui::GetColorU32(link_col));
-
-		if (hovered) {
-			ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-			ImGui::SetTooltip("%s", url);
-
-			if (ImGui::IsMouseClicked(0)) {
-				augs::open_url(url);
-			}
-		}
+		augs::imgui::text_link("Click here!", "https://hypersomnia.io/generator", true);
 
 		ImGui::PopClipRect();
 	});
@@ -1557,9 +1521,37 @@ void browse_servers_gui_state::show_server_list(
 			return "Tournament " + ip;
 		}();
 
+		const auto row_clicked = ImGui::Selectable(name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap);
+		const bool row_hovered = ImGui::IsItemHovered();
+
+		ImGui::NextColumn();
+
+		{
+			auto online = 0;
+			auto max_online = 0;
+
+			for (const auto e : r.entries) {
+				if (e->details_known()) {
+					online += e->heartbeat.num_online;
+					max_online += e->heartbeat.max_online();
+				}
+			}
+
+			const auto players_text = typesafe_sprintf("%x/%x", online, max_online);
+
+			if (online == 0) {
+				text_disabled(players_text);
+			}
+			else {
+				text(players_text);
+			}
+		}
+
+		ImGui::NextColumn();
+
 		/*
-			Its results: the tournament's page, served by its host - opened in the browser, the row neither expanded
-			nor collapsed. Not on CrazyGames (no links out).
+			Its results in the Event column: the tournament's page, served by its host - opened in the browser, the row
+			neither expanded nor collapsed. Not on CrazyGames (no links out).
 		*/
 
 		bool results_hovered = false;
@@ -1570,12 +1562,7 @@ void browse_servers_gui_state::show_server_list(
 		const auto page_port = uint16_t(0);
 #endif
 
-		const auto row_clicked = ImGui::Selectable(name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap);
-		const bool row_hovered = ImGui::IsItemHovered();
-
 		if (page_port != 0) {
-			ImGui::SameLine();
-
 			/*
 				At the address a join goes to - on the local network its own, not the router's.
 			*/
@@ -1618,30 +1605,7 @@ void browse_servers_gui_state::show_server_list(
 			toggle(r);
 		}
 
-		ImGui::NextColumn();
-
-		{
-			auto online = 0;
-			auto max_online = 0;
-
-			for (const auto e : r.entries) {
-				if (e->details_known()) {
-					online += e->heartbeat.num_online;
-					max_online += e->heartbeat.max_online();
-				}
-			}
-
-			const auto players_text = typesafe_sprintf("%x/%x", online, max_online);
-
-			if (online == 0) {
-				text_disabled(players_text);
-			}
-			else {
-				text(players_text);
-			}
-		}
-
-		next_columns(num_columns - 3);
+		next_columns(num_columns - 4);
 	};
 
 	auto row_id = 0;
@@ -2294,7 +2258,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const float col_star = ImGui::GetTextLineHeight() + ImGui::GetStyle().ItemSpacing.x * 2;
 		float col_1 = ImGui::CalcTextSize("9999999").x;
 		float col_3 = ImGui::CalcTextSize("99h 99m 9").x;
-		float col_4 = ImGui::CalcTextSize("Players  9").x;
+
+		/*
+			The Event column: also a tournament's trophy and "Results", whole.
+		*/
+
+		float col_4 = std::max(
+			ImGui::CalcTextSize("Players  9").x,
+			ImGui::GetTextLineHeight() + ImGui::CalcTextSize("Results").x + ImGui::GetStyle().ItemSpacing.x * 2
+		);
 		float col_5 = ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2);
 		float col_6 = ImGui::CalcTextSize("Capture the flag 9").x;
 		float col_7 = ImGui::CalcTextSize("9").x * 25;
