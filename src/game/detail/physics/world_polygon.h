@@ -6,7 +6,6 @@
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 #include "augs/misc/constant_size_vector.h"
-#include "augs/math/polygon_queries.h"
 #include "game/inferred_caches/find_physics_cache.h"
 
 /*

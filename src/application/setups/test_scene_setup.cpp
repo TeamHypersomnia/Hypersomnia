@@ -45,7 +45,7 @@ static std::optional<item_flavour_id> test_enemy_weapon;//= to_entity_flavour_id
 using portal_marker = editor_area_marker_node;
 
 /*
-	Some rifles to test the gore on: the top half of the leftmost column of the range's opponents holds a Baka47.
+	Some of the range's opponents hold a Baka47: the top half of its leftmost column.
 */
 
 static void give_rifles_to_range_column(test_mode& mode, const std::vector<std::pair<vec2, mode_player_id>>& range_opponents) {

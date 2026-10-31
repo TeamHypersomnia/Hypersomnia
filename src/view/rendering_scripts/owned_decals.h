@@ -2,6 +2,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include "augs/math/polygon_queries.h"
 #include "game/cosmos/entity_id.h"
 #include "game/enums/render_layer.h"
 #include "game/components/decal_component.h"

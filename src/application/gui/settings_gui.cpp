@@ -4401,11 +4401,8 @@ void settings_gui_state::perform(
 						do_lag_simulator(config.client.network_simulator);
 
 						{
-							{
-								auto& scope_cfg = config.simulation_receiver;
-								revertable_slider(SCOPE_CFG_NVP(misprediction_smoothing_multiplier), 0.f, 3.f);
-							}
-
+							auto& scope_cfg = config.simulation_receiver;
+							revertable_slider(SCOPE_CFG_NVP(misprediction_smoothing_multiplier), 0.f, 3.f);
 						}
 
 						{

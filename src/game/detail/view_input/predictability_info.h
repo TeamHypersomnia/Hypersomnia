@@ -54,7 +54,7 @@ enum class effect_prediction_type {
 
 struct effect_prediction_settings {
 	// GEN INTROSPECTOR struct effect_prediction_settings
-	effect_prediction_type death_particles = effect_prediction_type::CONFIRM;
+	effect_prediction_type death_particles = effect_prediction_type::PREDICT;
 	effect_prediction_type death_sounds = effect_prediction_type::CONFIRM;
 	effect_prediction_type item_drop_sounds = effect_prediction_type::PREDICT;
 	effect_prediction_type body_drop_sounds = effect_prediction_type::CONFIRM;

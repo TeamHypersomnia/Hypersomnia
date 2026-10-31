@@ -94,7 +94,7 @@ void tree_of_npo_cache::specific_infer_cache_for(const E& handle) {
 	}
 	else {
 		/*
-			No longer in the tree - e.g. a hole whose character was resurrected.
+			An entity that no longer qualifies (see create_default_for) leaves the tree.
 		*/
 		cache.clear(*this);
 	}

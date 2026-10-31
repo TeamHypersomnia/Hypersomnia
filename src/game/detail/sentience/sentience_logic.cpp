@@ -1,7 +1,9 @@
+#include <cmath>
+#include "augs/templates/hash_templates.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/sentience/corpse_limbs.h"
 #include "game/detail/sentience/death_drop_falls.h"
-#include "game/detail/decals/character_gunshot_decal.h"
+#include "game/detail/decals/character_holes_layout.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/stateless_systems/driver_system.h"
@@ -190,7 +192,7 @@ static void try_detach_limbs(
 				Play the arm detach sound from the dead player's perspective.
 			*/
 			if (arm_detach_sound.id.is_set()) {
-				const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_particles);
+				const auto predictability = ::calc_death_effect_predictability(step.get_settings().effect_prediction.death_sounds);
 
 				arm_detach_sound.start(
 					step,
@@ -417,14 +419,14 @@ void handle_corpse_damage(
 						}
 					},
 
-					[typed_subject_id, old_lying_corpse_id, head_detached, head_effect, corpse_head_offset, mirrored = should_flip != old_flip.vertically](const auto& typed_entity, const logic_step step) {
+					[typed_subject_id, old_lying_corpse_id, head_detached, head_effect, corpse_head_offset, mirrored = should_flip != old_flip.vertically, layout = sentience_def.corpse_layout](const auto& typed_entity, const logic_step step) {
 						if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 							auto& s = typed_subject.template get<components::sentience>();
 							s.detached.lying_corpse = typed_entity;
 							::start_lying_corpse_stump_splatters(s);
 						}
 
-						::move_character_decals_onto(step, old_lying_corpse_id, typed_entity, false, mirrored);
+						::move_character_decals_onto(step, old_lying_corpse_id, typed_entity, layout, false, mirrored);
 
 						/*
 							Send a white highlight for the replacement lying corpse.
@@ -520,13 +522,17 @@ void handle_corpse_detonation(
 		/*
 			Flip logic:
 			- Exactly 1 arm detached: use tattered flip (mirrors the standing corpse).
-			- 0 or 2 arms detached: random 50/50 based on when_knocked_out.step for variety.
+			- 0 or 2 arms detached: 50/50 for variety - from the character and the direction it was killed in,
+			  not the step of its death: a kill that drops the corpse at once is predicted, and the server may place it
+			  a step off, which would mirror the corpse after the correction.
 		*/
 		const bool should_flip = [&]() {
 			if (num_arms == 1) {
 				return sentience.should_flip_tattered_sprite();
 			}
-			return sentience.when_knocked_out.step % 2 == 0;
+
+			const auto death_degrees = static_cast<int>(std::round(sentience.last_corpse_damage_direction.degrees()));
+			return augs::hash_multiple(subject.get_id().raw.indirection_index, death_degrees) % 2 == 0;
 		}();
 
 		const auto corpse_flavour = ::calc_lying_corpse_flavour(sentience_def, sentience, should_flip);
@@ -599,14 +605,14 @@ void handle_corpse_detonation(
 					}
 				},
 
-				[typed_subject_id, gentle, head_detached, head_effect, corpse_head_offset](const auto& typed_entity, const logic_step step) {
+				[typed_subject_id, gentle, head_detached, head_effect, corpse_head_offset, layout = sentience_def.corpse_layout](const auto& typed_entity, const logic_step step) {
 					if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
 						auto& s = typed_subject.template get<components::sentience>();
 						s.detached.lying_corpse = typed_entity;
 						::start_lying_corpse_stump_splatters(s);
 					}
 
-					::move_character_decals_onto(step, typed_subject_id, typed_entity, true);
+					::move_character_decals_onto(step, typed_subject_id, typed_entity, layout, true);
 
 					/*
 						Send a white highlight for the lying corpse when it first appears.
