@@ -48,14 +48,29 @@ auto xfreed_unique(T* const ptr) {
 	return std::unique_ptr<T, decltype(XFree)*>(ptr, XFree);
 }
 
+/*
+	set_current_to_none_impl is static, so it can't reach the window's display - there is only one window.
+*/
+
+static Display* context_display = nullptr;
+
 namespace augs {
 	window::window(const window_settings& settings) {
+		/*
+			GLX is called from the GL thread while the main thread takes the window's events.
+			Must come before any other Xlib call.
+		*/
+
+		XInitThreads();
+
 		/* Open Xlib Display */ 
 		display = XOpenDisplay(0);
 
 		if (display == nullptr) {
 			throw window_error("Failed to open X Display.");
 		}
+
+		context_display = display;
 
 		if (!gladLoadGLX(display, 0)) {
 			throw window_error("Failed to load GLX glad.");
@@ -390,6 +405,7 @@ namespace augs {
 			glxwindow = 0;
 			drawable = 0;
 			display = nullptr;
+			context_display = nullptr;
 			connection = nullptr;
 		}	
 	}
@@ -937,8 +953,14 @@ namespace augs {
 
 	void window::set_current_to_none_impl() {
 #if BUILD_OPENGL
-	//	 For now we only will have one window anyway
-	//	 glXMakeContextCurrent(display, None, None, nullptr);
+		/*
+			The context moves between the main thread and the GL thread -
+			GLX refuses to make it current on one while it is still current on the other.
+		*/
+
+		if (context_display != nullptr) {
+			glXMakeContextCurrent(context_display, None, None, nullptr);
+		}
 #endif
 	}
 
@@ -1029,6 +1051,17 @@ namespace augs {
 		//LOG("Re-checking current context");
 #endif
 	}
+
+	void window::wait_events() {
+		/*
+			XCB has no wait that another thread could interrupt, so poll every millisecond -
+			this backend is only for development builds.
+		*/
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+
+	void window::post_empty_event() const {}
 
 	window::~window() {
 		destroy();

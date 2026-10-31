@@ -296,7 +296,7 @@ namespace augs {
 		active = glfwGetWindowAttrib(window, GLFW_FOCUSED);
 
 		set_as_current();
-		set(settings.vsync_mode);
+		apply_vsync(settings.vsync_mode);
 
 		current_settings = settings;
 		last_windowed_rect = current_settings.make_window_rect();
@@ -746,6 +746,25 @@ namespace augs {
 
 	void window::check_current_context() {
 
+	}
+
+	void window::wait_events() {
+#if PLATFORM_WINDOWS
+		augs::wait_for_messages();
+#elif PLATFORM_LINUX
+		/*
+			The GL thread's swaps read the X connection too and can pull the window's events into the queue
+			while we sleep on its socket, which then never wakes us up - so never sleep longer than a millisecond.
+		*/
+
+		glfwWaitEventsTimeout(0.001);
+#else
+		glfwWaitEvents();
+#endif
+	}
+
+	void window::post_empty_event() const {
+		glfwPostEmptyEvent();
 	}
 
 	window::~window() {

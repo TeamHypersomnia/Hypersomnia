@@ -92,6 +92,9 @@ namespace augs {
 
 	}
 
+	void window::wait_events() {}
+	void window::post_empty_event() const {}
+
 	window::~window() {
 
 	}

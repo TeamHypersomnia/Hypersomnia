@@ -514,6 +514,10 @@ struct configuration_subscribers {
 
 	void apply(const config_json_table&) const;
 
-	void apply_main_thread(const augs::window_settings&) const;
+	/*
+		On the thread that renders - the window's own settings go to the main thread (gl_thread.h).
+	*/
+
+	void apply_screen_size(const vec2i screen_size) const;
 	void sync_back_into(config_json_table&) const;
 };

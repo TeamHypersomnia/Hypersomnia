@@ -152,11 +152,15 @@ namespace augs {
 		/*
 			SDL_GL_SetSwapInterval will call emscripten_set_main_loop_timing
 			which needs to be called only after emscripten_set_main_loop.
+
+			Marked as applied, so that only a change of the setting calls it (apply_vsync).
 		*/
+
+		applied_vsync = settings.vsync_mode;
 #else
 		LOG("Calling SDL_GL_SetSwapInterval");
 
-        SDL_GL_SetSwapInterval(settings.vsync_mode == vsync_type::ON ? 1 : 0);
+        apply_vsync(settings.vsync_mode);
 #endif
 
         current_settings = settings;
@@ -413,6 +417,13 @@ namespace augs {
     void window::check_current_context() {
 
     }
+
+	/*
+		The web build renders and takes the input on its one main loop - nothing waits for events.
+	*/
+
+	void window::wait_events() {}
+	void window::post_empty_event() const {}
 
     window::~window() {
         destroy();

@@ -234,8 +234,8 @@ namespace augs {
 			set_window_name(settings.name);
 		}
 
-		if (force || changed(settings.vsync_mode)) {
-			set(settings.vsync_mode);
+		if (force) {
+			apply_vsync(settings.vsync_mode);
 		}
 
 		if (force || changed(settings.border)) {
@@ -274,6 +274,13 @@ namespace augs {
 		if (force) {
 			current_rect = get_window_rect_impl();
 			last_windowed_rect = settings.make_window_rect();
+		}
+	}
+
+	void window::apply_vsync(const vsync_type mode) {
+		if (applied_vsync != mode) {
+			set(mode);
+			applied_vsync = mode;
 		}
 	}
 
@@ -316,12 +323,5 @@ namespace augs {
 
 	bool window::is_active() const {
 		return active;
-	}
-	
-	void window::handle_pending_requests() {
-		if (requested_cursor_pos) {
-			set_cursor_pos(*requested_cursor_pos);
-			requested_cursor_pos = std::nullopt;
-		}
 	}
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <utility>
 
 #if PLATFORM_UNIX
 /*
@@ -155,6 +156,12 @@ namespace augs {
 
 		window_settings current_settings;
 
+		/*
+			Only the thread rendering touches it - see apply_vsync.
+		*/
+
+		std::optional<vsync_type> applied_vsync;
+
 		void set_cursor_visible_impl(bool flag); 
 		bool set_cursor_clipping_impl(bool flag); 
 
@@ -163,7 +170,6 @@ namespace augs {
 		xywhi get_window_rect_impl() const;
 
 		std::optional<vec2i> requested_cursor_pos;
-		void set_cursor_pos(vec2i);
 	public:
 		window(const window_settings&);
 		~window();
@@ -179,7 +185,23 @@ namespace augs {
 		void set_mouse_pos_paused(const bool);
 		bool is_mouse_pos_paused() const;
 
+		void set_cursor_pos(vec2i);
+
+		/*
+			Everything but vsync, which needs the GL context: after the construction (force)
+			the thread that renders sets it with apply_vsync.
+		*/
+
 		void apply(const window_settings&, const bool force = false);
+		void apply_vsync(vsync_type);
+
+		/*
+			Blocks until a window message comes or post_empty_event is called from another thread.
+			May return spuriously.
+		*/
+
+		void wait_events();
+		void post_empty_event() const;
 		void sync_back_into(window_settings&);
 		window_settings get_current_settings() const;
 
@@ -288,6 +310,8 @@ namespace augs {
 			requested_cursor_pos = pos;
 		}
 		
-		void handle_pending_requests();
+		std::optional<vec2i> take_requested_cursor_pos() {
+			return std::exchange(requested_cursor_pos, std::nullopt);
+		}
 	};
 }

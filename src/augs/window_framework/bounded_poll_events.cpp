@@ -43,5 +43,14 @@ namespace augs {
 			}
 		}
 	}
+
+	void wait_for_messages() {
+		/*
+			MWMO_INPUTAVAILABLE: without it, input that PeekMessage has already seen
+			would not wake us up even though it is still in the queue.
+		*/
+
+		MsgWaitForMultipleObjectsEx(0, NULL, INFINITE, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+	}
 }
 #endif

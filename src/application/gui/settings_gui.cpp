@@ -73,10 +73,7 @@ void configuration_subscribers::apply(const config_json_table& new_config) const
 	audio_context.apply(new_config.audio);
 }
 
-void configuration_subscribers::apply_main_thread(const augs::window_settings& settings) const {
-	window.apply(settings);
-
-	const auto screen_size = window.get_screen_size();
+void configuration_subscribers::apply_screen_size(const vec2i screen_size) const {
 	fbos.apply(screen_size);
 }
 
@@ -107,6 +104,12 @@ int performance_settings::get_default_num_pool_workers() {
 #endif
 
 	const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
+
+	/*
+		rendering_threads is the GL thread, main_threads the one running the game logic.
+		The real main thread - the window's (gl_thread.h) - is left out:
+		it sleeps until a window message comes.
+	*/
 
 	const auto audio_threads = 1;
 	const auto openal_threads = 1;
