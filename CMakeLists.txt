@@ -977,6 +977,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_glfw.cpp"
+			"src/augs/window_framework/bounded_poll_events.cpp"
 		)
 	elseif(UNIX)
 		message("Using X window systems as the window framework.")

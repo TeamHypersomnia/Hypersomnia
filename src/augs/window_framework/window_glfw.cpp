@@ -9,6 +9,7 @@
 
 #include "augs/window_framework/event.h"
 #include "augs/window_framework/window.h"
+#include "augs/window_framework/bounded_poll_events.h"
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
 
@@ -362,7 +363,11 @@ namespace augs {
 			handle_event(ch);
 		}
 
+#if PLATFORM_WINDOWS
+		augs::bounded_poll_events(window, 2.0);
+#else
 		glfwPollEvents();
+#endif
 
 		using namespace event;
 
