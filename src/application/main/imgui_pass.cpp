@@ -44,20 +44,7 @@ void perform_imgui_pass(
 
 	ImGui::NewFrame();
 
-	/* 
-		Don't show settings if we're in-game
-		and a setting was specified to hide it automatically when playing
-	*/
-
-	if (
-		const bool should_hide_settings =
-			config.session.hide_settings_ingame
-			&& has_gameplay_setup
-			&& !ingame_menu_active
-		;
-
-		!should_hide_settings
-	) {
+	if (!::is_settings_hidden_ingame(config.session.hide_settings_ingame, has_gameplay_setup, ingame_menu_active)) {
 		settings_gui.perform(
 			window,
 			audio,

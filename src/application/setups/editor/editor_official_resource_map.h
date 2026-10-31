@@ -26,6 +26,7 @@ struct editor_official_resource_map {
 	Map<test_shootable_weapons, editor_firearm_resource> firearms;
 	Map<test_container_items, editor_ammunition_resource> magazines;
 	Map<test_shootable_charges, editor_ammunition_resource> shootable_charges;
+	Map<test_plain_missiles, editor_missile_resource> missiles;
 	Map<test_melee_weapons, editor_melee_resource> melees;
 	Map<test_hand_explosives, editor_explosive_resource> explosives;
 	Map<test_tool_items, editor_tool_resource> tools;

@@ -7593,3 +7593,8 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 
 - balance snipers somehow with slower bullets now
 
+- randomized waypoints in absence of any
+	- we have multitude of maps, it will be a bother to create waypoints for all right away
+	- chyba bedziemy forsowac to i tak, bo te waypointy chujowo beda wygladaly
+- zaimast tego warny jak nie ma waypointow na site i innych spotow ale to potem mozna po wydaniu
+

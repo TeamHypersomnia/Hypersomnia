@@ -961,6 +961,30 @@ namespace test_flavours {
 			test_scene_image_id::BLOOD_FOOTSTEP_3_WEAK
 		);
 
+		/*
+			A bullet hole on a hit character - the wall's one with a blood red rim -
+			and the blood running down from it on a lying corpse.
+		*/
+		for (const auto& ids : {
+			std::make_pair(test_decal_decorations::CHARACTER_GUNSHOT_DECAL_1, test_scene_image_id::CHARACTER_GUNSHOT_DECAL_1),
+			std::make_pair(test_decal_decorations::CHARACTER_GUNSHOT_DECAL_2, test_scene_image_id::CHARACTER_GUNSHOT_DECAL_2),
+			std::make_pair(test_decal_decorations::CHARACTER_GUNSHOT_DRIP_1, test_scene_image_id::CHARACTER_GUNSHOT_DRIP_1),
+			std::make_pair(test_decal_decorations::CHARACTER_GUNSHOT_DRIP_2, test_scene_image_id::CHARACTER_GUNSHOT_DRIP_2),
+			std::make_pair(test_decal_decorations::CHARACTER_GUNSHOT_DRIP_3, test_scene_image_id::CHARACTER_GUNSHOT_DRIP_3)
+		}) {
+			auto& meta = get_test_flavour(flavours, ids.first);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::CHARACTER_DECALS;
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, ids.second, white);
+
+			invariants::decal decal_def;
+			decal_def.is_character_decal = true;
+			meta.set(decal_def);
+		}
+
 		/* Gunshot decals */
 		gunshot_decal_flavour(
 			test_decal_decorations::GUNSHOT_DECAL_1,

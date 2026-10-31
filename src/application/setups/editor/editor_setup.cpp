@@ -4370,6 +4370,7 @@ template struct edit_resource_command<editor_area_marker_resource>;
 
 template struct edit_resource_command<editor_firearm_resource>;
 template struct edit_resource_command<editor_ammunition_resource>;
+template struct edit_resource_command<editor_missile_resource>;
 template struct edit_resource_command<editor_tool_resource>;
 template struct edit_resource_command<editor_touch_collectible_resource>;
 template struct edit_resource_command<editor_melee_resource>;
@@ -4388,6 +4389,7 @@ template struct edit_node_command<editor_area_marker_node>;
 
 template struct edit_node_command<editor_firearm_node>;
 template struct edit_node_command<editor_ammunition_node>;
+template struct edit_node_command<editor_missile_node>;
 template struct edit_node_command<editor_tool_node>;
 template struct edit_node_command<editor_touch_collectible_node>;
 template struct edit_node_command<editor_melee_node>;
@@ -4405,6 +4407,7 @@ template struct create_node_command<editor_area_marker_node>;
 
 template struct create_node_command<editor_firearm_node>;
 template struct create_node_command<editor_ammunition_node>;
+template struct create_node_command<editor_missile_node>;
 template struct create_node_command<editor_tool_node>;
 template struct create_node_command<editor_touch_collectible_node>;
 template struct create_node_command<editor_melee_node>;

@@ -8,20 +8,31 @@
 #include "augs/graphics/neon_light_color.h"
 
 namespace augs {
-	inline const std::array<std::pair<rgba, rgba>, 6> gore_color_map = {{
+	/*
+		Every red the blood of the gore sprites is drawn with - torn off limbs, head splatters -
+		with its red and green swapped.
+	*/
+
+	inline const std::array<std::pair<rgba, rgba>, 11> gore_color_map = {{
 		{ rgba(255, 0, 0, 255), rgba(0, 255, 0, 255) },
 		{ rgba(207, 0, 0, 255), rgba(0, 207, 0, 255) },
 		{ rgba(192, 0, 0, 255), rgba(0, 192, 0, 255) },
 		{ rgba(128, 0, 0, 255), rgba(0, 128, 0, 255) },
 		{ rgba(91,  0, 0, 255), rgba(0, 91,  0, 255) },
-		{ rgba(31,  0, 0, 255), rgba(0, 31,  0, 255) }
+		{ rgba(31,  0, 0, 255), rgba(0, 31,  0, 255) },
+		{ rgba(233, 19, 19, 255), rgba(19, 233, 19, 255) },
+		{ rgba(229, 3, 3, 255), rgba(3, 229, 3, 255) },
+		{ rgba(255, 0, 27, 255), rgba(0, 255, 27, 255) },
+		{ rgba(255, 0, 18, 255), rgba(0, 255, 18, 255) },
+		{ rgba(194, 0, 16, 255), rgba(0, 194, 16, 255) }
 	}};
 
 	inline const std::vector<std::string> gore_sprites_match_words = {
 		"gore",
 		"blood",
 		"tattered",
-		"corpse"
+		"corpse",
+		"character_gunshot"
 	};
 
 	inline bool path_matches_gore_words(const std::string& path) {

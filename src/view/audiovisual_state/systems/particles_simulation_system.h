@@ -100,6 +100,7 @@ public:
 		*/
 		vec2 previous_chased_pos = vec2::zero;
 		bool has_previous_chased_pos = false;
+		bool prewarm_applied = false;
 
 		particles_emission source_emission;
 

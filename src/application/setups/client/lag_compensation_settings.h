@@ -3,7 +3,7 @@
 
 struct lag_compensation_settings {
 	// GEN INTROSPECTOR struct lag_compensation_settings
-	bool confirm_local_character_death = true;
+	effect_prediction_type local_player_death = effect_prediction_type::CONFIRM;
 	effect_prediction_settings effect_prediction;
 	bool simulate_decorative_organisms_during_reconciliation = true;
 	// END GEN INTROSPECTOR

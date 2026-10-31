@@ -56,7 +56,7 @@ namespace invariants {
 		bool stackable = false;
 		bool draw_under_hands_in_akimbo = false;
 		bool ground_scale_affects_body = true;
-		pad_bytes<1> pad;
+		bool falls_when_dropped_on_death = true;
 
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;

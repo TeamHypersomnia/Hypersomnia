@@ -4,6 +4,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/detail/decals/spawn_decals.hpp"
+#include "game/detail/decals/character_gunshot_decal.h"
 #include "game/detail/decals/penetration_fatigue.h"
 #include "game/detail/physics/calc_penetrability.hpp"
 #include "game/stateless_systems/sentience_system.h"
@@ -394,9 +395,12 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			}
 
 			const bool was_conscious_before = sentience->is_conscious();
+			const auto before_hit = ::character_before_hit(*sentience);
 
 			sentience_system().process_damage_message(damage_msg, step);
 			damage_msg.processed = true;
+
+			::leave_character_gunshot_decal(step, surface_handle, typed_missile, missile, before_hit, damage_msg, point, impact_dir);
 
 			const bool is_conscious_now = sentience->is_conscious();
 			const bool just_died = was_conscious_before && !is_conscious_now;

@@ -11,17 +11,24 @@ namespace invariants {
 		bool is_footstep_decal = false;
 		bool is_gunshot_decal = false;
 		bool is_explosion_decal = false;
+		bool is_character_decal = false;
 		// END GEN INTROSPECTOR
 	};
 }
 
 namespace components {
+	/*
+		hit_stance and hit_stance_mirrored are only for the holes on characters:
+		the stance the character was in when hit, its colliders then - see character_gunshot_decal.h.
+	*/
+
 	struct decal {
 		// GEN INTROSPECTOR struct components::decal
 		real32 last_size_mult = 1.f;
 		bool marked_for_deletion = false;
 		bool follows_attached = false;
-		pad_bytes<2> pad;
+		uint8_t hit_stance = 0;
+		bool hit_stance_mirrored = false;
 		augs::stepped_timestamp when_marked_for_deletion;
 		entity_id spawned_by;
 		real32 freshness = -1.f;

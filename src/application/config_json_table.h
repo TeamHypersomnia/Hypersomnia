@@ -87,7 +87,7 @@ struct config_json_table {
 	streamer_mode_flags_data streamer_mode_flags;
 
 	activity_type last_activity = activity_type::TUTORIAL;
-	launch_type launch_at_startup = launch_type::LAST_ACTIVITY;
+	launch_type launch_at_startup = launch_type::MAIN_MENU;
 
 	bool gore = true;
 	bool skip_tutorial = false;

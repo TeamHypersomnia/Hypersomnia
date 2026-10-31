@@ -12,7 +12,22 @@ struct basic_detached_body_parts {
 	T head;
 	T arm_upper;
 	T arm_lower;
+	T leg_upper;
+	T leg_lower;
 	T lying_corpse;
+	// END GEN INTROSPECTOR
+};
+
+/*
+	Lying corpse variants without legs, for one state of the arms.
+	noleg lacks the top leg of the image, noleg_other the bottom one.
+*/
+
+struct lying_corpse_legless_flavours {
+	// GEN INTROSPECTOR struct lying_corpse_legless_flavours
+	body_part_flavour noleg;
+	body_part_flavour noleg_other;
+	body_part_flavour nolegs;
 	// END GEN INTROSPECTOR
 };
 

@@ -10,6 +10,8 @@
 
 class allocate_new_entity_access;
 
+void delete_holes_of_resurrected(const logic_step step, const entity_id character);
+
 template <class E>
 void resurrect(const logic_step step, const E& typed_handle, const float spawn_protection_ms = 0.0f) {
 	auto& sentience = typed_handle.template get<components::sentience>();
@@ -23,15 +25,10 @@ void resurrect(const logic_step step, const E& typed_handle, const float spawn_p
 		step.queue_deletion_of(head, "Lying head of resurrected character");
 	}
 
-	const auto arm_upper = cosm[sentience.detached.arm_upper];
-	const auto arm_lower = cosm[sentience.detached.arm_lower];
-
-	if (arm_upper) {
-		step.queue_deletion_of(arm_upper, "Detached arm of resurrected character");
-	}
-
-	if (arm_lower) {
-		step.queue_deletion_of(arm_lower, "Detached arm of resurrected character");
+	for (const auto limb_id : { sentience.detached.arm_upper, sentience.detached.arm_lower, sentience.detached.leg_upper, sentience.detached.leg_lower }) {
+		if (const auto limb = cosm[limb_id]) {
+			step.queue_deletion_of(limb, "Detached limb of resurrected character");
+		}
 	}
 
 	const auto lying_corpse = cosm[sentience.detached.lying_corpse];
@@ -40,20 +37,30 @@ void resurrect(const logic_step step, const E& typed_handle, const float spawn_p
 		step.queue_deletion_of(lying_corpse, "Lying corpse of resurrected character");
 	}
 
+	::delete_holes_of_resurrected(step, typed_handle.get_id());
+
 	sentience.detached = {};
 	sentience.when_corpse_catched_fire = {};
 	sentience.when_knocked_out = {};
+	sentience.knockout_origin = {};
+	sentience.health_value_at_death = 0.f;
 	sentience.when_arms_detached = {};
 	sentience.pending_arm_splatters = 0;
+	sentience.pending_stump_splatters = 0;
+	sentience.when_lying_corpse_settled = {};
 	sentience.arms_queued_for_detach = 0;
 	sentience.first_arm_queued_as_upper = false;
+	sentience.leg_upper_queued_for_detach = false;
+	sentience.leg_lower_queued_for_detach = false;
+	sentience.corpse_fell_at_once = false;
+	sentience.got_bloody_headshot = false;
+	sentience.got_body_blasted = false;
+	sentience.got_body_cut = false;
+	sentience.corpse_stands_until = {};
+	sentience.corpse_standing_least_secs = 0.f;
 	sentience.idle_blood_drip_count = 0;
 	sentience.last_corpse_damage_direction = vec2::zero;
-	sentience.pending_lying_gore_head = 0;
-	sentience.pending_lying_gore_shoulder = 0;
-	sentience.pending_lying_gore_secondary_shoulder = 0;
-	sentience.pending_lying_gore_center = 0;
-	sentience.when_lying_corpse_settled = {};
+	sentience.newest_hole_offset = vec2::zero;
 
 	if (sentience.has_exploded) {
 		sentience.has_exploded = false;

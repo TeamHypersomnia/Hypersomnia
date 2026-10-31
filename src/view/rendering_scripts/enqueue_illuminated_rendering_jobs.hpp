@@ -183,7 +183,8 @@ void enqueue_illuminated_rendering_jobs(
 				draw_long_bullet_neons,
 				interp.get_bullets_alpha()
 			},
-			interp
+			interp,
+			nullptr
 		};
 	};
 
@@ -419,6 +420,12 @@ void enqueue_illuminated_rendering_jobs(
 			}
 		}
 	};
+
+	/*
+		Gathered before the jobs run - read by the sentiences and lying corpses jobs.
+	*/
+	auto& decals = ::thread_local_owned_decals();
+	decals.gather(cosm, visible);
 
 	auto enqueue_layer_jobs = [&]() {
 		auto make_helper = [&](const D d) {
@@ -898,6 +905,7 @@ void enqueue_illuminated_rendering_jobs(
 				&interp,
 				&game_images,
 				&visible,
+				&decals,
 				queried_cone,
 				corpse_shadow_offset,
 				corpses_in = make_drawing_input(D::LYING_CORPSES),
@@ -980,6 +988,16 @@ void enqueue_illuminated_rendering_jobs(
 					render_layer::LYING_CORPSES
 				>();
 
+				/*
+					Bullet holes of the lying corpses - over the bodies, under the head overlays.
+				*/
+
+				visible.for_each<render_layer::LYING_CORPSES>(cosm, [&](const auto& handle) {
+					decals.for_each_of(handle.get_id(), [&](const auto& typed_decal) {
+						::specific_draw_entity(typed_decal, corpses_in);
+					});
+				});
+
 				for_each_visible_head_overlay([&](const auto& sprite, const auto& input) {
 					augs::draw(sprite, game_images, input);
 
@@ -993,13 +1011,19 @@ void enqueue_illuminated_rendering_jobs(
 				h7.draw_neons<
 					render_layer::LYING_CORPSES
 				>();
+
+				visible.for_each<render_layer::LYING_CORPSES>(cosm, [&](const auto& handle) {
+					decals.for_each_of(handle.get_id(), [&](const auto& typed_decal) {
+						::specific_draw_neon_map(typed_decal, corpse_neons_in);
+					});
+				});
 			};
 
 			pool.enqueue(job);
 		}
 	};
 
-	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, settings, cast_highlight_tex, &cosm, fog_of_war_character_id, classifying_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds]() {
+	auto sentiences_job = [character_shadow_offset, standing_corpse_shadow_offset, draw_enemy_silhouettes, see_enemies_behind_walls, settings, cast_highlight_tex, &cosm, fog_of_war_character_id, classifying_character_id, make_drawing_input, &visible, &interp, real_global_time_seconds, &decals]() {
 		/*
 			Enemies and teammates - with the items they hold - are darkened
 			by enemy_darkening and teammate_darkening with a black overlay, see illuminated_rendering.cpp.
@@ -1026,6 +1050,10 @@ void enqueue_illuminated_rendering_jobs(
 
 		auto draw_lights_for = [&](const auto& drawing_in, const auto& handle, const std::optional<rgba> shield_glow_color = std::nullopt) {
 			::specific_draw_neon_map(handle, drawing_in);
+
+			decals.for_each_within_standing_corpse(handle, [&](const auto& typed_decal) {
+				::specific_draw_neon_map(typed_decal, drawing_in);
+			});
 
 			::draw_character_glow(
 				handle, 
@@ -1097,8 +1125,11 @@ void enqueue_illuminated_rendering_jobs(
 			}
 		};
 
-		const auto friendly_drawing_in = make_drawing_input(D::FRIENDLY_SENTIENCES);
-		const auto enemy_drawing_in = make_drawing_input(D::ENEMY_SENTIENCES);
+		auto friendly_drawing_in = make_drawing_input(D::FRIENDLY_SENTIENCES);
+		auto enemy_drawing_in = make_drawing_input(D::ENEMY_SENTIENCES);
+
+		friendly_drawing_in.decals = std::addressof(decals);
+		enemy_drawing_in.decals = std::addressof(decals);
 
 		const auto borders_friendly_drawing_in = make_drawing_input(D::BORDERS_FRIENDLY_SENTIENCES);
 		const auto borders_enemy_drawing_in = make_drawing_input(D::BORDERS_ENEMY_SENTIENCES);

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/text_link.h"
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/window_framework/shell.h"
 #include "augs/misc/date_time.h"
@@ -147,37 +148,9 @@ static void draw_token(const std::string& token, const augs::markdown_span& span
 
 	switch (span.style) {
 		case augs::markdown_span_style::LINK: {
-			/*
-				Underlined, a hand over it - a click opens it in the browser.
-				On CrazyGames only its color: no links out of the game there.
-			*/
-
-			const auto link_col = rgba(130, 190, 255, 255);
-			const auto pos = vec2(ImGui::GetCursorScreenPos());
-
-			{
-				auto sc = scoped_text_color(link_col);
-				ImGui::TextUnformatted(token.c_str());
-			}
-
-#if !WEB_CRAZYGAMES
-			const auto size = vec2(ImGui::CalcTextSize(token.c_str()));
-			const auto underline_y = pos.y + size.y;
-			draw_list->AddLine(ImVec2(pos.x, underline_y), ImVec2(pos.x + size.x, underline_y), ImGui::GetColorU32(link_col));
-
-			if (ImGui::IsItemHovered()) {
-				ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-				ImGui::SetTooltip("%s", span.url.c_str());
-			}
-
-			if (ImGui::IsItemClicked()) {
+			if (augs::imgui::text_link(token, span.url)) {
 				link_clicked = true;
-				augs::open_url(span.url);
 			}
-#else
-			(void)pos;
-			(void)draw_list;
-#endif
 
 			break;
 		}

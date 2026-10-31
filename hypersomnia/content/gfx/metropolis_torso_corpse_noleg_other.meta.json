@@ -1,0 +1,367 @@
+{
+    "extra_loadables": {
+        "generate_neon_map": {
+            "standard_deviation": 6.0,
+            "radius": [
+                80,
+                80
+            ],
+            "amplification": 100.0,
+            "alpha_multiplier": 1.0,
+            "light_colors": [
+                [
+                    89,
+                    31,
+                    168,
+                    255,
+                    0.6000000071525574
+                ],
+                [
+                    48,
+                    42,
+                    88,
+                    255,
+                    0.6000000071525574
+                ],
+                [
+                    192,
+                    0,
+                    0,
+                    255
+                ],
+                [
+                    255,
+                    0,
+                    0,
+                    255
+                ]
+            ]
+        },
+        "generate_desaturation": false
+    },
+    "usage_as_button": {
+        "flip": {
+            "horizontally": false,
+            "vertically": false
+        },
+        "bbox_expander": [
+            0.0,
+            0.0
+        ]
+    },
+    "offsets": {
+        "torso": {
+            "primary_hand": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "secondary_hand": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "back": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "head": {
+                "pos": [
+                    -63,
+                    4
+                ],
+                "rotation": 0.0
+            },
+            "legs": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "shoulder": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "secondary_shoulder": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "strafe_facing_offset": 0.0,
+            "is_akimbo": false
+        },
+        "legs": {
+            "foot": [
+                0,
+                0
+            ]
+        },
+        "gun": {
+            "bullet_spawn": [
+                0,
+                0
+            ],
+            "detachable_magazine": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "chamber": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "chamber_magazine": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "shell_spawn": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "rail": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            }
+        },
+        "item": {
+            "hand_anchor": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "back_anchor": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "shoulder_anchor": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "head_anchor": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "attachment_anchor": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            },
+            "akimbo_offset": {
+                "pos": [
+                    0,
+                    0
+                ],
+                "rotation": 0.0
+            }
+        },
+        "non_standard_shape": {
+            "source_polygon": [
+                [
+                    -63.0,
+                    -25.0
+                ],
+                [
+                    -59.0,
+                    -31.0
+                ],
+                [
+                    -40.0,
+                    -37.0
+                ],
+                [
+                    -8.0,
+                    -32.0
+                ],
+                [
+                    -3.0,
+                    -27.0
+                ],
+                [
+                    -6.0,
+                    -21.0
+                ],
+                [
+                    -31.0,
+                    -20.0
+                ],
+                [
+                    -25.0,
+                    -16.0
+                ],
+                [
+                    -14.0,
+                    -12.0
+                ],
+                [
+                    -4.0,
+                    -11.0
+                ],
+                [
+                    14.0,
+                    -30.0
+                ],
+                [
+                    35.0,
+                    -37.0
+                ],
+                [
+                    47.0,
+                    -33.0
+                ],
+                [
+                    58.0,
+                    -46.0
+                ],
+                [
+                    63.0,
+                    -49.0
+                ],
+                [
+                    55.0,
+                    -20.0
+                ],
+                [
+                    29.0,
+                    -20.0
+                ],
+                [
+                    28.0,
+                    -15.0
+                ],
+                [
+                    8.0,
+                    1.0
+                ],
+                [
+                    12.0,
+                    5.0
+                ],
+                [
+                    10.0,
+                    24.0
+                ],
+                [
+                    -3.0,
+                    18.0
+                ],
+                [
+                    -16.0,
+                    20.0
+                ],
+                [
+                    -31.0,
+                    26.0
+                ],
+                [
+                    -22.0,
+                    30.0
+                ],
+                [
+                    -2.0,
+                    30.0
+                ],
+                [
+                    0.0,
+                    38.0
+                ],
+                [
+                    -5.0,
+                    42.0
+                ],
+                [
+                    -20.0,
+                    43.0
+                ],
+                [
+                    -39.0,
+                    46.0
+                ],
+                [
+                    -59.0,
+                    39.0
+                ],
+                [
+                    -64.0,
+                    17.0
+                ]
+            ],
+            "convex_partition": [
+                1,
+                6,
+                23,
+                30,
+                1,
+                23,
+                26,
+                29,
+                30,
+                23,
+                1,
+                2,
+                4,
+                6,
+                1,
+                6,
+                9,
+                18,
+                20,
+                23,
+                6,
+                9,
+                10,
+                16,
+                18,
+                9,
+                10,
+                12,
+                15,
+                16,
+                10,
+                12,
+                14,
+                15,
+                12
+            ]
+        }
+    }
+}

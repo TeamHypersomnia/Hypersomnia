@@ -2797,6 +2797,11 @@ namespace test_flavours {
 			meta = get_test_flavour(flavours, test_shootable_charges::CYAN_CHARGE);
 			meta.get<invariants::text_details>().name = "Datum gun charge";
 			meta.get<invariants::cartridge>().round_flavour = to_entity_flavour_id(test_plain_missiles::DATUM_ROUND);
+
+			/*
+				An energy gun - no casings.
+			*/
+			meta.get<invariants::cartridge>().shell_flavour = {};
 		}
 
 		{
@@ -4434,6 +4439,7 @@ namespace test_flavours {
 			set_density_from_sprint_speed(meta, 953.f);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 350;
+			meta.get<invariants::item>().falls_when_dropped_on_death = false;
 			set_chambering_duration_ms(meta, 433.f);
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -4479,6 +4485,7 @@ namespace test_flavours {
 			set_density_from_sprint_speed(meta, 958.f);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 350;
+			meta.get<invariants::item>().falls_when_dropped_on_death = false;
 			set_chambering_duration_ms(meta, 389.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
@@ -4513,6 +4520,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {1500.f, 2500.f};
 			gun_def.damage_multiplier = 22.4f;
+			gun_def.corpse_falls_at_once = true;
 			gun_def.headshot_multiplier = 3.85f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -4571,6 +4579,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = augs::bound<real32> { 800.f, 1300.f };
 			gun_def.damage_multiplier = 9.8f;
+			gun_def.corpse_falls_at_once = true;
 			gun_def.headshot_multiplier = 3.85f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -4625,6 +4634,7 @@ namespace test_flavours {
 			gun_def.shell_velocity = {300.f, 1300.f};
 			gun_def.eject_shells_on_magazine_unmount = true;
 			gun_def.damage_multiplier = 6.f;
+			gun_def.corpse_falls_at_once = true;
 			gun_def.headshot_multiplier = 3.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -4682,6 +4692,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 1500.f};
 			gun_def.damage_multiplier = 11.2f;
+			gun_def.corpse_falls_at_once = true;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 0;
 			gun_def.recoil_multiplier = 4.f;
 			gun_def.kickback_towards_wielder = kickback_mult * 500.f;
@@ -5144,6 +5155,7 @@ namespace test_flavours {
 			gun_def.shell_velocity = {500.f, 1500.f};
 			gun_def.ducks_shell_sounds = false;
 			gun_def.damage_multiplier = 9.8f;
+			gun_def.corpse_falls_at_once = true;
 			gun_def.headshot_multiplier = 3.0f;
 			gun_def.gunshot_decal_scale = 3.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;

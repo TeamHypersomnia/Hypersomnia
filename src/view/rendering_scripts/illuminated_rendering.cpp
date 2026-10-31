@@ -188,7 +188,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				settings.bullet_trails != bullet_trails_mode::NONE,
 				interp.get_bullets_alpha()
 			},
-			interp
+			interp,
+			nullptr
 		};
 	};
 
@@ -1418,6 +1419,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		});
 	}
 	
+	/*
+		Under the particles, so that blood bursting out of a hit character shows over its white flash.
+	*/
+
+	draw_pure_color_highlights();
+
 	set_shader(shaders.standard);
 	renderer.call_triangles(D::FOREGROUND_GLOWS);
 
@@ -1496,7 +1503,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.exploding_rings);
 
 	renderer.call_triangles(D::EXPLODING_RINGS);
-	draw_pure_color_highlights();
+
+	/*
+		Thunders use the highlights' shader - the rings' one would discard them.
+	*/
+	set_shader(shaders.pure_color_highlight);
 	renderer.call_triangles(D::THUNDERS);
 
 	set_shader(shaders.standard);

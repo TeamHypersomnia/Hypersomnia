@@ -293,7 +293,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 		auto predictability = destroyed ? never_predictable_v : always_predictable_v;
 
-		if (step.get_settings().effect_prediction.predict_death_particles) {
+		if (step.get_settings().effect_prediction.death_particles == effect_prediction_type::PREDICT) {
 			predictability = always_predictable_v;
 		}
 

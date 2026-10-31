@@ -625,7 +625,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
 	root.clear();
-	root.subfolders.resize(15);
+	root.subfolders.resize(16);
 	root.should_sort = false;
 
 	auto i = 0;
@@ -636,6 +636,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 
 	auto& firearms_folder = root.subfolders[i++];
 	auto& ammunition_folder = root.subfolders[i++];
+	auto& missiles_folder = root.subfolders[i++];
 	auto& melee_weapons_folder = root.subfolders[i++];
 	auto& explosives_folder = root.subfolders[i++];
 
@@ -657,6 +658,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 
 	firearms_folder.name = "Firearms";
 	ammunition_folder.name = "Ammunition";
+	missiles_folder.name = "Missiles";
 	melee_weapons_folder.name = "Melee weapons";
 	explosives_folder.name = "Explosives";
 
@@ -698,6 +700,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	auto& firearms_folder = root.subfolders[i++];
 	auto& ammunition_folder = root.subfolders[i++];
+	auto& missiles_folder = root.subfolders[i++];
 	auto& melee_weapons_folder = root.subfolders[i++];
 	auto& explosives_folder = root.subfolders[i++];
 
@@ -793,6 +796,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	handle(firearms_folder, resources.get_pool_for<editor_firearm_resource>(), assets::necessary_image_id::CHAMBER_SLOT_ICON);
 	handle(ammunition_folder, resources.get_pool_for<editor_ammunition_resource>(), assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
+	handle(missiles_folder, resources.get_pool_for<editor_missile_resource>(), assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 	handle(melee_weapons_folder, resources.get_pool_for<editor_melee_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
 	handle(explosives_folder, resources.get_pool_for<editor_explosive_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
 

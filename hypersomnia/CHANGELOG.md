@@ -4,6 +4,57 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [4.4.0] - 2026-10-30
+
+### Added
+
+- **Gore: legs come off.**
+	- Shoot the middle of a corpse for a leg, the sides for an arm.
+	- Up to four limbs, +$500 each.
+	- Rip them all off and keep shooting: it explodes for +$1000.
+- **Gore: corpses stay up while you keep shooting them.**
+	- Every hit keeps the body standing a little longer.
+	- The Awka, Hunter, Deagle, Ao44 and ELON rocket launcher drop it at once.
+- **Gore: bullet holes.**
+	- Bodies carry the holes you put in them.
+	- Blood runs from them.
+- **Gore: stumps bleed.**
+	- Blood pools where a head, arm or leg was torn off.
+	- Knives and explosions splatter the body itself, each its own way.
+- **Guns fall out of dead hands** - and clatter on the floor.
+- **Server browser:** "Want to host your 24/7 server? Click here!" (Linux).
+- **Editor:** a Missile object - fires once at round start, for test maps.
+
+### Changed
+
+- **The game starts in the main menu**, not where you left off.
+	- New players still start in the tutorial.
+	- Settings > General > At startup, launch: Last activity brings the old way back.
+- **Corpses slide in a straight line** - no more sideways bounces off corners.
+	- Through a portal they come out along its exit.
+- **Lying corpses hit walls by their shape**, not a box.
+- **Shooting range:** some enemies hold a Baka47.
+- **Tournaments in the server browser:** one row per tournament.
+	- Finished matches stay listed.
+	- The stage shows on TAB.
+- **Tournaments:** spectator slots are split between a round's matches.
+- **Tournaments:** nicknames are matched regardless of case.
+	- A wrong match tells you which nicknames it waits for.
+- **Favorites typed by hand** show as the listed server, under your name for it.
+- **Servers sign their ping answers** - a favorite can't be impersonated.
+- **Prediction settings** in Settings > Client > Lag compensation.
+	- Confirm or predict each: your own death, and the particles, death sounds, item drop and body drop sounds of killed players.
+
+### Fixed
+
+- **The mouse is free whenever a window pops up over the game.**
+	- E.g. the question whether a Steam account is yours, as the shooting range starts.
+- **Gore off: all blood is green**, also on torn off limbs and head splatters.
+- **Joining from a link** no longer waits behind the changelog.
+- **Browser players** refused for too many joins at once are now told why.
+- **Browser players** are no longer dropped right after joining for no reason.
+- A tournament restarted midway no longer updates the game.
+
 ## [4.3.0] - 2026-10-27
 
 ### Added

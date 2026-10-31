@@ -28,7 +28,11 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"
+#include "view/rendering_scripts/owned_decals.h"
 #include "game/components/torso_component.hpp"
+
+template <class H>
+void draw_standing_corpse_decals(const owned_decals&, const H& corpse, const draw_renderable_input&);
 
 /*
 	Collapse a round's neon tail the moment it is turned, instead of fading it out
@@ -510,7 +514,10 @@ FORCE_INLINE void specific_entity_drawer(
 				const bool is_dead = sentience.is_dead();
 				const bool is_lying_corpse = is_dead && sentience.has_exploded;
 
-				if (!is_lying_corpse) {
+				/*
+					Corpses never show legs - standing ones would show them still walking.
+				*/
+				if (!is_dead) {
 					const auto leg_anim = torso.calc_leg_anim(velocity, face_degrees + stance_offsets.strafe_facing_offset);
 
 					if (const auto animation = logicals.find(leg_anim.id);
@@ -665,6 +672,10 @@ FORCE_INLINE void specific_entity_drawer(
 					}
 
 					draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees + body_rotation });
+
+					if (!is_neon && in.decals != nullptr) {
+						::draw_standing_corpse_decals(*in.decals, typed_handle, in);
+					}
 
 					draw_standing_head = true;
 					head_flip = sentience.should_flip_tattered_sprite();
@@ -907,5 +918,16 @@ FORCE_INLINE void draw_border(
 ) {
 	handle.constrained_dispatch<entities_with_renderables>([&in, &borders](const auto typed_handle) {
 		specific_draw_border(typed_handle, in, std::forward<B>(borders));
+	});
+}
+
+/*
+	See owned_decals.h.
+*/
+
+template <class H>
+void draw_standing_corpse_decals(const owned_decals& decals, const H& corpse, const draw_renderable_input& in) {
+	decals.for_each_within_standing_corpse(corpse, [&](const auto& typed_decal) {
+		::specific_draw_entity(typed_decal, in);
 	});
 }

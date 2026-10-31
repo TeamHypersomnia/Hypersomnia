@@ -32,6 +32,7 @@ struct particles_emission {
 	float stream_fade_in_ms = 0.f;
 	float stream_shrink_out_ms = 0.f;
 	float stream_delay_ms = 0.f;
+	float prewarm_ms = 0.f;
 	bound particle_lifetime_ms = bound(0.f, 0.f);
 	bound size_multiplier = bound(1.f, 1.f);
 	bound acceleration = bound(0.f, 0.f);

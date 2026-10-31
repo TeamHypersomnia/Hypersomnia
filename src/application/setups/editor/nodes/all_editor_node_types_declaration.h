@@ -12,6 +12,7 @@ struct editor_area_marker_node;
 
 struct editor_firearm_node;
 struct editor_ammunition_node;
+struct editor_missile_node;
 struct editor_melee_node;
 struct editor_explosive_node;
 struct editor_tool_node;
@@ -34,6 +35,7 @@ using all_editor_node_types = type_list<
 	editor_explosive_node,
 	editor_melee_node,
 	editor_ammunition_node,
+	editor_missile_node,
 	editor_firearm_node,
 	editor_tool_node,
 	editor_touch_collectible_node,

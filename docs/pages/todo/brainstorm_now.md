@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- audyt desync dla botow i arena mode
+
+- zombie mode
+	- ale najpierw refactor
+	- jak dzialaja mody w cs2d, ror, xonotic, czy maja jakies dll czy cos innego zeby bylo bezpiecznie
+
+- enable dash to game varsow ale w generatorze to advanced
+- money bar mruga przy restarcie rundy (widziane jako ALIVE na serwerze) - dalej niewyjasnione; jedyny zostawiony fix: rysowac kase gdy spectator nikogo nie oglada
+- dac jednak 0.75x default w shooting range moze?
+- wywalic discord redicrect z crazygames
 - do audytow zeby dodawalo slad po audycie zeby wiedzeic ktore commity przepatrzone
 - audyt wszystkich skilli
 - turniejowy live results page jako combo: Off / Default / I will host my own - wlasny frontend do tournament.json (juz podpisany i z CORS), na tej samej maszynie; heartbeat nadal daje pucharek Results obok nazwy na liscie serwerow

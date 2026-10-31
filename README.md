@@ -61,9 +61,7 @@ Only ~30 MB!
 
 The game will start with a **Tutorial!**
 
-### Host your own server
-
-**[Interactive Server Setup](https://hypersomnia.io/generator)**
+### [Host your own server](https://hypersomnia.io/generator)
 
 Complete server configuration in a few clicks.  
 *Never read the docs again!*  

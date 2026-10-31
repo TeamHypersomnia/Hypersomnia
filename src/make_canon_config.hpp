@@ -8,6 +8,7 @@ inline void make_canon_config(config_json_table& result, bool is_dedicated_serve
 		result.server.suppress_new_community_server_webhook = true;
 		result.unit_tests.run = true;
 		result.audio_volume.music = 0;
+		result.launch_at_startup = launch_type::LAST_ACTIVITY;
 
 #if PLATFORM_UNIX
 		result.window.fullscreen = false;

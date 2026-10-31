@@ -1,6 +1,6 @@
 ---
 name: run-map
-description: Start any Hypersomnia map from the CLI for a test - a dedicated server on it (official, downloaded or an edited copy), with or without bots, a spectator or visible client, the editor playtest, and copies of a map with changed rules or items (map_copy.py). Use whenever a test needs a map running - gameplay, bots, shop, UI on screen, rendering - "odpal mapkę", "na testowej mapce", "na fy_iceworld", "stestuj na mapie", also as the base of the bot matches in local-testing.
+description: Start any Hypersomnia map from the CLI for a test - a dedicated server on it (official, downloaded or an edited copy), with or without bots, a spectator or visible client, the editor playtest, and copies of a map with changed rules or items (map_copy.py). Use whenever a test needs a map running - gameplay, bots, shop, UI on screen, rendering - "odpal mapkę", "na testowej mapce", "na fy_iceworld", "stestuj na mapie", also as the base of the bot matches in local-testing. Also damage, death and gore tests without bots - missiles fired at one character (DAMAGE_TESTS.md).
 ---
 
 # Running a map for a test
@@ -42,6 +42,11 @@ Build into `build/Debug-x64-clang-claude` first (`BIN` defaults to it), never `b
   `run_map.sh` prints their count; anything above 0 is a determinism bug (a client that joined mid-round
   has the server's snapshot, so a desync right after joining means the snapshot misses something - see
   `never_changes_in_game` in net_solvable_stream.h).
+
+## Damage, death and gore - without bots
+
+Hits, knockout, standing and lying corpses, limbs, bullet holes, blood: `scripts/damage_test.sh` fires a fixed set of
+missiles (the editor's Missile node) at one character in a chosen stance and screenshots it - see `DAMAGE_TESTS.md`.
 
 ## The editor and playtest
 

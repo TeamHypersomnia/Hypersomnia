@@ -97,6 +97,7 @@ struct test_mode_player {
 	bool is_bot = false;
 
 	std::optional<ai_path_navigation_state> debug_navigation;
+	std::optional<item_flavour_id> round_start_weapon;
 	// END GEN INTROSPECTOR
 
 	/* Dummy field for compatibility */

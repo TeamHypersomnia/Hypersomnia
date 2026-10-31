@@ -814,12 +814,24 @@ void particles_simulation_system::advance_visible_streams(
 			auto considered_delta = delta;
 			considered_delta *= time_mult;
 
-			const auto dt_secs = considered_delta.in_seconds();
-
 			if (instance.delay_remaining_ms > 0.f) {
 				instance.delay_remaining_ms -= considered_delta.in_milliseconds();
 				continue;
 			}
+
+			/*
+				On its first advance, a prewarmed emission catches up prewarm_ms at once:
+				it spawns what it would have spawned by then, aged accordingly,
+				as if the effect had started that much earlier.
+			*/
+			if (const auto prewarm_ms = instance.source_emission.prewarm_ms;
+				prewarm_ms > 0.f && !instance.prewarm_applied
+			) {
+				considered_delta = augs::delta::from_milliseconds(considered_delta.in_milliseconds() + prewarm_ms);
+				instance.prewarm_applied = true;
+			}
+
+			const auto dt_secs = considered_delta.in_seconds();
 
 			const auto stream_alivity_mult = std::fmod(instance.calc_alivity_mult(), 1.0f);
 			const auto stream_delta = instance.advance_lifetime_get_dt(considered_delta, infinitely);
@@ -1012,15 +1024,29 @@ void particles_simulation_system::advance_visible_streams(
 					return modified;
 				};
 
+				/*
+					In steps, as a prewarm may age a particle by much more than a frame.
+				*/
+				auto age_particle = [&](auto& particle, auto&&... args) {
+					const auto max_step_secs = 1.f / 120.f;
+					auto remaining_secs = time_elapsed;
+
+					do {
+						const auto step_secs = std::min(remaining_secs, max_step_secs);
+						particle.integrate(step_secs, args...);
+						remaining_secs -= step_secs;
+					} while (remaining_secs > 0.f);
+				};
+
 				if (emission.has<general_particle>()) {
 					auto new_general = spawner(general_particle());
-					new_general.integrate(time_elapsed);
+					age_particle(new_general);
 					add_particle(emission.target_layer, new_general);
 				}
 
 				if (emission.has<animated_particle>()) {
 					auto new_animated = spawner(animated_particle());
-					new_animated.integrate(time_elapsed, anims);
+					age_particle(new_animated, anims);
 					add_particle(emission.target_layer, new_animated);
 				}
 

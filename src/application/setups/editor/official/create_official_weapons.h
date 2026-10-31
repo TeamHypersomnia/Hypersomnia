@@ -78,6 +78,21 @@ void create_weapons(const intercosm& scene, editor_resource_pools& pools) {
 	}
 
 	{
+		using test_id_type = test_plain_missiles;
+
+		auto& pool = pools.template get_pool_for<editor_missile_resource>();
+
+		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+			auto res = editor_missile_resource();
+			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.official_tag = enum_id;
+			res.scene_flavour_id = to_entity_flavour_id(enum_id);
+
+			pool.allocate(res);
+		});
+	}
+
+	{
 		using test_id_type = test_container_items;
 
 		auto& pool = pools.template get_pool_for<editor_ammunition_resource>();

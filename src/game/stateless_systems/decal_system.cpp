@@ -14,15 +14,17 @@
 #include "game/components/decal_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/sprite_component.h"
+#include "game/detail/decals/living_character_holes.h"
 
 /*
-	Blood, gunshot and explosion decals have separate budgets
+	Blood, gunshot, explosion and character (holes and drips on bodies) decals have separate budgets
 	so that e.g. numerous gunshot decals never eat away the explosion ones.
 */
 enum class decal_category {
 	BLOOD,
 	GUNSHOT,
 	EXPLOSION,
+	CHARACTER,
 
 	COUNT
 };
@@ -30,11 +32,19 @@ enum class decal_category {
 static constexpr std::size_t NUM_DECAL_CATEGORIES = static_cast<std::size_t>(decal_category::COUNT);
 
 /* Soft limits: when exceeded, oldest decals of the category are marked for deletion */
-static constexpr std::array<std::size_t, NUM_DECAL_CATEGORIES> SOFT_LIMIT_DECALS = { 800, 500, 150 };
+static constexpr std::array<std::size_t, NUM_DECAL_CATEGORIES> SOFT_LIMIT_DECALS = { 800, 500, 150, 300 };
 /* Hard limits: when exceeded, oldest decal of the category is deleted immediately */
-static constexpr std::array<std::size_t, NUM_DECAL_CATEGORIES> HARD_LIMIT_DECALS = { 1000, 600, 200 };
+static constexpr std::array<std::size_t, NUM_DECAL_CATEGORIES> HARD_LIMIT_DECALS = { 1000, 600, 200, 350 };
 
 static decal_category calc_decal_category(const invariants::decal& def) {
+	/*
+		Bullet holes and drips on characters and corpses have their own budget -
+		so that the marks on the walls of a long firefight don't make the corpses' holes shrink away.
+	*/
+	if (def.is_character_decal) {
+		return decal_category::CHARACTER;
+	}
+
 	if (def.is_gunshot_decal) {
 		return decal_category::GUNSHOT;
 	}
@@ -109,6 +119,9 @@ void decal_system::limit_decal_count(const logic_step step) const {
 					if (!state.follows_attached) {
 						/* Static surface - only needs to exist. */
 					}
+					else if (::is_hole_of_living_character(subject)) {
+						/* Not drawn until its character dies - see living_character_holes.h. */
+					}
 					else if (const auto owner_transform = owner.find_logic_transform()) {
 						const auto new_transform = *owner_transform * state.attachment_offset;
 
@@ -159,6 +172,12 @@ void decal_system::limit_decal_count(const logic_step step) const {
 					sprite->colorize = rgba(white).multiply_rgb(colorize_mult);
 					sprite->colorize_neon = rgba(white).mult_alpha(neon_alpha_mult);
 				}
+			}
+
+			if (state.marked_for_deletion && !state.when_marked_for_deletion.was_set()) {
+				/* Marked with no time - to go at once, see delete_decal_next_step. */
+				step.queue_deletion_of(subject, "Decal deleted at once");
+				return;
 			}
 
 			if (state.marked_for_deletion) {

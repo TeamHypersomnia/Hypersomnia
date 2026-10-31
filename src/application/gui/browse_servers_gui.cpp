@@ -8,6 +8,7 @@
 #include "application/main/favorite_servers.h"
 #include "application/gui/browse_servers_gui.h"
 #include "augs/misc/imgui/simple_popup.h"
+#include "augs/misc/imgui/text_link.h"
 #include "augs/misc/imgui/long_input_text_with_dots.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
@@ -924,6 +925,36 @@ static void name_column_row(const std::function<void()> content) {
 	next_columns(num_columns - 2);
 }
 
+#if PLATFORM_LINUX && !PLATFORM_WEB
+/*
+	Below the community servers, only in the native Linux build (Steam or not) - the ones who would host a 24/7 server.
+	"Click here!" looks like a changelog link and opens the server config generator.
+*/
+
+static void host_server_invitation_row() {
+	using namespace augs::imgui;
+
+	ImGui::Separator();
+
+	name_column_row([&]() {
+		/*
+			Wider than the name column - drawn over the next columns, which are empty in this row.
+		*/
+
+		const auto window_lt = ImGui::GetWindowPos();
+		const auto window_rb = ImVec2(window_lt.x + ImGui::GetWindowWidth(), window_lt.y + ImGui::GetWindowHeight());
+		ImGui::PushClipRect(window_lt, window_rb, false);
+
+		ImGui::TextUnformatted("Want to host your 24/7 server?");
+		ImGui::SameLine();
+
+		augs::imgui::text_link("Click here!", "https://hypersomnia.io/generator", true);
+
+		ImGui::PopClipRect();
+	});
+}
+#endif
+
 
 
 void browse_servers_gui_state::select_server(const server_list_entry& s) {
@@ -1490,9 +1521,37 @@ void browse_servers_gui_state::show_server_list(
 			return "Tournament " + ip;
 		}();
 
+		const auto row_clicked = ImGui::Selectable(name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap);
+		const bool row_hovered = ImGui::IsItemHovered();
+
+		ImGui::NextColumn();
+
+		{
+			auto online = 0;
+			auto max_online = 0;
+
+			for (const auto e : r.entries) {
+				if (e->details_known()) {
+					online += e->heartbeat.num_online;
+					max_online += e->heartbeat.max_online();
+				}
+			}
+
+			const auto players_text = typesafe_sprintf("%x/%x", online, max_online);
+
+			if (online == 0) {
+				text_disabled(players_text);
+			}
+			else {
+				text(players_text);
+			}
+		}
+
+		ImGui::NextColumn();
+
 		/*
-			Its results: the tournament's page, served by its host - opened in the browser, the row neither expanded
-			nor collapsed. Not on CrazyGames (no links out).
+			Its results in the Event column: the tournament's page, served by its host - opened in the browser, the row
+			neither expanded nor collapsed. Not on CrazyGames (no links out).
 		*/
 
 		bool results_hovered = false;
@@ -1503,12 +1562,7 @@ void browse_servers_gui_state::show_server_list(
 		const auto page_port = uint16_t(0);
 #endif
 
-		const auto row_clicked = ImGui::Selectable(name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap);
-		const bool row_hovered = ImGui::IsItemHovered();
-
 		if (page_port != 0) {
-			ImGui::SameLine();
-
 			/*
 				At the address a join goes to - on the local network its own, not the router's.
 			*/
@@ -1551,30 +1605,7 @@ void browse_servers_gui_state::show_server_list(
 			toggle(r);
 		}
 
-		ImGui::NextColumn();
-
-		{
-			auto online = 0;
-			auto max_online = 0;
-
-			for (const auto e : r.entries) {
-				if (e->details_known()) {
-					online += e->heartbeat.num_online;
-					max_online += e->heartbeat.max_online();
-				}
-			}
-
-			const auto players_text = typesafe_sprintf("%x/%x", online, max_online);
-
-			if (online == 0) {
-				text_disabled(players_text);
-			}
-			else {
-				text(players_text);
-			}
-		}
-
-		next_columns(num_columns - 3);
+		next_columns(num_columns - 4);
 	};
 
 	auto row_id = 0;
@@ -2227,7 +2258,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const float col_star = ImGui::GetTextLineHeight() + ImGui::GetStyle().ItemSpacing.x * 2;
 		float col_1 = ImGui::CalcTextSize("9999999").x;
 		float col_3 = ImGui::CalcTextSize("99h 99m 9").x;
-		float col_4 = ImGui::CalcTextSize("Players  9").x;
+
+		/*
+			The Event column: also a tournament's trophy and "Results", whole.
+		*/
+
+		float col_4 = std::max(
+			ImGui::CalcTextSize("Players  9").x,
+			ImGui::GetTextLineHeight() + ImGui::CalcTextSize("Results").x + ImGui::GetStyle().ItemSpacing.x * 2
+		);
 		float col_5 = ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2);
 		float col_6 = ImGui::CalcTextSize("Capture the flag 9").x;
 		float col_7 = ImGui::CalcTextSize("9").x * 25;
@@ -2484,7 +2523,22 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		if (t == browser_tab::ALL) {
+#if PLATFORM_LINUX && !PLATFORM_WEB
+			/*
+				With no community server online the invitation takes the place of "No community servers".
+			*/
+
+			if (has_community_servers) {
+				section(community_servers_label, orange, "community", communities, "");
+			}
+			else {
+				header_or_separator(community_servers_label, orange);
+			}
+
+			::host_server_invitation_row();
+#else
 			section(community_servers_label, orange, "community", communities, has_community_servers ? "" : "No community servers are online at the time.");
+#endif
 		}
 	};
 

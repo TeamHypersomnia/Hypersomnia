@@ -28,7 +28,7 @@ struct item_fall_state {
 	uint8_t sound_variation = NO_SOUND_VARIATION;
 	bool hops_like_shell = false;
 	uint8_t num_falls = 0;
-	pad_bytes<1> pad;
+	bool dropped_on_death = false;
 	uint32_t seed = 0;
 	// END GEN INTROSPECTOR
 

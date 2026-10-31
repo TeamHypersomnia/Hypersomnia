@@ -21,6 +21,7 @@
 #include "game/detail/decals/decal_geometry.h"
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/physics/physics_queries.h"
+#include "game/detail/physics/world_polygon.h"
 #include "game/detail/visible_entities.hpp"
 #include "game/detail/decals/for_each_decal_in_box.hpp"
 #include "game/inferred_caches/find_physics_cache.h"
@@ -144,25 +145,6 @@ inline vec2i to_decal_sprite_size(const vec2 size) {
 /* How far outside a fixture an impact point may land and still be attributed to it. */
 inline constexpr real32 MAX_IMPACT_ATTRIBUTION_DISTANCE_PX = 10.f;
 
-inline auto get_world_polygon_px(const b2Fixture& fixture, const si_scaling si) {
-	augs::constant_size_vector<vec2, b2_maxPolygonVertices> result;
-
-	const auto* const shape = fixture.GetShape();
-
-	if (shape->GetType() != b2Shape::e_polygon) {
-		return result;
-	}
-
-	const auto& poly = static_cast<const b2PolygonShape&>(*shape);
-	const auto& xf = fixture.GetBody()->GetTransform();
-
-	for (int v = 0; v < poly.GetVertexCount(); ++v) {
-		result.push_back(si.get_pixels(static_cast<vec2>(b2Mul(xf, poly.GetVertex(v)))));
-	}
-
-	return result;
-}
-
 /*
 	Finds the convex fixture of the surface entity whose boundary
 	is the closest to the given impact point. Robust against impacts
@@ -200,6 +182,18 @@ const b2Fixture* find_fixture_of_impact(
 	}
 
 	return best_fixture;
+}
+
+/*
+	A weapon may dictate its mark's scale outright;
+	zero means it is derived from the damage instead.
+*/
+inline real32 calc_gunshot_decal_size_mult(const real32 damage_amount, const real32 custom_decal_scale) {
+	if (custom_decal_scale > 0.f) {
+		return std::min(custom_decal_scale, MAX_CUSTOM_GUNSHOT_DECAL_SCALE);
+	}
+
+	return std::clamp(damage_amount / GUNSHOT_DECAL_BASELINE_DAMAGE, MIN_GUNSHOT_DECAL_SCALE, MAX_GUNSHOT_DECAL_SCALE);
 }
 
 struct nearby_decal {
@@ -249,6 +243,16 @@ inline bool decal_overlaps_spot(const nearby_decal& other, const vec2 at, const 
 	return (other.pos - at).length_sq() < overlap_radius * overlap_radius;
 }
 
+inline bool decal_overlaps_any(const nearby_decals& others, const vec2 at, const real32 len) {
+	for (const auto& other : others) {
+		if (::decal_overlaps_spot(other, at, len)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /*
 	Deletes the closest decal of an already crowded spot right away -
 	the decal spawned on top of it covers its disappearance.
@@ -292,6 +296,48 @@ inline void delete_closest_decal_if_crowded(
 	}
 }
 
+/*
+	set_decal_state sets the rest of the new decal's state, e.g. what only the holes on characters keep.
+*/
+
+template <class SetDecalState>
+void queue_decal_creation(
+	const logic_step step,
+	const typed_entity_flavour_id<decal_decoration> flavour,
+	const transformr decal_transform,
+	const vec2i final_size,
+	const entity_id spawned_by,
+	const entity_id attached_to,
+	const bool follows_attached,
+	const transformr attachment_offset,
+	const rgba colorize,
+	SetDecalState set_decal_state
+) {
+	cosmic::queue_create_entity(
+		step,
+		constrained_entity_flavour_id<invariants::decal>(flavour),
+		[decal_transform, final_size, spawned_by, attached_to, follows_attached, attachment_offset, colorize, set_decal_state](const auto typed_handle, auto& agg) {
+			typed_handle.set_logic_transform(decal_transform);
+
+			if (auto* const decal_state = agg.template find<components::decal>()) {
+				decal_state->spawned_by = spawned_by;
+				decal_state->attached_to = attached_to;
+				decal_state->follows_attached = follows_attached;
+				decal_state->attachment_offset = attachment_offset;
+				set_decal_state(*decal_state);
+			}
+
+			if (auto* const geo = agg.template find<components::overridden_geo>()) {
+				geo->size = final_size;
+			}
+
+			if (auto* const sprite = agg.template find<components::sprite>()) {
+				sprite->colorize = colorize;
+			}
+		}
+	);
+}
+
 inline void queue_decal_creation(
 	const logic_step step,
 	const typed_entity_flavour_id<decal_decoration> flavour,
@@ -303,27 +349,17 @@ inline void queue_decal_creation(
 	const transformr attachment_offset = transformr(),
 	const rgba colorize = white
 ) {
-	cosmic::queue_create_entity(
+	::queue_decal_creation(
 		step,
-		constrained_entity_flavour_id<invariants::decal>(flavour),
-		[decal_transform, final_size, spawned_by, attached_to, follows_attached, attachment_offset, colorize](const auto typed_handle, auto& agg) {
-			typed_handle.set_logic_transform(decal_transform);
-
-			if (auto* const decal_state = agg.template find<components::decal>()) {
-				decal_state->spawned_by = spawned_by;
-				decal_state->attached_to = attached_to;
-				decal_state->follows_attached = follows_attached;
-				decal_state->attachment_offset = attachment_offset;
-			}
-
-			if (auto* const geo = agg.template find<components::overridden_geo>()) {
-				geo->size = final_size;
-			}
-
-			if (auto* const sprite = agg.template find<components::sprite>()) {
-				sprite->colorize = colorize;
-			}
-		}
+		flavour,
+		decal_transform,
+		final_size,
+		spawned_by,
+		attached_to,
+		follows_attached,
+		attachment_offset,
+		colorize,
+		[](components::decal&) {}
 	);
 }
 
@@ -516,15 +552,7 @@ std::optional<transformr> spawn_surface_impact_decal(
 		return std::nullopt;
 	}
 
-	/*
-		A weapon may dictate its mark's scale outright;
-		zero means it is derived from the damage instead.
-	*/
-	const auto size_mult =
-		custom_decal_scale > 0.f ?
-		std::min(custom_decal_scale, MAX_CUSTOM_GUNSHOT_DECAL_SCALE) :
-		std::clamp(damage_amount / GUNSHOT_DECAL_BASELINE_DAMAGE, MIN_GUNSHOT_DECAL_SCALE, MAX_GUNSHOT_DECAL_SCALE)
-	;
+	const auto size_mult = ::calc_gunshot_decal_size_mult(damage_amount, custom_decal_scale);
 
 	const auto desired_size = original_size * size_mult * rng.randval(0.9f, 1.1f);
 

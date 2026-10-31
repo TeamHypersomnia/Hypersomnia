@@ -96,25 +96,39 @@ const SYSTEMS = [
 }
 ];
 
-const TOP = [
-	["example", 0], ["example", 1]
-];
-
 const DONE_KEY = "hs-audit-done";
 let done = {};
 try { done = JSON.parse(localStorage.getItem(DONE_KEY) || "{}"); } catch (e) {}
 const save_done = () => { try { localStorage.setItem(DONE_KEY, JSON.stringify(done)); } catch (e) {} };
 
-let active = "top";
+let active = "red";
 let sev_on = Object.fromEntries(SEV.map(s => [s, true]));
 
 /*
-	One number per finding across the whole report, also in Top - so "punkt 7" names exactly one finding.
+	One number per finding across the whole report: the red ones first, 1 to R through the systems in order,
+	then the green ones - so the first tab, every red finding, reads 1, 2, 3... and "punkt 7" names exactly one finding.
 */
-const NUM_BASE = {};
-SYSTEMS.reduce((acc, s) => { NUM_BASE[s.id] = acc; return acc + s.items.length; }, 0);
+const NUM = {};
+const REDS = [];
+{
+	let n = 1;
 
-const tabs = [{ id: "top", name: "Top", n: TOP.length }].concat(SYSTEMS.map(s => ({ id: s.id, name: s.name, n: s.items.length })));
+	for (const color of ["r", "g"]) {
+		for (const s of SYSTEMS) {
+			s.items.forEach((it, i) => {
+				if (it[0] === color) {
+					NUM[`${s.id}:${i}`] = n++;
+
+					if (color === "r") {
+						REDS.push([s, i]);
+					}
+				}
+			});
+		}
+	}
+}
+
+const tabs = [{ id: "red", name: "Czerwone", n: REDS.length }].concat(SYSTEMS.map(s => ({ id: s.id, name: s.name, n: s.items.length })));
 
 function render_tabs() {
 	const nav = document.getElementById("tabs");
@@ -154,7 +168,7 @@ function card(sys, idx, show_sys) {
 	const d = document.createElement("div");
 	d.className = `item ${color}` + (done[key] ? " done" : "");
 	d.innerHTML = `
-		<h3><span class="num">${NUM_BASE[sys.id] + idx + 1}.</span><span class="badge b-${sev}">${SEV_LABEL[sev]}</span>${title}
+		<h3><span class="num">${NUM[`${sys.id}:${idx}`]}.</span><span class="badge b-${sev}">${SEV_LABEL[sev]}</span>${title}
 			<span class="state ${state}">${state === "fixed" ? "poprawione" : "do decyzji"}</span>
 			${show_sys ? `<span class="sysname">· ${sys.name}</span>` : ""}
 			<input type="checkbox" title="zrobione" ${done[key] ? "checked" : ""}></h3>
@@ -176,16 +190,16 @@ function render() {
 	const list = document.getElementById("list");
 	const clean = document.getElementById("clean");
 	list.innerHTML = "";
-	if (active === "top") {
-		for (const [sid, idx] of TOP) {
-			const sys = SYSTEMS.find(s => s.id === sid);
+	if (active === "red") {
+		for (const [sys, idx] of REDS) {
 			if (sev_on[sys.items[idx][1]]) { list.appendChild(card(sys, idx, true)); }
 		}
-		clean.textContent = "Najgorsze findingi ze wszystkich systemów, od najpoważniejszych.";
+		clean.textContent = REDS.length ? "Wszystkie czerwone findingi, ze wszystkich systemów." : "Brak czerwonych findingów.";
 		return;
 	}
 	const sys = SYSTEMS.find(s => s.id === active);
-	sys.items.forEach((it, i) => { if (sev_on[it[1]]) { list.appendChild(card(sys, i, false)); } });
+	const order = sys.items.map((it, i) => i).sort((a, b) => NUM[`${sys.id}:${a}`] - NUM[`${sys.id}:${b}`]);
+	order.forEach(i => { if (sev_on[sys.items[i][1]]) { list.appendChild(card(sys, i, false)); } });
 	clean.textContent = sys.clean;
 }
 

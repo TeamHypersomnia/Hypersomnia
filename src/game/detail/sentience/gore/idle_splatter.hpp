@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "game/detail/sentience/gore/blood_splatter.hpp"
 #include "game/components/sentience_component.h"
 #include "game/cosmos/cosmos.h"
@@ -27,6 +28,23 @@ inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET = 20.f;
 
 inline constexpr real32 IDLE_SPLATTER_MIN_OFFSET_START = 20.f;
 inline constexpr real32 IDLE_SPLATTER_MAX_OFFSET_START = 30.f;
+
+/*
+	Where the character's newest hole is now (none: zero offset) - the blood dripping from the body runs from it.
+*/
+
+template <class E>
+std::optional<vec2> find_newest_character_hole_pos(const E& character, const components::sentience& sentience) {
+	if (sentience.newest_hole_offset.is_zero()) {
+		return std::nullopt;
+	}
+
+	if (const auto character_transform = character.find_logic_transform()) {
+		return (*character_transform * transformr(sentience.newest_hole_offset)).pos;
+	}
+
+	return std::nullopt;
+}
 
 /*
 	Handles periodic blood dripping for low-HP characters and corpses.
@@ -116,7 +134,10 @@ inline void handle_idle_blood_splatter(
 	const auto random_start_offset = rng.random_point_in_ring(IDLE_SPLATTER_MIN_OFFSET_START, IDLE_SPLATTER_MAX_OFFSET_START);
 	const auto random_offset = rng.random_point_in_ring(IDLE_SPLATTER_MIN_OFFSET, IDLE_SPLATTER_MAX_OFFSET);
 
-	const auto splatter_start = pos + random_start_offset;
+	/*
+		From its newest bullet hole if it has any.
+	*/
+	const auto splatter_start = ::find_newest_character_hole_pos(subject, sentience).value_or(pos + random_start_offset);
 	const auto splatter_pos = splatter_start + random_offset;
 
 	/*
