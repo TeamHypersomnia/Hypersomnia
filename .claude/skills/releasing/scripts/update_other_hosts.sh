@@ -31,7 +31,7 @@ fi
 sleep 10
 systemctl is-active hypersomnia
 "$T" --version 2>/dev/null | head -1
-# the running process's age, not the file's version: a process that never restarted still runs the old one
+# the age of the running process, not the version of the file: a process that never restarted still runs the old one
 echo "game process up for: $(ps -eo etime,args | grep "[u]sr/bin/Hypersomnia --calling-cwd" | awk "{print \$1}" | head -1)"
 '
 echo "== US"; ssh -o BatchMode=yes ubuntu@arena-us.hypersomnia.io "bash -s /home/ubuntu/Hypersomnia-Headless.AppImage sudo" <<< "$REMOTE" 2>&1 | tail -3
