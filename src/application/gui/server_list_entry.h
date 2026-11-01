@@ -110,14 +110,15 @@ struct server_list_entry {
 	}
 
 	/*
-		The server list has another server (another key) at the favorite's address - named here; the favorite is
-		not pinged there (that one would answer).
+		The server list has another server (another key) at the favorite's address - the favorite is not pinged there
+		(that one would answer).
 	*/
 
-	std::string other_server_at_address;
+	bool other_server_at_address = false;
 
 	/*
-		Found on the local network by a broadcast, the server list not having it - joined at its address, no key expected.
+		Found on the local network by a broadcast, the server list not having it - joined at its address, by the key it
+		answered with.
 	*/
 
 	bool lan = false;

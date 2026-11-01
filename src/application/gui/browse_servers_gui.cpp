@@ -56,6 +56,15 @@ constexpr auto reping_interval = 10;
 constexpr auto max_packets_per_frame_v = 64;
 #endif
 
+/*
+	Between a tournament's trophy and its "Results": as much room as from the trophy to the cell's edge - with the
+	default 22 px font 0.3 of the trophy less 2 px, scaled with the font.
+*/
+
+static float results_trophy_gap(const float trophy_size) {
+	return trophy_size * (0.3f - 2.0f / 22.0f);
+}
+
 #define LOG_BROWSER 1
 
 template <class... Args>
@@ -648,8 +657,30 @@ bool browse_servers_gui_state::handle_gameserver_response(netcode_socket_t& sock
 		A heartbeat to a ping - taken only by a server the list does not have.
 	*/
 
-	if (auto received = ::read_heartbeat_on_ping(packet_buffer, packet_bytes)) {
-		const auto sequence = received->header.sequence;
+	if (const auto header = ::read_heartbeat_on_ping_header(packet_buffer, packet_bytes)) {
+		const auto sequence = header->sequence;
+
+		auto asked = [&](const auto& list) {
+			return std::any_of(list.begin(), list.end(), [&](const auto& s) {
+				return s.address == from && s.progress.ping_sequence == sequence;
+			});
+		};
+
+		/*
+			The signature is checked only for an answer to what was asked - a flood of others costs no verify.
+		*/
+
+		if (!asked(favorite_only_list) && !asked(data->lan.list)) {
+			BRW_LOG("Received a heartbeat (seq=%x) from an UNKNOWN game server at: %x", sequence, ::ToString(from));
+			return true;
+		}
+
+		auto received = ::read_heartbeat_on_ping(packet_buffer, packet_bytes);
+
+		if (!received.has_value()) {
+			BRW_LOG("A heartbeat from %x whose signature doesn't hold - ignored.", ::ToString(from));
+			return true;
+		}
 
 		auto on_list = [this](const netcode_address_t& a) {
 			return on_server_list(a);
@@ -659,10 +690,12 @@ bool browse_servers_gui_state::handle_gameserver_response(netcode_socket_t& sock
 			for (auto& s : list) {
 				if (s.address == from && s.progress.ping_sequence == sequence) {
 					/*
-						A server known by its key (starred from the list) answers only signed with that key.
+						A server known by its key (starred from the list) answers only signed with that key. One found on
+						the local network is found by its address: it takes the key it answers with now (a server
+						reinstalled there is the new one at once).
 					*/
 
-					if (const auto known_key = s.get_public_key(); known_key.has_value() && *known_key != received->server_public_key) {
+					if (const auto known_key = s.get_public_key(); !s.lan && known_key.has_value() && *known_key != received->server_public_key) {
 						BRW_LOG("A heartbeat from %x signed with another key than the server's - ignored.", ::ToString(from));
 						return true;
 					}
@@ -681,8 +714,8 @@ bool browse_servers_gui_state::handle_gameserver_response(netcode_socket_t& sock
 			return false;
 		};
 
-		if (!take_into(favorite_only_list) && !take_into(data->lan.list)) {
-			BRW_LOG("Received a heartbeat (seq=%x) from an UNKNOWN game server at: %x", sequence, ::ToString(from));
+		if (!take_into(favorite_only_list)) {
+			take_into(data->lan.list);
 		}
 
 		return true;
@@ -789,7 +822,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			return;
 		}
 
-		if (s.favorite_only && (s.address.type == NETCODE_ADDRESS_NONE || !s.other_server_at_address.empty())) {
+		if (s.favorite_only && (s.address.type == NETCODE_ADDRESS_NONE || s.other_server_at_address)) {
 			return;
 		}
 
@@ -852,10 +885,14 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 		if (p.state == S::PING_MEASURED && s.favorite_only) {
 			const bool unanswered = p.when_sent_last_ping > p.when_answered;
 
-			if (unanswered && interval_passed(server_entry_timeout, p.when_sent_last_ping)) {
-				p.state = server_entry_state::GIVEN_UP;
-				p.when_sent_first_ping = current_time;
-				s.gave_up_once = true;
+			/*
+				Asked again every second like a new entry, gone only after the timeout - one lost packet doesn't
+				take it off.
+			*/
+
+			if (unanswered && interval_passed(ping_retry_interval, p.when_sent_last_ping)) {
+				p.state = S::AWAITING_RESPONSE;
+				p.when_sent_first_ping = p.when_sent_last_ping;
 				return;
 			}
 		}
@@ -882,7 +919,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			again now and then (it may be up by now).
 		*/
 
-		if (p.state == S::GIVEN_UP && s.favorite_only && s.other_server_at_address.empty() && show) {
+		if (p.state == S::GIVEN_UP && s.favorite_only && !s.other_server_at_address && show) {
 			if (interval_passed(reping_interval, p.when_sent_first_ping)) {
 				p = {};
 			}
@@ -1187,10 +1224,11 @@ void browse_servers_gui_state::show_server_list(
 			auto displayed_name = d.server_name;
 
 			/*
-				A favorite added by hand keeps the name the player gave it - on the list too.
+				A favorite added by hand keeps the name the player gave it - on the list too. A tournament's match keeps
+				its own ("[alice] vs [bob]"): the join line it was added by names the whole tournament.
 			*/
 
-			if (!s.manual_favorite_name.empty()) {
+			if (!s.manual_favorite_name.empty() && !d.is_tournament_server()) {
 				displayed_name = s.manual_favorite_name;
 			}
 
@@ -1228,9 +1266,9 @@ void browse_servers_gui_state::show_server_list(
 				text_disabled("Unlisted - added by hand.");
 			}
 
-			if (!s.other_server_at_address.empty()) {
-				text_color(typesafe_sprintf("Another server is at its address now: %x", s.other_server_at_address), orange);
-				text_disabled("This one moved or got a new key - add it to your favorites anew.");
+			if (s.other_server_at_address) {
+				text_color(std::string("Another server (another key) is at this address now."), orange);
+				text_disabled("Reinstalled? Add it again with its new key.");
 			}
 
 			if (!streamer_mode) {
@@ -1575,12 +1613,18 @@ void browse_servers_gui_state::show_server_list(
 			const auto pos = ImGui::GetCursorScreenPos();
 			const auto label_w = ImGui::CalcTextSize("Results").x;
 
-			ImGui::InvisibleButton("##results", ImVec2(size + label_w, size));
+			/*
+				The trophy's handles end short of its box - as much room again to the text as to the cell's edge.
+			*/
+
+			const auto gap = ::results_trophy_gap(size);
+
+			ImGui::InvisibleButton("##results", ImVec2(size + gap + label_w, size));
 			results_hovered = ImGui::IsItemHovered();
 
 			const auto col = ImGui::GetColorU32(ImVec4(results_hovered ? rgba(255, 220, 80, 255) : rgba(255, 200, 0, 200)));
 			trophy_shape(ImGui::GetWindowDrawList(), pos, size, col);
-			ImGui::GetWindowDrawList()->AddText(ImVec2(pos.x + size, pos.y), col, "Results");
+			ImGui::GetWindowDrawList()->AddText(ImVec2(pos.x + size + gap, pos.y), col, "Results");
 
 			if (ImGui::IsItemClicked()) {
 				augs::open_url(url);
@@ -2012,7 +2056,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			continue;
 		}
 
-		if (!passes_filter(s, std::string(s.heartbeat.server_name) + " " + std::string(s.heartbeat.tournament_name))) {
+		if (!passes_filter(s, std::string(s.heartbeat.server_name) + " " + std::string(s.heartbeat.current_arena) + " " + std::string(s.heartbeat.tournament_name))) {
 			continue;
 		}
 
@@ -2265,7 +2309,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		float col_4 = std::max(
 			ImGui::CalcTextSize("Players  9").x,
-			ImGui::GetTextLineHeight() + ImGui::CalcTextSize("Results").x + ImGui::GetStyle().ItemSpacing.x * 2
+			ImGui::GetTextLineHeight() + ::results_trophy_gap(ImGui::GetTextLineHeight()) + ImGui::CalcTextSize("Results").x + ImGui::GetStyle().ItemSpacing.x * 2
 		);
 		float col_5 = ImGui::CalcTextSize("9").x * (max_arena_name_length_v / 2);
 		float col_6 = ImGui::CalcTextSize("Capture the flag 9").x;
@@ -3696,9 +3740,11 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 
 	auto& shown_list = displayed_list();
 
-	for (auto& s : shown_list) {
-		s.manual_favorite_address.clear();
-		s.manual_favorite_name.clear();
+	for (auto* const list : { &shown_list, &data->lan.list }) {
+		for (auto& s : *list) {
+			s.manual_favorite_address.clear();
+			s.manual_favorite_name.clear();
+		}
 	}
 
 #if BUILD_NATIVE_SOCKETS
@@ -3757,7 +3803,7 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 			the list has its key at its address (or answering there inside this network) - then that listed one is it.
 		*/
 
-		const auto listed_entry = std::find_if(shown_list.begin(), shown_list.end(), [&](const auto& s) {
+		auto is_it = [&](const server_list_entry& s) {
 			if (s.get_public_key() != f.key) {
 				return false;
 			}
@@ -3773,9 +3819,25 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 #endif
 
 			return false;
+		};
+
+		const auto on_list = std::find_if(shown_list.begin(), shown_list.end(), is_it);
+
+		/*
+			Found on the local network by its key: that row is it too, as the list's would be.
+		*/
+
+		const auto on_lan = std::find_if(data->lan.list.begin(), data->lan.list.end(), [&](const auto& s) {
+			return lan_servers::shown(s) && is_it(s);
 		});
 
-		if (const bool listed = listed_entry != shown_list.end()) {
+		auto* const listed_entry =
+			on_list != shown_list.end() ? std::addressof(*on_list) :
+			on_lan != data->lan.list.end() ? std::addressof(*on_lan) :
+			nullptr
+		;
+
+		if (listed_entry != nullptr) {
 			if (f.manual) {
 				listed_entry->manual_favorite_address = f.address;
 				listed_entry->manual_favorite_name = f.name;
@@ -3790,7 +3852,7 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 				continue;
 			}
 
-			if (listed_entry->is_official_server() != f.official) {
+			if (on_list != shown_list.end() && listed_entry->is_official_server() != f.official) {
 				now_official.emplace_back(f, listed_entry->is_official_server());
 			}
 
@@ -3818,10 +3880,11 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 		entry.heartbeat.instance_label = f.label;
 		entry.favorite_address = f.address;
 		/*
-			The name the server tells once it answers - but one added by hand keeps the player's own.
+			The name the server tells once it answers - but one added by hand keeps the player's own (not a tournament's
+			match: its own name says who plays there).
 		*/
 
-		if (!entry.heartbeat_from_ping || (f.manual && !f.name.empty())) {
+		if (!entry.heartbeat_from_ping || (f.manual && !f.name.empty() && !entry.heartbeat.is_tournament_server())) {
 			entry.heartbeat.server_name = f.name.empty() ? "0x" + augs::bytes_to_hex(f.key).substr(0, 8) + "..." : f.name;
 		}
 
@@ -3857,14 +3920,10 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 			A listed server with another key at that address: the favorite is not there (moved, or got a new key).
 		*/
 
-		const bool was_elsewhere = !entry.other_server_at_address.empty();
-		entry.other_server_at_address.clear();
+		const bool was_elsewhere = entry.other_server_at_address;
+		entry.other_server_at_address = false;
 
 		for (const auto& s : shown_list) {
-			if (f.manual) {
-				break;
-			}
-
 			const bool same_address =
 				(entry.address.type != NETCODE_ADDRESS_NONE && s.address == entry.address)
 				|| connect_target::without_default_port(s.get_my_connect_string()) == f.address
@@ -3872,13 +3931,13 @@ void browse_servers_gui_state::update_favorite_only_list(favorite_servers& favor
 			;
 
 			if (same_address && s.get_public_key() != f.key) {
-				entry.other_server_at_address = std::string(s.heartbeat.server_name);
+				entry.other_server_at_address = true;
 				entry.progress.state = server_entry_state::GIVEN_UP;
 				break;
 			}
 		}
 
-		if (was_elsewhere && entry.other_server_at_address.empty()) {
+		if (was_elsewhere && !entry.other_server_at_address) {
 			entry.progress = {};
 		}
 

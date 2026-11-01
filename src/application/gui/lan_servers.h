@@ -141,6 +141,13 @@ struct lan_servers {
 	void take_heartbeat(server_list_entry& s, heartbeat_on_ping&& received, F&& on_server_list) {
 		::take_heartbeat_on_ping(s, std::move(received.heartbeat));
 
+		/*
+			Its key, as the signature proved it - the same server as on the list: a tournament's matches in one row,
+			starred and joined by the key.
+		*/
+
+		s.meta.server_public_key = received.server_public_key;
+
 		const auto teller = s.address;
 		s.lan_first_port = received.header.lan_first_port;
 		s.lan_num_ports = received.header.lan_num_ports;
