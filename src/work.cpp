@@ -219,6 +219,7 @@
 #if HEADLESS
 #include "application/setups/server/tournament/run_tournament.h"
 #endif
+#include "application/setups/server/tournament/tournament_config.h"
 #include "work_result.h"
 
 namespace augs {
@@ -960,7 +961,18 @@ work_result work(
 	*/
 
 	if (params.print_join_string_only) {
-		return server_join_string::print(config) == EXIT_SUCCESS ? work_result::SUCCESS : work_result::FAILURE;
+		/*
+			A tournament's line is named after it - also when only its name is given (the generator's command for
+			players' lines, apart from the tournament's own start).
+		*/
+
+		const auto tournament_name =
+			params.is_tournament() || !params.tournament_name.empty() ?
+			::tournament_name_of(params.tournament_name) :
+			std::string()
+		;
+
+		return server_join_string::print(config, tournament_name) == EXIT_SUCCESS ? work_result::SUCCESS : work_result::FAILURE;
 	}
 #endif
 
@@ -1042,21 +1054,10 @@ work_result work(
 #if PLATFORM_WEB
 	LOG("Nothing to self-update on the Web.");
 #else
-	/*
-		A tournament started again in the middle of it (after a crash, a restart of its service): never another version
-		halfway - a new tournament updates as any start.
-	*/
-
-	WEBSTATIC const bool tournament_in_progress = params.is_tournament() && augs::exists(USER_DIR / "tournament.ongoing.json");
-
-	if (tournament_in_progress && config.self_update.update_on_launch && !params.no_update_on_launch) {
-		LOG("A tournament is in progress - no update on launch until it's over.");
-	}
-
 	WEBSTATIC const bool should_run_self_updater = 
 		params.update_once_now ||
 		params.only_check_update_availability_and_quit ||
-		(config.self_update.update_on_launch && !params.no_update_on_launch && !tournament_in_progress)
+		(config.self_update.update_on_launch && !params.no_update_on_launch)
 	;
 
 	if (should_run_self_updater) {
@@ -1124,7 +1125,7 @@ work_result work(
 		if (params.no_update_on_launch) {
 			LOG("Skipping update check due to --no-update-on-launch flag.");
 		}
-		else if (!tournament_in_progress) {
+		else {
 			LOG("Skipping update check due to update_on_launch = false.");
 		}
 	}

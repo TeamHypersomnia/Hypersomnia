@@ -34,15 +34,14 @@ std::optional<std::string> server_setup::find_listed_nickname(const std::string&
 
 /*
 	The listed nicknames still to come on this match - named in the refusal of someone whose nickname isn't one of them.
+	Only its players: the teams out or waiting (spectators here) would be wrong guesses.
 */
 
 std::string server_setup::unclaimed_listed_nicknames() const {
 	auto out = std::string();
 
 	for (const auto& [id, faction] : assigned_teams.id_to_faction) {
-		(void)faction;
-
-		if (begins_with(id, nickname_account_id_prefix_v)) {
+		if (::is_actual_faction(faction) && begins_with(id, nickname_account_id_prefix_v)) {
 			out += (out.empty() ? "" : ", ") + ::account_id_to_nickname(id);
 		}
 	}

@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include "augs/string/parse_url.h"
+#include "augs/filesystem/file.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/to_bytes.h"
 #include "augs/network/netcode_socket_raii.h"
@@ -121,7 +122,7 @@ namespace server_join_string {
 		Exit code. The line on stdout, how it was made on stderr.
 	*/
 
-	inline int print(const config_json_table& config) {
+	inline int print(const config_json_table& config, const std::string& tournament_name) {
 		if (const auto error = server_key::dedicated_start_error()) {
 			std::cerr << "ERROR: " << *error << std::endl;
 			return EXIT_FAILURE;
@@ -137,10 +138,19 @@ namespace server_join_string {
 
 		/*
 			A dedicated server with no name is "My server" (server_setup) - and the default port is left out.
+			A tournament's line is named after the tournament: it has no server name of its own.
 		*/
 
 		const auto configured_name = std::string(config.server.server_name);
-		const auto name = configured_name.empty() ? std::string("My server") : configured_name;
+
+		const auto name = [&]() {
+			if (!tournament_name.empty()) {
+				return tournament_name;
+			}
+
+			return configured_name.empty() ? std::string("My server") : configured_name;
+		}();
+
 		const auto port = config.server_start.port;
 		const auto port_suffix = port == DEFAULT_GAME_PORT_V ? std::string() : ":" + std::to_string(port);
 
@@ -154,8 +164,18 @@ namespace server_join_string {
 
 		auto ip = std::string();
 
+		/*
+			In Docker the only address inside is the container's, which nobody reaches - the host's own goes in.
+		*/
+
+		const bool in_docker = augs::exists("/.dockerenv");
+
 		if (public_address.has_value()) {
 			ip = ip_of(*public_address);
+		}
+		else if (in_docker) {
+			ip = "<your server's address>";
+			std::cerr << "Couldn't learn the public address - " << server_list << " didn't answer. In Docker: put in the address of the machine running it (on a LAN, its local address)." << std::endl;
 		}
 		else if (const auto own = get_internal_network_address(); own.has_value()) {
 			ip = ip_of(*own);

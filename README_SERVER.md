@@ -99,7 +99,7 @@ Later ones win:
 | `HYPERSOMNIA_PORT`, `HYPERSOMNIA_WEB_PORT` | The first server's ports | `8500` |
 | `HYPERSOMNIA_BROWSER_PLAYERS` | `off`: no browser players, no browser ports | `off` |
 | `HYPERSOMNIA_SERVER_LIST` | `off`: not on the [server list](https://hypersomnia.io/servers) - browser players can't join; or the address of your own masterserver | `off` |
-| `HYPERSOMNIA_TOURNAMENT_SPECTATOR_SLOTS` | How many others may watch each tournament match (6 by default) - every place takes about 4.4 MB of RAM up front | `10` |
+| `HYPERSOMNIA_TOURNAMENT_SPECTATOR_SLOTS` | How many others may watch a tournament round's matches at once, split between them (16 by default, at most 58) - every place takes about 4.4 MB of RAM up front | `24` |
 | `HYPERSOMNIA_GAME_SPEED` | The whole game's speed, `0.5`-`1.5` (default `0.75`; `1` - the original Hypersomnia) | `1` |
 | `HYPERSOMNIA_BULLET_SPEED` | The bullets' own speed, `0.5`-`1.5` - without it, as the game speed | `0.9` |
 | `HYPERSOMNIA_ZOOM` | The camera zoom for everyone, `0.5`-`1.5` - without it, the map's own | `0.7` |
@@ -177,10 +177,10 @@ A knockout tournament: a server for every match, the winners go on round by roun
 - Admins join any match: before it starts as anyone (a player in round 1 with anyone joining), once it's played as spectators.
 - The teams that are out or waiting watch the other matches - 16 places a round by default (`--tournament-spectator-slots`), split between its matches: 2 on each of round 1's 8, all 16 on the final; at least 1 on each, 0 - nobody watches. Every place takes about 4.4 MB of RAM up front and upload while watched. A match's players always get in, the admins and the spectator account too.
 - A tournament doesn't start with anything in its config it can't read as written - a misspelled key, text where a number goes, a map that doesn't exist. Other servers only warn.
-- After a crash, start it again with the same settings - it carries on mid-round. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew - and so it does after any change to the teams, their size or the maps (a fixed typo in a nickname too); the old state stays in `tournament.config-changed.<time>.json`.
-- It never updates in the middle of it.
+- After a crash, start it again with the same settings - it carries on mid-round. Carrying on another day: use the command you started it with - a new one from the generator has another date as its default name. Once over, the same settings under the same name don't start it again - give the next one a new `--tournament-name`; the finished one's state in `tournament.completed.<time>.state.json`. The name is part of what the tournament is: started again under another name after a crash, it begins anew - and so it does after any change to the teams, their size or the maps (a fixed typo in a nickname too); the old state stays in `tournament.config-changed.<time>.json`.
+- It updates on launch like any server - started again after a crash too: the bracket carries on; a match that was being played starts again from 0:0 if a new version came out meanwhile (players' games update the same way).
 - In `Browse servers` a tournament is one row - a click on it shows its matches (a favorite one is shown expanded). A finished match stays on the list empty until its round ends; the finished tournament's final until you stop it.
-- LAN players don't see it (a router blocking broadcast, another port than 8412-8415): the server's log says where it is on the local network - they add that address with the server's key (`--print-server-key`) under `Favorites`, `Add an unlisted server`. A match's address brings the whole tournament.
+- LAN players don't see it (a router blocking broadcast, another port than 8412-8415): the server's log says where it is on the local network (with its live page on; in Docker it can't know - it's the local address of the machine running it) - they add that address with the server's key (`--print-server-key`) under `Favorites`, `Add an unlisted server`. A match's address brings the whole tournament.
 
 ## The results as JSON
 
@@ -235,7 +235,7 @@ Both are signed by the server's key: `X-Hypersomnia-Server-Key` - its public key
 | `--tournament <players>` | A [tournament](#tournaments) for this many players |
 | `--tournament-team-size <n>` | `2` for 2v2 and so on |
 | `--tournament-teams <teams>` | Teams set up beforehand, e.g. `"alice, bob; carol, dave"`, or verified by their accounts: `"alice=0x8aed..., bob=steam_7656...; ..."` - or a player per line, the teams apart by an empty line |
-| `--tournament-spectator-slots <places>` | How many others may watch each match at once, 6 by default (`HYPERSOMNIA_TOURNAMENT_SPECTATOR_SLOTS`) |
+| `--tournament-spectator-slots <places>` | How many others may watch a round's matches at once, split between them - 16 by default, at most 58 (`HYPERSOMNIA_TOURNAMENT_SPECTATOR_SLOTS`) |
 | `--tournament-maps <maps>` | A map per round, e.g. `de_cyberaqua,de_silo` - or one per line |
 | `--tournament-round-1-max-wait <minutes>` | Time to enter round 1: how long it waits for its players after the tournament starts (30 by default), or `off` |
 | `--tournament-next-rounds-max-wait <minutes>` | Time to enter next round: how long it waits once the last match of a round ends (15 by default), or `off` |

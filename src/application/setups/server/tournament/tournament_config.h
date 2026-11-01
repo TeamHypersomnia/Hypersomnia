@@ -6,6 +6,14 @@
 
 struct cmd_line_params;
 
+/*
+	The tournament's name - "My Tournament" when not given: on its page, in its results and in its players' join line.
+*/
+
+inline std::string tournament_name_of(const std::string& given) {
+	return given.empty() ? std::string("My Tournament") : given;
+}
+
 enum class tournament_skill_source {
 	// GEN INTROSPECTOR enum class tournament_skill_source
 	ORDER,

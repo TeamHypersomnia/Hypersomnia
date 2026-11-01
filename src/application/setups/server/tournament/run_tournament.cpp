@@ -245,12 +245,18 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 					return out;
 				}
 
-				if (std::find(seen_names.begin(), seen_names.end(), name) != seen_names.end()) {
+				/*
+					Kuba and kuba are one: a listed nickname is claimed whatever its case.
+				*/
+
+				const auto lowered = ::to_lowercase(name);
+
+				if (std::find(seen_names.begin(), seen_names.end(), lowered) != seen_names.end()) {
 					error = typesafe_sprintf("--tournament-teams: %x is listed more than once", name);
 					return out;
 				}
 
-				seen_names.push_back(name);
+				seen_names.push_back(lowered);
 
 				if (eq == std::string::npos) {
 					/*
@@ -392,14 +398,14 @@ tournament_config tournament_config::from_params(const cmd_line_params& params, 
 		}
 	}
 
+	out.name = ::tournament_name_of(params.tournament_name);
+
 	/*
-		Unnamed: "My Tournament" - on its page and in its results.
+		Whole in the browsers: the heartbeat carries as much as a server's name.
 	*/
 
-	out.name = params.tournament_name.empty() ? std::string("My Tournament") : params.tournament_name;
-
-	if (out.name.size() > 100) {
-		error = "--tournament-name: at most 100 characters";
+	if (out.name.size() > max_server_name_length_v) {
+		error = typesafe_sprintf("--tournament-name: at most %x characters", max_server_name_length_v);
 		return out;
 	}
 
@@ -938,9 +944,12 @@ work_result run_tournament(const run_tournament_input& in) {
 
 			/*
 				Where to find it on the local network - a first-time host doesn't know the machine's address.
+				Not in Docker: inside its network the only address is the container's, which nobody reaches.
 			*/
 
-			if (const auto lan = ::get_internal_network_address()) {
+			const auto lan = augs::exists("/.dockerenv") ? std::nullopt : ::get_internal_network_address();
+
+			if (lan.has_value()) {
 				auto game = *lan;
 				game.port = static_cast<port_type>(base_port);
 
@@ -1063,7 +1072,9 @@ work_result run_tournament(const run_tournament_input& in) {
 			[&](const auto& m) { return !is_resolved(m); }
 		)));
 
-		if (*unresolved == 0 && !hold_until_interrupted) {
+		const auto num_to_play = static_cast<int>(*unresolved);
+
+		if (num_to_play == 0 && !hold_until_interrupted) {
 			return;
 		}
 
@@ -1092,28 +1103,11 @@ work_result run_tournament(const run_tournament_input& in) {
 		const auto bracket_round_deadline = current_bracket_round_deadline ? current_bracket_round_deadline() : int64_t(0);
 
 		/*
-			Started again after a crash: the players of the matches decided before it came already - counted,
-			so round 1 still closes by itself once the rest are here.
+			Started again after a crash: the players of the open matches decided before it came already - counted,
+			so round 1 still closes by itself once the rest are here, and each keeps their place (one per account).
 		*/
 
-		const auto already_came = [&]() {
-			uint32_t n = 0;
-
-			for (const auto& m : matches) {
-				if (m.open_team_size > 0 && m.result.has_value()) {
-					n += static_cast<uint32_t>(m.team_a_player_ids.size() + m.team_b_player_ids.size());
-				}
-			}
-
-			return n;
-		}();
-
-		const auto open_bracket_round_players = std::make_shared<std::atomic<uint32_t>>(already_came);
-
-		/*
-			Who has a place on which open match - one place per account; the decided matches' players have theirs.
-		*/
-
+		uint32_t already_came = 0;
 		const auto open_places = std::make_shared<open_bracket_round_places>();
 
 		for (const auto& m : matches) {
@@ -1121,10 +1115,13 @@ work_result run_tournament(const run_tournament_input& in) {
 				for (const auto& ids : { m.team_a_player_ids, m.team_b_player_ids }) {
 					for (const auto& id : ids) {
 						open_places->take(id, m.server_name);
+						++already_came;
 					}
 				}
 			}
 		}
+
+		const auto open_bracket_round_players = std::make_shared<std::atomic<uint32_t>>(already_came);
 
 		std::vector<std::thread> threads;
 		threads.reserve(matches.size());
@@ -1198,11 +1195,12 @@ work_result run_tournament(const run_tournament_input& in) {
 				);
 
 				/*
-					The round's places split between its matches - at least 1 on each, unless there are none at all.
+					The round's places split between its matches still to be played - at least 1 on each, unless there
+					are none at all. A decided one (started finished, the held final) lets nobody in.
 				*/
 
 				const auto budget = static_cast<int>(in.config.spectator_places);
-				const auto per_match = budget == 0 ? 0 : std::max(1, budget / static_cast<int>(matches.size()));
+				const auto per_match = budget == 0 || starts_finished ? 0 : std::max(1, budget / std::max(1, num_to_play));
 				const auto places = std::clamp(max_server_slots_v - players, 0, per_match);
 				this_config.server_start.slots = std::min(max_server_slots_v, players + places);
 				return static_cast<uint32_t>(places);
