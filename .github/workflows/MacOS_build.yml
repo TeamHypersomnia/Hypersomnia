@@ -37,7 +37,7 @@ jobs:
     # cpp-httplib doesn't build with it). Linked too - /opt/homebrew/include comes first in the include paths, and
     # OpenSSL 4's headers there would go with OpenSSL 3's libraries.
     - name: Install OpenSSL 3
-      run: brew install openssl@3 && (brew unlink openssl@4 || true) && brew link --force openssl@3 && ls -l /opt/homebrew/include/openssl | head -3
+      run: brew install openssl@3 && (brew unlink openssl@4 || true) && brew link --force --overwrite openssl@3 && ls -l /opt/homebrew/include/openssl | head -3
     # The committed bin/macos/libsteam_integration.dylib is the real, Steam-enabled
     # one. build_nonsteam_integration.sh's "ninja install" overwrites it with the
     # stub (BUILD_STEAM=0). generate_archives.sh swaps that file back into the Steam
