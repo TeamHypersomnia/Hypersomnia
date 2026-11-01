@@ -164,15 +164,33 @@ struct target_vertex {
 			return a.pos.x < b.pos.x;
 		}
 
-		return a.pos.y < b.pos.y;
-	}
-
-	bool operator<(const target_vertex& b) const {
-		if (angle != b.angle) {
-			return angle < b.angle;
+		if (a.pos.y != b.pos.y) {
+			return a.pos.y < b.pos.y;
 		}
 
-		return farther_first(*this, b);
+		/*
+			Copies of one vertex (the convex pieces of one collider share it) differ only here - which one stays must
+			never be the STL's choice. The one the ray goes straight to first.
+		*/
+
+		if ((a.vision_extends == 0) != (b.vision_extends == 0)) {
+			return a.vision_extends == 0;
+		}
+
+		if (a.vision_extends != b.vision_extends) {
+			return a.vision_extends < b.vision_extends;
+		}
+
+		return a.is_on_a_bound < b.is_on_a_bound;
+	}
+
+	/*
+		By the angle only: equal angles always land in one run of sort_near_equal_runs, which orders it fully by
+		farther_first - the one place that decides the order of ties.
+	*/
+
+	bool operator<(const target_vertex& b) const {
+		return angle < b.angle;
 	}
 
 	bool operator==(const target_vertex& b) const {

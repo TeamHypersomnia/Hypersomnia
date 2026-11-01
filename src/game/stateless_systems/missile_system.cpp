@@ -314,12 +314,16 @@ void missile_system::advance_penetrations(const logic_step step) {
 				return (entry - p1).length_sq();
 			};
 
-			auto owner_index_of = [&](const b2Fixture* const f) {
+			/*
+				The whole id: two entity types can share an index in their pools.
+			*/
+
+			auto owner_id_of = [&](const b2Fixture* const f) {
 				if (const auto owner = cosm[f->GetUserData()]) {
-					return owner.get_id().raw.indirection_index;
+					return entity_id(owner.get_id());
 				}
 
-				return std::numeric_limits<decltype(entity_id().raw.indirection_index)>::max();
+				return entity_id();
 			};
 
 			std::sort(
@@ -334,8 +338,8 @@ void missile_system::advance_penetrations(const logic_step step) {
 					}
 
 					/* Ties are broken by identity, never by the order of the spatial query. */
-					const auto owner_a = owner_index_of(a);
-					const auto owner_b = owner_index_of(b);
+					const auto owner_a = owner_id_of(a);
+					const auto owner_b = owner_id_of(b);
 
 					if (owner_a != owner_b) {
 						return owner_a < owner_b;

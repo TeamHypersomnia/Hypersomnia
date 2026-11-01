@@ -132,9 +132,12 @@ inline void gather_penetration_obstacles(
 				return a.entry_dist < b.entry_dist;
 			}
 
-			/* Ties are broken by identity, never by the order of the spatial query. */
-			if (a.owner.raw.indirection_index != b.owner.raw.indirection_index) {
-				return a.owner.raw.indirection_index < b.owner.raw.indirection_index;
+			/*
+				Ties are broken by identity - the whole id, two entity types can share a pool index - never by the order
+				of the spatial query.
+			*/
+			if (a.owner != b.owner) {
+				return a.owner < b.owner;
 			}
 
 			return a.fixture->index_in_component < b.fixture->index_in_component;
