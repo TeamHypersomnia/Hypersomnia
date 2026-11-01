@@ -63,7 +63,7 @@ One run with alternating phases cancels out scene, thermal and clock differences
 - **On the user's screen, deliberately:** the one exception to running test games under Xvfb - the real GPU and window
   are what's measured. Still silent and never opening a failure log in the user's editor: source
   `.claude/skills/local-testing/scripts/test_env.sh` first and pass `$GAME_TEST_FLAGS`.
-- Launch with cwd = `hypersomnia/`: `cd hypersomnia && timeout 76 ../build/current/Hypersomnia /range $GAME_TEST_FLAGS > <scratchpad>/bench.txt 2>&1`.
+- Launch with cwd = `hypersomnia/`: `cd hypersomnia && timeout 76 ../build/<config>/Hypersomnia /range $GAME_TEST_FLAGS > <scratchpad>/bench.txt 2>&1` (the folder built for the benchmark).
   From the repo root the game fails to read its config and litters the root with empty `cache/`, `user/`, `logs/`.
 - LOG output goes to stdout, so it lands in the redirected file even when `timeout` kills the game.
 - The user allows launching and killing the game by yourself for benchmarks.
@@ -132,7 +132,7 @@ repo, as `~/Hypersomnia-<tag>`), then copy the submodule directories from the ma
 (`git ls-tree -r <tag> | awk '$2=="commit"{print $4}'`; compare with HEAD first) with `rsync -a --exclude=.git` - a
 copied `.git` file would make every git command in the worktree fail.
 Build with `BUILD_FOLDER_SUFFIX=fast cmake/build.sh RelWithDebInfo x64 -DGENERATE_DEBUG_INFORMATION=0`, then `ninja`
-in `build/current` (~15 min, run it in the background). Copy `hypersomnia/user/runtime_prefs.json` into the worktree.
+in `build/current` (~15 min, run it in the background) - after `. "$(git rev-parse --path-format=absolute --git-common-dir)/../.claude/skills/local-testing/scripts/lib.sh" && wait_build_slot` (the main checkout's - a release tag's worktree may not have it) in the same shell. Copy `hypersomnia/user/runtime_prefs.json` into the worktree.
 Before commit a5c684fd5 `--edit` falls through to the project selector: add the `break;` after `launch_editor(params.editor_target);`.
 Remove the worktree when done: `git worktree remove --force <path>` (the build inside is the only thing lost).
 
@@ -185,12 +185,14 @@ Suspicious FPS values are the round ones: 60, 144, 165, 240, 400, or anything ex
    - logs cumulative averages after every WITH+WITHOUT cycle as `BENCH cycles=...`.
 
 3. **Build** in the worktree's own build folder (`nice -n 19 ninja -C build/<config>`) - the MCP tools build the main
-   checkout's `build/current`, not the worktree.
+   checkout's `build/current`, not the worktree. First wait for the machine's one build at a time:
+   `. "$(git rev-parse --path-format=absolute --git-common-dir)/../.claude/skills/local-testing/scripts/lib.sh" && wait_build_slot` (the main checkout's - a release tag's worktree may not have it) in the same shell as the ninja.
 
 4. **Run** ~76 s (8 s warmup + ~11 cycles), then grep:
    ```
-   cd hypersomnia && (vblank_mode=0 timeout 76 ../build/current/Hypersomnia /range $GAME_TEST_FLAGS > <scratchpad>/bench.txt 2>&1); grep -E "BENCH|GL error|Launched mode" <scratchpad>/bench.txt
+   cd hypersomnia && (vblank_mode=0 timeout 76 ../build/<config>/Hypersomnia /range $GAME_TEST_FLAGS > <scratchpad>/bench.txt 2>&1); grep -E "BENCH|GL error|Launched mode" <scratchpad>/bench.txt
    ```
+   `build/<config>` is the folder built in step 3 - `build/current` may be missing in the worktree or point elsewhere.
    Wait until the diff stabilizes over the last few cycles. The first cycle is noisy.
 
 5. **Revert** only the temporary edits: `git restore` the touched files, but only after checking with `git diff`

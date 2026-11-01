@@ -45,10 +45,9 @@ lan_address() {
 # downloads/maps: 2 rounds of 5 s by default, no warmup - idle players end a ranked match 1:1 in about a minute
 short_ranked_map() {
 	local a=$1/de_e2e_short
-	mkdir -p $1
-	cp -r $REPO/hypersomnia/content/arenas/de_cyberaqua $a
+	mkdir -p $a
+	rsync -a --exclude=last_saved.json --exclude=editor_view.json $REPO/hypersomnia/content/arenas/de_cyberaqua/ $a/
 	mv $a/de_cyberaqua.json $a/de_e2e_short.json
-	rm -f $a/last_saved.json $a/editor_view.json
 	python3 - $a/de_e2e_short.json ${2:-2} ${3:-5} <<'PY'
 import json, sys
 p = sys.argv[1]
@@ -62,9 +61,28 @@ json.dump(d, open(p, 'w'), indent=1)
 PY
 }
 
+# runs_game_under <pid> - the game (or a debugger, an editor) runs under that process: a ninja that only runs the game
+# (ninja run / debug - alive while the user plays), not one that builds (its build phase has compilers under it)
+runs_game_under() {
+	local p
+	for p in $(pgrep -P $1); do
+		case "$(ps -o comm= -p $p)" in Hypersomnia|cgdb|gdb|vim|nvim|valgrind*|memcheck*) return 0 ;; esac
+		runs_game_under $p && return 0
+	done
+	return 1
+}
+
+# ninjas_building - how many ninja processes build right now
+ninjas_building() {
+	local n=0 pid
+	for pid in $(pgrep -x ninja); do runs_game_under $pid || n=$((n + 1)); done
+	echo $n
+}
+
 # wait_build_slot - one build on the machine at a time (31 GB, no swap - two full ones freeze the desktop): takes a slot
-# of the global lock (MAX_BUILDS, 1 by default) on fd 9 and waits while any other ninja runs (the user's, the build
-# MCP's). The caller keeps fd 9 open for the whole build - its ninja inherits it, the lock goes with the last process.
+# of the global lock (MAX_BUILDS, 1 by default) on fd 9 and waits while any other ninja builds (the user's, the build
+# MCP's) - not one that only runs the game. The caller keeps fd 9 open for the whole build - its ninja inherits it, the
+# lock goes with the last process.
 wait_build_slot() {
 	local locks=${XDG_RUNTIME_DIR:-/tmp}/hypersomnia-builds max=${MAX_BUILDS:-1} said=""
 	mkdir -p $locks
@@ -74,7 +92,7 @@ wait_build_slot() {
 			exec 9> $locks/slot$slot
 
 			if flock -n 9; then
-				[ "$(pgrep -x ninja | wc -l)" -lt $max ] && return 0
+				[ "$(ninjas_building)" -lt $max ] && return 0
 				flock -u 9
 			fi
 		done

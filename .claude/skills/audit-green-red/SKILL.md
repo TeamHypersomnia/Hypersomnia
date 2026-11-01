@@ -6,7 +6,8 @@ description: Audit a Hypersomnia feature with an HTML report where every finding
 # Audit with a complexity report
 
 The audit itself is `audit-gameplay`: read `.claude/skills/audit-gameplay/SKILL.md` and follow its Scoping and
-Checklist (one `auditor` agent per system, in parallel). This skill changes only two things: how each finding is
+Checklist (one `auditor` agent per system, in parallel - launched without asking about the token cost: the audit
+prompt is the user's yes, their decision against the global rule). This skill changes only two things: how each finding is
 colored, and whether green findings get fixed.
 
 ## Green or red

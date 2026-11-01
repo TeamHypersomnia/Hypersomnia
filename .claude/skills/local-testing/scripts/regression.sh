@@ -166,8 +166,9 @@ done
 
 if [ -n "$SOAK" ] && wanted soak; then
 	run soak 3000 bash -c "./soak/build_soak.sh && ./soak/soak_netcode.sh 1"
-	# Every phase "0 failed", except the one wrong key that must fail; then a real client gets in
-	check soak bash -c "[ -z \"\$(grep -a 'done:' $LOG/soak.log | grep -v ' 0 failed' | grep -v '0 connected, 0 abandoned mid-handshake, 1 failed')\" ] && grep -a -q '0 connected, 0 abandoned mid-handshake, 1 failed' $LOG/soak.log && grep -a -q 'Received initial state' $LOG/soak.log"
+	# All 8 soak runs ended (a crashed one prints no "done:"), every one "0 failed" except the one wrong key that must
+	# fail; then a real client gets in
+	check soak bash -c "[ \"\$(grep -a -c 'done:' $LOG/soak.log)\" = 8 ] && [ -z \"\$(grep -a 'done:' $LOG/soak.log | grep -v ' 0 failed' | grep -v '0 connected, 0 abandoned mid-handshake, 1 failed')\" ] && grep -a -q '0 connected, 0 abandoned mid-handshake, 1 failed' $LOG/soak.log && grep -a -q 'Received initial state' $LOG/soak.log"
 fi
 
 if [ -n "$REMOTE" ] && wanted remote; then

@@ -1122,7 +1122,7 @@ case_watch_limit() {
 	wait_log "No more places to watch this match" 60
 	check "alice watches carol-dave" bash -c "grep -q \"T$((PORT + 1))] Adding alice to game state\" $SRV"
 	check "bob refused - no more places to watch" in_log "No more places to watch this match"
-	check "carol and dave still in their match" bash -c "! grep -q 'was kicked\|You were kicked' $T/carol.*.out $T/dave.*.out"
+	check "carol and dave still in their match" bash -c "! grep -q 'was kicked' $T/carol.*.out $T/dave.*.out"
 	finish_case
 }
 

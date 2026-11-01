@@ -24,7 +24,7 @@ if [ "$1" = "stop" ]; then
 	exit 0
 fi
 
-for port in 18000 18410 18420 18430 $P_OFFICIAL $((P_OFFICIAL + 1)) $P_COMMUNITY $((P_COMMUNITY + 3)) $P_CASUAL; do
+for port in 18000 18410 18420 18430 $P_OFFICIAL $((P_OFFICIAL + 1)) $(seq $P_COMMUNITY $((P_COMMUNITY + 3))) $P_CASUAL; do
 	if ss -tuln | grep -q ":$port "; then echo "port $port busy - abort"; exit 1; fi
 done
 
@@ -81,7 +81,7 @@ if [ -n "$FAVORITES" ]; then
 	echo "$FAVORITES" | sed "s/KEY_OF_OFFICIAL/$OFFICIAL_KEY/g; s/KEY_OF_COMMUNITY/$COMMUNITY_KEY/g" > $S/eve/user/favorite_servers.json
 fi
 
-Xvfb $DISP -screen 0 ${SCREEN}x24 > /dev/null 2>&1 &
+timeout $SECS Xvfb $DISP -screen 0 ${SCREEN}x24 > /dev/null 2>&1 &
 sleep 2
 env DISPLAY=$DISP LP_NUM_THREADS=2 timeout $SECS $CLIENT_BIN --appdata-dir $S/eve $GAME_TEST_FLAGS > $S/eve.out 2>&1 &
 sleep 40
@@ -98,6 +98,7 @@ ok = any(e['name']=='Casual server' for e in l) and sum(e['tournament_name']=='O
 print('list: casual + 2 official + 4 community matches -', 'PASS' if ok else 'FAIL')"
 echo "=== $S - screenshot $S/browse.png, list $S/list.json, DISPLAY=$DISP"
 
+# by its full path - the cd above breaks a relative $0
 if [ -z "$KEEP_RUNNING" ]; then
-	$0 stop
+	"$HERE/scenario_browser_tournaments.sh" stop
 fi

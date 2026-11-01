@@ -65,8 +65,8 @@ after Ctrl+C or regression.sh's timeout) and waits for log lines, never a fixed 
    `ALSOFT_DRIVERS=null`, `VISUAL=true`, and `$GAME_TEST_FLAGS` = `--no-update-on-launch --mute --no-open-logs`)
    and passes `$GAME_TEST_FLAGS` to every game it starts - a new script does the same, a game started by hand too
    (`. .claude/skills/local-testing/scripts/test_env.sh` first). Firefox profiles get `user_pref("media.volume_scale", "0.0");`.
-   No window on the user's screen either: every game started for a test - `--unit-tests-only` too - under `xvfb-run -a`
-   or a private `Xvfb :NN` (the one exception: benchmark-rendering, which measures the real GPU).
+   No window on the user's screen either: every game started for a test - `--unit-tests-only` too - under `xvfb-run -d`
+   (not `-a`: parallel starts share one Xvfb and the first to exit takes it down) or a private `Xvfb :NN` (the one exception: benchmark-rendering, which measures the real GPU).
 7. On remote hosts, production runs as `Hypersomnia-Headless.AppImage --as-service` (masterserver, official server) - find it with `ps`.
    Work only in `~/yojimbo-test`, restart only by your own PIDs, and verify afterwards that the production processes still
    have their old uptime (`ps -eo etime,args | grep Hypersomnia-Headless`).

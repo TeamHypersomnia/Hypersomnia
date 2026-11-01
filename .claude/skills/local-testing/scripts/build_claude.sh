@@ -9,7 +9,7 @@
 #   steam     build/Debug-x64-clang-claude-steam      needs the Steamworks SDK unpacked (see remote.md)
 #
 # One build on the machine at a time: it waits for the machine's build lock (wait_build_slot in lib.sh - any other ninja
-# running counts too). ccache when installed (sudo pacman -S ccache): one cache for every worktree
+# that builds counts too, not one only running the game). ccache when installed (sudo pacman -S ccache): one cache for every worktree
 # (CCACHE_BASEDIR=$HOME), so a fresh worktree builds in minutes. JOBS (10), CMAKE_ARGS (more -D flags),
 # TARGET (ninja's target, default all), SUFFIX (a folder of its own for a variant), e.g. the STL that breaks ties
 # like the Windows client's MSVC STL: SUFFIX=libstdcxx CMAKE_ARGS="-DPREFER_LIBCXX=0 -DHAVE_WFUNCTION_EFFECTS=0"

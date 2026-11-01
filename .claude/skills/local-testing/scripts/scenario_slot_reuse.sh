@@ -315,7 +315,10 @@ case_master_restart() {
 	stop_all
 }
 
+[ -n "$(echo $CASES)" ] || { echo "no cases to run (CASES=\"$CASES\")"; exit 1; }
+
 for c in $CASES; do
+	declare -F case_$c > /dev/null || { CASE=$c; echo "FAIL  $c: no such case" | tee -a $RESULTS; continue; }
 	case_$c
 done
 

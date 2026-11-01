@@ -39,8 +39,9 @@ reaches production unless they have said to go ahead with all of them.
 1. **What the new game needs from the site goes first** (nginx locations, endpoints): the site repo's
    `infra/` - `ansible-playbook -i inventory/hypersomnia.io.yml playbooks/site.yml --tags nginx` (`--check --diff`
    first). Check with curl.
-2. **Push the site** (its master) - but deploy its pages only after the game (step 7): the generator writes commands
-   for the new version.
+2. **The site stays unpushed until step 7** - a push of its master deploys it at once (GitHub Actions "Deploy to
+   hypersomnia.io": nginx + homepage), and the generator writes commands for the new version. Commit it, push it at
+   step 7.
 3. **Tag and push the game**: `cmake/push_tag.sh X.Y.Z` (the tag first, then master - CI reads the version from the
    tag). Watch CI (`gh run list`); four builds (Windows, Linux, macOS, headless) and the Docker release on the tag.
 4. **Web builds at the tag** (HEAD must be exactly at it): the user's aliases `cmkrw` (play), `cmkrwi` (itch),
@@ -68,7 +69,8 @@ reaches production unless they have said to go ahead with all of them.
    downloads into `.server_update`, checks `--version`, swaps, then restarts. `sync_repo` rsyncs the admin shell's
    working tree - keep that fix in it (commit it).
    Check: `ssh arena 'bash -s' < scripts/hostcheck.sh` - version X.Y.Z, both processes with a fresh uptime.
-7. **Deploy the site's pages**: `playbooks/homepage.yml` (or `site.yml --tags homepage`).
+7. **Deploy the site's pages**: push its master (the workflow deploys it - check `gh run list` in the site repo),
+   or by hand `playbooks/homepage.yml` (or `site.yml --tags homepage`).
 8. **The other official servers**: `server_update` updates only the hub. US, NL and DE: `scripts/update_other_hosts.sh
    X.Y.Z` (md5 against the hub's `hosting/builds/X.Y.Z`, swap, restart; DE has no sudo - SIGINT to the game process).
    Then all 10 official servers ([PL], [DE], [NL], [US] Central, each also as "R") on the new version:
