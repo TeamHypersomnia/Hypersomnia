@@ -191,7 +191,11 @@ struct webrtc_client_detail {
 				self->set_message(unreachable_through_masterserver_v);
 				self->set_error();
 			}
-			else {
+			else if (!self->is_error()) {
+				/*
+					An error said already (e.g. the masterserver's refusal) keeps its text.
+				*/
+
 				self->set_message("WebSocket closed");
 			}
         });
@@ -212,9 +216,10 @@ struct webrtc_client_detail {
 
 			/*
 				The masterserver refused to negotiate (e.g. too many joining at once from one network) - it says why.
+				Its own message has no "id" - a relayed one (from another peer) never refuses.
 			*/
 
-			if (message.is_object() && message.contains("refused") && message["refused"].is_string()) {
+			if (message.is_object() && !message.contains("id") && message.contains("refused") && message["refused"].is_string()) {
 				self->set_message(message["refused"].get<std::string>());
 				self->set_error();
 				return;

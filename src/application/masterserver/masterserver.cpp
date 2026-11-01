@@ -51,7 +51,7 @@ TEST_CASE("A heartbeat to a ping is signed by the server's key") {
 	auto heartbeat = server_heartbeat();
 	heartbeat.server_name = "Signed server";
 
-	const auto bytes = ::make_heartbeat_on_ping_bytes(0x1234, 8412, 4, heartbeat, seed);
+	const auto bytes = ::make_heartbeat_on_ping_bytes(0x1234, 8412, 4, heartbeat, seed, public_key);
 	REQUIRE(!bytes.empty());
 
 	auto read = [](std::vector<std::byte> b) {
@@ -481,8 +481,12 @@ work_result perform_masterserver(const config_json_table& cfg) try {
 		return found_in(banlist_notifications.second, ::to_lowercase(t));
 	};
 
+	/*
+		An empty name is never banned: an empty part of a banlist line would ban every server without a tournament.
+	*/
+
 	auto is_banned_server_name = [&](const std::string& t) {
-		return found_in(banlist_servers.second, ::to_lowercase(t));
+		return !t.empty() && found_in(banlist_servers.second, ::to_lowercase(t));
 	};
 
 	auto signalling = signalling_server(

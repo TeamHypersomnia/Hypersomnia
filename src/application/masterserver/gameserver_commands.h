@@ -25,11 +25,12 @@ struct gameserver_heartbeat_request {
 };
 
 /*
-	The request is padded up to this many bytes and a shorter one is ignored - a heartbeat is then at most a few times
-	bigger than what asked for it, so a spoofed request is worth little for flooding someone.
+	The request is padded up to this many bytes and a shorter one is ignored - a heartbeat (at most ~2.5 KB) is then
+	about twice what asked for it, so a spoofed request is worth nothing for flooding someone, and many may ask
+	(heartbeat_on_ping_limiter.h).
 */
 
-constexpr std::size_t min_heartbeat_request_bytes_v = 256;
+constexpr std::size_t min_heartbeat_request_bytes_v = 1200;
 
 using gameserver_command = std::variant<
 	gameserver_ping_request,

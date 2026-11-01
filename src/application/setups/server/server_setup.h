@@ -228,7 +228,6 @@ class server_setup :
 
 	struct closed_datachannel {
 		yojimbo::Address address;
-		net_time_t when;
 	};
 
 	std::vector<closed_datachannel> closed_datachannels_of_unset_clients;

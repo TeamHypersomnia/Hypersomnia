@@ -822,14 +822,11 @@ public:
 		pc_metas.erase(id);
 	}
 
-	void disconnect(const client_id id, const bool notify_game = true) {
+	void disconnect(const client_id id) {
 		/*
 			Safe disconnect - allows us to deinit the peer connection
 			because of literally any reason - onclose, onstatechange,
 			our server's kick logic etc.
-
-			notify_game: false when the game itself disconnected the client - no "channel closed" note comes back to it
-			(kept 10 s, it would drop a new client that gets the same id meanwhile).
 
 			Map removal happens under a lock and destruction happens outside of the lock -
 			which means it won't ever deadlock in case other destruction logic called "disconnect" again.
@@ -858,12 +855,10 @@ public:
 				if (preserve_dc || preserve_pc) {
 					set_message("Disconnected client: " + std::to_string(id));
 
-					if (notify_game) {
-						std::scoped_lock lock(packets_lk);
+					std::scoped_lock lock(packets_lk);
 
-						/* Push a disconnect packet for this client */
-						received_packets.push({ id, {}, true });
-					}
+					/* Push a disconnect packet for this client */
+					received_packets.push({ id, {}, true });
 				}
 				else {
 					set_message("Empty disconnect: " + std::to_string(id));
@@ -1226,7 +1221,7 @@ int server_setup::receive_packet_override(netcode_address_t& from, std::byte* bu
 				*/
 
 				if (!found && closed_datachannels_of_unset_clients.size() < max_incoming_connections_v) {
-					closed_datachannels_of_unset_clients.push_back({ to_kick, server_time });
+					closed_datachannels_of_unset_clients.push_back({ to_kick });
 				}
 
 				return 0;
@@ -2963,7 +2958,7 @@ bool server_setup::handle_gameserver_command(
 				const auto first_port = lan_first_port != 0 ? lan_first_port : last_start.port;
 				const auto num_ports = lan_num_ports != 0 ? lan_num_ports : uint16_t(1);
 
-				auto bytes = ::make_heartbeat_on_ping_bytes(typed_request.sequence, first_port, num_ports, std::move(heartbeat), this_server_key);
+				auto bytes = ::make_heartbeat_on_ping_bytes(typed_request.sequence, first_port, num_ports, std::move(heartbeat), this_server_key, this_server_public_key);
 
 				if (!bytes.empty()) {
 					server->send_udp_packet(from, bytes.data(), bytes.size());
@@ -4289,7 +4284,7 @@ void server_setup::unset_client(const client_id_type& id) {
 				LOG("It's a WebRTC client. Closing the PeerConnection and DataChannel.");
 
 				const auto client_webrtc_id = get_client_address(id).GetPort();
-				webrtc_server->disconnect(client_webrtc_id, false);
+				webrtc_server->disconnect(client_webrtc_id);
 			}
 			else {
 				LOG("Not a WebRTC client.");
@@ -4409,32 +4404,25 @@ void server_setup::advance_clients_state() {
 	bool added_someone_already = false;
 	bool removed_someone_already = false;
 
-	for (std::size_t i = 0; i < closed_datachannels_of_unset_clients.size();) {
-		const auto& closed = closed_datachannels_of_unset_clients[i];
-		bool handled = false;
+	/*
+		A note matters only in the tick it was made in: the channel closed in the very receive that set the client
+		(a later one with the same WebRTC id is another browser). A note nobody matches (a handshake that never
+		completed, the server's own disconnect) is dropped at once.
+	*/
 
+	for (const auto& closed : closed_datachannels_of_unset_clients) {
 		for (std::size_t cid = 0; cid < clients.size(); ++cid) {
 			auto& candidate = clients[cid];
 
 			if (candidate.is_set() && candidate.address == closed.address) {
 				LOG("queue_kick_due_to_closed_datachannel (id: %x): the channel closed before the client was set.", cid);
 				candidate.queue_kick_due_to_closed_datachannel = true;
-				handled = true;
 				break;
 			}
 		}
-
-		/*
-			A handshake that never completed has nothing to kick.
-		*/
-
-		if (handled || server_time - closed.when > 10.0) {
-			closed_datachannels_of_unset_clients.erase(closed_datachannels_of_unset_clients.begin() + i);
-		}
-		else {
-			++i;
-		}
 	}
+
+	closed_datachannels_of_unset_clients.clear();
 
 	const auto inv_simulation_delta_ms = 1.0 / (get_inv_tickrate() * 1000.0);
 

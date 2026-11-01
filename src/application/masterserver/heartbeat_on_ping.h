@@ -58,7 +58,8 @@ inline std::vector<std::byte> make_heartbeat_on_ping_bytes(
 	const uint16_t lan_first_port,
 	const uint16_t lan_num_ports,
 	server_heartbeat heartbeat,
-	const augs::ed25519_seed_type& server_key
+	const augs::ed25519_seed_type& server_key,
+	const augs::ed25519_public_key_type& server_public_key
 ) {
 	auto bytes = std::vector<std::byte>();
 
@@ -84,10 +85,9 @@ inline std::vector<std::byte> make_heartbeat_on_ping_bytes(
 		write();
 	}
 
-	const auto public_key = augs::ed25519_public_key(server_key);
 	const auto signature = augs::ed25519_sign(server_key, ::heartbeat_on_ping_signed_message(bytes.data(), bytes.size()));
 
-	if (!public_key.has_value() || !signature.has_value()) {
+	if (!signature.has_value()) {
 		return {};
 	}
 
@@ -96,10 +96,34 @@ inline std::vector<std::byte> make_heartbeat_on_ping_bytes(
 		bytes.insert(bytes.end(), first, first + array.size());
 	};
 
-	append(*public_key);
+	append(server_public_key);
 	append(*signature);
 
 	return bytes;
+}
+
+/*
+	Only the header: which ping it answers - checked against what was asked before the signature costs anything.
+*/
+
+inline std::optional<heartbeat_on_ping_header> read_heartbeat_on_ping_header(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
+	if (packet_bytes < sizeof(heartbeat_on_ping_header) + heartbeat_on_ping_signature_bytes_v) {
+		return std::nullopt;
+	}
+
+	try {
+		auto stream = augs::make_ptr_read_stream(packet_buffer, packet_bytes);
+		const auto header = augs::read_bytes<heartbeat_on_ping_header>(stream);
+
+		if (header.magic != heartbeat_on_ping_magic_v) {
+			return std::nullopt;
+		}
+
+		return header;
+	}
+	catch (const augs::stream_read_error&) {
+		return std::nullopt;
+	}
 }
 
 /*
@@ -107,7 +131,9 @@ inline std::vector<std::byte> make_heartbeat_on_ping_bytes(
 */
 
 inline std::optional<heartbeat_on_ping> read_heartbeat_on_ping(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
-	if (packet_bytes < sizeof(heartbeat_on_ping_header) + heartbeat_on_ping_signature_bytes_v) {
+	const auto header = ::read_heartbeat_on_ping_header(packet_buffer, packet_bytes);
+
+	if (!header.has_value()) {
 		return std::nullopt;
 	}
 
@@ -115,12 +141,7 @@ inline std::optional<heartbeat_on_ping> read_heartbeat_on_ping(const uint8_t* co
 
 	try {
 		auto stream = augs::make_ptr_read_stream(packet_buffer, signed_bytes);
-
-		const auto header = augs::read_bytes<heartbeat_on_ping_header>(stream);
-
-		if (header.magic != heartbeat_on_ping_magic_v) {
-			return std::nullopt;
-		}
+		(void)augs::read_bytes<heartbeat_on_ping_header>(stream);
 
 		auto heartbeat = augs::read_bytes<server_heartbeat>(stream);
 
@@ -136,7 +157,7 @@ inline std::optional<heartbeat_on_ping> read_heartbeat_on_ping(const uint8_t* co
 			return std::nullopt;
 		}
 
-		return heartbeat_on_ping { header, std::move(heartbeat), public_key };
+		return heartbeat_on_ping { *header, std::move(heartbeat), public_key };
 	}
 	catch (const augs::stream_read_error&) {
 		return std::nullopt;
