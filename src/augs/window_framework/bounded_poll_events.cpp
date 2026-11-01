@@ -80,13 +80,14 @@ static void release_keys_left_down(GLFWwindow* const window) {
 	at the window's center, so it cannot move at all. The game then reads raw mouse motion, which does not depend
 	on where the cursor is - without raw motion the cursor is left alone.
 
-	Like SDL3, the clip is checked again after a pump that saw the cursor move, which a pinned cursor cannot,
-	and also every 100 ms (SDL2 checks every 3 s). A pixel that GLFW does not release is released here.
+	The clip is checked at once when the lock starts (e.g. the window back in front), then at most every 100 ms
+	(SDL2 checks every 3 s) - never per mouse message: the clip's own move would wake the next check. A pixel that
+	GLFW does not release is released here.
 	Like SDL, only the foreground window locks: a window can be active in its own thread while another program
 	is in front.
 */
 
-static void lock_disabled_cursor(GLFWwindow* const window, const bool cursor_moved) {
+static void lock_disabled_cursor(GLFWwindow* const window) {
 	static auto lock = RECT();
 	static auto locked = false;
 	static auto since_check = augs::timer();
@@ -114,7 +115,7 @@ static void lock_disabled_cursor(GLFWwindow* const window, const bool cursor_mov
 		return;
 	}
 
-	const bool check_due = !locked || cursor_moved || since_check.get<std::chrono::milliseconds>() >= 100.0;
+	const bool check_due = !locked || since_check.get<std::chrono::milliseconds>() >= 100.0;
 
 	if (!check_due) {
 		return;
@@ -160,7 +161,6 @@ namespace augs {
 		const auto budget_ticks = static_cast<LONGLONG>(budget_ms * static_cast<double>(frequency.QuadPart) / 1000.0);
 
 		MSG msg;
-		auto cursor_moved = false;
 
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (msg.message == WM_QUIT) {
@@ -171,10 +171,6 @@ namespace augs {
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
 			}
 			else {
-				if (msg.message == WM_MOUSEMOVE) {
-					cursor_moved = true;
-				}
-
 				TranslateMessage(&msg);
 				DispatchMessageW(&msg);
 			}
@@ -188,7 +184,7 @@ namespace augs {
 		}
 
 		::release_keys_left_down(window);
-		::lock_disabled_cursor(window, cursor_moved);
+		::lock_disabled_cursor(window);
 	}
 
 	void wait_for_messages() {
