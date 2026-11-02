@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- audyt desync dla botow i arena mode
+- remove comments
 
 - zombie mode
 	- ale najpierw refactor

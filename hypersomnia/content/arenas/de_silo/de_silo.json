@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2026-10-20 21:59:48.593483 UTC"
+        "version_timestamp": "2026-11-01 15:14:13.674016 UTC"
     },
     "about": {
         "author": "lia",
@@ -9,10 +9,10 @@
         "welcome_message": "[color=vslightgray]Welcome to [/color][color=orange]THE ABANDONED ROCKET SILO.[/color]\n\nlia - [color=cyan]MAPPING[/color]\nMarcel Windys - [color=cyan]WARMUP THEME[/color]\n\nThis creepy and incredibly tactical\ncommunity map will test your [color=cyan]CQB[/color] \nto the utmost limit."
     },
     "settings": {
-        "brighten_lights": true,
         "default_server_mode": "bomb_defusal",
         "include_disabled_nodes": false,
         "ambient_light_color": [70, 111, 179, 255],
+        "brighten_lights": true,
         "sun_shadows": {
             "strength": 0.6000000238418579
         },
@@ -26,8 +26,7 @@
     "playtesting": {
         "mode": "bomb_defusal",
         "starting_faction": "RESISTANCE",
-        "friendly_fire": false,
-        "spawn_bots": true,
+        "spawn_only_enemy_bots": true,
         "bot_difficulty": "HARD"
     },
     "game_modes": {

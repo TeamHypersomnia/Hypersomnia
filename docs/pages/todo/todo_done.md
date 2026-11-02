@@ -7598,3 +7598,5 @@ na marginesie nie widze wielu decali jak strzelam przez skrzynke dynamiczna a ch
 	- chyba bedziemy forsowac to i tak, bo te waypointy chujowo beda wygladaly
 - zaimast tego warny jak nie ma waypointow na site i innych spotow ale to potem mozna po wydaniu
 
+- audyt desync dla botow i arena mode
+
