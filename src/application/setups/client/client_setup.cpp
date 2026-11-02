@@ -57,6 +57,7 @@
 #include "augs/misc/to_hex_str.h"
 #include "application/detail_file_paths.h"
 #include "application/platform_settings.h"
+#include "application/main/flatpak_build.h"
 
 #include "augs/templates/main_thread_queue.h"
 
@@ -2166,7 +2167,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 							break;
 
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_VERSION_MISMATCH:
-							set_disconnect_reason("The server runs a different version of the game.\nUpdate the game, or wait for the server to be updated.");
+							set_disconnect_reason(typesafe_sprintf(
+								"The server runs a different version of the game.\n%x, or wait for the server to be updated.",
+								get_how_to_update_the_game()
+							));
 							break;
 
 						case yojimbo::YOJIMBO_CLIENT_DISCONNECT_REASON_CONNECTION_DENIED:

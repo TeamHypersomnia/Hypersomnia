@@ -31,6 +31,7 @@ struct self_update_result {
 
 	result_type type = result_type::NONE;
 	bool exit_with_failure_if_not_upgraded = false;
+	std::string available_version;
 };
 
 namespace augs {

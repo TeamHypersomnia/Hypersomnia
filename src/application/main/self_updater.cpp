@@ -226,6 +226,7 @@ self_update_result check_and_apply_updates(
 	
 	if (only_check_availability_and_quit) {
 		result.type = R::UPDATE_AVAILABLE;
+		result.available_version = new_version;
 		return result;
 	}
 

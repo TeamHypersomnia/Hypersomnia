@@ -105,7 +105,15 @@ if(UNIX)
 	endif()
 
 	if(NOT ARCHITECTURE)
-		message(FATAL_ERROR "Architecture type was not specified.")
+		if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
+			set(ARCHITECTURE "x64")
+		elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+			set(ARCHITECTURE "ARM64")
+		else()
+			message(FATAL_ERROR "Architecture type was not specified and ${CMAKE_SYSTEM_PROCESSOR} is not recognized.")
+		endif()
+
+		message("Architecture detected from the system processor: ${ARCHITECTURE}")
 	endif()
 
 	if(${ARCHITECTURE} STREQUAL "x86")
@@ -376,6 +384,8 @@ if (NOT BUILD_WINDOW_FRAMEWORK)
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(flatpak_build)
 
 #####################################################
 ### SPECIFICATION OF ALL SOURCE FILES BEGINS HERE ###
@@ -1809,6 +1819,10 @@ if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 		set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
 		set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
 		set(ALSOFT_ENABLE_MODULES FALSE CACHE BOOL "Enable use of C++20 modules when supported" FORCE)
+		set(ALSOFT_INSTALL FALSE CACHE BOOL "Install main library" FORCE)
+		set(ALSOFT_INSTALL_CONFIG FALSE CACHE BOOL "Install alsoft.conf sample configuration file" FORCE)
+		set(ALSOFT_INSTALL_HRTF_DATA FALSE CACHE BOOL "Install HRTF data files" FORCE)
+		set(ALSOFT_INSTALL_AMBDEC_PRESETS FALSE CACHE BOOL "Install AmbDec preset files" FORCE)
 
 		# With modules disabled there is nothing to scan, and CI runners have no clang-scan-deps.
 		set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
@@ -1835,6 +1849,10 @@ if(BUILD_OPENAL AND NOT BUILD_FOR_WEB)
 
 		if(CLANG AND NOT MSVC)
 			string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		endif()
+
+		if(CLANG AND NOT MSVC AND NOT USE_LIBCXX)
+			set(HAVE_WFUNCTION_EFFECTS 0)
 		endif()
 
 		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
@@ -1944,6 +1962,7 @@ if(BUILD_FREETYPE)
 
 	if (NOT (USE_SYSTEM_FREETYPE AND FREETYPE_FOUND))
 		message("Building Freetype (no harfbuzz/png/bzip2/brotli/zlib).")
+		set(SKIP_INSTALL_ALL ON)
 		add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype2")
 
 		if(ADD_MCMODEL_LARGE_FLAG)
@@ -2498,6 +2517,8 @@ string(REPLACE ";" "\n" READABLE_ALL_LIBS_STR "${HYPERSOMNIA_LIBS}")
 message("All libs:\n${READABLE_ALL_LIBS_STR}")
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
+
+include(linux_install)
 
 if(MSVC_SPECIFIC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")

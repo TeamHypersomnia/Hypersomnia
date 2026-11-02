@@ -35,6 +35,7 @@
 
 #include "hypersomnia_version.h"
 #include "application/main/self_updater.h"
+#include "application/main/flatpak_build.h"
 
 #include "application/arena/choose_arena.h"
 #include "application/setups/editor/packaged_official_content.h"
@@ -293,7 +294,7 @@ void main_menu_setup::draw_overlays(
 			case R::FAILED:
 				return colored("Failed to connect with the update server.", red);
 			case R::UPDATE_AVAILABLE:
-				return colored("Updates are available. Restart to install.", yellow);
+				return colored(get_update_available_status(), yellow);
 
 			default: return colored("", white);
 		}
@@ -305,6 +306,15 @@ void main_menu_setup::draw_overlays(
 	(void)dbbox;
 
 	vec2i padding = { 6, 6 };
+
+	if (const auto notice = get_flatpak_update_notice(last_update_result)) {
+		print_stroked(
+			output,
+			vec2i(screen_size.x - padding.x, padding.y),
+			colored(*notice, yellow),
+			{ augs::ralign::R, augs::ralign::T }
+		);
+	}
 
 	print_stroked(
 		output,

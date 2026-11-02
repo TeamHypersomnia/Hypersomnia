@@ -82,6 +82,7 @@
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "application/main/server_passwords.h"
 #include "application/main/favorite_servers.h"
+#include "application/main/flatpak_build.h"
 #include "application/setups/client/connect_target.h"
 #include "application/main/server_key.h"
 #include "application/main/environment_variables.h"
@@ -1067,7 +1068,7 @@ work_result work(
 
 		LOG_NVPS(should_update_headless);
 
-		const bool only_check = is_steam_client || params.only_check_update_availability_and_quit;
+		const bool only_check = is_steam_client || is_flatpak_build_v || params.only_check_update_availability_and_quit;
 
 		if (should_update_headless) {
 			last_update_result = check_and_apply_updates(

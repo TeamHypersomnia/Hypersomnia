@@ -9,6 +9,7 @@
 
 #include "application/main/verify_signature.h"
 #include "application/main/server_key.h"
+#include "application/main/flatpak_build.h"
 #if !PLATFORM_WEB
 #include "application/setups/server/server_join_string.h"
 #endif
@@ -264,7 +265,7 @@ int main(const int argc, const char* const * const argv) {
 		}
 	}
 	else {
-		::APPDATA_DIR = augs::get_default_documents_dir();
+		::APPDATA_DIR = get_default_appdata_dir();
 	}
 
 	if (params.print_server_key_only) {
