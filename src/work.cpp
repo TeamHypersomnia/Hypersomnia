@@ -7958,7 +7958,7 @@ work_result work(
 				);
 			};
 
-			auto do_flash_afterimage = [&](augs::renderer& chosen_renderer) {
+			auto do_flash_afterimage = [&](augs::renderer& chosen_renderer, const config_json_table& viewing_config) {
 				const auto flash_mult = gameplay_camera.get_effective_flash_mult();
 				const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
 
@@ -7977,7 +7977,8 @@ work_result work(
 					get_drawer,
 					flash_mult,
 					rendering_flash_afterimage,
-					screen_size
+					screen_size,
+					viewing_config.drawing.flashbang_color
 				);
 			};
 
@@ -8270,7 +8271,7 @@ work_result work(
 				/* #7 */
 				draw_non_menu_cursor(chosen_renderer, new_viewing_config, menu_chosen_cursor);
 
-				do_flash_afterimage(chosen_renderer);
+				do_flash_afterimage(chosen_renderer, new_viewing_config);
 			};
 
 			auto show_performance_details_job = [&]() {

@@ -10,7 +10,8 @@ void handle_flash_afterimage(
 	const D get_drawer,
 	const float flash_mult,
 	const bool rendering_flash_afterimage,
-	const vec2i screen_size
+	const vec2i screen_size,
+	const rgba flashbang_color
 ) {
 	if (flash_mult > 0 || rendering_flash_afterimage) {
 		/* 
@@ -46,12 +47,18 @@ void handle_flash_afterimage(
 	}
 
 	if (!rendering_flash_afterimage) {
-		/* Don't draw white blinding overlay while we are capturing the flash afterimage */
+		/* Don't draw the blinding overlay while we are capturing the flash afterimage */
 
 		if (flash_mult > 0) {
 			renderer.call_and_clear_triangles();
 
-			auto flash_overlay_col = white;
+			auto flash_overlay_col = flashbang_color;
+
+			/*
+				Only the hue is up to the player - a lower alpha would blind less.
+			*/
+
+			flash_overlay_col.a = 255;
 
 			if (viewed_character) {
 				if (const auto sentience = viewed_character.template find<components::sentience>()) {

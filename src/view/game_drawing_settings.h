@@ -302,6 +302,7 @@ struct game_drawing_settings {
 	bool draw_enemy_silhouettes_in_spectator = true;
 	rgba enemy_color = rgba(255, 0, 0, 255);
 	rgba friendly_color = rgba(0, 255, 0, 255);
+	rgba flashbang_color = rgba(0, 0, 0, 255);
 	bool colorize_enemies = true;
 	float enemy_darkening = 0.7f;
 	bool colorize_teammates = true;

@@ -3583,6 +3583,8 @@ void settings_gui_state::perform(
 
 						revertable_color_edit("Enemy color", config.drawing.enemy_color);
 						revertable_color_edit("Friendly color", config.drawing.friendly_color);
+						revertable_color_edit("Flashbang color", config.drawing.flashbang_color, ImGuiColorEditFlags_NoAlpha);
+						tooltip_on_hover("Color the screen turns when you are blinded by a flashbang.");
 
 						revertable_checkbox("Colorize enemies", config.drawing.colorize_enemies);
 						revertable_checkbox("Colorize teammates", config.drawing.colorize_teammates);

@@ -194,6 +194,7 @@
         "draw_enemy_silhouettes_in_spectator": true,
         "enemy_color": [255, 0, 0, 255],
         "friendly_color": [0, 255, 0, 255],
+        "flashbang_color": [0, 0, 0, 255],
         "colorize_enemies": true,
         "enemy_darkening": 0.7,
         "colorize_teammates": true,
