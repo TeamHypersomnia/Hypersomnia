@@ -15,7 +15,7 @@ colored, and whether green findings get fixed.
 Color decides the fix, not the bug. A crash with a one-line fix is green; a nit whose fix adds a flag is red.
 
 - **Green** - the fix keeps or removes complexity: a one-liner, a guard, a wrong constant, deleting dead or duplicated
-  code, moving code to where it belongs, a stale comment. The intended behavior is obvious.
+  code, moving code to where it belongs, deleting a comment. The intended behavior is obvious.
 - **Red** - the fix adds complexity (a new field, map, flag, setting, second code path, new file, new sync), or it
   is a product/UX choice, or intended behavior is unclear (severity `decision`), or it changes gameplay balance or
   what players see.

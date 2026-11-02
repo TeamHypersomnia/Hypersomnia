@@ -29,8 +29,9 @@ description: Audit/review a Hypersomnia feature or system (recently added gamepl
    Example: the shell RNG seed should be derived from the weapon (id + shot index), so all random values of every
    subsequent shell are known once the weapon exists; if a shot lands in a different step due to jitter,
    the shell trajectory stays the same. Check every place where RNG is applied during gameplay.
-4. **Comments** - not too many; they describe the current state and why it is so,
-   never the iteration history ("we tried X, so now Y" - only say why Y).
+4. **Comments** - none allowed. Every comment in the audited code is a finding: the fix deletes it, and where the
+   code is unclear without it, renames variables/functions or splits the code into well-named functions.
+   The generator markers (`// GEN INTROSPECTOR`, `// END GEN INTROSPECTOR`) are not comments.
 5. **Performance** - CPU cost, GPU memory (FBOs, textures), extra passes over all entities of a type
    where a shorter path is evident, per-frame allocations. In extreme cases state could live in inferred
    instead of significant - only with good reasons.

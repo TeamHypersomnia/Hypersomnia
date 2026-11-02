@@ -31,6 +31,13 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 
 # General programming rules
 
+- **Never write comments** - in any code (C++, scripts, the site), not even one line, not for a dependency on another repo,
+  a workaround or a deliberate behavior. Everything must be clear from the code itself: name variables, constants and
+  functions so they say it, and split code into well-named functions when a name alone is not enough. In extreme
+  cases the name carries even that (e.g. `link_page_lifetime_secs_same_as_page_repo`, `get_x_from_page_repo()`).
+	- The generator markers (`// GEN INTROSPECTOR`, `// END GEN INTROSPECTOR`) are not comments - they stay.
+	- When you change code that an existing comment describes, delete that comment instead of updating it.
+
 - **Do not change formatting style like tabs or other spacing conventions in the files you are editing.**
 
 - Don't automatically commit unless I ask to.
@@ -175,14 +182,6 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 	``` 
 	Take care to not put function declarations between these comments, only member field definitions.
 
-- Write comments like this, even if they are single-line:
-	```cpp
-	/*
-		This is a very long comment.
-	*/
-	```
-	This makes it easier to later add lines to that comment.
-
 - Where appropriate, use this if-scoping mechanism for variables:
 	```cpp
 	if (const auto stack_target = cosm[stack_target_id]) {
@@ -281,7 +280,7 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 
 ## Rules
 
-- To create new entities, allocate_new_entity_access access is required; you must declare the function you need there and write a comment that justifies why and how you're going to create new entities.
+- To create new entities, allocate_new_entity_access access is required; you must declare the function you need there, named so that it says why and how it creates new entities.
 
 - Prefer using vec2 (float) and vec2i (int) for coordinates so e.g.
 	```cpp
