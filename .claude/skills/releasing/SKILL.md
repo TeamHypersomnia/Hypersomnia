@@ -84,6 +84,10 @@ reaches production unless they have said to go ahead with all of them.
     repoint it (`ln -sfn Release-Web-clang-<suffix> build/current`) before each, and leave it on release-crazygames
     for the user's `cgdrag`. Check: md5 of the 4 files on play.hypersomnia.io against the local build;
     `butler status Hyperdev/Hypersomnia:html` shows X.Y.Z processed.
+12. **Flathub** (once the game is there - `io.hypersomnia.Hypersomnia`): the user merges the version bump PR that
+    Flathub's bot opens in `flathub/io.hypersomnia.Hypersomnia` after the tag, or bumps the tag and commit by hand.
+    **Never do it for them, never draft it** - Flathub forbids AI-made manifests, commits, PR texts and replies there.
+    The release entries in the metainfo come from the CHANGELOG headings (`cmake/generate_metainfo.py`), nothing to do.
 
 ## After
 

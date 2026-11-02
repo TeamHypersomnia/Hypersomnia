@@ -62,7 +62,9 @@ after Ctrl+C or regression.sh's timeout) and waits for log lines, never a fixed 
 5. **Check ports are free first** (`ss -tulpn`, `lsof -ti tcp:<port>`) and abort if busy - a server that fails to bind
    silently leaves the requests going to whatever else listens there.
 6. **Silence, nothing on the user's screen.** Every script sources `scripts/test_env.sh` (the one place for it:
-   `ALSOFT_DRIVERS=null`, `VISUAL=true`, and `$GAME_TEST_FLAGS` = `--no-update-on-launch --mute --no-open-logs`)
+   `ALSOFT_DRIVERS=null`, `VISUAL=true`, `DBUS_SESSION_BUS_ADDRESS=disabled:` - without it the game's file dialogs
+   and "show in folder" go through the user's desktop portal and open on the user's screen; the fake zenity/xdg-open
+   in `identity_ui/fake_bin` take over instead - and `$GAME_TEST_FLAGS` = `--no-update-on-launch --mute --no-open-logs`)
    and passes `$GAME_TEST_FLAGS` to every game it starts - a new script does the same, a game started by hand too
    (`. .claude/skills/local-testing/scripts/test_env.sh` first). Firefox profiles get `user_pref("media.volume_scale", "0.0");`.
    No window on the user's screen either: every game started for a test - `--unit-tests-only` too - under `xvfb-run -d`
