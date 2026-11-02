@@ -50,6 +50,7 @@ namespace augs {
 #include <thread>
 #include <cstdio>
 #include <array>
+#include "augs/window_framework/xdg_desktop_portal.h"
 
 namespace augs {
 	static std::string shell_escape(const std::string& s) {
@@ -125,8 +126,32 @@ namespace augs {
 		}
 	}
 
+	static std::vector<xdg_desktop_portal::file_filter> to_portal_filters(const std::vector<window::file_dialog_filter>& filters) {
+		std::vector<xdg_desktop_portal::file_filter> portal_filters;
+
+		for (const auto& f : filters) {
+			portal_filters.push_back({ f.description, f.patterns() });
+		}
+
+		return portal_filters;
+	}
+
+	static bool use_portal_file_chooser(const xdg_desktop_portal::file_chooser_mode mode) {
+		if (xdg_desktop_portal::can_choose(mode)) {
+			return true;
+		}
+
+		LOG("No file chooser in the desktop portal - falling back to zenity, kdialog or ranger.");
+		return false;
+	}
+
 	bool window::has_file_dialog() const {
-		return command_exists("zenity") || command_exists("kdialog") || (std::getenv("TERMINAL") != nullptr && command_exists("ranger"));
+		return
+			xdg_desktop_portal::is_service_present() ||
+			command_exists("zenity") ||
+			command_exists("kdialog") ||
+			(std::getenv("TERMINAL") != nullptr && command_exists("ranger"))
+		;
 	}
 
 	std::optional<path_type> window::open_file_dialog(
@@ -134,6 +159,10 @@ namespace augs {
 		const std::string& custom_title
 	) {
 		const auto title = custom_title.empty() ? "Open File" : custom_title;
+
+		if (use_portal_file_chooser(xdg_desktop_portal::file_chooser_mode::OPEN_FILE)) {
+			return xdg_desktop_portal::choose({ xdg_desktop_portal::file_chooser_mode::OPEN_FILE, title, to_portal_filters(filters), {}, {} });
+		}
 
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --title=" + shell_escape(title);
@@ -184,6 +213,18 @@ namespace augs {
 			return default_name;
 		}();
 
+		if (use_portal_file_chooser(xdg_desktop_portal::file_chooser_mode::SAVE_FILE)) {
+			const auto suggested = path_type(default_path);
+
+			return xdg_desktop_portal::choose({
+				xdg_desktop_portal::file_chooser_mode::SAVE_FILE,
+				title,
+				to_portal_filters(filters),
+				suggested.filename().string(),
+				suggested.parent_path()
+			});
+		}
+
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + shell_escape(title);
 
@@ -221,6 +262,10 @@ namespace augs {
 	) {
 		const auto title = custom_title.empty() ? "Choose Directory" : custom_title;
 
+		if (use_portal_file_chooser(xdg_desktop_portal::file_chooser_mode::CHOOSE_DIRECTORY)) {
+			return xdg_desktop_portal::choose({ xdg_desktop_portal::file_chooser_mode::CHOOSE_DIRECTORY, title, {}, {}, {} });
+		}
+
 		if (command_exists("zenity")) {
 			std::string cmd = "zenity --file-selection --directory --title=" + shell_escape(title);
 			return run_dialog_command(cmd);
@@ -239,7 +284,7 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	void window::reveal_in_explorer(const augs::path_type& p) {
+	static void reveal_without_portal(const augs::path_type& p) {
 		std::string shell_command;
 
 		const char* terminal = std::getenv("TERMINAL");
@@ -251,7 +296,19 @@ namespace augs {
 			shell_command = "xdg-open " + shell_escape(parent_dir.string());
 		}
 
-		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
+		augs::shell(shell_command);
+	}
+
+	void window::reveal_in_explorer(const augs::path_type& p) {
+		std::thread([p]() {
+			if (xdg_desktop_portal::can_open_directory()) {
+				xdg_desktop_portal::open_directory_of(p);
+				return;
+			}
+
+			LOG("No OpenDirectory in the desktop portal - falling back to ranger or xdg-open.");
+			reveal_without_portal(p);
+		}).detach();
 	}
 
 	message_box_button window::retry_cancel(

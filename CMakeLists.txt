@@ -966,6 +966,12 @@ if(BUILD_WINDOW_FRAMEWORK)
 		"src/augs/window_framework/window_explorer_utils.cpp"
 	)
 
+	if(LINUX AND NOT BUILD_FOR_WEB)
+		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+			"src/augs/window_framework/xdg_desktop_portal.cpp"
+		)
+	endif()
+
 	if(USE_SDL2)
 		message("Using SDL as the window framework.")
 
@@ -2331,6 +2337,12 @@ if(BUILD_WINDOW_FRAMEWORK)
 		list(APPEND HYPERSOMNIA_LIBS ${X11_LIBRARIES})
 		list(APPEND HYPERSOMNIA_LIBS ${XCB_LIBRARIES})
 		list(APPEND HYPERSOMNIA_LIBS ${X11_XCB_LIBRARIES})
+	endif()
+
+	if(LINUX AND NOT BUILD_FOR_WEB)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(DBUS REQUIRED IMPORTED_TARGET dbus-1)
+		list(APPEND HYPERSOMNIA_LIBS PkgConfig::DBUS)
 	endif()
 endif()
 

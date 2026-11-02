@@ -282,10 +282,6 @@ namespace augs {
 			}
 		};
 
-		/*
-			Whether the file dialogs can open at all - on Linux they need zenity, kdialog or ranger in $TERMINAL.
-		*/
-
 #if PLATFORM_LINUX
 		bool has_file_dialog() const;
 #else
