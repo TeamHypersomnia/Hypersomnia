@@ -335,8 +335,8 @@ namespace test_flavours {
 			auto& dmg = in.damage;
 
 			dmg.base = 6.f;
-			in.inner_ring_color = white;
-			in.outer_ring_color = white;
+			in.inner_ring_color = black;
+			in.outer_ring_color = black;
 			in.effective_radius = 2100.f;
 
 			::apply_cybernetic_explosion_look(in);

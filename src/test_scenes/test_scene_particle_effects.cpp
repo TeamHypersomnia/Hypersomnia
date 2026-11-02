@@ -264,7 +264,7 @@ void load_test_scene_particle_effects(
 
 	make_grenade_trail(test_scene_particle_effect_id::FORCE_GRENADE_TRAIL, red);
 	make_grenade_trail(test_scene_particle_effect_id::INTERFERENCE_GRENADE_TRAIL, yellow);
-	make_grenade_trail(test_scene_particle_effect_id::FLASHBANG_TRAIL, white);
+	make_grenade_trail(test_scene_particle_effect_id::FLASHBANG_TRAIL, black);
 	make_grenade_trail(test_scene_particle_effect_id::PED_GRENADE_TRAIL, cyan);
 
 	{
