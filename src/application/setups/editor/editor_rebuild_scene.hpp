@@ -13,6 +13,7 @@ void editor_setup::rebuild_arena(const bool editor_preview) {
 	const bool for_playtesting = true;
 	const auto override_game_mode = game_mode_name_type("");
 	const bool showing_navmesh = view.show_navmesh;
+	arena_built_showing_navmesh = showing_navmesh;
 
 	::build_arena_from_editor_project<editor_arena_handle<false>>(
 		get_arena_handle(),

@@ -196,18 +196,31 @@ namespace augs {
 	}
 #endif
 
-	audio_device::audio_device(const audio_settings& settings, const audio_paths& paths) : 
+	audio_device::audio_device(
+		const audio_settings& settings,
+		const audio_paths& paths,
+		const std::optional<unsigned> loopback_frequency
+	) : 
 		paths(paths),
-		period_size_at_launch(settings.period_size)
+		period_size_at_launch(settings.period_size),
+		loopback_frequency(loopback_frequency)
 	{
 		const auto& device_name = settings.output_device_name;
 
 #if BUILD_OPENAL
 #if !PLATFORM_WEB
 		write_openal_config(settings, paths);
-#endif
 
+		if (loopback_frequency.has_value()) {
+			device = alcLoopbackOpenDeviceSOFT(nullptr);
+			LOG("Opened an OpenAL loopback device rendering stereo at %x Hz.", *loopback_frequency);
+		}
+		else {
+			device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
+		}
+#else
 		device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
+#endif
 		
 		AL_CHECK_DEVICE(device);
 
@@ -231,7 +244,8 @@ namespace augs {
 	audio_device::audio_device(audio_device&& b) noexcept
 		: device(b.device),
 		paths(std::move(b.paths)),
-		period_size_at_launch(b.period_size_at_launch)
+		period_size_at_launch(b.period_size_at_launch),
+		loopback_frequency(b.loopback_frequency)
 	{
 		b.device = nullptr;
 	}
@@ -242,6 +256,7 @@ namespace augs {
 		device = b.device;
 		paths = std::move(b.paths);
 		period_size_at_launch = b.period_size_at_launch;
+		loopback_frequency = b.loopback_frequency;
 
 		b.device = nullptr;
 		return *this;
@@ -386,9 +401,14 @@ namespace augs {
 	}
 
 #if BUILD_OPENAL
-	static std::array<ALCint, 11> make_attrs(const audio_settings& settings, const int hrtf_id) {
+	static std::array<ALCint, 17> make_attrs(
+		const audio_settings& settings,
+		const int hrtf_id,
+		const std::optional<unsigned> loopback_frequency
+	) {
 #if PLATFORM_WEB
 		(void)hrtf_id;
+		(void)loopback_frequency;
 
 		return {
 			ALC_HRTF_SOFT, settings.output_mode == audio_output_mode::STEREO_HRTF, /* request HRTF */
@@ -412,20 +432,33 @@ namespace augs {
 
 		/* A negative id lets OpenAL pick - it tries the data sets in order. */
 
-		return {
+		auto attrs = std::array<ALCint, 17> {
 			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
 			ALC_OUTPUT_MODE_SOFT, output_mode_to_al_mode(settings.output_mode),
 			ALC_OUTPUT_LIMITER_SOFT, AL_TRUE,
 			ALC_HRTF_ID_SOFT, hrtf_id,
 			0
 		};
+
+		if (loopback_frequency.has_value()) {
+			const auto loopback_attrs = std::array<ALCint, 6> {
+				ALC_FORMAT_CHANNELS_SOFT, ALC_STEREO_SOFT,
+				ALC_FORMAT_TYPE_SOFT, ALC_SHORT_SOFT,
+				ALC_FREQUENCY, static_cast<ALCint>(*loopback_frequency)
+			};
+
+			std::copy(loopback_attrs.begin(), loopback_attrs.end(), attrs.begin() + 8);
+			attrs[14] = 0;
+		}
+
+		return attrs;
 #endif
 	}
 #endif
 
 	void audio_device::reset_device(audio_settings settings) {
 #if BUILD_OPENAL
-		auto attrs = make_attrs(settings, find_hrtf_id(settings));
+		auto attrs = make_attrs(settings, find_hrtf_id(settings), loopback_frequency);
 
 		if ((bool)alcResetDeviceSOFT) {
 			alcResetDeviceSOFT(device, &attrs[0]);
@@ -438,11 +471,15 @@ namespace augs {
 #endif
 	}
 
-	audio_context::audio_context(const audio_settings& settings, const audio_paths& paths) 
-		: device(settings, paths) 
+	audio_context::audio_context(
+		const audio_settings& settings,
+		const audio_paths& paths,
+		const std::optional<unsigned> loopback_frequency
+	) 
+		: device(settings, paths, loopback_frequency) 
 	{
 #if BUILD_OPENAL
-		auto attrs = make_attrs(settings, device.find_hrtf_id(settings));
+		auto attrs = make_attrs(settings, device.find_hrtf_id(settings), loopback_frequency);
 		context = alcCreateContext(device, &attrs[0]);
 
 		/* The context is already created with these, so apply must not reset the device again. */
@@ -522,6 +559,17 @@ namespace augs {
 		return result == ALC_TRUE;
 #else
 		return true;
+#endif
+	}
+
+	void audio_context::render_loopback_stereo(int16_t* const interleaved_samples, const int num_sample_frames) {
+#if BUILD_OPENAL && !PLATFORM_WEB
+		if (is_loopback()) {
+			alcRenderSamplesSOFT(device, interleaved_samples, num_sample_frames);
+		}
+#else
+		(void)interleaved_samples;
+		(void)num_sample_frames;
 #endif
 	}
 

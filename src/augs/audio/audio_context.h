@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <optional>
@@ -45,8 +46,9 @@ namespace augs {
 
 		audio_paths paths;
 		unsigned period_size_at_launch = 0;
+		std::optional<unsigned> loopback_frequency;
 
-		audio_device(const audio_settings&, const audio_paths&);
+		audio_device(const audio_settings&, const audio_paths&, std::optional<unsigned> loopback_frequency);
 		~audio_device();
 
 		audio_device(audio_device&&) noexcept;
@@ -99,7 +101,7 @@ namespace augs {
 		void speed_of_sound(float);
 
 	public:
-		audio_context(const audio_settings&, const audio_paths&);
+		audio_context(const audio_settings&, const audio_paths&, std::optional<unsigned> loopback_frequency = std::nullopt);
 		~audio_context();
 
 		audio_context(audio_context&&) noexcept;
@@ -117,5 +119,11 @@ namespace augs {
 		}
 
 		void apply(const audio_settings&, bool force = false);
+
+		bool is_loopback() const {
+			return device.loopback_frequency.has_value();
+		}
+
+		void render_loopback_stereo(int16_t* interleaved_samples, int num_sample_frames);
 	};
 }

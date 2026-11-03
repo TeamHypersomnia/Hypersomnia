@@ -65,6 +65,7 @@
 
 #include "application/setups/editor/commands/replace_whole_project_command.hpp"
 #include "application/setups/editor/editor_random_waypoints.hpp"
+#include "application/setups/editor/playtest_recording/editor_playtest_recordings.hpp"
 
 #include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
@@ -246,6 +247,7 @@ editor_setup::editor_setup(
 editor_setup::~editor_setup() {
 	auto sync_after = hold_persistent_filesystem_raii();
 
+	playtest_recordings.finish_recording(*this);
 	autosave_now_if_needed();
 
 	/*
@@ -408,6 +410,10 @@ bool editor_setup::handle_input_before_game(
 ) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
+
+	if (playtest_recordings.handle_replay_input(*this, in)) {
+		return true;
+	}
 
 	if (arena_gui_base::handle_input_before_game(in)) {
 		return true;
@@ -2604,6 +2610,10 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 }
 
 void editor_setup::draw_custom_gui_over_imgui(const draw_setup_gui_input& in) {
+	if (playtest_recordings.captures_frames()) {
+		return;
+	}
+
 	draw_recent_message(in);
 }
 
@@ -3592,6 +3602,19 @@ void editor_setup::start_playtesting() {
 
 	recent_message.set("Playtesting offline. Press ESC to quit.");
 
+	auto start = editor_playtest_start();
+	start.initial_spawn_pos = get_camera_eye().transform.pos;
+	start.rng_offset = static_cast<uint32_t>(std::random_device()()) & 0x3fffffffu;
+	start.nickname = simulated_client.nickname;
+
+	playtest_recordings.begin_recording(*this, start, arena_built_showing_navmesh);
+	setup_playtest_session(project.playtesting, start);
+}
+
+void editor_setup::setup_playtest_session(
+	const editor_playtesting_settings& playtest_settings,
+	const editor_playtest_start& start
+) {
 	arena_gui.choose_team.show = false;
 
 	playtesting = true;
@@ -3604,20 +3627,16 @@ void editor_setup::start_playtesting() {
 
 	get_arena_handle().on_mode_with_input([&]<typename M>(M& mode, const auto& input) {
 		if constexpr(std::is_same_v<M, test_mode>) {
-			mode.playtesting_context = make_playtesting_context();
-			local_player_id = mode.add_player(input, simulated_client.nickname, project.playtesting.starting_faction);
+			mode.playtesting_context = make_playtesting_context(playtest_settings.starting_faction, start.initial_spawn_pos);
+			local_player_id = mode.add_player(input, start.nickname, playtest_settings.starting_faction);
 		}
 		else {
-			/*
-				Like a server at every arena load - otherwise every playtest would start with the same rounds.
-			*/
+			mode.set_rng_offset(start.rng_offset);
 
-			mode.set_rng_offset(static_cast<uint32_t>(std::random_device()()) & 0x3fffffffu);
+			local_player_id = mode.add_player(input, start.nickname);
+			mode.choose_faction(input, local_player_id, playtest_settings.starting_faction);
 
-			local_player_id = mode.add_player(input, simulated_client.nickname);
-			mode.choose_faction(input, local_player_id, project.playtesting.starting_faction);
-
-			if (project.playtesting.spawn_only_enemy_bots) {
+			if (playtest_settings.spawn_only_enemy_bots) {
 				dummy_dynamic_vars.bots_override.requester = local_player_id;
 				dummy_dynamic_vars.bots_override.quota = {
 					uint8_t(0),
@@ -3628,25 +3647,24 @@ void editor_setup::start_playtesting() {
 	});
 
 	dummy_dynamic_vars.bot_override_difficulty = [&]() {
-		const auto chosen = project.playtesting.bot_difficulty;
+		const auto chosen = playtest_settings.bot_difficulty;
 
-		/*
-			Progressive sets its own bot quota, which would override the enemy-only one -
-			such a playtest gets very easy bots instead (the setting itself is left as it is).
-		*/
-
-		if (project.playtesting.spawn_only_enemy_bots && chosen == difficulty_type::PROGRESSIVE) {
+		if (const bool progressive_quota_would_override_enemy_only = playtest_settings.spawn_only_enemy_bots && chosen == difficulty_type::PROGRESSIVE) {
 			return difficulty_type::VERY_EASY;
 		}
 
 		return chosen;
 	}();
-	dummy_dynamic_vars.friendly_fire = project.playtesting.friendly_fire;
+
+	dummy_dynamic_vars.friendly_fire = playtest_settings.friendly_fire;
 
 	cosm.request_resample();
 }
 
 void editor_setup::stop_playtesting() {
+	playtest_recordings.finish_recording(*this);
+	playtest_recordings.stop_replaying(*this);
+
 	playtesting = false;
 	dummy_dynamic_vars.bots_override = {};
 	rebuild_arena();
@@ -3675,7 +3693,7 @@ void editor_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 }
 
 std::optional<camera_eye> editor_setup::find_current_camera_eye() const {
-	if (is_playtesting() && gui.playtest_immersive) {
+	if (is_playtesting() && gui.playtest_immersive && !playtest_recordings.replay_uses_free_camera()) {
 		return std::nullopt;
 	}
 
@@ -3874,9 +3892,13 @@ const editor_official_resource_map& editor_setup::get_official_resource_map() co
 }
 
 arena_playtesting_context editor_setup::make_playtesting_context() const {
+	return make_playtesting_context(project.playtesting.starting_faction, get_camera_eye().transform.pos);
+}
+
+arena_playtesting_context editor_setup::make_playtesting_context(const faction_type starting_faction, const vec2 initial_spawn_pos) const {
 	arena_playtesting_context ctx;
-	ctx.initial_spawn_pos = get_camera_eye().transform.pos;
-	ctx.first_player_faction = project.playtesting.starting_faction;
+	ctx.initial_spawn_pos = initial_spawn_pos;
+	ctx.first_player_faction = starting_faction;
 
 	/*
 		Look for DEBUG_NAVIGATION_START and DEBUG_NAVIGATION_END markers.
@@ -3929,15 +3951,20 @@ void editor_setup::after_all_drawcalls(game_frame_buffer& write_buffer) {
 	if (miniature_generator.has_value()) {
 		miniature_generator->request_screenshot(write_buffer.renderers.all[renderer_type::GENERAL]);
 	}
+
+	playtest_recordings.request_frame(write_buffer);
 }
 
 void editor_setup::do_game_main_thread_synced_op(renderer_backend_result& result) {
-	if (miniature_generator.has_value()) {
-		auto& ss = result.result_screenshot;
+	auto& ss = result.result_screenshot;
 
+	if (miniature_generator.has_value()) {
 		if (ss.has_value()) {
 			miniature_generator->acquire(*ss);
 		}
+	}
+	else if (ss.has_value()) {
+		playtest_recordings.write_frame(*ss);
 	}
 }
 

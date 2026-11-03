@@ -131,6 +131,7 @@
 #include "application/gui/arena_miniatures.h"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/project/editor_project_paths.h"
+#include "application/setups/editor/playtest_recording/playtest_replay_loopback_audio.h"
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
@@ -2293,7 +2294,16 @@ work_result work(
 		CACHE_DIR / "alsoft.conf"
 	};
 
-	WEBSTATIC augs::audio_context audio(config.audio, audio_paths);
+	WEBSTATIC augs::audio_context audio(
+		config.audio,
+		audio_paths,
+		params.replay_capture.records_audio() ? std::make_optional(playtest_replay_capture_audio_frequency_v) : std::nullopt
+	);
+
+	WEBSTATIC auto replay_loopback_audio = params.replay_capture.records_audio() ?
+		std::make_optional<playtest_replay_loopback_audio>() :
+		std::nullopt
+	;
 
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
@@ -6890,7 +6900,8 @@ work_result work(
 			ingame_menu.root.scale = get_gui_fonts_ratio();
 			main_menu_gui.root.scale = get_gui_fonts_ratio();
 
-			const auto frame_delta = frame_timer.extract_delta();
+			const auto real_frame_delta = frame_timer.extract_delta();
+			const auto frame_delta = params.replay_capture.records_frames() ? ::playtest_replay_capture_frame_delta() : real_frame_delta;
 			const auto current_frame_num = current_frame.load();
 
 			/*
@@ -6998,6 +7009,23 @@ work_result work(
 						playtest_requested = false;
 						editor.start_playtesting();
 						editor.set_playtest_speed(params.playtest_speed);
+					}
+
+					static bool replay_capture_requested = params.replay_capture.requested();
+
+					if (replay_capture_requested && streaming.completed_all_loading()) {
+						replay_capture_requested = false;
+						editor.get_playtest_recordings().start_capturing(editor, params.replay_capture);
+
+						if (!params.replay_capture.records_frames()) {
+							editor.set_playtest_speed(params.playtest_speed);
+						}
+					}
+
+					editor.get_playtest_recordings().advance_capture(streaming.completed_all_loading());
+
+					if (editor.get_playtest_recordings().capture_complete()) {
+						request_quit();
 					}
 				});
 
@@ -8481,6 +8509,13 @@ work_result work(
 				visit_current_setup([&](auto& s) {
 					return s.after_all_drawcalls(get_write_buffer());
 				});
+
+				if (replay_loopback_audio.has_value()) {
+					on_specific_setup([&](editor_setup& editor) {
+						audio_buffers.finish();
+						editor.get_playtest_recordings().queue_audio_of_captured_frame(replay_loopback_audio->render_one_frame(audio));
+					});
+				}
 
 				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
 

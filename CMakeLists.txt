@@ -605,6 +605,7 @@ if(HAS_HEAD)
 	"src/application/setups/editor/selector/editor_entity_selector.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
+	"src/application/setups/editor/gui/editor_recorded_playtests_gui.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
 	"src/application/setups/editor/editor_setup_imgui.cpp"
 	"src/application/setups/editor/gui/editor_inspector_gui.cpp"

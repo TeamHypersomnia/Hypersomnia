@@ -25,6 +25,8 @@
 #include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/gui/editor_filesystem_gui.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
+#include "application/setups/editor/gui/editor_recorded_playtests_gui.h"
+#include "application/setups/editor/playtest_recording/editor_playtest_recordings.h"
 
 #include "application/setups/editor/gui/editor_toolbar_gui.h"
 
@@ -91,6 +93,7 @@ struct editor_gui {
 	editor_filesystem_gui filesystem = std::string("Resources");
 	editor_history_gui history = std::string("History");
 	editor_toolbar_gui toolbar = std::string("Toolbar");
+	editor_recorded_playtests_gui recorded_playtests = std::string("Recorded playtests");
 
 	bool playtest_immersive = true;
 	bool sounds_preview = true;
@@ -136,6 +139,9 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	bool playtesting = false;
 	double playtest_speed = 1.0;
+	bool arena_built_showing_navmesh = false;
+
+	editor_playtest_recordings playtest_recordings;
 
 	scene_entity_to_node_map scene_entity_to_node;
 
@@ -192,6 +198,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	void create_official_filesystems();
 
+	void setup_playtest_session(const editor_playtesting_settings&, const editor_playtest_start&);
+
 	void on_window_activate();
 
 	void rescan_physical_filesystem();
@@ -244,6 +252,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	friend edit_project_settings_command;
 
 	friend editor_node_mover;
+	friend editor_playtest_recordings;
 
 	cosmos& get_cosmos() {
 		return scene.world;
@@ -641,7 +650,7 @@ public:
 	/*********************************************************/
 
 	auto get_audiovisual_speed() const {
-		return is_playtesting() ? playtest_speed : 1.0;
+		return is_playtesting() ? get_current_playtest_speed() : 1.0;
 	}
 
 	const auto& get_viewed_cosmos() const {
@@ -674,43 +683,65 @@ public:
 	}
 
 	template <class C>
+	void advance_playtest_step(
+		const mode_entropy& total,
+		const C& callbacks
+	) {
+		get_arena_handle().on_mode_with_input(
+			[&](auto& mode, const auto& input) {
+				mode.advance(
+					input,
+					total,
+					callbacks,
+					solve_settings()
+				);
+
+				using M = remove_cref<decltype(mode)>;
+
+				if constexpr(std::is_same_v<M, arena_mode>) {
+					if (const auto seed = mode.find_generated_waypoints_seed()) {
+						show_playtest_waypoints_seed(*seed);
+					}
+				}
+			}
+		);
+	}
+
+	template <class C>
 	void advance(
 		const setup_advance_input& in,
 		const C& callbacks
 	) {
+		if (is_replaying_playtest()) {
+			playtest_recordings.perform_requested_seek(*this);
+		}
+
 		auto dt = in.frame_delta;
-		dt *= playtest_speed;
+		dt *= get_current_playtest_speed();
 		global_time_seconds += dt.in_seconds();
 		timer.advance(dt);
 
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
-			if (is_playtesting()) {
+			if (is_replaying_playtest()) {
+				if (const auto replayed = playtest_recordings.begin_replayed_step(*this)) {
+					advance_playtest_step(*replayed, callbacks);
+					playtest_recordings.end_replayed_step(*this);
+				}
+			}
+			else if (is_playtesting()) {
 				const auto total = total_collected.extract(
 					get_viewed_character(), 
 					local_player_id, 
 					in.make_accumulator_input()
 				);
 
-				get_arena_handle().on_mode_with_input(
-					[&](auto& mode, const auto& input) {
-						mode.advance(
-							input,
-							total,
-							callbacks,
-							solve_settings()
-						);
+				const auto dynamic_vars_in_effect = dummy_dynamic_vars;
 
-						using M = remove_cref<decltype(mode)>;
-
-						if constexpr(std::is_same_v<M, arena_mode>) {
-							if (const auto seed = mode.find_generated_waypoints_seed()) {
-								show_playtest_waypoints_seed(*seed);
-							}
-						}
-					}
-				);
+				playtest_recordings.before_recorded_step(*this);
+				advance_playtest_step(total, callbacks);
+				playtest_recordings.record_step(*this, total, dynamic_vars_in_effect);
 			}
 			else {
 				animation_system().dry_advance_stateful_animations(scene.world);
@@ -753,13 +784,13 @@ public:
 
 	template <class T>
 	void control(const T& t) {
-		if (is_playtesting()) {
+		if (is_playtesting() && !is_replaying_playtest()) {
 			total_collected.control(t);
 		}
 	}
 
 	const entropy_accumulator& get_entropy_accumulator() const {
-		if (is_playtesting()) {
+		if (is_playtesting() && !is_replaying_playtest()) {
 			return total_collected;
 		}
 
@@ -798,6 +829,30 @@ public:
 
 	void start_playtesting();
 	bool is_playtesting() const;
+
+	auto& get_playtest_recordings() {
+		return playtest_recordings;
+	}
+
+	const auto& get_playtest_recordings() const {
+		return playtest_recordings;
+	}
+
+	bool is_replaying_playtest() const {
+		return playtest_recordings.is_replaying();
+	}
+
+	double get_current_playtest_speed() const {
+		return playtest_recordings.is_replay_paused() ? 0.0 : playtest_speed;
+	}
+
+	augs::path_type get_recorded_playtests_folder() const {
+		return ::get_recorded_playtests_folder(paths.project_folder);
+	}
+
+	bool requires_cursor() const {
+		return playtest_recordings.replay_requires_cursor() || arena_gui_base::requires_cursor();
+	}
 
 	/* Arena interface */
 	bool is_gameplay_on() const { return is_playtesting(); }
@@ -843,6 +898,7 @@ public:
 	void on_project_assigned(const bool undoing_to_first_revision);
 
 	arena_playtesting_context make_playtesting_context() const;
+	arena_playtesting_context make_playtesting_context(faction_type starting_faction, vec2 initial_spawn_pos) const;
 
 	template <class... Args>
 	void set_recent_message(Args&&... args) { recent_message.set(std::forward<Args>(args)...); }

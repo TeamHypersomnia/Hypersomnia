@@ -228,6 +228,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			do_window_entry(gui.filesystem, "CTRL+F");
 			do_window_entry(gui.inspector, "CTRL+I");
 			do_window_entry(gui.history, "CTRL+H");
+			do_window_entry(gui.recorded_playtests, nullptr);
 		}
 
 		if (auto menu = scoped_menu("View")) {
@@ -361,6 +362,8 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		toggle_sounds_preview();
 	}
 
+	playtest_recordings.perform_replay_controls(*this, in.window);
+
 	if (is_playtesting() && gui.playtest_immersive) {
 		return custom_imgui_result::NONE;
 	}
@@ -408,6 +411,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGui::DockBuilderDockWindow(gui.scratchpad.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
 			ImGui::DockBuilderDockWindow(gui.history.get_title().c_str(), dock_id_bottom_right);
+			ImGui::DockBuilderDockWindow(gui.recorded_playtests.get_title().c_str(), dock_id_bottom_right);
 
 			ImGui::DockBuilderDockWindow(gui.toolbar.get_title().c_str(), dock_id_top);
 
@@ -475,6 +479,16 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	});
 
 	gui.history.perform({ *this, history });
+
+	if (gui.recorded_playtests.show) {
+		if (const auto history_window = ImGui::FindWindowByName(gui.history.get_title().c_str())) {
+			if (history_window->DockId != 0) {
+				ImGui::SetNextWindowDockID(history_window->DockId, ImGuiCond_FirstUseEver);
+			}
+		}
+	}
+
+	gui.recorded_playtests.perform({ *this, in.window, in.necessary_images });
 
 	gui.toolbar.perform({
 			*this,

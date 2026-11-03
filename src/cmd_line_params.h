@@ -8,6 +8,7 @@
 #include "application/activity_type.h"
 #include "augs/string/typesafe_sscanf.h"
 #include "application/main/environment_variables.h"
+#include "application/setups/editor/playtest_recording/playtest_replay_capture_settings.h"
 
 struct cmd_line_params {
 	std::string complete_command_line;
@@ -40,6 +41,8 @@ struct cmd_line_params {
 	*/
 
 	double playtest_speed = 1.0;
+
+	playtest_replay_capture_settings replay_capture;
 
 	augs::path_type consistency_report;
 	bool unit_tests_only = false;
@@ -349,6 +352,26 @@ struct cmd_line_params {
 			}
 			else if (a == "--playtest-speed") {
 				playtest_speed = std::max(0.01, std::atof(get_next()));
+			}
+			else if (a == "--replay-playtest") {
+				replay_capture.recording_folder = get_next();
+				editor_target = ::project_folder_of_recording(replay_capture.recording_folder);
+				launch_activity = activity_type::EDITOR;
+			}
+			else if (a == "--replay-from") {
+				replay_capture.from_secs = std::max(0.0, std::atof(get_next()));
+			}
+			else if (a == "--replay-to") {
+				replay_capture.to_secs = std::atof(get_next());
+			}
+			else if (a == "--replay-frames") {
+				replay_capture.frames_path = get_next();
+			}
+			else if (a == "--replay-audio") {
+				replay_capture.audio_path = get_next();
+			}
+			else if (a == "--replay-camera") {
+				replay_capture.camera = ::parse_playtest_replay_camera(get_next());
 			}
 			else if (a == "--signature") {
 				verified_signature = get_next();
