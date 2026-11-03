@@ -7895,7 +7895,7 @@ work_result work(
 
 					if constexpr(std::is_same_v<S, editor_setup>) {
 						if (setup.is_playtesting()) {
-							return setup.get_project().playtesting.see_enemies_behind_walls;
+							return setup.sees_enemies_behind_walls();
 						}
 					}
 

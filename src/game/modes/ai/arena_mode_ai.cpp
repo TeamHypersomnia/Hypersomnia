@@ -426,7 +426,8 @@ arena_ai_result update_arena_mode_ai(
 	if (
 		bot_faction == faction_type::RESISTANCE &&
 		team_state.chosen_bombsite != marker_letter_type::COUNT &&
-		!ai_state.escaping_explosion
+		!ai_state.escaping_explosion &&
+		!ai_state.keeps_playtest_spawn_letter
 	) {
 		if (ai_state.patrol_letter != team_state.chosen_bombsite) {
 			ai_state.patrol_letter = team_state.chosen_bombsite;

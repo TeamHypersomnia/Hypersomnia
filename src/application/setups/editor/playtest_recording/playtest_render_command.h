@@ -11,6 +11,7 @@ struct playtest_render_request {
 	double from_secs = 0.0;
 	double to_secs = 0.0;
 	std::optional<camera_eye> camera;
+	bool hide_hud = false;
 };
 
 inline augs::path_type get_playtest_render_script_path() {
@@ -35,6 +36,10 @@ inline std::string make_playtest_render_command(const playtest_render_request& r
 	if (request.camera.has_value()) {
 		const auto& eye = *request.camera;
 		command += typesafe_sprintf(" --camera %2f,%2f,%4f", eye.transform.pos.x, eye.transform.pos.y, eye.zoom);
+	}
+
+	if (request.hide_hud) {
+		command += " --no-hud";
 	}
 
 	return command;

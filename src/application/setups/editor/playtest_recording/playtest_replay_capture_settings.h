@@ -22,6 +22,7 @@ struct playtest_replay_capture_settings {
 	augs::path_type frames_path;
 	augs::path_type audio_path;
 	std::optional<camera_eye> camera;
+	bool hide_hud = false;
 
 	bool requested() const {
 		return !recording_folder.empty();

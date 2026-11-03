@@ -12,6 +12,7 @@
 
 #include "application/arena/build_arena_from_editor_project.h"
 #include "application/arena/missile_node_shot.h"
+#include "application/arena/editor_playtest_spawns.h"
 #include "application/setups/editor/detail/has_custom_scene_flavour_id.h"
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/create_entity.hpp"
@@ -702,6 +703,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		)
 	);
 
+	if (in.for_playtesting) {
+		::set_playtest_spawns_in_rules(arena_handle, project, official.resources, find_resource);
+	}
+
 	if (in.target_clean_round_state) {
 		*in.target_clean_round_state = scene.world.get_solvable().significant;
 	}
@@ -711,20 +716,6 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	*/
 
 	{
-		/*
-			Determine whether we need a navmesh:
-
-			- Always need if in real gameplay (for_playtesting == false)
-			- Always need if showing_navmesh is true (user wants to see an up-to-date navmesh)
-			- If playtesting in editor (for_playtesting == true):
-			  - Only need if spawn_bots is true in playtesting settings
-			    and the tested mode isn't the quick test, which never has bots
-			- Otherwise, no need to load or generate the navmesh.
-
-			Additionally, *always* regenerate if we need the navmesh in editor,
-			instead of loading from a file, because the timestamp might not change too often.
-		*/
-
 		const bool not_playtesting = !in.for_playtesting;
 		const bool testing_quick_test = [&]() {
 			const auto& pool = project.resources.get_pool_for<editor_game_mode_resource>();
@@ -741,7 +732,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		}();
 
 		const bool spawn_bots_enabled =
-			(project.playtesting.spawn_bots || project.playtesting.spawn_only_enemy_bots)
+			(project.playtesting.spawn_bots || project.playtesting.spawn_only_enemy_bots || ::has_playtest_spawns(project, official.resources))
 			&& !testing_quick_test
 		;
 

@@ -18,6 +18,7 @@
 #include "game/modes/ranked_state_type.h"
 
 #include "application/arena/arena_playtesting_context.h"
+#include "game/modes/playtest_spawn.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 
 using mode_entity_id = entity_id;
@@ -55,6 +56,7 @@ struct test_mode_ruleset {
 	per_actual_faction<test_mode_faction_rules> factions;
 	test_mode_view_rules view;
 	uint32_t round_secs = 120;
+	std::vector<playtest_spawn> quick_test_spawns;
 	// END GEN INTROSPECTOR
 
 	test_mode_ruleset();
@@ -182,6 +184,7 @@ public:
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);
+	void add_quick_test_spawn_players(input, mode_player_id host);
 	void remove_player(input, logic_step, mode_player_id);
 
 	/*

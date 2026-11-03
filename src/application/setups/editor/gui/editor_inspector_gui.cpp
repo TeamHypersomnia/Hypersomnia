@@ -933,6 +933,7 @@ static bool has_letter(const point_marker_type type) {
 static bool has_team(const point_marker_type type) {
 	switch (type) {
 		case point_marker_type::TEAM_SPAWN:
+		case point_marker_type::QUICK_TEST_SPAWN:
 		case point_marker_type::BOT_WAYPOINT_PUSH:
 		case point_marker_type::BOT_WAYPOINT_PATROL:
 			return true;
@@ -959,8 +960,7 @@ static bool has_team(const area_marker_type type) {
 	}
 }
 
-EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point_marker_resource& resource) {
-	auto special_handler = default_widget_handler();
+EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point_marker_resource& resource, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -990,6 +990,54 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 			MULTIPROPERTY("Look far", camp_look_far);
 
 			tooltip_on_hover("While camping here, the bot looks far ahead\nlike a player with the crosshair at the screen edge:\nit sees farther, but within a much narrower angle.");
+		}
+	}
+
+	auto custom_equipment_properties = [&](const char* const tooltip) {
+		MULTIPROPERTY("Custom equipment", playtest_custom_equipment);
+		tooltip_on_hover(tooltip);
+
+		if (insp.playtest_custom_equipment) {
+			auto ind = scoped_indent();
+			EQUIPMENT_PROPERTIES(playtest_equipment);
+		}
+	};
+
+	if (type == point_marker_type::QUICK_TEST_SPAWN) {
+		text_disabled(
+			"Only in the editor's offline playtest of a quick test.\n"
+			"If a faction has any of these, you spawn on its topmost one in the layers\n"
+			"and every other one gets a bot that stands still, holding its equipment."
+		);
+
+		custom_equipment_properties("Whoever spawns here gets exactly this equipment,\ninstead of the quick test mode's.");
+
+		MULTIPROPERTY("Bot respawns", respawns_in_quick_test);
+		tooltip_on_hover("A killed bot comes back here after the mode's respawn time.\nOtherwise it stays dead.");
+	}
+
+	if (type == point_marker_type::TEAM_SPAWN) {
+		MULTIPROPERTY("Playtest spawn", playtest_spawn);
+
+		tooltip_on_hover(
+			"Only in the editor's offline playtest.\n"
+			"If a faction has any playtest spawns, its players spawn only there,\n"
+			"one per spawn - you take the topmost one in the layers, bots the rest.\n"
+			"A bot spawned here patrols the bombsite nearest to it."
+		);
+
+		if (insp.playtest_spawn) {
+			auto ind = scoped_indent();
+
+			MULTIPROPERTY("Bot camps here from the start", camp);
+			tooltip_on_hover("The bot spawned here stays and waits for the enemy,\nlooking in the direction of this spawn.\nOtherwise it walks to its bombsite right away.");
+
+			if (insp.camp) {
+				auto ind = scoped_indent();
+				MULTIPROPERTY("Look far", camp_look_far);
+			}
+
+			custom_equipment_properties("Whoever spawns here gets exactly this equipment every round,\ninstead of the game mode's and what they kept from the last round.\nA bot spawned with it doesn't buy.");
 		}
 	}
 
@@ -3706,12 +3754,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				const auto resource = in.setup.find_resource(node.resource_id);
 				ensure(resource != nullptr);
 
-				if constexpr(std::is_same_v<N, editor_area_marker_node>) {
-					changed = perform_editable_gui(edited_copy, cmd.entries, *resource, id_handler);
-				}
-				else {
-					changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
-				}
+				changed = perform_editable_gui(edited_copy, cmd.entries, *resource, id_handler);
 			}
 			else {
 				changed = perform_editable_gui(edited_copy, cmd.entries);

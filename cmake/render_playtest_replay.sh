@@ -3,10 +3,11 @@ set -e
 
 usage() {
 	echo "usage: render_playtest_replay.sh --game <executable> --recording <recorded playtest folder>"
-	echo "       [--from <secs>] [--to <secs>] [--camera <x>,<y>,<zoom>] [--size <width>x<height>] [--output <file.mp4>]"
+	echo "       [--from <secs>] [--to <secs>] [--camera <x>,<y>,<zoom>] [--no-hud] [--size <width>x<height>] [--output <file.mp4>]"
 	echo
 	echo "Renders a playtest recorded in the editor at exactly 60 fps, with sound, offscreen (Xvfb) - Linux only."
-	echo "Without --camera the camera follows the recorded player. Copy a ready command with \"Copy render command\""
+	echo "Without --camera the camera follows the recorded player. --no-hud renders in cinematic mode (no HUD)."
+	echo "Copy a ready command with \"Copy render command\""
 	echo "in the editor's replay window."
 	exit 2
 }
@@ -16,6 +17,7 @@ RECORDING=""
 FROM=0
 TO=""
 CAMERA=""
+NO_HUD=""
 SIZE=1920x1080
 OUTPUT=""
 
@@ -26,6 +28,7 @@ while [ $# -gt 0 ]; do
 		--from) FROM=$2; shift 2 ;;
 		--to) TO=$2; shift 2 ;;
 		--camera) CAMERA=$2; shift 2 ;;
+		--no-hud) NO_HUD=1; shift ;;
 		--size) SIZE=$2; shift 2 ;;
 		--output) OUTPUT=$2; shift 2 ;;
 		*) usage ;;
@@ -108,6 +111,7 @@ GAME_ARGS=(
 
 [ -n "$TO" ] && GAME_ARGS+=(--replay-to "$TO")
 [ -n "$CAMERA" ] && GAME_ARGS+=(--replay-camera "$CAMERA")
+[ -n "$NO_HUD" ] && GAME_ARGS+=(--replay-no-hud)
 
 echo "Rendering $RECORDING from ${FROM}s${TO:+ to ${TO}s} at ${WIDTH}x${HEIGHT} (logs in $WORK)..."
 

@@ -26,6 +26,7 @@ class editor_playtest_recordings {
 	std::unique_ptr<editor_playtest_replay> replay;
 
 	std::optional<playtest_replay_capture_output> capture_output;
+	bool capture_hides_hud = false;
 	bool capture_waits_for_viewables = false;
 	bool capture_failed = false;
 	bool frame_requested_now = false;
@@ -43,6 +44,7 @@ public:
 	bool is_replay_paused() const;
 	bool replay_uses_free_camera() const;
 	bool replay_requires_cursor() const;
+	bool replay_hides_hud(bool hud_hidden_in_editor_replays) const;
 
 	bool captures_frames() const {
 		return capture_output.has_value();

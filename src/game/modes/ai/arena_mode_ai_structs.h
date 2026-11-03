@@ -469,6 +469,7 @@ struct arena_mode_ai_state {
 
 	bool already_nothing_more_to_buy = false;
 	float purchase_decision_countdown = -10000.0f;
+	bool keeps_playtest_spawn_letter = false;
 
 	bool has_acquired_target_by_hearing_during_bomb_plant = false;
 
@@ -550,6 +551,7 @@ struct arena_mode_ai_state {
 		escaping_explosion = false;
 		already_nothing_more_to_buy = false;
 		purchase_decision_countdown = -10000.0f;
+		keeps_playtest_spawn_letter = false;
 		has_acquired_target_by_hearing_during_bomb_plant = false;
 		navigation.reset();
 		current_navigation_request = std::nullopt;

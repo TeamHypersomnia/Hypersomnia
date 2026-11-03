@@ -9,6 +9,7 @@
 #include "game/messages/health_event.h"
 #include "game/modes/arena_mode.hpp"
 #include "game/modes/casual_level_logic.h"
+#include "game/modes/arena_playtest_spawns.hpp"
 
 /*
 	Non-deterministic randomness for the ranked match id (declared in yojimbo_utils.h).
@@ -222,7 +223,8 @@ void arena_mode::init_spawned(
 	const entity_id id, 
 	const logic_step step,
 	messages::changed_identities_message& changed_identities,
-	const round_transferred_player* transferred
+	const round_transferred_player* transferred,
+	const requested_equipment* const playtest_spawn_equipment
 ) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
@@ -231,7 +233,10 @@ void arena_mode::init_spawned(
 	auto access = allocate_new_entity_access();
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-		if (progressive_enabled(in)) {
+		if (playtest_spawn_equipment != nullptr) {
+			playtest_spawn_equipment->generate_for(access, typed_handle, step, 1);
+		}
+		else if (progressive_enabled(in)) {
 			reset_equipment_for(step, in, player_id, typed_handle);
 		}
 		else if (transferred != nullptr && transferred->survived) {
@@ -475,15 +480,7 @@ entity_id arena_mode::teleport_to_next_spawn(const input in, const entity_id id)
 			reshuffle();
 		}
 		else {
-			used_spawn = spawns[spawn_idx];
-
-			const auto spawn_transform = spawn.get_logic_transform();
-			typed_handle.set_logic_transform(spawn_transform);
-			snap_interpolated_to(typed_handle, spawn_transform);
-
-			if (const auto crosshair = typed_handle.find_crosshair()) {
-				crosshair->base_offset = spawn_transform.get_direction() * 200;
-			}
+			used_spawn = teleport_to_spawn(in, typed_handle.get_id(), spawns[spawn_idx]);
 
 			++spawn_idx;
 
@@ -494,6 +491,27 @@ entity_id arena_mode::teleport_to_next_spawn(const input in, const entity_id id)
 	});
 
 	return used_spawn;
+}
+
+entity_id arena_mode::teleport_to_spawn(const input in, const entity_id id, const entity_id spawn_id) {
+	auto& cosm = in.cosm;
+	const auto spawn = cosm[spawn_id];
+
+	if (spawn.dead()) {
+		return {};
+	}
+
+	cosm[id].dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
+		const auto spawn_transform = spawn.get_logic_transform();
+		typed_handle.set_logic_transform(spawn_transform);
+		snap_interpolated_to(typed_handle, spawn_transform);
+
+		if (const auto crosshair = typed_handle.find_crosshair()) {
+			crosshair->base_offset = spawn_transform.get_direction() * 200;
+		}
+	});
+
+	return spawn_id;
 }
 
 bool arena_mode::add_player_custom(const input_type in, const add_player_input& add_in) {
@@ -1105,6 +1123,22 @@ void arena_mode::create_character_for_player(
 						}
 					},
 					[&](const entity_handle new_character) {
+						const auto playtest_spawn = ::choose_playtest_spawn_for(cosm, in.rules.playtest_spawns, players, id, faction);
+
+						if (playtest_spawn != nullptr) {
+							const auto spawn_used = teleport_to_spawn(in, new_character, playtest_spawn->spawn);
+							const auto equipment = playtest_spawn->custom_equipment ? std::addressof(playtest_spawn->equipment) : nullptr;
+
+							init_spawned(in, id, new_character, step, changed_identities, equipment != nullptr ? nullptr : transferred, equipment);
+							p.ai_state.source_spawn_point = spawn_used;
+
+							if (p.is_bot) {
+								::start_bot_at_playtest_spawn(p.ai_state, cosm, ai_arena_meta, *playtest_spawn);
+							}
+
+							return;
+						}
+
 						const auto spawn_used = teleport_to_next_spawn(in, new_character);
 						init_spawned(in, id, new_character, step, changed_identities, transferred);
 						p.ai_state.source_spawn_point = spawn_used;
@@ -3297,6 +3331,19 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 }
 
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in) const {
+	auto requested_bots = calc_requested_bots_without_playtest_spawns(in);
+
+	::override_bots_with_playtest_spawns(
+		in.cosm,
+		in.rules.playtest_spawns,
+		requested_bots,
+		[&](const faction_type faction) { return num_human_players_in(faction); }
+	);
+
+	return requested_bots;
+}
+
+per_actual_faction<uint8_t> arena_mode::calc_requested_bots_without_playtest_spawns(const const_input in) const {
 	const auto& over = in.dynamic_vars.bots_override;
 
 	if (ranked_state != ranked_state_type::NONE) {

@@ -26,6 +26,7 @@
 #include "game/modes/ranked_state_type.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 #include "game/modes/only_human.hpp"
+#include "game/modes/playtest_spawn.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -84,6 +85,8 @@ struct arena_mode_ruleset {
 	arena_mode_view_rules view;
 
 	all_subrules_variant subrules;
+
+	std::vector<playtest_spawn> playtest_spawns;
 	// END GEN INTROSPECTOR
 
 	arena_mode_ruleset();
@@ -364,13 +367,15 @@ private:
 	void reset_equipment_for(logic_step step, input in, mode_player_id ko, H character_handle);
 
 	entity_id teleport_to_next_spawn(input, entity_id character);
+	entity_id teleport_to_spawn(input, entity_id character, entity_id spawn);
 	void init_spawned(
 		input, 
 		mode_player_id,
 		entity_id character, 
 		logic_step, 
 		messages::changed_identities_message& changed_identities,
-		const round_transferred_player* = nullptr
+		const round_transferred_player* = nullptr,
+		const requested_equipment* playtest_spawn_equipment = nullptr
 	);
 
 	bool handle_suspended_logic(input, logic_step);
@@ -877,6 +882,7 @@ public:
 	}
 
 	per_actual_faction<uint8_t> calc_requested_bots(const const_input in) const;
+	per_actual_faction<uint8_t> calc_requested_bots_without_playtest_spawns(const const_input in) const;
 	per_actual_faction<uint8_t> calc_requested_bots_from_quotas(
 		const const_input in,
 		const bot_quota& quota,

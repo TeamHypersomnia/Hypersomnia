@@ -96,6 +96,7 @@ struct editor_gui {
 	editor_recorded_playtests_gui recorded_playtests = std::string("Recorded playtests");
 
 	bool playtest_immersive = true;
+	bool hide_hud_in_playtest_replays = false;
 	bool sounds_preview = true;
 
 	bool request_toggle_sounds_preview = false;
@@ -852,6 +853,10 @@ public:
 
 	bool requires_cursor() const {
 		return playtest_recordings.replay_requires_cursor() || arena_gui_base::requires_cursor();
+	}
+
+	bool sees_enemies_behind_walls() const {
+		return playtest_recordings.replay_uses_free_camera() || project.playtesting.see_enemies_behind_walls;
 	}
 
 	/* Arena interface */

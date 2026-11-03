@@ -682,6 +682,10 @@ void editor_setup::customize_for_viewing(config_json_table& config) const {
 
 	if (is_playtesting()) {
 		get_arena_handle().adjust(config.drawing);
+
+		if (playtest_recordings.replay_hides_hud(gui.hide_hud_in_playtest_replays)) {
+			config.drawing.cinematic_mode = true;
+		}
 	}
 	else {
 		config.drawing.snap_zoom_to_fov_size = false;
@@ -3629,6 +3633,7 @@ void editor_setup::setup_playtest_session(
 		if constexpr(std::is_same_v<M, test_mode>) {
 			mode.playtesting_context = make_playtesting_context(playtest_settings.starting_faction, start.initial_spawn_pos);
 			local_player_id = mode.add_player(input, start.nickname, playtest_settings.starting_faction);
+			mode.add_quick_test_spawn_players(input, local_player_id);
 		}
 		else {
 			mode.set_rng_offset(start.rng_offset);

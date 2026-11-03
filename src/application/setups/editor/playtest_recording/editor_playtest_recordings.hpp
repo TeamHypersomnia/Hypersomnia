@@ -35,6 +35,18 @@ bool editor_playtest_recordings::replay_requires_cursor() const {
 	return is_replaying() && !replay->controls_hidden;
 }
 
+bool editor_playtest_recordings::replay_hides_hud(const bool hud_hidden_in_editor_replays) const {
+	if (!is_replaying()) {
+		return false;
+	}
+
+	if (captures_frames()) {
+		return capture_hides_hud;
+	}
+
+	return hud_hidden_in_editor_replays;
+}
+
 bool editor_playtest_recordings::capture_complete() const {
 	if (capture_failed) {
 		return true;
@@ -373,6 +385,8 @@ void editor_playtest_recordings::perform_replay_controls(editor_setup& editor, a
 		}
 	}
 
+	checkbox("Hide HUD (cinematic mode)", editor.gui.hide_hud_in_playtest_replays);
+
 	if (ImGui::Button("Copy render command")) {
 		auto request = playtest_render_request();
 		request.recording_folder = shown.recording.paths.folder;
@@ -383,12 +397,14 @@ void editor_playtest_recordings::perform_replay_controls(editor_setup& editor, a
 			request.camera = editor.view.panned_camera;
 		}
 
+		request.hide_hud = editor.gui.hide_hud_in_playtest_replays;
+
 		ImGui::SetClipboardText(::make_playtest_render_command(request).c_str());
 		editor.recent_message.set("Copied the command rendering this replay from %x to the end.", ::format_mins_secs(request.from_secs));
 	}
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("Renders from the current moment to the end at 60 fps, with sound,\nwith the free camera if it is on - otherwise following the player.");
+		text_tooltip("Renders from the current moment to the end at 60 fps, with sound,\nwith the free camera if it is on - otherwise following the player,\nwithout the HUD if it is hidden here.");
 	}
 
 	ImGui::SameLine();
@@ -472,6 +488,8 @@ void editor_playtest_recordings::start_capturing(editor_setup& editor, const pla
 		replay->free_camera = true;
 		editor.view.panned_camera = *capture.camera;
 	}
+
+	capture_hides_hud = capture.hide_hud;
 
 	if (capture.records_frames()) {
 		replay->controls_hidden = true;

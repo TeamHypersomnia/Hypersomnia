@@ -20,6 +20,7 @@
 #include "game/cosmos/create_entity.hpp"
 
 #include "game/components/movement_component.h"
+#include "game/modes/quick_test_spawns.hpp"
 #include "game/components/crosshair_component.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/pathfinding/pathfinding.h"
@@ -60,8 +61,12 @@ void test_mode::init_spawned(const input_type in, const entity_id id, const logi
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		auto eq = in.rules.factions[typed_handle.get_official_faction()].round_start_eq;
 
-		if (const auto player = find(lookup(typed_handle.get_id())); player != nullptr && player->round_start_weapon.has_value()) {
-			eq.weapon = *player->round_start_weapon;
+		if (const auto player = find(lookup(typed_handle.get_id()))) {
+			if (player->round_start_weapon.has_value()) {
+				eq.weapon = *player->round_start_weapon;
+			}
+
+			::apply_quick_test_spawn_equipment(in.rules.quick_test_spawns, player->dedicated_spawn, eq);
 		}
 
 		eq.generate_for(access, typed_handle, step, 1);
@@ -152,7 +157,7 @@ void test_mode::create_controlled_character_for(const input_type in, const mode_
 			cosm, 
 			flavour, 
 			[&](const auto new_character, auto&&...) {
-				if (playtesting_context) {
+				if (playtesting_context && !entry->dedicated_spawn.is_set()) {
 					const auto spawn_transform = transformr(playtesting_context->initial_spawn_pos, 0);
 
 					new_character.set_logic_transform(spawn_transform);

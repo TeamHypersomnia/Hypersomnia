@@ -7,6 +7,7 @@
 #include "game/detail/view_input/continuous_rings_input.h"
 
 #include "application/setups/editor/nodes/editor_color_preset.h"
+#include "application/setups/editor/resources/editor_game_mode_resource.h"
 
 #include "game/detail/sentience_shake.h"
 #include "game/enums/portal_enums.h"
@@ -105,6 +106,11 @@ struct editor_point_marker_node_editable {
 	bool camp_look_far = false;
 	float camp_secs_min = 2.0f;
 	float camp_secs_max = 10.0f;
+
+	bool playtest_spawn = false;
+	bool playtest_custom_equipment = false;
+	editor_requested_equipment playtest_equipment;
+	bool respawns_in_quick_test = false;
 
 	vec2 pos;
 	real32 rotation = 0.0f;
