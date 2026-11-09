@@ -82,8 +82,11 @@ void enqueue_illuminated_rendering_jobs(
 	using DV = augs::dedicated_buffer_vector;
 
 	const bool viewer_is_spectator = in.viewer_is_spectator;
-	const bool draw_enemy_silhouettes = viewer_is_spectator && in.drawing.draw_enemy_silhouettes_in_spectator;
-	const bool see_enemies_behind_walls = in.see_enemies_behind_walls;
+	const bool see_enemies_behind_walls = in.enemies_behind_walls == enemies_behind_walls_mode::FULL;
+	const bool draw_enemy_silhouettes =
+		(viewer_is_spectator && in.drawing.draw_enemy_silhouettes_in_spectator)
+		|| in.enemies_behind_walls == enemies_behind_walls_mode::SILHOUETTES
+	;
 	const bool streamer_mode = in.streamer_mode;
 	const auto& necessarys = in.necessary_images;
 

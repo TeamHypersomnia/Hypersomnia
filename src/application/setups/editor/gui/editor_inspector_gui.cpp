@@ -2557,16 +2557,16 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 		text_tooltip("Only in Bomb Defusal and Gun Game.\nSpawns bots exclusively for the enemy team.");
 	}
 
-	PROPERTY("See enemies behind walls", see_enemies_behind_walls);
-
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("For debugging.");
-	}
-
 	PROPERTY("Draw enemy crosshairs", draw_enemy_crosshairs);
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("Draw crosshairs for all enemy characters.\nFor debugging bot aim.");
+	}
+
+	PROPERTY("Enemies behind walls", enemies_behind_walls);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("For debugging.");
 	}
 
 	PROPERTY("Bot difficulty", bot_difficulty);

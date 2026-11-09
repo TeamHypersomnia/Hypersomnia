@@ -7890,12 +7890,12 @@ work_result work(
 				/*
 					Determine if we can draw enemies (for editor playtesting debug).
 				*/
-				const bool see_enemies_behind_walls = visit_current_setup([&](const auto& setup) {
+				const auto enemies_behind_walls = visit_current_setup([&](const auto& setup) {
 					using S = remove_cref<decltype(setup)>;
 
 					if constexpr(std::is_same_v<S, editor_setup>) {
 						if (setup.is_playtesting()) {
-							return setup.sees_enemies_behind_walls();
+							return setup.get_enemies_behind_walls();
 						}
 					}
 
@@ -7924,7 +7924,7 @@ work_result work(
 						return setup.arena_gui.scoreboard.show;
 					}
 
-					return false;
+					return enemies_behind_walls_mode::HIDDEN;
 				});
 
 				return illuminated_rendering_input {
@@ -7936,7 +7936,7 @@ work_result work(
 					get_audiovisuals(),
 					viewing_config.drawing,
 					viewer_is_spectator(),
-					see_enemies_behind_walls,
+					enemies_behind_walls,
 					draw_enemy_crosshairs,
 					minimap_extended_range ? minimap_state_type::UNDER_TAB : minimap_state_type::NORMAL,
 					gameplay_camera.current_area_zoom_mult,

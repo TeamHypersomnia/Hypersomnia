@@ -4,6 +4,7 @@
 
 #include "game/enums/faction_type.h"
 #include "game/modes/difficulty_type.h"
+#include "view/enemies_behind_walls_mode.h"
 
 struct editor_game_mode_resource;
 
@@ -19,8 +20,8 @@ struct editor_playtesting_settings {
 	bool friendly_fire = false;
 	bool spawn_bots = true;
 	bool spawn_only_enemy_bots = false;
-	bool see_enemies_behind_walls = false;
 	bool draw_enemy_crosshairs = false;
+	enemies_behind_walls_mode enemies_behind_walls = enemies_behind_walls_mode::HIDDEN;
 	difficulty_type bot_difficulty = difficulty_type::PROGRESSIVE;
 	// END GEN INTROSPECTOR
 

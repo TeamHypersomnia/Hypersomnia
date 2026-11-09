@@ -855,8 +855,12 @@ public:
 		return playtest_recordings.replay_requires_cursor() || arena_gui_base::requires_cursor();
 	}
 
-	bool sees_enemies_behind_walls() const {
-		return playtest_recordings.replay_uses_free_camera() || project.playtesting.see_enemies_behind_walls;
+	enemies_behind_walls_mode get_enemies_behind_walls() const {
+		if (playtest_recordings.replay_uses_free_camera()) {
+			return enemies_behind_walls_mode::FULL;
+		}
+
+		return project.playtesting.enemies_behind_walls;
 	}
 
 	/* Arena interface */

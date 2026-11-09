@@ -3,6 +3,7 @@
 #include <vector>
 #include "view/character_camera.h"
 #include "view/game_drawing_settings.h"
+#include "view/enemies_behind_walls_mode.h"
 #include "view/necessary_resources.h"
 #include "view/game_gui/special_indicator.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
@@ -52,7 +53,7 @@ struct illuminated_rendering_input {
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const bool viewer_is_spectator;
-	const bool see_enemies_behind_walls = false;
+	const enemies_behind_walls_mode enemies_behind_walls = enemies_behind_walls_mode::HIDDEN;
 	const bool draw_enemy_crosshairs = false;
 	const minimap_state_type minimap_state = minimap_state_type::NORMAL;
 	const float minimap_area_zoom = 1.0f;
