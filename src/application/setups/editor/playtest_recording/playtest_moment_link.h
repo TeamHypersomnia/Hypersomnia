@@ -17,13 +17,13 @@ constexpr auto playtest_moment_link_prefix_v = "[hypersomnia replay moment]";
 
 struct playtest_moment {
 	std::string map_name;
-	augs::path_type recording_folder;
+	augs::path_type recording_json;
 	double secs = 0.0;
 	std::optional<camera_eye> camera;
 };
 
 inline std::string make_playtest_moment_link(const playtest_moment& moment) {
-	const auto recording = augs::string_windows_friendly(std::filesystem::absolute(moment.recording_folder));
+	const auto recording = augs::string_windows_friendly(std::filesystem::absolute(moment.recording_json));
 
 	auto camera_field = std::string();
 	auto camera_arg = std::string();
@@ -73,7 +73,7 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 	}
 
 	auto request = playtest_replay_capture_settings();
-	request.recording_folder = augs::path_windows_friendly(*recording);
+	request.recording_json = augs::path_windows_friendly(*recording);
 	request.from_secs = std::max(0.0, std::atof(at->c_str()));
 	request.start_paused = true;
 
@@ -81,11 +81,11 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 		request.camera = ::parse_playtest_replay_camera(*camera);
 	}
 
-	if (!augs::exists(editor_playtest_recording_paths(request.recording_folder).meta_json)) {
+	if (!::is_recording_meta_json(request.recording_json) || !augs::exists(request.recording_json)) {
 		return std::nullopt;
 	}
 
-	const auto project_folder = ::project_folder_of_recording(request.recording_folder);
+	const auto project_folder = ::project_folder_of_recording(request.recording_json);
 	auto project_json = project_folder / project_folder.filename();
 	project_json += ".json";
 

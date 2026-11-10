@@ -47,8 +47,14 @@ public:
 		++num_written;
 	}
 
-	bool complete() const {
+	bool cannot_write() const {
 		const bool frames_cannot_be_written = !frames_output.good();
-		return frames_cannot_be_written || (last_requested && num_written >= num_requested);
+		const bool audio_cannot_be_written = audio_output.has_value() && !audio_output->good();
+
+		return frames_cannot_be_written || audio_cannot_be_written;
+	}
+
+	bool complete() const {
+		return cannot_write() || (last_requested && num_written >= num_requested);
 	}
 };

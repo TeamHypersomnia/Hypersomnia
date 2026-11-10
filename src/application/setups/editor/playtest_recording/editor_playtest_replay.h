@@ -27,7 +27,6 @@ struct editor_playtest_replay {
 	std::optional<uint32_t> requested_seek;
 	std::optional<uint32_t> first_desync_step;
 	std::map<uint32_t, editor_playtest_replay_snapshot> snapshots;
-	playtest_replay_speed_ranges speed_ranges;
 
 	bool paused = false;
 	bool controls_hidden = false;
@@ -59,7 +58,7 @@ struct editor_playtest_replay {
 	}
 
 	double get_speed_mult() const {
-		return ::calc_replay_speed_mult(speed_ranges, get_current_secs());
+		return ::calc_replay_speed_mult(recording.meta.speed_ranges, get_current_secs());
 	}
 
 	uint32_t secs_to_step(const double secs) const {

@@ -26,8 +26,8 @@ struct editor_recorded_playtests_gui : standard_window_mixin<editor_recorded_pla
 	std::vector<editor_recorded_playtest_entry> entries;
 	bool rescan_requested = true;
 
-	augs::path_type selected_folder;
-	std::optional<augs::path_type> renamed_folder;
+	augs::path_type selected_recording;
+	std::optional<augs::path_type> renamed_recording;
 	std::string rename_buffer;
 	bool rename_focus_once = false;
 

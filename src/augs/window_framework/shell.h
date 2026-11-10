@@ -2,6 +2,12 @@
 #include <string>
 
 namespace augs {
+#if PLATFORM_WEB
+	constexpr bool reveal_in_explorer_available_v = false;
+#else
+	constexpr bool reveal_in_explorer_available_v = true;
+#endif
+
 	int shell(const std::string&);
 	void open_url(const std::string&);
 	void open_text_editor(const std::string& on_file);

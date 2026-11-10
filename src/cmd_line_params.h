@@ -354,9 +354,12 @@ struct cmd_line_params {
 				playtest_speed = std::max(0.01, std::atof(get_next()));
 			}
 			else if (a == "--replay-playtest") {
-				replay_capture.recording_folder = get_next();
-				editor_target = ::project_folder_of_recording(replay_capture.recording_folder);
+				replay_capture.recording_json = get_next();
+				editor_target = ::project_folder_of_recording(replay_capture.recording_json);
 				launch_activity = activity_type::EDITOR;
+			}
+			else if (a == "--replay-map") {
+				replay_capture.map_json_instead_of_recorded = get_next();
 			}
 			else if (a == "--replay-from") {
 				replay_capture.from_secs = std::max(0.0, std::atof(get_next()));

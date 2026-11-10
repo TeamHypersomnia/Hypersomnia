@@ -228,6 +228,7 @@ hypersomnia/libsteam_api.dylib
 *.hist
 report.bin
 hypersomnia/content/arenas/*/autosave/
+.playtests/
 .recorded_playtests/
 hypersomnia/content/*/*/editor_view.json
 hypersomnia/content/*/*/last_saved.json

@@ -7,6 +7,7 @@
 #include "augs/math/camera_cone.h"
 #include "augs/filesystem/path.h"
 #include "augs/misc/timing/delta.h"
+#include "application/setups/editor/playtest_recording/editor_playtest_recording.h"
 
 constexpr unsigned playtest_replay_capture_frames_per_second_v = 60;
 constexpr unsigned playtest_replay_capture_renders_per_frame_v = 4;
@@ -19,7 +20,8 @@ inline augs::delta playtest_replay_capture_render_delta() {
 }
 
 struct playtest_replay_capture_settings {
-	augs::path_type recording_folder;
+	augs::path_type recording_json;
+	augs::path_type map_json_instead_of_recorded;
 	double from_secs = 0.0;
 	std::optional<double> to_secs;
 	augs::path_type frames_path;
@@ -30,7 +32,7 @@ struct playtest_replay_capture_settings {
 	bool hides_player = false;
 
 	bool requested() const {
-		return !recording_folder.empty();
+		return !recording_json.empty();
 	}
 
 	bool records_frames() const {
@@ -41,16 +43,6 @@ struct playtest_replay_capture_settings {
 		return !audio_path.empty();
 	}
 };
-
-inline augs::path_type project_folder_of_recording(const augs::path_type& recording_folder) {
-	auto folder = recording_folder.lexically_normal();
-
-	if (folder.filename().empty()) {
-		folder = folder.parent_path();
-	}
-
-	return folder.parent_path().parent_path();
-}
 
 inline std::optional<camera_eye> parse_playtest_replay_camera(std::string x_y_zoom) {
 	std::replace(x_y_zoom.begin(), x_y_zoom.end(), ',', ' ');

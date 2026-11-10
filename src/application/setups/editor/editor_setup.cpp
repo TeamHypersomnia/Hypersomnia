@@ -117,23 +117,13 @@ editor_setup::editor_setup(
 		}
 	}
 
-	/*
-		Only the editor reads the scratchpad - everything else loads the map without it.
-	*/
-
-	auto editor_reading_settings = []() {
-		auto settings = editor_project_readwrite::reading_settings();
-		settings.read_scratchpad = true;
-		return settings;
-	};
-
 	auto try_read_saved_revision_from = [&](const auto& path) {
 		try {
 			project = editor_project_readwrite::read_project_json(
 				path,
 				official.resources,
 				official.resource_map,
-				editor_reading_settings()
+				editor_project_readwrite::reading_settings::like_editor()
 			);
 
 			/* Will be overwritten to the new name upon the first save. */
@@ -161,7 +151,7 @@ editor_setup::editor_setup(
 				path,
 				official.resources,
 				official.resource_map,
-				editor_reading_settings()
+				editor_project_readwrite::reading_settings::like_editor()
 			));
 
 			autosaved_project->meta.name = paths.arena_name;

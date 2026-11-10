@@ -366,8 +366,7 @@ namespace editor_project_readwrite {
 		return augs::from_json_file<editor_view>(json_path);
 	}
 
-	void write_project_json(
-		const augs::path_type& json_path,
+	std::string project_to_json_string(
 		const editor_project& project,
 		const editor_resource_pools& officials,
 		const editor_official_resource_map& officials_map
@@ -833,10 +832,21 @@ namespace editor_project_readwrite {
 			We have to write them manually.
 		*/
 
-		augs::save_as_text(json_path, s.GetString());
+		auto json = std::string(s.GetString());
 
 		clean_stringified_resource_ids(project);
 		clean_stringified_node_ids(project);
+
+		return json;
+	}
+
+	void write_project_json(
+		const augs::path_type& json_path,
+		const editor_project& project,
+		const editor_resource_pools& officials,
+		const editor_official_resource_map& officials_map
+	) {
+		augs::save_as_text(json_path, project_to_json_string(project, officials, officials_map));
 	}
 
 	editor_project read_project_json(

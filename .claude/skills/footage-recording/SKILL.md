@@ -11,8 +11,9 @@ own sound - any camera, with or without HUD, laser or the player, as many times 
 
 ## 0. Back up first - every time
 
-**Copy every recording that a capture uses to a persistent folder before anything else** (`cp -r`, never the
-session scratchpad; ask the user where if no project folder exists yet). The editor deletes the oldest unnamed
+**Copy every recording that a capture uses to a persistent folder before anything else** - its three files (section 1:
+`<date>.json`, `<date>.inputs.lz4` and its `map_versions/<map_version>.json.lz4`), never into the session scratchpad;
+ask the user where if no project folder exists yet. The editor deletes the oldest unnamed
 recordings of a map beyond a limit - it was 50 and deleted two devlog 6 sources: one came back only through ext4
 journal forensics, the other is lost (only its rendered clip survived). The limit is 1000 now, but backups stay
 the rule. Also back up the rendered takes: a re-capture overwrites `OUTPUT` - copy the previous take aside first
@@ -21,13 +22,16 @@ the rule. Also back up the rendered takes: a re-capture overwrites `OUTPUT` - co
 ## 1. Recording a playtest
 
 - The editor records **every offline playtest** (Space in the editor, or `--edit <project> --playtest`) into
-  `<project>/.recorded_playtests/<date>/`: `map.json` (the map as it was), `playtest.json` (mode, rng offset, spawn,
-  nickname, `duration_secs`, `name`), `inputs.bin` (inputs and dynamic vars of every step, state hash after every
-  step), optional `speed_ranges.json`. Under 2 s it is dropped.
+  `<project>/.playtests/recordings/`: `<date>.json` (plain JSON: mode, rng offset, spawn, nickname, `duration_secs`,
+  `name`, `map_version`, `speed_ranges`) and `<date>.inputs.lz4` (inputs and dynamic vars of every step, state hash
+  after every step). The map as it was lies once per version in `<project>/.playtests/map_versions/<map_version>.json.lz4`
+  (blake3 of the map json, 16 hex; lz4 with an 8-byte size header) - many recordings share one. A version no recording
+  refers to is deleted when recordings are pruned or deleted. Under 2 s a recording is dropped.
 - A **named** recording (Rename in the Recorded playtests list - a tab next to History; or the `name` field in
-  `playtest.json`) is kept forever. Name the ones a video uses.
+  `<date>.json`) is kept forever. Name the ones a video uses.
+- A backup of a recording = its `<date>.json`, `<date>.inputs.lz4` and its `map_versions/<map_version>.json.lz4`.
 - In the dev checkout `hypersomnia/user/projects` is a symlink to `content/arenas`, so a user's project folder can
-  sit among the official maps (`.recorded_playtests/` is gitignored everywhere).
+  sit among the official maps (`.playtests/` is gitignored everywhere).
 - Shots needing a human (aiming, a specific fight) - the user plays them. Shots of bots alone - stage them (below)
   and start the playtest yourself with `--edit <project> --playtest` under the local-testing rules (own build,
   `$GAME_TEST_FLAGS`, Xvfb), then quit; the recording appears in the project.
@@ -55,13 +59,14 @@ the rule. Also back up the rendered takes: a re-capture overwrites `OUTPUT` - co
 ## 2. Rendering a recording - `scripts/capture_replay.sh`
 
 ```
-RECORDING=<project>/.recorded_playtests/<date> OUTPUT=<file.mp4> [env...] scripts/capture_replay.sh
+RECORDING=<project>/.playtests/recordings/<date>.json OUTPUT=<file.mp4> [env...] scripts/capture_replay.sh
 ```
 
 | env | meaning |
 |---|---|
 | `FROM`, `TO` | recording seconds (default whole) |
 | `CAMERA=x,y,zoom` | fixed camera (default: follows the recorded player) |
+| `MAP=<map.json>` | replay on this map instead of the recorded version (section 3) |
 | `HUD=1` | with HUD (default: cinematic, no HUD) |
 | `LASER=1` | weapon laser on (default off - the user's own game has it on; match the original take!) |
 | `NO_PLAYER=1` | the recorded player moved out of every frame (backdrops, scenery) |
@@ -96,36 +101,38 @@ time on the machine).
 -frames:v 1`) and look at them; when re-capturing a shot, diff frames against the previous take (same character
 positions, the laser line if the original had it). Never report a take as done without looking at its frames.
 
-## 3. Re-rendering an old recording on a changed map - `scripts/inject_map.sh`
+## 3. Re-rendering an old recording on a changed map - `MAP=`
 
 The inputs replay on any map with the same geometry and spawns, so lighting, colors and decorations can change after
-the fact: `RECORDING=<rec> BACKUPS=<persistent folder> [MAP=<map.json>] scripts/inject_map.sh` backs the recording
-up, then copies the map (default: the project's current json) into `<rec>/map.json`; capture as usual.
+the fact: `MAP=<map.json>` (e.g. the project's current `<project>/<project>.json`, or an edited copy) makes the replay
+build that map instead of the recorded version (the game flag `--replay-map <json>`); the recording itself is never
+rewritten. Without frames (`--replay-playtest <rec> --replay-map <json>` alone) it opens in the editor to look around.
 
-- "desynced at step 0" is expected afterwards (the map's hash changed); check the frames instead - the characters
+- A desync is expected when the change touches anything simulated; check the frames instead - the characters
   must stand where they did in the original take.
 - Keep each take under its own name (e.g. `<shot>__<what changed>_take_<HH-MM>.mp4`) and let the user compare;
   devlog 6 offered them in a combo of its ending panel.
-- Small map fixes for one shot go into the recording's own `map.json` (back it up first): a camera_zoom zone grown
+- Small map fixes for one shot go into a copy of the map json passed as `MAP=`: a camera_zoom zone grown
   so the camera stops zooming out when the player leaves its edge (camera zones don't change the state hash), or
   `default_zoom` for a closer shot.
 
-## 4. Slow motion - `speed_ranges.json`
+## 4. Slow motion - `speed_ranges` in the recording's json
 
-Next to a recording: `{"ranges": [{"from_secs": 11.0, "to_secs": 16.0, "speed": 0.5}]}` (recording seconds, speed
+In `<date>.json`: `"speed_ranges": [{"from_secs": 11.0, "to_secs": 16.0, "speed": 0.5}]` (recording seconds, speed
 clamped to 0.05-4). Replays and captures play those parts at that speed - the simulation and the sounds (lower pitch)
-- and a capture gets 2+ frames per step, so 0.5x stays smooth. Write the file by hand (there is no UI for it); keep
-the ranges apart - the first range covering a moment wins.
+- and a capture gets 2+ frames per step, so 0.5x stays smooth. Edit it by hand (there is no UI for it; back the json
+up first, and not while the editor shows the recordings list - a rename there rewrites the json); keep the ranges
+apart - the first range covering a moment wins.
 
 ## 5. The replay window and moment links
 
 - Recorded playtests list: double-click or the play icon replays, right-click renames/reveals/deletes.
 - Replay keys: Space pause/resume, Left/Right seek 5 s (Shift 1 s), numpad speed (0 resets), Alt+P hides the window,
   Esc quits. Free camera: drag with RMB, zoom with the wheel. "Hide HUD", "Copy moment link", "Reveal in explorer".
-- A moment link: `[hypersomnia replay moment] map=<map> recording="<folder>" at=<secs>s [camera=x,y,zoom]
-  | --replay-playtest "<folder>" --replay-from <secs> [--replay-camera ...]`. With such a line in
+- A moment link: `[hypersomnia replay moment] map=<map> recording="<date>.json path" at=<secs>s [camera=x,y,zoom]
+  | --replay-playtest "<date>.json path" --replay-from <secs> [--replay-camera ...]`. With such a line in
   the clipboard, switching to the game while it shows the editor's project selector opens that map and replays it
-  paused at that moment (only a recording inside `<project>/.recorded_playtests/`; a broken project shows an error).
+  paused at that moment (only a recording inside `<project>/.playtests/recordings/`; a broken project shows an error).
   When the user pastes one, take `recording`, `at` and `camera` from it.
 
 ## 6. Footage recorded by hand (screen recordings)
@@ -149,12 +156,13 @@ Some shots the user records on the desktop (Ctrl+Print, files in `~/Videos/gamep
 Stop writing to that disk. The data blocks usually survive; the folder's inode was found again in the ext4 journal:
 the user dumps the journal with `sudo debugfs -c -R 'dump <8> <file on another disk>' /dev/<partition>` (Claude has no
 sudo password - the user runs sudo commands), old copies of the inode table in the journal still hold the deleted
-files' extents (inode -> block numbers), and `dd` of those blocks from the partition gives `map.json`, `playtest.json`
-and `inputs.bin` back. Verify by capturing the recovered recording and comparing frames with an old render.
+files' extents (inode -> block numbers), and `dd` of those blocks from the partition gives `<date>.json`,
+`<date>.inputs.lz4` and the map version back (in devlog 6 they were still `map.json`, `playtest.json` and `inputs.bin`
+in one folder per recording - that layout is gone). Verify by capturing the recovered recording and comparing frames with an old render.
 
 ## Example pipeline
 
 devlog 6 (ask the user for its folder): `scripts/capture_replay.sh` (the original of this skill's script),
-`scripts/ending_footage_new_map.sh` (backup + map injection + capture in one), clip caches named
+`scripts/ending_footage_new_map.sh` (backup + map injection + capture in one, for the old layout), clip caches named
 `<map>_<recording>_from_<s>_to_<s>_hud_raise_<px>_laser_<0|1>_r240.mp4` and reused when they cover the needed range,
 and `recordings_backup/` with every source recording.

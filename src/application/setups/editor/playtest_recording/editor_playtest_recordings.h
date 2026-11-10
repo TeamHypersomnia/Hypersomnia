@@ -33,8 +33,6 @@ class editor_playtest_recordings {
 	bool render_belongs_to_capture = false;
 	uint32_t renders_since_capture_start = 0;
 
-	void rebuild_arena_for_replay(editor_setup&, const editor_project& recorded_project, bool showing_navmesh) const;
-
 public:
 	editor_playtest_recordings();
 	~editor_playtest_recordings();
@@ -54,13 +52,14 @@ public:
 	}
 
 	bool capture_complete() const;
+	bool capture_cannot_write() const;
 
 	void begin_recording(editor_setup&, const editor_playtest_start&, bool built_showing_navmesh);
 	void before_recorded_step(editor_setup&);
 	void record_step(const editor_setup&, const mode_entropy& total, const synced_dynamic_vars& dynamic_vars_in_effect);
 	void finish_recording(editor_setup&);
 
-	bool start_replaying(editor_setup&, const augs::path_type& recording_folder);
+	bool start_replaying(editor_setup&, const augs::path_type& recording_json, const augs::path_type& map_json_instead_of_recorded = {});
 	void stop_replaying(editor_setup&);
 
 	void perform_requested_seek(editor_setup&);

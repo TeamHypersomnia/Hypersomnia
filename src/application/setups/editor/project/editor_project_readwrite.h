@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include "augs/filesystem/path.h"
@@ -32,6 +33,12 @@ namespace editor_project_readwrite {
 		*/
 
 		bool read_scratchpad = false;
+
+		static reading_settings like_editor() {
+			auto settings = reading_settings();
+			settings.read_scratchpad = true;
+			return settings;
+		}
 	};
 
 	editor_project read_project_json(
@@ -49,6 +56,12 @@ namespace editor_project_readwrite {
 		const editor_official_resource_map& officials_map,
 		const reading_settings settings = reading_settings(),
 		augs::secure_hash_type* output_arena_hash = nullptr
+	);
+
+	std::string project_to_json_string(
+		const editor_project& project,
+		const editor_resource_pools& officials,
+		const editor_official_resource_map& officials_map
 	);
 
 	void write_project_json(

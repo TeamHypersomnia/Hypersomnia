@@ -3,10 +3,11 @@ set -e
 here=$(cd "$(dirname "$0")" && pwd)
 repo=${REPO:-$(cd "$here/../../../.." && pwd)}
 bin=${BIN:-$repo/build/Release-x64-clang-claude/Hypersomnia}
-recording=${RECORDING:?RECORDING=<project>/.recorded_playtests/<date> is required}
+recording=${RECORDING:?RECORDING=<project>/.playtests/recordings/<date>.json is required}
 output=${OUTPUT:?OUTPUT=<file.mp4> is required}
 work=${WORK:-${TMPDIR:-/tmp}/hypersomnia_footage_capture}
 camera=${CAMERA:-}
+map=${MAP:-}
 from_secs=${FROM:-0}
 to_secs=${TO:-}
 crf=${CRF:-14}
@@ -19,7 +20,8 @@ size=1920x1080
 display=${DISPLAY_NUMBER:-78}
 
 [ -x "$bin" ] || { echo "no game binary at $bin - build it (local-testing build_claude.sh release) or pass BIN="; exit 1; }
-[ -f "$recording/playtest.json" ] || { echo "$recording is not a recorded playtest (no playtest.json)"; exit 1; }
+[ -f "$recording" ] && [ -f "${recording%.json}.inputs.lz4" ] || { echo "$recording is not a recorded playtest (needs <date>.json and <date>.inputs.lz4)"; exit 1; }
+[ -z "$map" ] || [ -f "$map" ] || { echo "no map json at $map"; exit 1; }
 
 while [ -e /tmp/.X11-unix/X$display ]; do
 	display=$((display + 1))
@@ -49,6 +51,7 @@ EOF
 replay_args=(--replay-playtest "$recording" --replay-from "$from_secs" --replay-frames "$frames_fifo" --replay-audio "$audio_file")
 [ -n "$to_secs" ] && replay_args+=(--replay-to "$to_secs")
 [ -n "$camera" ] && replay_args+=(--replay-camera "$camera")
+[ -n "$map" ] && replay_args+=(--replay-map "$(realpath "$map")")
 [ -z "$HUD" ] && replay_args+=(--replay-no-hud)
 [ -n "$NO_PLAYER" ] && replay_args+=(--replay-no-player)
 

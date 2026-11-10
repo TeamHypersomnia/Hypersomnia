@@ -1,13 +1,13 @@
 #pragma once
 #include <algorithm>
 #include "augs/filesystem/file.h"
-#include "augs/readwrite/byte_file.h"
 #include "augs/templates/chrono_templates.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/maybe_different.h"
 #include "augs/graphics/renderer.h"
+#include "augs/window_framework/shell.h"
 #include "application/main/game_frame_buffer.h"
 #include "game/cosmos/cosmic_functions.h"
 #include "application/setups/editor/editor_setup.h"
@@ -54,6 +54,10 @@ bool editor_playtest_recordings::replay_hides_hud(const bool hud_hidden_in_edito
 
 bool editor_playtest_recordings::capture_complete() const {
 	return capture_output.has_value() && capture_output->complete();
+}
+
+bool editor_playtest_recordings::capture_cannot_write() const {
+	return capture_output.has_value() && capture_output->cannot_write();
 }
 
 void editor_playtest_recordings::begin_recording(
@@ -113,82 +117,71 @@ void editor_playtest_recordings::finish_recording(editor_setup& editor) {
 		return;
 	}
 
-	const auto recordings_folder = editor.get_recorded_playtests_folder();
-	const auto recording_paths = editor_playtest_recording_paths(::first_free_recording_folder(recordings_folder, finished->started_at));
+	const auto& project_folder = editor.paths.project_folder;
+	const auto recordings_folder = editor.get_playtest_recordings_folder();
+	const auto recording_paths = editor_playtest_recording_paths(::first_free_recording_json(recordings_folder, finished->started_at));
 
 	try {
-		augs::create_directories(recording_paths.folder);
+		augs::create_directories(recordings_folder);
 
-		editor_project_readwrite::write_project_json(
-			recording_paths.map_json,
-			finished->project_at_start,
-			editor.official.resources,
-			editor.official.resource_map
+		auto& meta = finished->meta;
+
+		meta.map_version = ::save_map_version(
+			project_folder,
+			editor_project_readwrite::project_to_json_string(
+				finished->project_at_start,
+				editor.official.resources,
+				editor.official.resource_map
+			)
 		);
 
-		augs::save_as_bytes(finished->inputs, recording_paths.inputs_bin);
-		augs::save_as_json_atomic(finished->meta, recording_paths.meta_json);
+		::save_recording_inputs(finished->inputs, recording_paths.inputs_lz4);
+		augs::save_as_json_atomic(meta, recording_paths.meta_json);
 
-		::remove_oldest_unnamed_recordings(recordings_folder);
+		if (::remove_oldest_unnamed_recordings(recordings_folder)) {
+			::remove_unreferenced_map_versions(project_folder);
+		}
 
 		auto& recordings_gui = editor.gui.recorded_playtests;
 		recordings_gui.rescan_requested = true;
-		recordings_gui.selected_folder = recording_paths.folder;
+		recordings_gui.selected_recording = recording_paths.meta_json;
 	}
 	catch (const std::exception& err) {
-		LOG("Could not save the recorded playtest into %x: %x", recording_paths.folder, err.what());
+		LOG("Could not save the recorded playtest %x: %x", recording_paths.meta_json, err.what());
 	}
 }
 
-void editor_playtest_recordings::rebuild_arena_for_replay(
+bool editor_playtest_recordings::start_replaying(
 	editor_setup& editor,
-	const editor_project& recorded_project,
-	const bool showing_navmesh
-) const {
-	const bool for_playtesting = true;
-	const bool editor_preview = false;
-
-	::build_arena_from_editor_project<editor_arena_handle<false>>(
-		editor.get_arena_handle(),
-		{
-			recorded_project,
-			game_mode_name_type(""),
-			editor.paths.project_folder,
-			editor.official,
-			nullptr,
-			std::addressof(editor.clean_round_state),
-			for_playtesting,
-			editor_preview,
-			showing_navmesh
-		}
-	);
-}
-
-bool editor_playtest_recordings::start_replaying(editor_setup& editor, const augs::path_type& recording_folder) {
+	const augs::path_type& recording_json,
+	const augs::path_type& map_json_instead_of_recorded
+) {
 	auto new_replay = std::make_unique<editor_playtest_replay>();
-	const auto recording_paths = editor_playtest_recording_paths(recording_folder);
+	const auto recording_paths = editor_playtest_recording_paths(recording_json);
 
 	auto recorded_project = editor_project();
 
 	try {
 		new_replay->recording = { recording_paths, augs::from_json_file<editor_playtest_recording_meta>(recording_paths.meta_json) };
-		new_replay->speed_ranges = ::load_replay_speed_ranges(recording_paths);
-		augs::load_from_bytes(new_replay->inputs, recording_paths.inputs_bin);
+		new_replay->inputs = ::load_recording_inputs(recording_paths.inputs_lz4);
 
-		auto reading_settings_like_editor = editor_project_readwrite::reading_settings();
-		reading_settings_like_editor.read_scratchpad = true;
+		const auto map_json =
+			map_json_instead_of_recorded.empty() ?
+			::load_map_version(recording_paths, new_replay->recording.meta.map_version) :
+			augs::file_to_string_crlf_to_lf(map_json_instead_of_recorded)
+		;
 
 		recorded_project = editor_project_readwrite::read_project_json(
 			editor.paths.project_folder,
-			augs::file_to_string_crlf_to_lf(recording_paths.map_json),
+			map_json,
 			editor.official.resources,
 			editor.official.resource_map,
-			reading_settings_like_editor
+			editor_project_readwrite::reading_settings::like_editor()
 		);
 	}
 	catch (const std::exception& err) {
-		editor.recent_message.set("Could not load the recorded playtest %x:\n%x", recording_folder.filename(), err.what());
-		LOG("Could not load the recorded playtest %x: %x", recording_folder, err.what());
+		editor.recent_message.set("Could not load the recorded playtest %x:\n%x", recording_json.stem(), err.what());
+		LOG("Could not load the recorded playtest %x: %x", recording_json, err.what());
 		return false;
 	}
 
@@ -198,7 +191,8 @@ bool editor_playtest_recordings::start_replaying(editor_setup& editor, const aug
 
 	const auto& meta = new_replay->recording.meta;
 
-	rebuild_arena_for_replay(editor, recorded_project, meta.built_showing_navmesh);
+	const bool editor_preview = false;
+	editor.build_arena_from(recorded_project, editor_preview, meta.built_showing_navmesh, nullptr);
 
 	new_replay->dynamic_vars_before_replay = editor.dummy_dynamic_vars;
 	new_replay->camera_before_replay = editor.view.panned_camera;
@@ -214,7 +208,7 @@ bool editor_playtest_recordings::start_replaying(editor_setup& editor, const aug
 	new_replay->snapshots[0] = { editor.scene.world.get_solvable().significant, editor.current_mode_state };
 
 	editor.recent_message.set("Replaying %x. Press ESC to quit.", new_replay->recording.get_display_name());
-	editor.gui.recorded_playtests.selected_folder = recording_folder;
+	editor.gui.recorded_playtests.selected_recording = recording_json;
 	editor.timer = augs::fixed_delta_timer { 5, augs::lag_spike_handling_type::DISCARD };
 
 	replay = std::move(new_replay);
@@ -261,7 +255,7 @@ void editor_playtest_recordings::end_replayed_step(const editor_setup& editor) {
 	replay->verify_state_after_current_step(editor.scene.world.calculate_solvable_signi_hash<uint32_t>());
 
 	if (was_in_sync && replay->first_desync_step.has_value()) {
-		LOG("The recorded playtest %x desynced at step %x.", replay->recording.paths.folder, replay->current_step);
+		LOG("The recorded playtest %x desynced at step %x.", replay->recording.paths.meta_json, replay->current_step);
 	}
 
 	++replay->current_step;
@@ -365,28 +359,30 @@ void editor_playtest_recordings::perform_replay_controls(editor_setup& editor, a
 	ImGui::SameLine();
 	checkbox("Hide HUD", editor.gui.hide_hud_in_playtest_replays);
 
-	if (ImGui::Button("Copy moment link")) {
-		auto moment = playtest_moment();
-		moment.map_name = editor.get_arena_name();
-		moment.recording_folder = shown.recording.paths.folder;
-		moment.secs = shown.get_current_secs();
+	if constexpr(augs::reveal_in_explorer_available_v) {
+		if (ImGui::Button("Copy moment link")) {
+			auto moment = playtest_moment();
+			moment.map_name = editor.get_arena_name();
+			moment.recording_json = shown.recording.paths.meta_json;
+			moment.secs = shown.get_current_secs();
 
-		if (shown.free_camera) {
-			moment.camera = editor.view.panned_camera;
+			if (shown.free_camera) {
+				moment.camera = editor.view.panned_camera;
+			}
+
+			ImGui::SetClipboardText(::make_playtest_moment_link(moment).c_str());
+			editor.recent_message.set("Copied a link to this moment (%x).", ::format_mins_secs(moment.secs));
 		}
 
-		ImGui::SetClipboardText(::make_playtest_moment_link(moment).c_str());
-		editor.recent_message.set("Copied a link to this moment (%x).", ::format_mins_secs(moment.secs));
-	}
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Copies the map, the recording and this exact moment (with the free camera if it is on)\nas one line - paste it to point someone at it.");
+		}
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Copies the map, the recording and this exact moment (with the free camera if it is on)\nas one line - paste it to point someone at it.");
-	}
+		ImGui::SameLine();
 
-	ImGui::SameLine();
-
-	if (ImGui::Button("Reveal in explorer")) {
-		window.reveal_in_explorer(shown.recording.paths.meta_json);
+		if (ImGui::Button("Reveal in explorer")) {
+			window.reveal_in_explorer(shown.recording.paths.meta_json);
+		}
 	}
 }
 
@@ -446,7 +442,7 @@ bool editor_playtest_recordings::handle_replay_input(editor_setup& editor, const
 }
 
 bool editor_playtest_recordings::start_capturing(editor_setup& editor, const playtest_replay_capture_settings& capture) {
-	if (!start_replaying(editor, capture.recording_folder)) {
+	if (!start_replaying(editor, capture.recording_json, capture.map_json_instead_of_recorded)) {
 		return false;
 	}
 
@@ -491,7 +487,7 @@ bool editor_playtest_recordings::start_capturing(editor_setup& editor, const pla
 
 	LOG(
 		"Replaying %x from step %x to step %x of %x.",
-		capture.recording_folder,
+		capture.recording_json,
 		replay->current_step,
 		replay->get_last_step(),
 		replay->get_num_steps()

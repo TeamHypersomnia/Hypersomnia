@@ -5642,7 +5642,7 @@ work_result work(
 						const auto* const clipboard = ImGui::GetClipboardText();
 
 						if (const auto replay_request = playtest_moment_links.take(clipboard != nullptr ? clipboard : "")) {
-							if (launch_editor_or_show_error(::project_folder_of_recording(replay_request->recording_folder))) {
+							if (launch_editor_or_show_error(::project_folder_of_recording(replay_request->recording_json))) {
 								pending_playtest_replay = replay_request;
 							}
 						}
@@ -7049,6 +7049,7 @@ work_result work(
 						pending_playtest_replay.reset();
 
 						if (!editor.get_playtest_recordings().start_capturing(editor, replay_request) && replay_request.records_frames()) {
+							game_thread_result = work_result::FAILURE;
 							request_quit();
 						}
 
@@ -7060,6 +7061,11 @@ work_result work(
 					editor.get_playtest_recordings().advance_capture(streaming.completed_all_loading());
 
 					if (editor.get_playtest_recordings().capture_complete()) {
+						if (editor.get_playtest_recordings().capture_cannot_write()) {
+							LOG("The replay capture could not write its frames or sound.");
+							game_thread_result = work_result::FAILURE;
+						}
+
 						request_quit();
 					}
 				});
