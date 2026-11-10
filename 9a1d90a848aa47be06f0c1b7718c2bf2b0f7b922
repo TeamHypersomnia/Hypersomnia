@@ -1,0 +1,1 @@
+Audited: audit #5, 2026-11-10 - playtest recordings .playtests layout, lz4, replay/capture CLI, skill (diff audit E1); fixes folded in: .recorded_playtests still ignored, rename rereads the json, map versions rewritten, lz4 size cap, capture start failure exit code
