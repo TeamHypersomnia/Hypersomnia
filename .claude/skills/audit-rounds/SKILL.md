@@ -1,6 +1,6 @@
 ---
 name: audit-rounds
-description: Running audits inside a longer working session and acting on their findings without going in circles - keeps one decisions document, checks every fix against what was already cut or decided, and shows the state of each finding as a status page (checkmarks, green/red, loop markers). Use whenever, after other work in the session, the user asks to run or launch audits ("puść audyt", "audyt diffa", "puść te audyty", "zaudytuj"), asks what an audit found, asks to fix after an audit ("popraw po audycie"), or asks whether we are going in circles ("czy kręcimy się w kółko"). Not for a session whose only prompt is the audit itself - that one just audits (see the `audit-gameplay` skill or the given prompt).
+description: Running audits inside a longer working session and acting on their findings without going in circles - keeps one decisions document, checks every fix against what was already cut or decided, and shows the state of each finding as a status page (checkmarks, green/red, loop markers). Use whenever an audit is launched from an ongoing session where other work came first - already the first single one, right away, not only from a second round: "puść audyt", "puszczaj audyt", "audyt diffa", "audyt zmian", "audycik", "zaudytuj", "przeaudytuj", "puść te audyty", or a prompt for the auditor given in quotes ("puść audyt czystym agentem '...'"). Also when the user asks what an audit found, asks to fix after an audit ("popraw po audycie", "zastosuj poprawki jeśli wyszło"), or asks whether we are going in circles ("czy kręcimy się w kółko"). Not for a session whose only prompt is the audit itself - that one just audits (see the `audit-gameplay` skill or the given prompt).
 ---
 
 # Audit rounds in a working session
@@ -55,7 +55,8 @@ For every finding ask, in this order, and write the answer into the decisions do
    a dedupe broken by re-signing: check the new code path against abuse and against the deployment (what the operator
    must now register or configure).
 
-Then fix, test right away (on screen or with the scenario scripts), commit, and update the document.
+Then fix, test right away (on screen or with the scenario scripts), commit, update the document, and mark the audited
+commits with git notes (the rule in CLAUDE.md).
 
 ## The status page
 

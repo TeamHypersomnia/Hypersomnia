@@ -42,6 +42,10 @@ From `hypersomnia/` (the game reads its config relative to the working directory
 
 - Don't automatically commit unless I ask to.
 
+- After an `auditor` audit, once the audited code is committed, mark every audited commit:
+  `git notes add -m "Audited: audit #N, YYYY-MM-DD - <scope in a few words>; <outcome, e.g. nothing serious / fixes in <hash>>"`.
+  Self-contained - the reports live outside the repo, so no paths.
+
 - Include order
 	- Standard libraries first
 	- Then in the order of basic to specific: augs -> game -> view -> application, e.g.:
