@@ -20,6 +20,7 @@
 
 #include "view/game_gui/game_gui_system.h"
 #include "view/rendering_scripts/minimap_layout.h"
+#include "view/rendering_scripts/right_bottom_bars_layout.h"
 #include "view/hud_bar_drawing.h"
 #include "3rdparty/imgui/imgui.h"
 #include "augs/drawing/drawing.hpp"
@@ -346,17 +347,11 @@ void value_bar::rebuild_layouts(
 	const auto icon_size = context.get_game_images().at(get_bar_icon(context, this_id)).get_original_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
-	/*
-		The bars live at the right bottom, in top-down order (health first),
-		with the same bottom padding as the hotbar. When the minimap
-		occupies the same corner, the bars keep that padding above it.
-	*/
-
 	const auto bottom_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
 
-	const auto rb_minimap_shift = ::calc_minimap_corner_reservation(context.dependencies.drawing.minimap, hud_corner_type::RIGHT_BOTTOM);
+	const auto rb_shift = ::calc_right_bottom_bars_shift(context.dependencies.drawing);
 
-	const auto bars_bottom = screen_size.y - bottom_pad - rb_minimap_shift;
+	const auto bars_bottom = screen_size.y - bottom_pad - rb_shift;
 
 	/* Pushed apart a little so that the rows do not stick together. */
 	const auto row_pitch = static_cast<int>(icon_size.y) + 8;

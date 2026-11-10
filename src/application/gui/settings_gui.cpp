@@ -3633,6 +3633,8 @@ void settings_gui_state::perform(
 						revertable_checkbox("Draw Health bar and ammo bar", config.drawing.draw_hp_bar);
 						revertable_checkbox("Draw Personal Electricity bar", config.drawing.draw_pe_bar);
 						revertable_checkbox("Draw Consciousness bar", config.drawing.draw_cp_bar);
+						revertable_slider("Raise money and health bars", config.drawing.right_bottom_bars_raise, 0, 800);
+						text_disabled("(in pixels, e.g. to make room for a facecam)");
 						revertable_checkbox("Draw character status", config.drawing.draw_character_status);
 						revertable_checkbox("Draw remaining ammo", config.drawing.draw_remaining_ammo);
 						revertable_checkbox("Draw damage indicators", config.drawing.draw_damage_indicators);

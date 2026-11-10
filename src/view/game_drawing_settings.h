@@ -315,6 +315,7 @@ struct game_drawing_settings {
 	teammate_nickname_position_type teammate_nickname_position = teammate_nickname_position_type::OVER_CHARACTER;
 	int teammate_nickname_offset = 0;
 	int small_health_bar_offset = 0;
+	int right_bottom_bars_raise = 0;
 
 	bool draw_bullet_shadows = true;
 	bullet_trails_mode bullet_trails = bullet_trails_mode::FULL;

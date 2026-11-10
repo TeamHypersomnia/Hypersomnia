@@ -5,6 +5,7 @@
 #include "augs/templates/logically_empty.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
 #include "view/rendering_scripts/minimap_layout.h"
+#include "view/rendering_scripts/right_bottom_bars_layout.h"
 #include "view/hud_bar_drawing.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
@@ -857,11 +858,7 @@ void arena_gui_state::draw_mode_gui(
 
 				auto drawn_current_money = stats.money;
 
-				/*
-					The money block lives at the right bottom.
-					When the minimap occupies the same corner, stack above it.
-				*/
-				const auto rb_minimap_shift = ::calc_minimap_corner_reservation(in.config.drawing.minimap, hud_corner_type::RIGHT_BOTTOM);
+				const auto rb_shift = ::calc_right_bottom_bars_shift(in.config.drawing);
 
 				/*
 					The money bar sits exactly one row above the character's
@@ -909,7 +906,7 @@ void arena_gui_state::draw_mode_gui(
 				/* Set a bit further apart from the value bars' stack. */
 				const auto money_extra_gap = 6;
 
-				const auto bars_bottom = in.screen_size.y - bottom_pad - rb_minimap_shift;
+				const auto bars_bottom = in.screen_size.y - bottom_pad - rb_shift;
 				const auto money_row_top = bars_bottom - (num_value_bars + 1) * row_pitch - money_extra_gap;
 
 				/* The bar drawing below centers the bar at money_row_y + line_height / 2. */
@@ -1241,8 +1238,7 @@ void arena_gui_state::draw_mode_gui(
 				}
 
 				if (corner == hud_corner_type::RIGHT_BOTTOM) {
-					/* The money and health bars always live in this corner. */
-					result += 280;
+					result += 280 + in.config.drawing.right_bottom_bars_raise;
 				}
 
 				return result;

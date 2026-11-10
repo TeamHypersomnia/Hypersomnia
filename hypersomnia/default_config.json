@@ -207,6 +207,7 @@
         "teammate_nickname_position": "OVER_CHARACTER",
         "teammate_nickname_offset": 0,
         "small_health_bar_offset": 0,
+        "right_bottom_bars_raise": 0,
         "draw_crosshairs": true,
         "draw_weapon_laser": true,
         "draw_grenade_trajectories": true,
