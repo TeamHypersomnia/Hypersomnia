@@ -21,6 +21,7 @@
     },
     "game_modes": {
         "quick_test": {
+            "spawn_money": true,
             "equipment": {
                 "metropolis": {
                     "firearm": null,
