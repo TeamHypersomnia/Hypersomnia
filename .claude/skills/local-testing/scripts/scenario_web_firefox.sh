@@ -1,7 +1,6 @@
 #!/bin/bash
 # The web build in Firefox (under Xvfb) joining a local official server over WebRTC, with a cert from the local broker.
 # Start the broker first (broker.sh start) and prepare the build with prepare_web.sh - it points the game at both.
-# Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on WEB_PORT (8765), broker on 13500, Xvfb :78.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 . "$(dirname "$0")/test_env.sh"
 # A failing game opens its failure log with $VISUAL - never in the user's editor

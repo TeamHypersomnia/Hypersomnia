@@ -15,8 +15,6 @@ mv -f "$T.new" "$T"
 if [ "$2" = sudo ]; then
 	sudo -n systemctl restart hypersomnia
 else
-	# No sudo: the game process itself (not the AppImage wrapper). A stuck one ignores SIGINT and SIGTERM (DE, 4.3.0) -
-	# then SIGKILL; the service has Restart=always.
 	P=$(ps -eo pid,args | grep "[u]sr/bin/Hypersomnia --calling-cwd" | awk "{print \$1}" | head -1)
 	for SIG in INT TERM KILL; do
 		kill -$SIG $P 2>/dev/null || true

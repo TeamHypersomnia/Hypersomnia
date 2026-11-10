@@ -336,7 +336,6 @@ namespace augs {
 			dbus_message_iter_open_container(&args_iter, DBUS_TYPE_ARRAY, "{sv}", &dict_iter);
 
 			append_string_option(dict_iter, "handle_token", handle_token);
-			append_bool_option(dict_iter, "modal", true);
 
 			if (request.mode == file_chooser_mode::CHOOSE_DIRECTORY) {
 				append_bool_option(dict_iter, "directory", true);
