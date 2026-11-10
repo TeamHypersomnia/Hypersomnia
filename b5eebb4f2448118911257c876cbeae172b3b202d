@@ -1,0 +1,1 @@
+Audited: audit #3, 2026-11-10 - recorded playtests: recording, replay, command-line capture, moment links; a moment link to a broken recording quit the game, recursive cleanup could delete user folders, a dead encoder could hang a capture - fixed in 461dc4110
