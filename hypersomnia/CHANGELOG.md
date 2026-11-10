@@ -14,8 +14,7 @@
 ### Changed
 
 - **Flashbangs blind black instead of white.**
-	- Pick your own color in Settings > Interface > HUD > Flashbang color.
-	- The trail and the explosion rings are black too.
+	- Pick your own color in `Settings > Interface > HUD > Flashbang color`.
 
 ### Fixed
 
