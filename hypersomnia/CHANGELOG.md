@@ -4,6 +4,26 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
+## [4.5.0] - 2026-11-14
+
+### Added
+
+- **Editor: every playtest is recorded.**
+	- Replay any of them in the Recorded playtests tab, next to History.
+
+### Changed
+
+- **Flashbangs blind black instead of white.**
+	- Pick your own color in Settings > Interface > HUD > Flashbang color.
+	- The trail and the explosion rings are black too.
+
+### Fixed
+
+- **Servers freezing after web players left.**
+	- Two separate deadlocks in the WebRTC handling, one of them in the library itself.
+- **Torn-off limbs fly to their own side again.**
+	- The right arm to the right, the left one to the left (broken in 4.4.0).
+
 ## [4.4.0] - 2026-11-01
 
 ### Added
