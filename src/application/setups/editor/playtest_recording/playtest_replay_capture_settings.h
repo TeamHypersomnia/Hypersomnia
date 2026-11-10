@@ -9,10 +9,13 @@
 #include "augs/misc/timing/delta.h"
 
 constexpr unsigned playtest_replay_capture_frames_per_second_v = 60;
+constexpr unsigned playtest_replay_capture_renders_per_frame_v = 4;
+constexpr unsigned playtest_replay_capture_renders_per_second_v = playtest_replay_capture_frames_per_second_v * playtest_replay_capture_renders_per_frame_v;
 constexpr unsigned playtest_replay_capture_audio_frequency_v = 48000;
+constexpr unsigned playtest_replay_capture_audio_sample_frames_per_render_v = playtest_replay_capture_audio_frequency_v / playtest_replay_capture_renders_per_second_v;
 
-inline augs::delta playtest_replay_capture_frame_delta() {
-	return augs::delta::steps_per_second(playtest_replay_capture_frames_per_second_v);
+inline augs::delta playtest_replay_capture_render_delta() {
+	return augs::delta::steps_per_second(playtest_replay_capture_renders_per_second_v);
 }
 
 struct playtest_replay_capture_settings {
@@ -23,6 +26,9 @@ struct playtest_replay_capture_settings {
 	augs::path_type audio_path;
 	std::optional<camera_eye> camera;
 	bool hide_hud = false;
+	bool start_paused = false;
+	bool hides_player = false;
+	std::optional<double> no_input_after_secs;
 
 	bool requested() const {
 		return !recording_folder.empty();

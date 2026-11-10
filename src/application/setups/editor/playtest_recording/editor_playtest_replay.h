@@ -9,6 +9,7 @@
 #include "game/cosmos/cosmos_solvable_significant.h"
 #include "game/modes/all_mode_includes.h"
 #include "application/setups/editor/playtest_recording/editor_playtest_recording.h"
+#include "application/setups/editor/playtest_recording/playtest_replay_speed_ranges.h"
 
 struct editor_playtest_replay_snapshot {
 	cosmos_solvable_significant solvable;
@@ -25,6 +26,8 @@ struct editor_playtest_replay {
 	std::optional<uint32_t> requested_seek;
 	std::optional<uint32_t> first_desync_step;
 	std::map<uint32_t, editor_playtest_replay_snapshot> snapshots;
+	playtest_replay_speed_ranges speed_ranges;
+	playtest_replay_slow_motion_draft slow_motion_draft;
 
 	bool paused = false;
 	bool controls_hidden = false;
@@ -53,6 +56,10 @@ struct editor_playtest_replay {
 
 	double get_current_secs() const {
 		return current_step * get_secs_per_step();
+	}
+
+	double get_speed_mult() const {
+		return ::calc_replay_speed_mult(speed_ranges, get_current_secs());
 	}
 
 	uint32_t secs_to_step(const double secs) const {

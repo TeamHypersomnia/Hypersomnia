@@ -483,7 +483,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	if (gui.recorded_playtests.show) {
 		if (const auto history_window = ImGui::FindWindowByName(gui.history.get_title().c_str())) {
 			if (history_window->DockId != 0) {
-				ImGui::SetNextWindowDockID(history_window->DockId, ImGuiCond_FirstUseEver);
+				ImGui::SetNextWindowDockID(history_window->DockId, ImGuiCond_Once);
 			}
 		}
 	}

@@ -283,6 +283,7 @@ void editor_setup::open_default_windows() {
 	gui.filesystem.open();
 	gui.history.open();
 	gui.toolbar.open();
+	gui.recorded_playtests.show = true;
 }
 
 bool editor_setup::handle_input_before_imgui(

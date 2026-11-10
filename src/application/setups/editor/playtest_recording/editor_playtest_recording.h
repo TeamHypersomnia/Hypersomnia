@@ -39,11 +39,26 @@ struct editor_playtest_recording_inputs {
 	// END GEN INTROSPECTOR
 };
 
+struct playtest_replay_speed_range {
+	// GEN INTROSPECTOR struct playtest_replay_speed_range
+	double from_secs = 0.0;
+	double to_secs = 0.0;
+	double speed = 0.5;
+	// END GEN INTROSPECTOR
+};
+
+struct playtest_replay_speed_ranges {
+	// GEN INTROSPECTOR struct playtest_replay_speed_ranges
+	std::vector<playtest_replay_speed_range> ranges;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_playtest_recording_paths {
 	augs::path_type folder;
 	augs::path_type map_json;
 	augs::path_type meta_json;
 	augs::path_type inputs_bin;
+	augs::path_type speed_ranges_json;
 
 	editor_playtest_recording_paths() = default;
 
@@ -51,7 +66,8 @@ struct editor_playtest_recording_paths {
 		folder(folder),
 		map_json(folder / "map.json"),
 		meta_json(folder / "playtest.json"),
-		inputs_bin(folder / "inputs.bin")
+		inputs_bin(folder / "inputs.bin"),
+		speed_ranges_json(folder / "speed_ranges.json")
 	{}
 };
 

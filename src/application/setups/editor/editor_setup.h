@@ -844,7 +844,7 @@ public:
 	}
 
 	double get_current_playtest_speed() const {
-		return playtest_recordings.is_replay_paused() ? 0.0 : playtest_speed;
+		return playtest_recordings.is_replay_paused() ? 0.0 : playtest_speed * playtest_recordings.replay_speed_mult();
 	}
 
 	augs::path_type get_recorded_playtests_folder() const {

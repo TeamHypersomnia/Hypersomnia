@@ -16,6 +16,10 @@
 #include "application/setups/editor/playtest_recording/editor_playtest_replay.h"
 #include "application/setups/editor/playtest_recording/editor_playtest_recording_files.h"
 #include "application/setups/editor/playtest_recording/playtest_render_command.h"
+#include "application/setups/editor/playtest_recording/playtest_moment_link.h"
+#include "application/setups/character_out_of_every_frame.h"
+#include "application/setups/editor/playtest_recording/playtest_replay_input_cutoff.h"
+#include "application/setups/editor/playtest_recording/playtest_replay_slow_motion_gui.h"
 #include "hypersomnia_version.h"
 
 void snap_interpolated_to_logical(cosmos&);
@@ -25,6 +29,10 @@ editor_playtest_recordings::~editor_playtest_recordings() = default;
 
 bool editor_playtest_recordings::is_replay_paused() const {
 	return is_replaying() && replay->paused;
+}
+
+double editor_playtest_recordings::replay_speed_mult() const {
+	return is_replaying() ? replay->get_speed_mult() : 1.0;
 }
 
 bool editor_playtest_recordings::replay_uses_free_camera() const {
@@ -183,6 +191,7 @@ bool editor_playtest_recordings::start_replaying(editor_setup& editor, const aug
 
 	try {
 		new_replay->recording = { recording_paths, augs::from_json_file<editor_playtest_recording_meta>(recording_paths.meta_json) };
+		new_replay->speed_ranges = ::load_replay_speed_ranges(recording_paths);
 		augs::load_from_bytes(new_replay->inputs, recording_paths.inputs_bin);
 
 		auto reading_settings_like_editor = editor_project_readwrite::reading_settings();
@@ -219,6 +228,7 @@ bool editor_playtest_recordings::start_replaying(editor_setup& editor, const aug
 	new_replay->snapshots[0] = { editor.scene.world.get_solvable().significant, editor.current_mode_state };
 
 	editor.recent_message.set("Replaying %x. Press ESC to quit.", new_replay->recording.get_display_name());
+	editor.gui.recorded_playtests.selected_folder = recording_folder;
 	editor.timer = augs::fixed_delta_timer { 5, augs::lag_spike_handling_type::DISCARD };
 
 	replay = std::move(new_replay);
@@ -387,6 +397,8 @@ void editor_playtest_recordings::perform_replay_controls(editor_setup& editor, a
 
 	checkbox("Hide HUD (cinematic mode)", editor.gui.hide_hud_in_playtest_replays);
 
+	::perform_slow_motion_controls(shown);
+
 	if (ImGui::Button("Copy render command")) {
 		auto request = playtest_render_request();
 		request.recording_folder = shown.recording.paths.folder;
@@ -405,6 +417,28 @@ void editor_playtest_recordings::perform_replay_controls(editor_setup& editor, a
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("Renders from the current moment to the end at 60 fps, with sound,\nwith the free camera if it is on - otherwise following the player,\nwithout the HUD if it is hidden here.");
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Copy moment link")) {
+		auto moment = playtest_moment();
+		moment.map_name = editor.get_arena_name();
+		moment.recording_folder = shown.recording.paths.folder;
+		moment.secs = shown.get_current_secs();
+		moment.step = shown.current_step;
+		moment.num_steps = shown.get_num_steps();
+
+		if (shown.free_camera) {
+			moment.camera = editor.view.panned_camera;
+		}
+
+		ImGui::SetClipboardText(::make_playtest_moment_link(moment).c_str());
+		editor.recent_message.set("Copied a link to this moment (%x).", ::format_mins_secs(moment.secs));
+	}
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Copies the map, the recording and this exact moment (with the free camera if it is on)\nas one line - e.g. to point someone at it, or for a replay from the command line.");
 	}
 
 	ImGui::SameLine();
@@ -481,8 +515,18 @@ void editor_playtest_recordings::start_capturing(editor_setup& editor, const pla
 		replay->stop_at_step = replay->secs_to_step(*capture.to_secs);
 	}
 
+	if (capture.no_input_after_secs.has_value()) {
+		::cut_off_recorded_inputs_from(replay->inputs, replay->secs_to_step(*capture.no_input_after_secs));
+	}
+
 	replay->seek_to(replay->secs_to_step(capture.from_secs));
 	perform_requested_seek(editor);
+
+	if (capture.hides_player) {
+		if (const auto player = editor.scene.world[editor.get_viewed_character_id()]) {
+			::move_character_out_of_every_frame(player);
+		}
+	}
 
 	if (capture.camera.has_value()) {
 		replay->free_camera = true;
@@ -491,10 +535,18 @@ void editor_playtest_recordings::start_capturing(editor_setup& editor, const pla
 
 	capture_hides_hud = capture.hide_hud;
 
+	if (capture.start_paused) {
+		replay->paused = true;
+	}
+
 	if (capture.records_frames()) {
 		replay->controls_hidden = true;
 		capture_waits_for_viewables = true;
 		capture_output.emplace(capture.frames_path, capture.audio_path);
+		renders_since_capture_start = 0;
+
+		const auto silence_before_first_frame = (playtest_replay_capture_renders_per_frame_v - 1) * playtest_replay_capture_audio_sample_frames_per_render_v * 2;
+		audio_since_last_captured_frame.assign(silence_before_first_frame, 0);
 	}
 
 	LOG(
@@ -524,6 +576,7 @@ void editor_playtest_recordings::advance_capture(const bool all_viewables_loaded
 
 void editor_playtest_recordings::request_frame(game_frame_buffer& write_buffer) {
 	frame_requested_now = false;
+	render_belongs_to_capture = false;
 
 	if (!capture_output.has_value() || !is_replaying()) {
 		return;
@@ -533,14 +586,30 @@ void editor_playtest_recordings::request_frame(game_frame_buffer& write_buffer) 
 		return;
 	}
 
+	render_belongs_to_capture = true;
+
+	const bool captures_this_render = renders_since_capture_start % playtest_replay_capture_renders_per_frame_v == 0;
+	++renders_since_capture_start;
+
+	if (!captures_this_render) {
+		return;
+	}
+
 	write_buffer.renderers.all[renderer_type::GENERAL].screenshot(xywhi(vec2i::zero, write_buffer.screen_size));
 	capture_output->on_frame_requested(replay->reached_last_step());
 	frame_requested_now = true;
 }
 
-void editor_playtest_recordings::queue_audio_of_captured_frame(const std::vector<int16_t>& samples) {
-	if (frame_requested_now && capture_output.has_value()) {
-		capture_output->queue_audio_of_requested_frame(samples);
+void editor_playtest_recordings::queue_audio_of_render(const std::vector<int16_t>& samples) {
+	if (!render_belongs_to_capture || !capture_output.has_value()) {
+		return;
+	}
+
+	audio_since_last_captured_frame.insert(audio_since_last_captured_frame.end(), samples.begin(), samples.end());
+
+	if (frame_requested_now) {
+		capture_output->queue_audio_of_requested_frame(audio_since_last_captured_frame);
+		audio_since_last_captured_frame.clear();
 	}
 }
 

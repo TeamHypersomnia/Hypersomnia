@@ -8,7 +8,7 @@
 #include "augs/log.h"
 #include "application/setups/editor/playtest_recording/editor_playtest_recording.h"
 
-constexpr std::size_t max_kept_unnamed_recordings_v = 50;
+constexpr std::size_t max_kept_unnamed_recordings_v = 1000;
 
 inline std::vector<editor_recorded_playtest_entry> find_recorded_playtests(const augs::path_type& recordings_folder) {
 	auto found = std::vector<editor_recorded_playtest_entry>();

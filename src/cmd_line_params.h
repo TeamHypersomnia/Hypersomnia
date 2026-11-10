@@ -373,6 +373,12 @@ struct cmd_line_params {
 			else if (a == "--replay-camera") {
 				replay_capture.camera = ::parse_playtest_replay_camera(get_next());
 			}
+			else if (a == "--replay-no-player") {
+				replay_capture.hides_player = true;
+			}
+			else if (a == "--replay-no-input-after") {
+				replay_capture.no_input_after_secs = std::atof(get_next());
+			}
 			else if (a == "--replay-no-hud") {
 				replay_capture.hide_hud = true;
 			}

@@ -132,6 +132,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/setups/editor/playtest_recording/playtest_replay_loopback_audio.h"
+#include "application/setups/editor/playtest_recording/playtest_moment_link.h"
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
@@ -2304,6 +2305,13 @@ work_result work(
 		std::make_optional<playtest_replay_loopback_audio>() :
 		std::nullopt
 	;
+
+	WEBSTATIC auto pending_playtest_replay = params.replay_capture.requested() ?
+		std::make_optional(params.replay_capture) :
+		std::nullopt
+	;
+
+	WEBSTATIC auto playtest_moment_links = playtest_moment_link_watcher();
 
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
@@ -5615,6 +5623,17 @@ work_result work(
 						browse_servers_gui.open();
 					}
 				}
+
+				if (const bool in_project_selector = has_current_setup() && std::holds_alternative<project_selector_setup>(*current_setup)) {
+					if (playtest_moment_links.worth_reading(window.get_times_activated())) {
+						const auto* const clipboard = ImGui::GetClipboardText();
+
+						if (const auto replay_request = playtest_moment_links.take(clipboard != nullptr ? clipboard : "")) {
+							pending_playtest_replay = replay_request;
+							launch_editor(::project_folder_of_recording(replay_request->recording_folder));
+						}
+					}
+				}
 #endif
 
 				if (const bool show_server_browser = (!has_current_setup() || ingame_menu.show) && !changelog_shown) {
@@ -6901,7 +6920,7 @@ work_result work(
 			main_menu_gui.root.scale = get_gui_fonts_ratio();
 
 			const auto real_frame_delta = frame_timer.extract_delta();
-			const auto frame_delta = params.replay_capture.records_frames() ? ::playtest_replay_capture_frame_delta() : real_frame_delta;
+			const auto frame_delta = params.replay_capture.records_frames() ? ::playtest_replay_capture_render_delta() : real_frame_delta;
 			const auto current_frame_num = current_frame.load();
 
 			/*
@@ -7011,13 +7030,13 @@ work_result work(
 						editor.set_playtest_speed(params.playtest_speed);
 					}
 
-					static bool replay_capture_requested = params.replay_capture.requested();
+					if (pending_playtest_replay.has_value() && streaming.completed_all_loading()) {
+						const auto replay_request = *pending_playtest_replay;
+						pending_playtest_replay.reset();
 
-					if (replay_capture_requested && streaming.completed_all_loading()) {
-						replay_capture_requested = false;
-						editor.get_playtest_recordings().start_capturing(editor, params.replay_capture);
+						editor.get_playtest_recordings().start_capturing(editor, replay_request);
 
-						if (!params.replay_capture.records_frames()) {
+						if (!replay_request.records_frames()) {
 							editor.set_playtest_speed(params.playtest_speed);
 						}
 					}
@@ -8513,7 +8532,7 @@ work_result work(
 				if (replay_loopback_audio.has_value()) {
 					on_specific_setup([&](editor_setup& editor) {
 						audio_buffers.finish();
-						editor.get_playtest_recordings().queue_audio_of_captured_frame(replay_loopback_audio->render_one_frame(audio));
+						editor.get_playtest_recordings().queue_audio_of_render(replay_loopback_audio->render_one_render(audio));
 					});
 				}
 

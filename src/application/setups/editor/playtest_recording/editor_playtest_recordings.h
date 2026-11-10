@@ -30,6 +30,9 @@ class editor_playtest_recordings {
 	bool capture_waits_for_viewables = false;
 	bool capture_failed = false;
 	bool frame_requested_now = false;
+	bool render_belongs_to_capture = false;
+	uint32_t renders_since_capture_start = 0;
+	std::vector<int16_t> audio_since_last_captured_frame;
 
 	void rebuild_arena_for_replay(editor_setup&, const editor_project& recorded_project, bool showing_navmesh) const;
 
@@ -42,6 +45,7 @@ public:
 	}
 
 	bool is_replay_paused() const;
+	double replay_speed_mult() const;
 	bool replay_uses_free_camera() const;
 	bool replay_requires_cursor() const;
 	bool replay_hides_hud(bool hud_hidden_in_editor_replays) const;
@@ -70,6 +74,6 @@ public:
 	void start_capturing(editor_setup&, const playtest_replay_capture_settings&);
 	void advance_capture(bool all_viewables_loaded);
 	void request_frame(game_frame_buffer&);
-	void queue_audio_of_captured_frame(const std::vector<int16_t>& samples);
+	void queue_audio_of_render(const std::vector<int16_t>& samples);
 	void write_frame(const augs::image&);
 };
