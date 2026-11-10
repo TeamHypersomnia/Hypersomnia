@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include "augs/window_framework/shell.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -16,7 +17,7 @@ namespace augs {
 
 		void open_pipe(std::string resolved_command, const std::string& stdin_file) {
 			if (!stdin_file.empty()) {
-				resolved_command += " < " + stdin_file;
+				resolved_command += " < " + augs::quoted_for_shell(stdin_file);
 			}
 
 			pipe_fd = std::shared_ptr<FILE>(popen(resolved_command.c_str(), "r"), pclose);

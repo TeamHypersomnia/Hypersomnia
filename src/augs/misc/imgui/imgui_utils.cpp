@@ -91,28 +91,27 @@ static void augs_SetClipboardText(void*, const char* text) {
     set_clipboard_op = text;
 }
 
-#else
-#include "augs/window_framework/shell.h"
-#include "augs/window_framework/exec.h"
-
-void unix_set_clipboard_data(const std::string& abc) {
-	const auto p = augs::path_type("/tmp/augs_clipboard_data.txt"); 
-	augs::save_as_text(p, abc);
-	augs::shell("xclip -selection CLIPBOARD -in " + p.string());
-}
-
-std::string unix_get_clipboard_data() {
-	return augs::exec("xclip -selection CLIPBOARD -out");
-}
+#elif BUILD_WINDOW_FRAMEWORK
+#include "augs/window_framework/x11_clipboard.h"
 
 static const char* augs_GetClipboardText(void*) {
-	thread_local std::string sss;
-	sss = unix_get_clipboard_data();
-	return sss.c_str();
+	thread_local std::string pasted;
+	pasted = augs::x11_clipboard::get_text();
+	return pasted.c_str();
 }
 
 static void augs_SetClipboardText(void*, const char* text) {
-	unix_set_clipboard_data(text);
+	augs::x11_clipboard::set_text(text);
+}
+#else
+static std::string clipboard_without_window;
+
+static const char* augs_GetClipboardText(void*) {
+	return clipboard_without_window.c_str();
+}
+
+static void augs_SetClipboardText(void*, const char* text) {
+	clipboard_without_window = text;
 }
 #endif
 #endif

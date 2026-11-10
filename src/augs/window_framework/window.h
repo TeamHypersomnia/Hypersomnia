@@ -92,6 +92,8 @@ namespace augs {
 		GLXContext context = 0;
 		GLXWindow glxwindow = 0;
 		xcb_window_t window_id = 0;
+
+		std::string get_parent_window_for_portal() const;
 		xcb_screen_t* screen = 0;
 		GLXDrawable drawable = 0;
 		Display *display = nullptr;
@@ -303,10 +305,6 @@ namespace augs {
 			const std::vector<file_dialog_filter>& filters,
 			const std::string& custom_title = std::string(),
 			const std::string& default_name = std::string()
-		);
-
-		std::optional<path_type> choose_directory_dialog(
-			const std::string& custom_title = std::string()
 		);
 
 		void reveal_in_explorer(const augs::path_type&);

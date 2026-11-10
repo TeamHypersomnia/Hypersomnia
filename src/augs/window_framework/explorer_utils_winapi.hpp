@@ -91,55 +91,6 @@ namespace augs {
 		}
 	}
 
-	static augs::path_type PickContainer(const std::wstring& custom_title) {
-		augs::path_type result;
-		IFileDialog *pfd;
-		
-		if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd))))
-		{
-			DWORD dwOptions;
-			if (SUCCEEDED(pfd->GetOptions(&dwOptions)))
-			{
-				pfd->SetOptions(dwOptions | FOS_PICKFOLDERS);
-			}
-			
-			pfd->SetTitle(custom_title.c_str());
-
-			if (SUCCEEDED(pfd->Show(NULL)))
-			{
-				IShellItem *psi;
-				if (SUCCEEDED(pfd->GetResult(&psi)))
-				{
-					LPWSTR g_path = nullptr;
-					if(!SUCCEEDED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &g_path)))
-					{
-						MessageBox(NULL, L"GetIDListName() failed", NULL, NULL);
-					}
-
-					result = augs::path_type(g_path);
-
-					psi->Release();
-				}
-			}
-			pfd->Release();
-		}
-
-		return result;
-	}
-
-	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& custom_title
-	) {
-		const auto title = widen(custom_title);
-		const auto choice = PickContainer(title);
-
-		if (!choice.empty()) {
-			return choice;
-		}
-
-		return std::nullopt;
-	}
-
 	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title,

@@ -69,12 +69,19 @@ namespace augs {
 		const auto full_path = std::filesystem::absolute(augs::path_type(on_file));
 
 #if PLATFORM_MACOS
-		const auto command = augs::path_type(typesafe_sprintf("open \"%x\"", full_path));
+		const auto command = typesafe_sprintf("open %x", augs::quoted_for_shell(full_path.string()));
 #else
-		const auto command = augs::path_type("$VISUAL ") += full_path;
+		const char* const visual = std::getenv("VISUAL");
+		const bool has_text_editor = visual != nullptr && visual[0] != '\0';
+
+		const auto command =
+			has_text_editor ?
+			"$VISUAL " + augs::quoted_for_shell(full_path.string()) :
+			"xdg-open " + augs::quoted_for_shell(full_path.string()) + " > /dev/null 2>&1 &"
+		;
 #endif
 
-		augs::shell(command.string());
+		augs::shell(command);
 #endif
 	}
 }
@@ -109,22 +116,7 @@ namespace augs {
 	}
 #elif PLATFORM_UNIX
 	void open_url(const std::string& url) {
-		/*
-			Quoted for the shell - a URL with "&" would otherwise be cut there.
-		*/
-
-		auto quoted = std::string("'");
-
-		for (const auto c : url) {
-			if (c == '\'') {
-				quoted += "'\\''";
-			}
-			else {
-				quoted += c;
-			}
-		}
-
-		quoted += "'";
+		const auto quoted = augs::quoted_for_shell(url);
 
 #if PLATFORM_LINUX
 		std::string command = "xdg-open " + quoted;

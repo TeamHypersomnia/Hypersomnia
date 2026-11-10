@@ -22,6 +22,7 @@
 
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "augs/string/path_sanitization.h"
+#include "augs/window_framework/shell.h"
 #include "application/setups/editor/detail/has_reference_count.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
@@ -186,7 +187,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		"Project",
 		"Official",
 		[&]() {
-			if (ImGui::BeginPopupContextItem()) {
+			if (augs::reveal_in_explorer_available_v && ImGui::BeginPopupContextItem()) {
 				if (ImGui::Selectable("Reveal in explorer")) {
 					reveal_project_json_file();
 				}
@@ -397,7 +398,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				}
 
 				if (ImGui::BeginPopupContextItem()) {
-					{
+					if constexpr(augs::reveal_in_explorer_available_v) {
 						const bool can_reveal = viewing_project_files;
 
 						auto disabled = maybe_disabled_cols(!can_reveal);

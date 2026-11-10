@@ -11,6 +11,7 @@
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/window_framework/window.h"
+#include "augs/window_framework/shell.h"
 #include "3rdparty/imgui/imgui_internal.h"
 #include "application/setups/client/https_file_uploader.h"
 
@@ -57,7 +58,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				save();
 			}
 
-			if (ImGui::MenuItem("Reveal in explorer", "CTRL+SHIFT+E")) {
+			if (augs::reveal_in_explorer_available_v && ImGui::MenuItem("Reveal in explorer", "CTRL+SHIFT+E")) {
 				in.window.reveal_in_explorer(paths.project_json);
 			}
 

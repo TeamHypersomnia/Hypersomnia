@@ -15,8 +15,8 @@ namespace augs {
 		constexpr const char* request_interface = "org.freedesktop.portal.Request";
 
 		constexpr int activation_timeout_ms = 25000;
+		constexpr int version_query_timeout_ms = 3000;
 		constexpr int response_poll_interval_ms = 100;
-		constexpr std::uint32_t first_version_choosing_directories = 3;
 		constexpr std::uint32_t first_version_opening_directories = 3;
 		constexpr std::uint32_t response_success = 0;
 
@@ -85,12 +85,13 @@ namespace augs {
 		static message_ptr call_and_wait_for_reply(
 			DBusConnection* const connection,
 			DBusMessage* const call,
-			const char* const what
+			const char* const what,
+			const int timeout_ms = activation_timeout_ms
 		) {
 			DBusError error;
 			dbus_error_init(&error);
 
-			DBusMessage* const reply = dbus_connection_send_with_reply_and_block(connection, call, activation_timeout_ms, &error);
+			DBusMessage* const reply = dbus_connection_send_with_reply_and_block(connection, call, timeout_ms, &error);
 
 			if (dbus_error_is_set(&error)) {
 				LOG("Desktop portal: %x failed (%x: %x).", what, error.name, error.message);
@@ -100,7 +101,7 @@ namespace augs {
 			return message_ptr(reply);
 		}
 
-		static std::optional<std::uint32_t> get_interface_version(DBusConnection* const connection, const char* interface_name) {
+		static std::optional<std::uint32_t> get_interface_version(DBusConnection* const connection, const char* const interface_name) {
 			const auto call = message_ptr(dbus_message_new_method_call(bus_name, object_path, "org.freedesktop.DBus.Properties", "Get"));
 			const char* const property_name = "version";
 
@@ -111,7 +112,7 @@ namespace augs {
 				DBUS_TYPE_INVALID
 			);
 
-			const auto reply = call_and_wait_for_reply(connection, call.get(), "getting the interface version");
+			const auto reply = call_and_wait_for_reply(connection, call.get(), "getting the interface version", version_query_timeout_ms);
 
 			if (reply.get() == nullptr) {
 				return std::nullopt;
@@ -135,7 +136,7 @@ namespace augs {
 			return version;
 		}
 
-		static std::uint32_t query_interface_version_once(const char* const interface_name) {
+		static std::uint32_t query_interface_version(const char* const interface_name) {
 			const auto bus = session_bus();
 
 			if (bus.get() == nullptr) {
@@ -148,79 +149,12 @@ namespace augs {
 			return version;
 		}
 
-		static std::uint32_t file_chooser_version() {
-			static const auto version = query_interface_version_once(file_chooser_interface);
-			return version;
-		}
-
-		static std::uint32_t open_uri_version() {
-			static const auto version = query_interface_version_once(open_uri_interface);
-			return version;
-		}
-
-		static bool is_name_activatable(DBusConnection* const connection, const std::string& name) {
-			const auto call = message_ptr(dbus_message_new_method_call(
-				"org.freedesktop.DBus",
-				"/org/freedesktop/DBus",
-				"org.freedesktop.DBus",
-				"ListActivatableNames"
-			));
-
-			const auto reply = call_and_wait_for_reply(connection, call.get(), "listing the activatable names");
-
-			if (reply.get() == nullptr) {
-				return false;
-			}
-
-			DBusMessageIter reply_iter;
-
-			if (!dbus_message_iter_init(reply.get(), &reply_iter) || dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
-				return false;
-			}
-
-			DBusMessageIter names_iter;
-			dbus_message_iter_recurse(&reply_iter, &names_iter);
-
-			while (dbus_message_iter_get_arg_type(&names_iter) == DBUS_TYPE_STRING) {
-				const char* candidate = nullptr;
-				dbus_message_iter_get_basic(&names_iter, &candidate);
-
-				if (candidate != nullptr && name == candidate) {
-					return true;
-				}
-
-				dbus_message_iter_next(&names_iter);
-			}
-
-			return false;
-		}
-
-		bool is_service_present() {
-			const auto bus = session_bus();
-
-			if (bus.get() == nullptr) {
-				return false;
-			}
-
-			if (dbus_bus_name_has_owner(bus.get(), bus_name, nullptr)) {
-				return true;
-			}
-
-			return is_name_activatable(bus.get(), bus_name);
-		}
-
-		bool can_choose(const file_chooser_mode mode) {
-			const auto version = file_chooser_version();
-
-			if (mode == file_chooser_mode::CHOOSE_DIRECTORY) {
-				return version >= first_version_choosing_directories;
-			}
-
-			return version > 0;
+		bool has_file_chooser() {
+			return query_interface_version(file_chooser_interface) > 0;
 		}
 
 		bool can_open_directory() {
-			return open_uri_version() >= first_version_opening_directories;
+			return query_interface_version(open_uri_interface) >= first_version_opening_directories;
 		}
 
 		static std::string make_handle_token() {
@@ -253,6 +187,36 @@ namespace augs {
 			dbus_bus_add_match(connection, rule.c_str(), nullptr);
 		}
 
+		static void listen_for_portal_leaving(DBusConnection* const connection) {
+			const auto rule =
+				"type='signal',sender='org.freedesktop.DBus',interface='org.freedesktop.DBus',"
+				"member='NameOwnerChanged',arg0='" + std::string(bus_name) + "'"
+			;
+
+			dbus_bus_add_match(connection, rule.c_str(), nullptr);
+		}
+
+		static bool is_portal_leaving(DBusMessage* const message) {
+			if (!dbus_message_is_signal(message, "org.freedesktop.DBus", "NameOwnerChanged")) {
+				return false;
+			}
+
+			const char* name = nullptr;
+			const char* old_owner = nullptr;
+			const char* new_owner = nullptr;
+
+			const bool read = dbus_message_get_args(
+				message,
+				nullptr,
+				DBUS_TYPE_STRING, &name,
+				DBUS_TYPE_STRING, &old_owner,
+				DBUS_TYPE_STRING, &new_owner,
+				DBUS_TYPE_INVALID
+			);
+
+			return read && name != nullptr && std::string(name) == bus_name && new_owner != nullptr && std::string(new_owner).empty();
+		}
+
 		static void append_string(DBusMessageIter& iter, const std::string& value) {
 			const char* const c_str = value.c_str();
 			dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &c_str);
@@ -269,13 +233,6 @@ namespace augs {
 			append_value(variant_iter);
 			dbus_message_iter_close_container(&entry_iter, &variant_iter);
 			dbus_message_iter_close_container(&dict_iter, &entry_iter);
-		}
-
-		static void append_bool_option(DBusMessageIter& dict_iter, const char* const key, const bool value) {
-			append_option(dict_iter, key, "b", [value](DBusMessageIter& variant_iter) {
-				const dbus_bool_t dbus_value = value ? TRUE : FALSE;
-				dbus_message_iter_append_basic(&variant_iter, DBUS_TYPE_BOOLEAN, &dbus_value);
-			});
 		}
 
 		static void append_string_option(DBusMessageIter& dict_iter, const char* const key, const std::string& value) {
@@ -336,10 +293,6 @@ namespace augs {
 			dbus_message_iter_open_container(&args_iter, DBUS_TYPE_ARRAY, "{sv}", &dict_iter);
 
 			append_string_option(dict_iter, "handle_token", handle_token);
-
-			if (request.mode == file_chooser_mode::CHOOSE_DIRECTORY) {
-				append_bool_option(dict_iter, "directory", true);
-			}
 
 			if (!request.filters.empty()) {
 				append_filters_option(dict_iter, request.filters);
@@ -491,6 +444,11 @@ namespace augs {
 					if (is_our_response) {
 						return read_response(message.get());
 					}
+
+					if (is_portal_leaving(message.get())) {
+						LOG("Desktop portal: the portal quit while waiting for the file chooser.");
+						return std::nullopt;
+					}
 				}
 			}
 
@@ -509,6 +467,7 @@ namespace augs {
 			const auto request_path = expected_request_path(bus.get(), handle_token);
 
 			listen_for_response(bus.get(), request_path);
+			listen_for_portal_leaving(bus.get());
 
 			const auto method = request.mode == file_chooser_mode::SAVE_FILE ? "SaveFile" : "OpenFile";
 			const auto call = message_ptr(dbus_message_new_method_call(bus_name, object_path, file_chooser_interface, method));
@@ -516,7 +475,7 @@ namespace augs {
 			DBusMessageIter args_iter;
 			dbus_message_iter_init_append(call.get(), &args_iter);
 
-			append_string(args_iter, "");
+			append_string(args_iter, request.parent_window);
 			append_string(args_iter, request.title);
 			append_file_chooser_options(args_iter, request, handle_token);
 

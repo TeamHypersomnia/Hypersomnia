@@ -31,6 +31,7 @@
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/editor/gui/property_editor/non_standard_shape_widget.h"
 #include "augs/misc/from_concave_polygon.h"
+#include "augs/window_framework/shell.h"
 
 #include "application/setups/editor/defaults/editor_game_mode_defaults.h"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
@@ -3430,6 +3431,10 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	};
 
 	auto reveal_in_explorer_button = [this](const auto& path) {
+		if constexpr(!augs::reveal_in_explorer_available_v) {
+			return;
+		}
+
 		auto cursor = scoped_preserve_cursor();
 
 		if (ImGui::Selectable("##RevealButton")) {

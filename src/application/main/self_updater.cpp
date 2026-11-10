@@ -38,6 +38,7 @@
 #include "application/main/extract_archive.h"
 #include "hypersomnia_version.h"
 #include "augs/window_framework/exec.h"
+#include "augs/window_framework/shell.h"
 
 #if PLATFORM_MACOS
 #define PLATFORM_STRING "MacOS"
@@ -824,7 +825,7 @@ self_update_result check_and_apply_updates(
 									so that we are immune to a rollback attack.
 								*/
 
-								const auto signed_downloaded_version = augs::exec(typesafe_sprintf("%x --version-line", target_archive_path.string()));
+								const auto signed_downloaded_version = augs::exec(typesafe_sprintf("%x --version-line", augs::quoted_for_shell(target_archive_path.string())));
 
 								if (signed_downloaded_version == new_version) {
 									/* Serious stuff begins here. */

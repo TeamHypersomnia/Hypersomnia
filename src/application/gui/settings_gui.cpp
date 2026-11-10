@@ -43,6 +43,7 @@
 #include "application/config_json_table.h"
 #include "application/main/auth_provider_type.h"
 #include "application/main/identity_key.h"
+#include "application/main/flatpak_build.h"
 #include "application/main/server_key.h"
 #include "application/main/ranked_match_record.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
@@ -1113,7 +1114,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 		::web_pick_text_file();
 #else
 		if (!window.has_file_dialog()) {
-			account_message = std::string("No file dialog on this system (install zenity).\nTo restore by hand, put your key file in place of account.key\n(Back up private key - Show key file in folder) - the game notices it.");
+			account_message = ::get_no_file_dialog_notice() + "\nTo restore by hand, put your key file in place of account.key\n(Back up private key - Show key file in folder) - the game notices it.";
 		}
 		else if (!chosen_key_file.valid()) {
 			chosen_key_file = launch_async(
@@ -1310,7 +1311,7 @@ void settings_gui_state::perform_account_manage_pane(augs::window& window) {
 			}
 
 			if (no_save_dialog_note) {
-				text_color("No file dialog on this system (install zenity).\nCopy account.key yourself (Show key file in folder).", orange);
+				text_color(::get_no_file_dialog_notice() + "\nCopy account.key yourself (Show key file in folder).", orange);
 			}
 #else
 			(void)window;
@@ -4122,7 +4123,12 @@ void settings_gui_state::perform(
 							if (signed_in.avatar_image_path.empty()) {
 								const auto tooltip = typesafe_sprintf("Change avatar\n\nAny image - scaled down to %xx%x.", max_avatar_side_v, max_avatar_side_v);
 
-								if (editable_image_overlay("Avatar", pos, ImVec2(avatar_size.x, avatar_size.y), tooltip) && !chosen_avatar.valid()) {
+								const bool avatar_clicked = editable_image_overlay("Avatar", pos, ImVec2(avatar_size.x, avatar_size.y), tooltip);
+
+								if (avatar_clicked && !window.has_file_dialog()) {
+									account_message = ::get_no_file_dialog_notice();
+								}
+								else if (avatar_clicked && !chosen_avatar.valid()) {
 									chosen_avatar = launch_async(
 										[&window]() -> std::optional<augs::path_type> {
 											const std::vector<augs::window::file_dialog_filter> filters = {

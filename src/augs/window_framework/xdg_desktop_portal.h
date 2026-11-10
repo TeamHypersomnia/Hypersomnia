@@ -13,8 +13,7 @@ namespace augs {
 
 		enum class file_chooser_mode {
 			OPEN_FILE,
-			SAVE_FILE,
-			CHOOSE_DIRECTORY
+			SAVE_FILE
 		};
 
 		struct file_chooser_request {
@@ -23,10 +22,10 @@ namespace augs {
 			std::vector<file_filter> filters;
 			std::string suggested_name;
 			path_type suggested_folder;
+			std::string parent_window;
 		};
 
-		bool is_service_present();
-		bool can_choose(file_chooser_mode);
+		bool has_file_chooser();
 		std::optional<path_type> choose(const file_chooser_request&);
 
 		bool can_open_directory();

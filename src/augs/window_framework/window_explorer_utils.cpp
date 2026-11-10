@@ -1,3 +1,4 @@
+#include <sstream>
 #include "augs/window_framework/window.h"
 #include "all_paths.h"
 #include "augs/filesystem/file.h"
@@ -26,12 +27,6 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& /* custom_title */
-	) {
-		return std::nullopt;
-	}
-
 	message_box_button window::retry_cancel(
 		const std::string& caption,
 		const std::string& text
@@ -53,19 +48,6 @@ namespace augs {
 #include "augs/window_framework/xdg_desktop_portal.h"
 
 namespace augs {
-	static std::string shell_escape(const std::string& s) {
-		std::string result = "'";
-		for (const char c : s) {
-			if (c == '\'') {
-				result += "'\\''";
-			} else {
-				result += c;
-			}
-		}
-		result += "'";
-		return result;
-	}
-
 	static bool command_exists(const std::string& cmd) {
 		const auto check_cmd = "command -v " + cmd + " > /dev/null 2>&1";
 		return std::system(check_cmd.c_str()) == 0;
@@ -105,7 +87,7 @@ namespace augs {
 		}
 
 		const auto temp_result = CACHE_DIR / "last_file_path.txt";
-		const auto temp_result_escaped = shell_escape(temp_result.string());
+		const auto temp_result_escaped = augs::quoted_for_shell(temp_result.string());
 
 		const std::string cmd = std::string(terminal) + " -e ranger " + ranger_flag + "=" + temp_result_escaped;
 		augs::shell(cmd);
@@ -136,8 +118,22 @@ namespace augs {
 		return portal_filters;
 	}
 
-	static bool use_portal_file_chooser(const xdg_desktop_portal::file_chooser_mode mode) {
-		if (xdg_desktop_portal::can_choose(mode)) {
+	static std::string get_home_folder_for_dialogs() {
+		if (const char* const home = std::getenv("HOME")) {
+			return std::string(home) + "/";
+		}
+
+		return "";
+	}
+
+	std::string window::get_parent_window_for_portal() const {
+		auto out = std::ostringstream();
+		out << "x11:" << std::hex << window_id;
+		return out.str();
+	}
+
+	static bool use_portal_file_chooser() {
+		if (xdg_desktop_portal::has_file_chooser()) {
 			return true;
 		}
 
@@ -147,7 +143,7 @@ namespace augs {
 
 	bool window::has_file_dialog() const {
 		return
-			xdg_desktop_portal::is_service_present() ||
+			xdg_desktop_portal::has_file_chooser() ||
 			command_exists("zenity") ||
 			command_exists("kdialog") ||
 			(std::getenv("TERMINAL") != nullptr && command_exists("ranger"))
@@ -160,14 +156,26 @@ namespace augs {
 	) {
 		const auto title = custom_title.empty() ? "Open File" : custom_title;
 
-		if (use_portal_file_chooser(xdg_desktop_portal::file_chooser_mode::OPEN_FILE)) {
-			return xdg_desktop_portal::choose({ xdg_desktop_portal::file_chooser_mode::OPEN_FILE, title, to_portal_filters(filters), {}, {} });
+		if (use_portal_file_chooser()) {
+			return xdg_desktop_portal::choose({
+				xdg_desktop_portal::file_chooser_mode::OPEN_FILE,
+				title,
+				to_portal_filters(filters),
+				{},
+				{},
+				get_parent_window_for_portal()
+			});
 		}
 
 		if (command_exists("zenity")) {
-			std::string cmd = "zenity --file-selection --title=" + shell_escape(title);
+			std::string cmd = "zenity --file-selection --title=" + augs::quoted_for_shell(title);
+
+			if (const auto home = get_home_folder_for_dialogs(); !home.empty()) {
+				cmd += " --filename=" + augs::quoted_for_shell(home);
+			}
+
 			for (const auto& f : filters) {
-				cmd += " --file-filter=" + shell_escape(f.description + " | " + f.patterns_joined(" "));
+				cmd += " --file-filter=" + augs::quoted_for_shell(f.description + " | " + f.patterns_joined(" "));
 			}
 			return run_dialog_command(cmd);
 		}
@@ -178,7 +186,10 @@ namespace augs {
 				if (!filter_str.empty()) filter_str += " ";
 				filter_str += f.patterns_joined(" ");
 			}
-			std::string cmd = "kdialog --getopenfilename . " + shell_escape(filter_str) + " --title " + shell_escape(title);
+			const auto home = get_home_folder_for_dialogs();
+			const auto start_folder = home.empty() ? std::string(".") : home;
+
+			std::string cmd = "kdialog --getopenfilename " + augs::quoted_for_shell(start_folder) + " " + augs::quoted_for_shell(filter_str) + " --title " + augs::quoted_for_shell(title);
 			return run_dialog_command(cmd);
 		}
 
@@ -206,14 +217,14 @@ namespace augs {
 				return default_name;
 			}
 
-			if (const char* const home = std::getenv("HOME")) {
-				return std::string(home) + "/" + default_name;
+			if (const auto home = get_home_folder_for_dialogs(); !home.empty()) {
+				return home + default_name;
 			}
 
 			return default_name;
 		}();
 
-		if (use_portal_file_chooser(xdg_desktop_portal::file_chooser_mode::SAVE_FILE)) {
+		if (use_portal_file_chooser()) {
 			const auto suggested = path_type(default_path);
 
 			return xdg_desktop_portal::choose({
@@ -221,19 +232,20 @@ namespace augs {
 				title,
 				to_portal_filters(filters),
 				suggested.filename().string(),
-				suggested.parent_path()
+				suggested.parent_path(),
+				get_parent_window_for_portal()
 			});
 		}
 
 		if (command_exists("zenity")) {
-			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + shell_escape(title);
+			std::string cmd = "zenity --file-selection --save --confirm-overwrite --title=" + augs::quoted_for_shell(title);
 
 			if (!default_path.empty()) {
-				cmd += " --filename=" + shell_escape(default_path);
+				cmd += " --filename=" + augs::quoted_for_shell(default_path);
 			}
 
 			for (const auto& f : filters) {
-				cmd += " --file-filter=" + shell_escape(f.description + " | " + f.patterns_joined(" "));
+				cmd += " --file-filter=" + augs::quoted_for_shell(f.description + " | " + f.patterns_joined(" "));
 			}
 			return run_dialog_command(cmd);
 		}
@@ -244,7 +256,7 @@ namespace augs {
 				if (!filter_str.empty()) filter_str += " ";
 				filter_str += f.patterns_joined(" ");
 			}
-			std::string cmd = "kdialog --getsavefilename " + shell_escape(default_path.empty() ? std::string(".") : default_path) + " " + shell_escape(filter_str) + " --title " + shell_escape(title);
+			std::string cmd = "kdialog --getsavefilename " + augs::quoted_for_shell(default_path.empty() ? std::string(".") : default_path) + " " + augs::quoted_for_shell(filter_str) + " --title " + augs::quoted_for_shell(title);
 			return run_dialog_command(cmd);
 		}
 
@@ -257,43 +269,16 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& custom_title
-	) {
-		const auto title = custom_title.empty() ? "Choose Directory" : custom_title;
-
-		if (use_portal_file_chooser(xdg_desktop_portal::file_chooser_mode::CHOOSE_DIRECTORY)) {
-			return xdg_desktop_portal::choose({ xdg_desktop_portal::file_chooser_mode::CHOOSE_DIRECTORY, title, {}, {}, {} });
-		}
-
-		if (command_exists("zenity")) {
-			std::string cmd = "zenity --file-selection --directory --title=" + shell_escape(title);
-			return run_dialog_command(cmd);
-		}
-
-		if (command_exists("kdialog")) {
-			std::string cmd = "kdialog --getexistingdirectory . --title " + shell_escape(title);
-			return run_dialog_command(cmd);
-		}
-
-		if (auto result = run_ranger_dialog("--choosedir")) {
-			return result;
-		}
-
-		LOG("WARNING! No directory dialog tool found (zenity, kdialog, or ranger with $TERMINAL).");
-		return std::nullopt;
-	}
-
 	static void reveal_without_portal(const augs::path_type& p) {
 		std::string shell_command;
 
 		const char* terminal = std::getenv("TERMINAL");
 		if (terminal && command_exists("ranger")) {
-			shell_command = std::string(terminal) + " -e ranger --selectfile=" + shell_escape(p.string());
+			shell_command = std::string(terminal) + " -e ranger --selectfile=" + augs::quoted_for_shell(p.string());
 		}
 		else {
 			const auto parent_dir = p.parent_path();
-			shell_command = "xdg-open " + shell_escape(parent_dir.string());
+			shell_command = "xdg-open " + augs::quoted_for_shell(parent_dir.string());
 		}
 
 		augs::shell(shell_command);
@@ -388,12 +373,6 @@ namespace augs {
 		}
 
 		return run_applescript_dialog(chooser, custom_title.empty() ? "Save File" : custom_title);
-	}
-
-	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& /* custom_title */
-	) {
-		return std::nullopt;
 	}
 
 	message_box_button window::retry_cancel(

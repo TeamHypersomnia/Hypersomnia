@@ -43,12 +43,12 @@ inline std::string get_how_to_update_the_game() {
 	}
 }
 
-inline std::string get_update_available_status() {
+inline std::string get_no_file_dialog_notice() {
 	if constexpr(is_flatpak_build_v) {
-		return "An update is available on Flathub.";
+		return "No file dialog on this system.";
 	}
 	else {
-		return "Updates are available. Restart to install.";
+		return "No file dialog on this system (install zenity).";
 	}
 }
 

@@ -1003,6 +1003,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_x.cpp"
 			"src/augs/window_framework/print_x_devices.cpp"
+			"src/augs/window_framework/x11_clipboard.cpp"
 		)
 	endif()
 else()

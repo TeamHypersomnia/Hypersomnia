@@ -8,6 +8,22 @@ namespace augs {
 	constexpr bool reveal_in_explorer_available_v = true;
 #endif
 
+	inline std::string quoted_for_shell(const std::string& text) {
+		auto quoted = std::string("'");
+
+		for (const auto c : text) {
+			if (c == '\'') {
+				quoted += "'\\''";
+			}
+			else {
+				quoted += c;
+			}
+		}
+
+		quoted += "'";
+		return quoted;
+	}
+
 	int shell(const std::string&);
 	void open_url(const std::string&);
 	void open_text_editor(const std::string& on_file);

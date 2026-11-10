@@ -53,12 +53,6 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	std::optional<path_type> window::choose_directory_dialog(
-		const std::string& 
-	) {
-		return std::nullopt;
-	}
-
 	void window::reveal_in_explorer(const augs::path_type&) {
 	
 	}

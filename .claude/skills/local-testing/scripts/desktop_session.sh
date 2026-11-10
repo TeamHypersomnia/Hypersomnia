@@ -8,6 +8,7 @@ usage() {
 	echo "usage: desktop_session.sh start|stop <display> <dir>"
 	echo "start: Xvfb :<display>, a private D-Bus session with the desktop portal (gtk backend) and private XDG dirs in <dir>;"
 	echo "       a directory opened through the portal is appended to <dir>/opened_directories; source <dir>/env to use it"
+	echo "stop: the session's whole process group (dbus-daemon and the portals it started) and the Xvfb"
 	exit 2
 }
 
@@ -48,18 +49,24 @@ export XDG_CURRENT_DESKTOP=i3
 EOF
 
 	: > $T/bus_address
-	(. $T/env && setsid dbus-run-session -- sh -c "echo \$DBUS_SESSION_BUS_ADDRESS > $T/bus_address; exec sleep ${SECS:-1800}" > $T/dbus.out 2>&1 < /dev/null &)
+	(. $T/env && setsid dbus-run-session -- sh -c "ps -o pgid= \$\$ > $T/session_pgid; echo \$DBUS_SESSION_BUS_ADDRESS > $T/bus_address; exec sleep ${SECS:-1800}" > $T/dbus.out 2>&1 < /dev/null &)
 
 	for _ in $(seq 50); do
 		[ -s $T/bus_address ] && break
 		sleep 0.1
 	done
 
+	[ -s $T/bus_address ] || { echo "no session bus address after 5 s - see $T/dbus.out"; exit 1; }
+
 	echo "export DBUS_SESSION_BUS_ADDRESS=$(cat $T/bus_address)" >> $T/env
 	echo "$T/env"
 	;;
 stop)
-	for p in $(pgrep -f "dbus-run-session -- sh -c echo .DBUS_SESSION_BUS_ADDRESS > $T/bus_address"); do kill $p; done
+	if [ -s $T/session_pgid ]; then
+		kill -- -$(tr -d ' ' < $T/session_pgid) 2> /dev/null || true
+		: > $T/session_pgid
+	fi
+
 	for p in $(pgrep -f "^Xvfb :$D "); do kill $p; done
 	;;
 *)
