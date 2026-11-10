@@ -739,10 +739,13 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		const bool playtesting_with_bots = in.for_playtesting && spawn_bots_enabled;
 		const bool want_to_see_up_to_date = in.for_playtesting && in.showing_navmesh;
 
+		const bool bots_walk_to_test_navigation_ends = in.for_playtesting && ::has_bot_test_navigation_ends(project, official.resources);
+
 		const bool needs_a_navmesh = 
 			not_playtesting || 
 			playtesting_with_bots || 
-			want_to_see_up_to_date
+			want_to_see_up_to_date ||
+			bots_walk_to_test_navigation_ends
 		;
 
 		const bool allow_loading_cached = not_playtesting;

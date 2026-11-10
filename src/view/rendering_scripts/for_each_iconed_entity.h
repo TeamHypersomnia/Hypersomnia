@@ -74,9 +74,17 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_SPAWN;
 			result.col = get_faction_color(meta.faction);
 		}
-		else if (p.type == point_marker_type::FFA_SPAWN || p.type == point_marker_type::QUICK_TEST_SPAWN) {
+		else if (p.type == point_marker_type::FFA_SPAWN) {
 			result.id = I::EDITOR_ICON_SPAWN;
 			result.col = white;
+		}
+		else if (p.type == point_marker_type::QUICK_TEST_SPAWN) {
+			result.id = I::EDITOR_ICON_SPAWN;
+			result.col = meta.faction == faction_type::ANY ? white : get_faction_color(meta.faction);
+		}
+		else if (p.type == point_marker_type::BOT_TEST_NAVIGATION_END) {
+			result.id = I::EDITOR_TOOL_PLAIN_ARROW;
+			result.col = meta.faction == faction_type::ANY ? white : get_faction_color(meta.faction);
 		}
 		else if (p.type == point_marker_type::DEBUG_NAVIGATION_START || p.type == point_marker_type::DEBUG_NAVIGATION_END) {
 			result.id = I::EDITOR_ICON_SPAWN;

@@ -19,6 +19,7 @@
 
 #include "application/arena/arena_playtesting_context.h"
 #include "game/modes/playtest_spawn.h"
+#include "game/modes/bot_test_navigation_end.h"
 #include "game/modes/ai/arena_mode_ai_structs.h"
 
 using mode_entity_id = entity_id;
@@ -57,6 +58,7 @@ struct test_mode_ruleset {
 	test_mode_view_rules view;
 	uint32_t round_secs = 120;
 	std::vector<playtest_spawn> quick_test_spawns;
+	std::vector<bot_test_navigation_end> bot_test_navigation_ends;
 	// END GEN INTROSPECTOR
 
 	test_mode_ruleset();
@@ -93,6 +95,7 @@ struct test_mode_player {
 	mode_entity_id controlled_character_id;
 	test_mode_player_stats stats;
 	entity_id dedicated_spawn;
+	entity_id test_navigation_end;
 
 	bool hide_in_scoreboard = false;
 	bool allow_respawn = true;

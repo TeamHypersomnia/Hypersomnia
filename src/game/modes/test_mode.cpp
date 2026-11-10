@@ -21,6 +21,7 @@
 
 #include "game/components/movement_component.h"
 #include "game/modes/quick_test_spawns.hpp"
+#include "game/modes/test_mode_navigation.hpp"
 #include "game/components/crosshair_component.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/pathfinding/pathfinding.h"
@@ -157,6 +158,10 @@ void test_mode::create_controlled_character_for(const input_type in, const mode_
 			cosm, 
 			flavour, 
 			[&](const auto new_character, auto&&...) {
+				if (const auto sentience = new_character.template find<components::sentience>()) {
+					sentience->is_bot = entry->is_bot;
+				}
+
 				if (playtesting_context && !entry->dedicated_spawn.is_set()) {
 					const auto spawn_transform = transformr(playtesting_context->initial_spawn_pos, 0);
 
@@ -499,74 +504,14 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 				}
 
 				if (has_navigation_target) {
-					const auto physics_hints = make_physics_path_hints(cosm);
-
-					if (first_player.debug_navigation == std::nullopt) {
-						first_player.debug_navigation = ::start_navigating_to(
-							character_pos,
-							target_transform,
-							navmesh,
-							&physics_hints
-						);
-					}
-
-					/*
-						Set exact_destination for DEBUG_NAVIGATION_END markers.
-					*/
-					if (use_exact_destination && first_player.debug_navigation.has_value()) {
-						first_player.debug_navigation->exact_destination = true;
-					}
-
-					/*
-						Apply crosshair interpolation with HARD difficulty.
-						Use snapping (is_navigating=true) since we're navigating a path.
-					*/
-					const real32 dt_secs = in.cosm.get_fixed_delta().in_seconds();
-
-					const auto nav_result = ::navigate_path(
-						first_player.debug_navigation,
-						character_pos,
-						navmesh,
-						character,
-						dt_secs,
-						&physics_hints
-					);
-
-					/*
-						Apply movement direction if navigation is active.
-						Apply sprinting if nav_result.can_sprint is true.
-					*/
-					if (nav_result.is_navigating && nav_result.movement_direction.has_value()) {
-						if (auto* movement = character.find<components::movement>()) {
-							movement->flags.set_from_closest_direction(*nav_result.movement_direction);
-							movement->flags.sprinting = nav_result.can_sprint;
-						}
-					}
-					else if (nav_result.path_completed) {
-						/*
-							Navigation completed - stop movement.
-						*/
-						first_player.debug_navigation = std::nullopt;
-
-						if (auto* movement = character.find<components::movement>()) {
-							movement->flags.set_from_closest_direction(vec2::zero);
-							movement->flags.sprinting = false;
-						}
-					}
-
-					const bool is_navigating = first_player.debug_navigation.has_value();
-
-					::interpolate_crosshair(
-						character.find_crosshair(),
-						nav_result.crosshair_offset,
-						dt_secs,
-						difficulty_type::HARD,
-						is_navigating
-					);
+					const bool allow_sprint = true;
+					::navigate_test_character(cosm, first_player.debug_navigation, character, target_transform, use_exact_destination, allow_sprint);
 				}
 			}
 		}
 	}
+
+	::navigate_bots_to_test_navigation_ends(step, in.rules.bot_test_navigation_ends, players);
 
 	if (auto character = in.cosm[infinite_ammo_for]) {
 		auto guns = character.get_wielded_guns();

@@ -7,16 +7,16 @@
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/editor_rebuild_game_mode.hpp"
 
-inline bool is_playtest_spawn_node(const editor_point_marker_node& node, const point_marker_type type) {
-	if (type == point_marker_type::QUICK_TEST_SPAWN) {
-		return true;
+inline bool is_playtest_marker_node(const editor_point_marker_node& node, const point_marker_type type) {
+	if (type == point_marker_type::TEAM_SPAWN) {
+		return node.editable.playtest_spawn;
 	}
 
-	return type == point_marker_type::TEAM_SPAWN && node.editable.playtest_spawn;
+	return true;
 }
 
 template <class F>
-void for_each_playtest_spawn_node(
+void for_each_playtest_marker_node(
 	const editor_project& project,
 	const editor_resource_pools& officials,
 	const point_marker_type type,
@@ -35,7 +35,7 @@ void for_each_playtest_spawn_node(
 
 				if constexpr(std::is_same_v<N, editor_point_marker_node>) {
 					if (const auto resource = project.find_resource(officials, node.resource_id)) {
-						if (resource->editable.type == type && ::is_playtest_spawn_node(node, type)) {
+						if (resource->editable.type == type && ::is_playtest_marker_node(node, type)) {
 							callback(node);
 						}
 					}
@@ -48,7 +48,17 @@ void for_each_playtest_spawn_node(
 inline bool has_playtest_spawns(const editor_project& project, const editor_resource_pools& officials) {
 	bool found = false;
 
-	::for_each_playtest_spawn_node(project, officials, point_marker_type::TEAM_SPAWN, [&](const auto&) {
+	::for_each_playtest_marker_node(project, officials, point_marker_type::TEAM_SPAWN, [&](const auto&) {
+		found = true;
+	});
+
+	return found;
+}
+
+inline bool has_bot_test_navigation_ends(const editor_project& project, const editor_resource_pools& officials) {
+	bool found = false;
+
+	::for_each_playtest_marker_node(project, officials, point_marker_type::BOT_TEST_NAVIGATION_END, [&](const auto&) {
 		found = true;
 	});
 
@@ -64,7 +74,7 @@ std::vector<playtest_spawn> make_playtest_spawns(
 ) {
 	auto playtest_spawns = std::vector<playtest_spawn>();
 
-	::for_each_playtest_spawn_node(project, officials, type, [&](const editor_point_marker_node& node) {
+	::for_each_playtest_marker_node(project, officials, type, [&](const editor_point_marker_node& node) {
 		if (!node.scene_entity_id.is_set()) {
 			return;
 		}
@@ -92,6 +102,28 @@ std::vector<playtest_spawn> make_playtest_spawns(
 	return playtest_spawns;
 }
 
+inline std::vector<bot_test_navigation_end> make_bot_test_navigation_ends(
+	const editor_project& project,
+	const editor_resource_pools& officials
+) {
+	auto ends = std::vector<bot_test_navigation_end>();
+
+	::for_each_playtest_marker_node(project, officials, point_marker_type::BOT_TEST_NAVIGATION_END, [&](const editor_point_marker_node& node) {
+		if (!node.scene_entity_id.is_set()) {
+			return;
+		}
+
+		auto end_def = bot_test_navigation_end();
+		end_def.end = node.scene_entity_id;
+		end_def.sprint = node.editable.test_navigation_sprint;
+		end_def.hides_weapons_on_arrival = node.editable.test_navigation_hides_weapons;
+
+		ends.push_back(end_def);
+	});
+
+	return ends;
+}
+
 template <class A, class F>
 void set_playtest_spawns_in_rules(
 	A arena_handle,
@@ -105,5 +137,6 @@ void set_playtest_spawns_in_rules(
 
 	if (const auto rules = std::get_if<test_mode_ruleset>(std::addressof(arena_handle.ruleset))) {
 		rules->quick_test_spawns = ::make_playtest_spawns(project, officials, point_marker_type::QUICK_TEST_SPAWN, find_resource);
+		rules->bot_test_navigation_ends = ::make_bot_test_navigation_ends(project, officials);
 	}
 }

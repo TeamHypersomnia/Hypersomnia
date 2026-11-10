@@ -111,6 +111,8 @@ struct editor_point_marker_node_editable {
 	bool playtest_custom_equipment = false;
 	editor_requested_equipment playtest_equipment;
 	bool respawns_in_quick_test = false;
+	bool test_navigation_sprint = false;
+	bool test_navigation_hides_weapons = false;
 
 	vec2 pos;
 	real32 rotation = 0.0f;

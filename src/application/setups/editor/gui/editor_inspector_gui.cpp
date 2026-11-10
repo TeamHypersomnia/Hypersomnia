@@ -934,6 +934,7 @@ static bool has_team(const point_marker_type type) {
 	switch (type) {
 		case point_marker_type::TEAM_SPAWN:
 		case point_marker_type::QUICK_TEST_SPAWN:
+		case point_marker_type::BOT_TEST_NAVIGATION_END:
 		case point_marker_type::BOT_WAYPOINT_PUSH:
 		case point_marker_type::BOT_WAYPOINT_PATROL:
 			return true;
@@ -1014,6 +1015,20 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 
 		MULTIPROPERTY("Bot respawns", respawns_in_quick_test);
 		tooltip_on_hover("A killed bot comes back here after the mode's respawn time.\nOtherwise it stays dead.");
+	}
+
+	if (type == point_marker_type::BOT_TEST_NAVIGATION_END) {
+		text_disabled(
+			"Only in the editor's offline playtest of a quick test.\n"
+			"Every bot from a quick_test_spawn walks once to the nearest free one of these\n"
+			"of its faction (Any matches every bot), then stands there facing its direction."
+		);
+
+		MULTIPROPERTY("Sprint", test_navigation_sprint);
+		tooltip_on_hover("The bot sprints on the way here. Otherwise it runs.");
+
+		MULTIPROPERTY("Hide weapons on arrival", test_navigation_hides_weapons);
+		tooltip_on_hover("Once here, the bot puts its weapons away - like pressing H.");
 	}
 
 	if (type == point_marker_type::TEAM_SPAWN) {
