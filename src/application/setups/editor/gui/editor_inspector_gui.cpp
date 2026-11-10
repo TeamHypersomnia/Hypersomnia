@@ -1753,6 +1753,12 @@ EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
 		text_tooltip("If you untick this, nodes will stop reacting to the mouse cursor.\nYou'll still see the nodes on the scene.\n\nThis way you can comfortably work on nodes only from layers of interest:\ne.g. disable - but still see - foregrounds while you tweak the objects beneath.");
 	}
 
+	MULTIPROPERTY("Show icons", show_icons);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("If you untick this, the editor won't draw the icons of this layer's nodes,\nnor their area outlines (e.g. bombsites, nav islands).\nThe nodes stay on the scene as they are.");
+	}
+
 	MULTIPROPERTY("Opacity", opacity);
 	MULTIPROPERTY("Tint", tint);
 

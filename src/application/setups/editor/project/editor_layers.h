@@ -19,6 +19,7 @@ struct editor_layer_editable {
 	rgba tint = white;
 
 	bool selectable_on_scene = true;
+	bool show_icons = true;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_layer_editable&) const = default;

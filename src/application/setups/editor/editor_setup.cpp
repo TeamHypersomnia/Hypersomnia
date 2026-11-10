@@ -49,6 +49,7 @@
 #include "augs/gui/text/printer.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
+#include "application/setups/editor/project/editor_layer_icons.h"
 #include "augs/drawing/general_border.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/templates/wrap_templates.h"
@@ -2473,6 +2474,8 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		}
 	}
 
+	const auto nodes_hiding_icons = ::make_node_set_of_layers_hiding_icons(project);
+
 	::for_each_iconed_entity(
 		scene.world, 
 		in.all_visible,
@@ -2503,7 +2506,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 					}
 				);
 
-				if (is_prefab_child) {
+				if (is_prefab_child || nodes_hiding_icons.contains(parent_node)) {
 					return;
 				}
 			}
