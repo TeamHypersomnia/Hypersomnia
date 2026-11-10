@@ -1,7 +1,7 @@
 #!/bin/bash
 # The web build in Firefox (under Xvfb) joining a local official server over WebRTC, with a cert from the local broker.
 # Start the broker first (broker.sh start) and prepare the build with prepare_web.sh - it points the game at both.
-# Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on 8765, broker on 13500, Xvfb :78.
+# Everything on localhost: test master on 18xxx, server on 10002 (WebRTC 19000-19050), web on WEB_PORT (8765), broker on 13500, Xvfb :78.
 # Silent: OpenAL plays to its null backend, so the test clients never sound on the user's speakers.
 . "$(dirname "$0")/test_env.sh"
 # A failing game opens its failure log with $VISUAL - never in the user's editor
@@ -31,7 +31,9 @@ for p in $(pgrep -f "firefox --no-remote --profile $S/web_test"); do kill $p; do
 for p in $(pgrep -f "^Xvfb :78"); do kill $p; done
 sleep 1
 
-for port in 18000 18410 18420 18430 10002 8765; do
+WEB_PORT=${WEB_PORT:-8765}
+
+for port in 18000 18410 18420 18430 10002 $WEB_PORT; do
 	if ss -tulpn 2>/dev/null | grep -q ":$port\b"; then echo "port $port busy, abort"; exit 1; fi
 done
 
@@ -85,7 +87,7 @@ CONNECT=${CONNECT//@KEY/$(cat $T/official_servers.d/pl)}
 timeout $((WAIT + EXTRA + 60)) $BIN --masterserver --appdata-dir $T/ms $GAME_TEST_FLAGS > $T/ms.out 2>&1 &
 sleep 3
 timeout $((WAIT + EXTRA + 55)) nice -n 10 $BIN --dedicated-server --appdata-dir $T/server $GAME_TEST_FLAGS > $T/server.out 2>&1 &
-timeout $((WAIT + EXTRA + 50)) python3 "$HERE/webserve.py" $WEB 8765 > $T/web.out 2>&1 &
+timeout $((WAIT + EXTRA + 50)) python3 "$HERE/webserve.py" $WEB $WEB_PORT > $T/web.out 2>&1 &
 sleep 14
 
 echo "=== list"
@@ -95,7 +97,7 @@ for e in json.load(sys.stdin): print(' ', e['name'], 'webrtc_id=', e.get('webrtc
 
 Xvfb :78 -screen 0 1280x720x24 > /dev/null 2>&1 &
 sleep 2
-DISPLAY=:78 timeout $((WAIT + EXTRA)) firefox --no-remote --profile $T/ff --new-instance "http://localhost:8765/game/$CONNECT" > $T/firefox.out 2>&1 &
+DISPLAY=:78 timeout $((WAIT + EXTRA)) firefox --no-remote --profile $T/ff --new-instance "http://localhost:$WEB_PORT/game/$CONNECT" > $T/firefox.out 2>&1 &
 sleep $((WAIT - 10))
 DISPLAY=:78 import -window root $T/screen.png
 
