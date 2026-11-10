@@ -700,7 +700,7 @@ public:
 				using M = remove_cref<decltype(mode)>;
 
 				if constexpr(std::is_same_v<M, arena_mode>) {
-					if (const auto seed = mode.find_generated_waypoints_seed()) {
+					if (const auto seed = mode.find_generated_waypoints_seed(); seed.has_value() && !is_replaying_playtest()) {
 						show_playtest_waypoints_seed(*seed);
 					}
 				}

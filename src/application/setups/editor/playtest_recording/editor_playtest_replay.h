@@ -20,6 +20,7 @@ struct editor_playtest_replay {
 	editor_recorded_playtest_entry recording;
 	editor_playtest_recording_inputs inputs;
 	synced_dynamic_vars dynamic_vars_before_replay;
+	camera_eye camera_before_replay;
 
 	uint32_t current_step = 0;
 	std::optional<uint32_t> stop_at_step;
@@ -27,7 +28,6 @@ struct editor_playtest_replay {
 	std::optional<uint32_t> first_desync_step;
 	std::map<uint32_t, editor_playtest_replay_snapshot> snapshots;
 	playtest_replay_speed_ranges speed_ranges;
-	playtest_replay_slow_motion_draft slow_motion_draft;
 
 	bool paused = false;
 	bool controls_hidden = false;
@@ -83,10 +83,6 @@ struct editor_playtest_replay {
 
 	void resume_or_restart_at_end() {
 		if (reached_last_step()) {
-			stop_at_step = std::nullopt;
-		}
-
-		if (reached_last_step()) {
 			seek_to(0);
 		}
 
@@ -105,7 +101,7 @@ struct editor_playtest_replay {
 	}
 
 	mode_entropy entropy_at(const uint32_t step) const {
-		if (const auto recorded = mapped_or_nullptr(inputs.entropies, step)) {
+		if (const auto recorded = mapped_or_nullptr(inputs.entropies, step); recorded != nullptr) {
 			return *recorded;
 		}
 

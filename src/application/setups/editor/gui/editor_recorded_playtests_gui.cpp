@@ -59,7 +59,7 @@ void editor_recorded_playtests_gui::perform(const editor_recorded_playtests_inpu
 		entry.meta.name = rename_buffer;
 
 		try {
-			augs::save_as_json(entry.meta, entry.paths.meta_json);
+			augs::save_as_json_atomic(entry.meta, entry.paths.meta_json);
 		}
 		catch (const std::exception& err) {
 			LOG("Could not rename the recorded playtest %x: %x", entry.paths.folder, err.what());

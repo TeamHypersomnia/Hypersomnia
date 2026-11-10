@@ -4140,6 +4140,29 @@ work_result work(
 		save_last_activity(activity_type::EDITOR);
 	};
 
+	WEBSTATIC auto launch_editor_or_show_error = [&](const augs::path_type& project_path) {
+		auto backup = std::unique_ptr<setup_variant>();
+
+		if (const auto selector = std::get_if<project_selector_setup>(current_setup.get()); selector != nullptr) {
+			backup = std::make_unique<setup_variant>(*selector);
+		}
+
+		try {
+			launch_editor(project_path);
+			return true;
+		}
+		catch (const std::runtime_error& err) {
+			const auto full_content = typesafe_sprintf("Failed to load: %x\nReason:\n\n%x", project_path, err.what());
+			failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
+
+			if (backup != nullptr) {
+				current_setup = std::move(backup);
+			}
+
+			return false;
+		}
+	};
+
 	/*
 		A project opened with --edit leaves the last activity and the last project as they were.
 	*/
@@ -5240,19 +5263,7 @@ work_result work(
 
 				case custom_imgui_result::OPEN_SELECTED_PROJECT:
 					if constexpr(std::is_same_v<S, project_selector_setup>) {
-						auto backup = std::make_unique<setup_variant>(setup);
-
-						const auto path = setup.get_selected_project_path();
-
-						try {
-							launch_editor(path);
-						}
-						catch (const std::runtime_error& err) {
-							const auto full_content = typesafe_sprintf("Failed to load: %x\nReason:\n\n%x", path, err.what());
-							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
-
-							current_setup = std::move(backup);
-						}
+						launch_editor_or_show_error(setup.get_selected_project_path());
 					}
 
 					break;
@@ -5624,13 +5635,16 @@ work_result work(
 					}
 				}
 
+				const bool window_activated_since_last_frame = playtest_moment_links.window_activated(window.get_times_activated());
+
 				if (const bool in_project_selector = has_current_setup() && std::holds_alternative<project_selector_setup>(*current_setup)) {
-					if (playtest_moment_links.worth_reading(window.get_times_activated())) {
+					if (window_activated_since_last_frame) {
 						const auto* const clipboard = ImGui::GetClipboardText();
 
 						if (const auto replay_request = playtest_moment_links.take(clipboard != nullptr ? clipboard : "")) {
-							pending_playtest_replay = replay_request;
-							launch_editor(::project_folder_of_recording(replay_request->recording_folder));
+							if (launch_editor_or_show_error(::project_folder_of_recording(replay_request->recording_folder))) {
+								pending_playtest_replay = replay_request;
+							}
 						}
 					}
 				}
@@ -7034,7 +7048,9 @@ work_result work(
 						const auto replay_request = *pending_playtest_replay;
 						pending_playtest_replay.reset();
 
-						editor.get_playtest_recordings().start_capturing(editor, replay_request);
+						if (!editor.get_playtest_recordings().start_capturing(editor, replay_request) && replay_request.records_frames()) {
+							request_quit();
+						}
 
 						if (!replay_request.records_frames()) {
 							editor.set_playtest_speed(params.playtest_speed);
@@ -8532,7 +8548,7 @@ work_result work(
 				if (replay_loopback_audio.has_value()) {
 					on_specific_setup([&](editor_setup& editor) {
 						audio_buffers.finish();
-						editor.get_playtest_recordings().queue_audio_of_render(replay_loopback_audio->render_one_render(audio));
+						editor.get_playtest_recordings().write_audio_of_render(replay_loopback_audio->render_one_render(audio));
 					});
 				}
 

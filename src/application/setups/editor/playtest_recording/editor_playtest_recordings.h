@@ -21,6 +21,8 @@ namespace augs {
 	class image;
 }
 
+constexpr uint32_t max_seek_steps_per_frame_v = 600;
+
 class editor_playtest_recordings {
 	std::unique_ptr<editor_playtest_recorder> recorder;
 	std::unique_ptr<editor_playtest_replay> replay;
@@ -28,11 +30,8 @@ class editor_playtest_recordings {
 	std::optional<playtest_replay_capture_output> capture_output;
 	bool capture_hides_hud = false;
 	bool capture_waits_for_viewables = false;
-	bool capture_failed = false;
-	bool frame_requested_now = false;
 	bool render_belongs_to_capture = false;
 	uint32_t renders_since_capture_start = 0;
-	std::vector<int16_t> audio_since_last_captured_frame;
 
 	void rebuild_arena_for_replay(editor_setup&, const editor_project& recorded_project, bool showing_navmesh) const;
 
@@ -71,9 +70,9 @@ public:
 	void perform_replay_controls(editor_setup&, augs::window&);
 	bool handle_replay_input(editor_setup&, handle_input_before_game_input);
 
-	void start_capturing(editor_setup&, const playtest_replay_capture_settings&);
+	bool start_capturing(editor_setup&, const playtest_replay_capture_settings&);
 	void advance_capture(bool all_viewables_loaded);
 	void request_frame(game_frame_buffer&);
-	void queue_audio_of_render(const std::vector<int16_t>& samples);
+	void write_audio_of_render(const std::vector<int16_t>& samples);
 	void write_frame(const augs::image&);
 };

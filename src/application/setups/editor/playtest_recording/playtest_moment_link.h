@@ -19,13 +19,11 @@ struct playtest_moment {
 	std::string map_name;
 	augs::path_type recording_folder;
 	double secs = 0.0;
-	uint32_t step = 0;
-	uint32_t num_steps = 0;
 	std::optional<camera_eye> camera;
 };
 
 inline std::string make_playtest_moment_link(const playtest_moment& moment) {
-	const auto recording = std::filesystem::absolute(moment.recording_folder).string();
+	const auto recording = augs::string_windows_friendly(std::filesystem::absolute(moment.recording_folder));
 
 	auto camera_field = std::string();
 	auto camera_arg = std::string();
@@ -37,13 +35,11 @@ inline std::string make_playtest_moment_link(const playtest_moment& moment) {
 	}
 
 	return typesafe_sprintf(
-		"%x map=%x recording=\"%x\" at=%3fs step=%x/%x%x | --replay-playtest \"%x\" --replay-from %3f%x",
+		"%x map=%x recording=\"%x\" at=%3fs%x | --replay-playtest \"%x\" --replay-from %3f%x",
 		playtest_moment_link_prefix_v,
 		moment.map_name,
 		recording,
 		moment.secs,
-		moment.step,
-		moment.num_steps,
 		camera_field,
 		recording,
 		moment.secs,
@@ -77,7 +73,7 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 	}
 
 	auto request = playtest_replay_capture_settings();
-	request.recording_folder = *recording;
+	request.recording_folder = augs::path_windows_friendly(*recording);
 	request.from_secs = std::max(0.0, std::atof(at->c_str()));
 	request.start_paused = true;
 
@@ -89,31 +85,37 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 		return std::nullopt;
 	}
 
+	const auto project_folder = ::project_folder_of_recording(request.recording_folder);
+	auto project_json = project_folder / project_folder.filename();
+	project_json += ".json";
+
+	if (!augs::exists(project_json)) {
+		return std::nullopt;
+	}
+
 	return request;
 }
 
 class playtest_moment_link_watcher {
 	uint32_t activations_seen = 0;
-	bool checked_once = false;
 	std::string last_taken;
 
 public:
-	bool worth_reading(const uint32_t times_activated) {
-		const bool activated = times_activated != std::exchange(activations_seen, times_activated);
-		const bool first_check = !std::exchange(checked_once, true);
-
-		return activated || first_check;
+	bool window_activated(const uint32_t times_activated) {
+		return times_activated != std::exchange(activations_seen, times_activated);
 	}
 
 	std::optional<playtest_replay_capture_settings> take(const std::string& clipboard) {
-		if (clipboard == last_taken) {
+		const auto link = ::cut_trailing(std::string(clipboard), " \t\r\n");
+
+		if (link == last_taken) {
 			return std::nullopt;
 		}
 
-		auto request = ::parse_playtest_moment_link(clipboard);
+		auto request = ::parse_playtest_moment_link(link);
 
 		if (request.has_value()) {
-			last_taken = clipboard;
+			last_taken = link;
 		}
 
 		return request;

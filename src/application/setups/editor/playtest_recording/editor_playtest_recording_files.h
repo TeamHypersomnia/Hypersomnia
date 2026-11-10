@@ -58,28 +58,27 @@ inline void remove_recorded_playtest_folder(const editor_playtest_recording_path
 	}
 }
 
-inline void remove_unfinished_recordings(const augs::path_type& recordings_folder) {
-	auto skip_file = [](auto&&...) { return callback_result::CONTINUE; };
+inline std::size_t count_recording_folders(const augs::path_type& recordings_folder) {
+	auto num_folders = std::size_t(0);
 
 	augs::for_each_in_directory(
 		recordings_folder,
-		[&](const auto& folder) {
-			const auto recording_paths = editor_playtest_recording_paths(folder);
-
-			if (!augs::exists(recording_paths.meta_json)) {
-				::remove_recorded_playtest_folder(recording_paths);
-			}
-
+		[&](const auto&) {
+			++num_folders;
 			return callback_result::CONTINUE;
 		},
-		skip_file
+		[](auto&&...) { return callback_result::CONTINUE; }
 	);
+
+	return num_folders;
 }
 
 inline void remove_oldest_unnamed_recordings(const augs::path_type& recordings_folder) {
-	::remove_unfinished_recordings(recordings_folder);
+	if (::count_recording_folders(recordings_folder) <= max_kept_unnamed_recordings_v) {
+		return;
+	}
 
-	std::size_t unnamed_kept = 0;
+	auto unnamed_kept = std::size_t(0);
 
 	for (const auto& entry : ::find_recorded_playtests(recordings_folder)) {
 		if (!entry.meta.name.empty()) {

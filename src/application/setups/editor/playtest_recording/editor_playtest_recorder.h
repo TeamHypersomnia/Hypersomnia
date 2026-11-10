@@ -1,7 +1,9 @@
 #pragma once
 #include <cstdint>
 #include "augs/math/vec2.h"
+#include "augs/misc/date_time.h"
 #include "augs/network/network_types.h"
+#include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/playtest_recording/editor_playtest_recording.h"
 
 struct editor_playtest_start {
@@ -13,7 +15,8 @@ struct editor_playtest_start {
 struct editor_playtest_recorder {
 	static constexpr double min_kept_secs_v = 2.0;
 
-	editor_playtest_recording_paths paths;
+	augs::date_time started_at;
+	editor_project project_at_start;
 	editor_playtest_recording_meta meta;
 	editor_playtest_recording_inputs inputs;
 

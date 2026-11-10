@@ -28,7 +28,6 @@ struct playtest_replay_capture_settings {
 	bool hide_hud = false;
 	bool start_paused = false;
 	bool hides_player = false;
-	std::optional<double> no_input_after_secs;
 
 	bool requested() const {
 		return !recording_folder.empty();

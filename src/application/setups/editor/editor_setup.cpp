@@ -249,6 +249,7 @@ editor_setup::~editor_setup() {
 	auto sync_after = hold_persistent_filesystem_raii();
 
 	playtest_recordings.finish_recording(*this);
+	playtest_recordings.stop_replaying(*this);
 	autosave_now_if_needed();
 
 	/*
