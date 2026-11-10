@@ -1,0 +1,1 @@
+Audited: audit #6, 2026-11-10 - NEW DEV JOURNAL follow-up (popup handover, layout, CrazyGames); fixes in 18d5d2a15 (one changelog rule for the handover, margins from the window size); the X close still flashes one frame (ImGui closes it itself) - accepted
