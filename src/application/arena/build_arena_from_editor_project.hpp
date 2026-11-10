@@ -711,10 +711,6 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		*in.target_clean_round_state = scene.world.get_solvable().significant;
 	}
 
-	/*
-		Navmesh generation - must happen after physics world is built.
-	*/
-
 	{
 		const bool not_playtesting = !in.for_playtesting;
 		const bool testing_quick_test = [&]() {
@@ -732,14 +728,14 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		}();
 
 		const bool spawn_bots_enabled =
-			(project.playtesting.spawn_bots || project.playtesting.spawn_only_enemy_bots || ::has_playtest_spawns(project, official.resources))
+			(project.playtesting.spawn_bots || project.playtesting.spawn_only_enemy_bots || ::has_playtest_spawns_in_rules(arena_handle.ruleset))
 			&& !testing_quick_test
 		;
 
 		const bool playtesting_with_bots = in.for_playtesting && spawn_bots_enabled;
 		const bool want_to_see_up_to_date = in.for_playtesting && in.showing_navmesh;
 
-		const bool bots_walk_to_test_navigation_ends = in.for_playtesting && ::has_bot_test_navigation_ends(project, official.resources);
+		const bool bots_walk_to_test_navigation_ends = in.for_playtesting && ::has_bot_test_navigation_ends_in_rules(arena_handle.ruleset);
 
 		const bool needs_a_navmesh = 
 			not_playtesting || 

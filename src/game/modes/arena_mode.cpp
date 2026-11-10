@@ -3331,25 +3331,25 @@ per_actual_faction<uint8_t> arena_mode::calc_requested_bots_from_quotas(
 }
 
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots(const const_input in) const {
+	if (ranked_state != ranked_state_type::NONE) {
+		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
+	}
+
 	auto requested_bots = calc_requested_bots_without_playtest_spawns(in);
 
-	::override_bots_with_playtest_spawns(
-		in.cosm,
-		in.rules.playtest_spawns,
-		requested_bots,
-		[&](const faction_type faction) { return num_human_players_in(faction); }
-	);
+	calc_participating_factions(in).for_each([&](const faction_type faction) {
+		const auto num_spawns = static_cast<int>(::get_playtest_spawns_of(in.cosm, in.rules.playtest_spawns, faction).size());
+
+		if (num_spawns > 0) {
+			requested_bots[faction] = static_cast<uint8_t>(std::max(0, num_spawns - static_cast<int>(num_human_players_in(faction))));
+		}
+	});
 
 	return requested_bots;
 }
 
 per_actual_faction<uint8_t> arena_mode::calc_requested_bots_without_playtest_spawns(const const_input in) const {
 	const auto& over = in.dynamic_vars.bots_override;
-
-	if (ranked_state != ranked_state_type::NONE) {
-		return per_actual_faction<uint8_t> { 0u, 0u, 0u };
-	}
-
 	const bool progressive = casual_progressive_enabled(in);
 
 	if (over.is_set() && (!progressive || over.disables_bots())) {

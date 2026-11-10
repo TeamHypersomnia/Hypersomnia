@@ -27,7 +27,7 @@ const playtest_spawn* choose_playtest_spawn_for(
 		return nullptr;
 	}
 
-	std::size_t humans_first_order = 0;
+	auto humans_first_index = std::size_t(0);
 
 	for (const bool bots : { false, true }) {
 		for (const auto& [id, player] : players) {
@@ -36,30 +36,14 @@ const playtest_spawn* choose_playtest_spawn_for(
 			}
 
 			if (id == player_id) {
-				return of_faction[humans_first_order % of_faction.size()];
+				return of_faction[humans_first_index % of_faction.size()];
 			}
 
-			++humans_first_order;
+			++humans_first_index;
 		}
 	}
 
 	return of_faction.front();
-}
-
-template <class NumHumansIn>
-void override_bots_with_playtest_spawns(
-	const cosmos& cosm,
-	const std::vector<playtest_spawn>& playtest_spawns,
-	per_actual_faction<uint8_t>& requested_bots,
-	NumHumansIn&& num_humans_in
-) {
-	::for_each_faction([&](const faction_type faction) {
-		const auto num_spawns = static_cast<int>(::get_playtest_spawns_of(cosm, playtest_spawns, faction).size());
-
-		if (num_spawns > 0) {
-			requested_bots[faction] = static_cast<uint8_t>(std::max(0, num_spawns - static_cast<int>(num_humans_in(faction))));
-		}
-	});
 }
 
 inline void start_bot_at_playtest_spawn(

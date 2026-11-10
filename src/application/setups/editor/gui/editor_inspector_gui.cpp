@@ -1035,7 +1035,7 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 		MULTIPROPERTY("Playtest spawn", playtest_spawn);
 
 		tooltip_on_hover(
-			"Only in the editor's offline playtest.\n"
+			"Only in the editor's playtests - offline, or hosted online from the editor.\n"
 			"If a faction has any playtest spawns, its players spawn only there,\n"
 			"one per spawn - you take the topmost one in the layers, bots the rest.\n"
 			"A bot spawned here patrols the bombsite nearest to it."

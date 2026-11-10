@@ -7922,9 +7922,6 @@ work_result work(
 					gameplay_camera.last_pixel_snapped_pos.reset();
 				}
 
-				/*
-					Determine if we can draw enemies (for editor playtesting debug).
-				*/
 				const auto enemies_behind_walls = visit_current_setup([&](const auto& setup) {
 					using S = remove_cref<decltype(setup)>;
 

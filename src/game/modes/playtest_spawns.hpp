@@ -32,8 +32,12 @@ inline std::vector<const playtest_spawn*> get_playtest_spawns_of(
 }
 
 inline const playtest_spawn* find_playtest_spawn(const std::vector<playtest_spawn>& playtest_spawns, const entity_id spawn) {
+	if (!spawn.is_set()) {
+		return nullptr;
+	}
+
 	for (const auto& spawn_def : playtest_spawns) {
-		if (spawn.is_set() && spawn_def.spawn == spawn) {
+		if (spawn_def.spawn == spawn) {
 			return std::addressof(spawn_def);
 		}
 	}

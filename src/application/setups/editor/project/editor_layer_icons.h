@@ -3,7 +3,7 @@
 #include "application/setups/editor/project/editor_project.h"
 
 inline std::unordered_set<editor_node_id> make_node_set_of_layers_hiding_icons(const editor_project& project) {
-	std::unordered_set<editor_node_id> result;
+	auto result = std::unordered_set<editor_node_id>();
 
 	for (const auto layer_id : project.layers.order) {
 		if (const auto layer = project.find_layer(layer_id)) {

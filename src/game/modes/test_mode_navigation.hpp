@@ -8,6 +8,12 @@
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
 #include "game/modes/difficulty_type.h"
 
+enum class test_navigation_result {
+	NAVIGATING,
+	ARRIVED,
+	NO_PATH
+};
+
 template <class Character>
 void stop_test_character(const Character& character) {
 	if (auto* movement = character.template find<components::movement>()) {
@@ -17,7 +23,7 @@ void stop_test_character(const Character& character) {
 }
 
 template <class Character>
-bool navigate_test_character(
+test_navigation_result navigate_test_character(
 	const cosmos& cosm,
 	std::optional<ai_path_navigation_state>& navigation,
 	const Character& character,
@@ -36,6 +42,10 @@ bool navigate_test_character(
 			navmesh,
 			&physics_hints
 		);
+
+		if (navigation == std::nullopt) {
+			return test_navigation_result::NO_PATH;
+		}
 	}
 
 	if (exact_destination && navigation.has_value()) {
@@ -74,5 +84,5 @@ bool navigate_test_character(
 		still_navigating
 	);
 
-	return still_navigating;
+	return still_navigating ? test_navigation_result::NAVIGATING : test_navigation_result::ARRIVED;
 }

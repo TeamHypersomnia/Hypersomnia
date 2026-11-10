@@ -13,7 +13,7 @@ inline void apply_quick_test_spawn_equipment(
 	const entity_id dedicated_spawn,
 	requested_equipment& eq
 ) {
-	if (const auto spawn_def = ::find_playtest_spawn(quick_test_spawns, dedicated_spawn)) {
+	if (const auto spawn_def = ::find_playtest_spawn(quick_test_spawns, dedicated_spawn); spawn_def != nullptr) {
 		if (spawn_def->custom_equipment) {
 			eq = spawn_def->equipment;
 		}
@@ -119,9 +119,13 @@ void navigate_bots_to_test_navigation_ends(
 		const auto end_transform = end.get_logic_transform();
 		const bool exact_destination = true;
 
-		if (!::navigate_test_character(cosm, player.debug_navigation, character, end_transform, exact_destination, end_def->sprint)) {
-			player.test_navigation_end.unset();
+		const auto result = ::navigate_test_character(cosm, player.debug_navigation, character, end_transform, exact_destination, end_def->sprint);
 
+		if (result != test_navigation_result::NAVIGATING) {
+			player.test_navigation_end.unset();
+		}
+
+		if (result == test_navigation_result::ARRIVED) {
 			if (const auto crosshair = character.find_crosshair()) {
 				crosshair->base_offset = end_transform.get_direction() * 200;
 			}

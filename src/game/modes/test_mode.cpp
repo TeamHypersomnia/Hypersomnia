@@ -460,10 +460,6 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 	remove_old_lying_items(in, step);
 
-	/*
-		Debug navigation for playtesting.
-		Run AI navigation on the first player if debug_navigation_end is set.
-	*/
 	if (playtesting_context.has_value()) {
 		const bool has_debug_target = 
 			playtesting_context->debug_navigation_end.has_value() ||
@@ -573,7 +569,6 @@ void test_mode::mode_post_solve(const input_type in, const mode_entropy&, const 
 
 					if (const auto award = ::get_knockout_award(cosm, sentience.knockout_origin); award.has_value()) {
 						sentience.coins_on_body += *award;
-						LOG("sentience.coins_on_body");
 					}
 				};
 

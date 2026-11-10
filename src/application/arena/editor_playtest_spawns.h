@@ -45,24 +45,22 @@ void for_each_playtest_marker_node(
 	}
 }
 
-inline bool has_playtest_spawns(const editor_project& project, const editor_resource_pools& officials) {
-	bool found = false;
+template <class Ruleset>
+bool has_playtest_spawns_in_rules(const Ruleset& ruleset) {
+	if (const auto rules = std::get_if<arena_mode_ruleset>(std::addressof(ruleset))) {
+		return !rules->playtest_spawns.empty();
+	}
 
-	::for_each_playtest_marker_node(project, officials, point_marker_type::TEAM_SPAWN, [&](const auto&) {
-		found = true;
-	});
-
-	return found;
+	return false;
 }
 
-inline bool has_bot_test_navigation_ends(const editor_project& project, const editor_resource_pools& officials) {
-	bool found = false;
+template <class Ruleset>
+bool has_bot_test_navigation_ends_in_rules(const Ruleset& ruleset) {
+	if (const auto rules = std::get_if<test_mode_ruleset>(std::addressof(ruleset))) {
+		return !rules->bot_test_navigation_ends.empty();
+	}
 
-	::for_each_playtest_marker_node(project, officials, point_marker_type::BOT_TEST_NAVIGATION_END, [&](const auto&) {
-		found = true;
-	});
-
-	return found;
+	return false;
 }
 
 template <class F>
