@@ -2,6 +2,7 @@
 #include "augs/templates/hash_templates.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/sentience/corpse_limbs.h"
+#include "game/detail/melee/bloody_melee_weapon.h"
 #include "game/detail/sentience/death_drop_falls.h"
 #include "game/detail/decals/character_holes_layout.h"
 #include "game/cosmos/cosmos.h"
@@ -153,6 +154,8 @@ static void try_detach_limbs(
 	if (::is_gore_award_deserved(subject, origin)) {
 		sentience.coins_on_body += 500;
 	}
+
+	::make_melee_weapon_of_damage_bloody(step.get_cosmos(), origin);
 
 	cosmic::queue_create_entity(
 		step,

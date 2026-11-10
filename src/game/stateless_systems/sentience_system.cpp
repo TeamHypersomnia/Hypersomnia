@@ -39,6 +39,7 @@
 #include "game/detail/weapon_like.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/sentience/corpse_limbs.h"
+#include "game/detail/melee/bloody_melee_weapon.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/sentience/tool_getters.h"
@@ -972,11 +973,7 @@ bool sentience_system::process_damage_message(const messages::damage_message& d,
 		}
 
 		if (reported_hp_damage > 0) {
-			if (const auto cause_entity = cosm[d.origin.cause.entity]) {
-				if (auto* const melee = cause_entity.find<components::melee>()) {
-					melee->gore_freshness = static_cast<real32>(cosm.get_clock().get_real_seconds_passed());
-				}
-			}
+			::make_melee_weapon_of_damage_bloody(cosm, d.origin);
 		}
 	}
 
