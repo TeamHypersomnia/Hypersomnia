@@ -110,6 +110,9 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 
 #include <nlohmann/json.hpp>
 #include "rtc/rtc.hpp"
+#if BUILD_OPENSSL && !PLATFORM_WEB
+#include "application/setups/server/server_dtls_certificate.h"
+#endif
 
 #if PLATFORM_WEB
 #define USE_WEBSOCKET 1
@@ -191,21 +194,30 @@ class webrtc_server_detail {
 
 public:
 	std::string remote_ip(const client_id id) {
-		std::scoped_lock lock(connections_lk);
-		return remote_ip_locked(id);
+		const auto pc = [&]() -> std::shared_ptr<rtc::PeerConnection> {
+			std::scoped_lock lock(connections_lk);
+
+			if (const auto found = mapped_or_nullptr(pcs, id)) {
+				return *found;
+			}
+
+			return nullptr;
+		}();
+
+		return remote_ip_of(pc);
 	}
 
 private:
-	std::string remote_ip_locked(const client_id id) {
+	static std::string remote_ip_of(const std::shared_ptr<rtc::PeerConnection>& pc) {
 #if PLATFORM_WEB
 		/*
 			The browser's WebRTC does not tell the peer's address.
 		*/
 
-		(void)id;
+		(void)pc;
 		return "";
 #else
-		if (const auto it = pcs.find(id); it != pcs.end() && it->second != nullptr) {
+		if (pc != nullptr) {
 			/*
 				A peer behind a TURN relay shows the relay's address - shared by everyone relayed there,
 				so it is no address of this player: no bans or per-address limits by it.
@@ -215,12 +227,12 @@ private:
 				auto local = rtc::Candidate();
 				auto remote = rtc::Candidate();
 
-				if (it->second->getSelectedCandidatePair(&local, &remote) && remote.type() == rtc::Candidate::Type::Relayed) {
+				if (pc->getSelectedCandidatePair(&local, &remote) && remote.type() == rtc::Candidate::Type::Relayed) {
 					return "";
 				}
 			}
 
-			if (const auto address = it->second->remoteAddress()) {
+			if (const auto address = pc->remoteAddress()) {
 				const auto& a = *address;
 
 				if (const auto colon = a.rfind(':'); colon != std::string::npos) {
@@ -396,6 +408,7 @@ private:
 	};
 
 	double when_last_sent_packets = -1;
+	std::mutex pending_packets_lk;
 	std::vector<pending_signalling_packet> pending_packets;
 
 	void answer_json(const std::string& json) {
@@ -404,6 +417,7 @@ private:
 
 		packet.message = json;
 
+		std::scoped_lock lock(pending_packets_lk);
 		pending_packets.emplace_back(std::move(packet));
 	}
 
@@ -426,124 +440,210 @@ private:
 			return;
 		}
 
-		/*
-			Destroyed only after the lock is released - its callbacks call disconnect, which takes the lock.
-		*/
-
-		std::shared_ptr<rtc::PeerConnection> failed_pc;
-
-		std::scoped_lock lock(self->connections_lk);  
-		auto external_id = message["id"].get<std::string>();
-		auto type = message["type"].get<std::string>();
-
-		auto& id_map = self->id_map;
-		auto& pcs = self->pcs;
-		auto& pc_metas = self->pc_metas;
+		const auto external_id = message["id"].get<std::string>();
+		const auto type = message["type"].get<std::string>();
 
 		if (type == "offer") {
 			LOG("Received SDP offer.");
-			if (!found_in(id_map, external_id)) {
-				/*
-					An offer that can not be set must not take a WebRTC id: its peer connection would never
-					change state, so nothing would ever free the id, and enough of them would refuse every peer.
-				*/
 
-				if (!is_string_field("description")) {
-					self->set_message("Ignoring an offer without a description.");
-					return;
-				}
-
-				const auto id = self->assign_client_id();
-
-				LOG("New peer: mapping %x to %x", external_id, id);
-
-				if (id < max_clients) {
-					id_map[external_id] = id;
-					self->assigned_at[id] = augs::high_precision_secs();
-
-					main_thread_queue::execute([&]() {		
-						try {
-							auto pc = setup_peer_connection(self, id, external_id);
-
-							try {
-								pc->setRemoteDescription(rtc::Description(message["description"].get<std::string>(), "offer"));
-							}
-							catch (...) {
-								failed_pc = pc;
-								throw;
-							}
-
-							pc_metas[id].has_description = true;
-
-							for (auto& candidate : pc_metas[id].pending_candidates) {
-								if (candidate.contains("candidate") && candidate["candidate"].is_string() && candidate.contains("mid") && candidate["mid"].is_string()) {
-									pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
-								}
-							}
-
-							pc_metas[id].pending_candidates.clear();
-						}
-						catch (const std::exception& err) {
-							self->set_message(std::string("Invalid offer, freeing its id: ") + err.what());
-
-							pcs.erase(id);
-							pc_metas.erase(id);
-							id_map.erase(external_id);
-						}
-					});
-				}
-				else {
-					self->set_message("Max clients reached, cannot assign new ID");
-					return;
-				}
+			if (const auto id = self->reserve_client_id(external_id, is_string_field("description")); id.has_value()) {
+				main_thread_queue::execute([&]() {
+					open_peer_connection(self, *id, external_id, message["description"].get<std::string>());
+				});
 			}
 		}
 		else if (type == "candidate") {
 			LOG("Received SDP candidate from %x.", external_id);
 
-			if (const auto id_ptr = mapped_or_nullptr(id_map, external_id)) {
-				const auto id = *id_ptr;
+			const auto pc = self->peer_connection_for_candidate(external_id, message);
 
-				if (!pc_metas[id].has_description) {
-					if (pc_metas[id].pending_candidates.size() >= max_pending_candidates_v) {
-						return;
-					}
-
-					pc_metas[id].pending_candidates.push_back(message);
-					LOG("Candidate arrived too early. Saving.");
-					return;
-				}
-
-				LOG("Peer: %x maps to %x", external_id, id);
-
-				if (const auto pc = mapped_or_nullptr(pcs, id)) {
-					if (!is_string_field("candidate") || !is_string_field("mid")) {
-						self->set_message("Ignoring a candidate without its fields.");
-						return;
-					}
-
-					LOG("calling addRemoteCandidate.");
-
-					main_thread_queue::execute([&]() {		
-						(*pc)->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
-					});
-				}
+			if (pc == nullptr) {
+				return;
 			}
-			else {
-				self->set_message("Received a candidate for an unknown session ID");
+
+			if (!is_string_field("candidate") || !is_string_field("mid")) {
+				self->set_message("Ignoring a candidate without its fields.");
+				return;
+			}
+
+			LOG("calling addRemoteCandidate.");
+
+			main_thread_queue::execute([&]() {
+				pc->addRemoteCandidate(rtc::Candidate(message["candidate"].get<std::string>(), message["mid"].get<std::string>()));
+			});
+		}
+	}
+
+	std::optional<client_id> reserve_client_id(const std::string& external_id, const bool has_description) {
+		std::scoped_lock lock(connections_lk);
+
+		if (found_in(id_map, external_id)) {
+			return std::nullopt;
+		}
+
+		if (!has_description) {
+			set_message("Ignoring an offer without a description.");
+			return std::nullopt;
+		}
+
+		const auto id = assign_client_id();
+
+		LOG("New peer: mapping %x to %x", external_id, id);
+
+		if (id >= max_clients) {
+			set_message("Max clients reached, cannot assign new ID");
+			return std::nullopt;
+		}
+
+		id_map[external_id] = id;
+		assigned_at[id] = augs::high_precision_secs();
+		pcs[id] = nullptr;
+
+		return id;
+	}
+
+	static void open_peer_connection(
+		this_sptr self,
+		const client_id id,
+		const std::string& external_id,
+		const std::string& description
+	) {
+		auto pc = std::shared_ptr<rtc::PeerConnection>();
+
+		auto drop_offer = [&](const std::string& reason) {
+			self->set_message("Dropping an offer: " + reason);
+
+			if (pc != nullptr) {
+				clear_peer_connection_callbacks(*pc);
+			}
+
+			std::scoped_lock lock(self->connections_lk);
+
+			if (const auto it = self->pcs.find(id); it != self->pcs.end() && it->second == pc) {
+				self->pcs.erase(it);
+				self->erase_from_id_map(id);
+			}
+		};
+
+		auto holds_the_reservation = [&](const std::shared_ptr<rtc::PeerConnection>& holder) {
+			const auto it = self->pcs.find(id);
+			return it != self->pcs.end() && it->second == holder;
+		};
+
+		const auto id_freed_meanwhile = std::string("its WebRTC id was freed meanwhile");
+
+		try {
+			pc = make_peer_connection(self, id, external_id);
+		}
+		catch (const std::exception& err) {
+			drop_offer(std::string("invalid - ") + err.what());
+			return;
+		}
+
+		const bool stored = [&]() {
+			std::scoped_lock lock(self->connections_lk);
+
+			if (!holds_the_reservation(nullptr)) {
+				return false;
+			}
+
+			self->pcs[id] = pc;
+			return true;
+		}();
+
+		if (!stored) {
+			drop_offer(id_freed_meanwhile);
+			return;
+		}
+
+		try {
+			pc->setRemoteDescription(rtc::Description(description, "offer"));
+		}
+		catch (const std::exception& err) {
+			drop_offer(std::string("invalid - ") + err.what());
+			return;
+		}
+
+		auto pending_candidates = std::optional<std::vector<nlohmann::json>>();
+
+		{
+			std::scoped_lock lock(self->connections_lk);
+
+			if (holds_the_reservation(pc)) {
+				auto& meta = self->pc_metas[id];
+				meta.has_description = true;
+				pending_candidates = std::exchange(meta.pending_candidates, {});
+			}
+		}
+
+		if (!pending_candidates.has_value()) {
+			drop_offer(id_freed_meanwhile);
+			return;
+		}
+
+		for (const auto& candidate : *pending_candidates) {
+			if (candidate.contains("candidate") && candidate["candidate"].is_string() && candidate.contains("mid") && candidate["mid"].is_string()) {
+				try {
+					pc->addRemoteCandidate(rtc::Candidate(candidate["candidate"].get<std::string>(), candidate["mid"].get<std::string>()));
+				}
+				catch (const std::exception& err) {
+					self->set_message(std::string("Ignoring an invalid candidate: ") + err.what());
+				}
 			}
 		}
 	}
 
-    static std::shared_ptr<rtc::PeerConnection> setup_peer_connection(this_sptr self, client_id id, std::string external_id) {
+	std::shared_ptr<rtc::PeerConnection> peer_connection_for_candidate(
+		const std::string& external_id,
+		const nlohmann::json& message
+	) {
+		std::scoped_lock lock(connections_lk);
+
+		const auto id_ptr = mapped_or_nullptr(id_map, external_id);
+
+		if (id_ptr == nullptr) {
+			set_message("Received a candidate for an unknown session ID");
+			return nullptr;
+		}
+
+		const auto id = *id_ptr;
+		auto& meta = pc_metas[id];
+
+		if (!meta.has_description) {
+			if (meta.pending_candidates.size() < max_pending_candidates_v) {
+				meta.pending_candidates.push_back(message);
+				LOG("Candidate arrived too early. Saving.");
+			}
+
+			return nullptr;
+		}
+
+		LOG("Peer: %x maps to %x", external_id, id);
+
+		if (const auto pc = mapped_or_nullptr(pcs, id)) {
+			return *pc;
+		}
+
+		return nullptr;
+	}
+
+	static void clear_peer_connection_callbacks(rtc::PeerConnection& pc) {
+		pc.onDataChannel(nullptr);
+		pc.onLocalDescription(nullptr);
+		pc.onLocalCandidate(nullptr);
+		pc.onStateChange(nullptr);
+	}
+
+    static std::shared_ptr<rtc::PeerConnection> make_peer_connection(this_sptr self, const client_id id, const std::string& external_id) {
 		auto pc = std::make_shared<rtc::PeerConnection>(self->config);
-		self->pcs[id] = pc;
 
 		pc->onDataChannel([wself = std::weak_ptr(self), id](std::shared_ptr<rtc::DataChannel> dc) {
 			if (auto self = wself.lock()) {
+				auto replaced_dc = std::shared_ptr<rtc::DataChannel>();
+
 				{
 					std::scoped_lock lock(self->connections_lk);
-					self->dcs[id] = dc;
+					replaced_dc = std::exchange(self->dcs[id], dc);
 				}
 
 				setup_data_channel_handlers(self, id, dc);
@@ -649,6 +749,9 @@ public:
 		self->config.portRangeBegin = { ports_begin };
 		self->config.portRangeEnd = { ports_end };
 		self->config.enableIceUdpMux = udp_mux;
+#if BUILD_OPENSSL
+		::use_shared_server_dtls_certificate(self->config);
+#endif
 #endif
 
 #if USE_WEBSOCKET
@@ -739,23 +842,25 @@ public:
 				return;
 			}
 
-			std::scoped_lock lock(self->connections_lk);
+			auto channels = std::vector<std::shared_ptr<rtc::DataChannel>>();
+			channels.reserve(packets.size());
 
-			auto& dcs = self->dcs;
+			{
+				std::scoped_lock lock(self->connections_lk);
 
-			for (const auto& p : packets) {
-				const auto id = p.client_id;
+				for (const auto& p : packets) {
+					const auto found = mapped_or_nullptr(self->dcs, p.client_id);
+					channels.push_back(found != nullptr ? *found : nullptr);
+				}
+			}
 
-				if (dcs.count(id)) {
-					const auto dc = dcs.at(id);
-
-					if (dc->isOpen()) {
-						try {
-							dc->send(p.bytes);
-						}
-						catch (const std::runtime_error& err) {
-							LOG("Failed to send DC message: %x", err.what());
-						}
+			for (std::size_t i = 0; i < packets.size(); ++i) {
+				if (const auto& dc = channels[i]; dc != nullptr && dc->isOpen()) {
+					try {
+						dc->send(packets[i].bytes);
+					}
+					catch (const std::exception& err) {
+						LOG("Failed to send DC message: %x", err.what());
 					}
 				}
 			}
@@ -772,6 +877,8 @@ public:
 	template <class P>
 	void send_signalling_packets(P send) {
 		const auto current_time = augs::high_precision_secs();
+
+		std::scoped_lock lock(pending_packets_lk);
 
 		if (current_time - when_last_sent_packets > 0.1) {
 			for (auto& p : pending_packets) {

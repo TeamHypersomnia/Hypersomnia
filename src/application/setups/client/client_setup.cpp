@@ -461,7 +461,12 @@ public:
 			}
 
 			if (dc->isOpen()) {
-				dc->send(msg);
+				try {
+					dc->send(msg);
+				}
+				catch (const std::exception& err) {
+					LOG("Failed to send DC message: %x", err.what());
+				}
 			}
 		});
 	}
