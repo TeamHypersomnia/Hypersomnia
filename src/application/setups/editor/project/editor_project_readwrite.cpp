@@ -111,6 +111,7 @@ namespace augs {
 
 #include "application/setups/editor/project/editor_project_readwrite.h"
 #include "application/setups/editor/editor_official_resource_map.hpp"
+#include "application/setups/editor/project/editor_renamed_resource_types.h"
 #include "application/setups/editor/defaults/editor_game_mode_defaults.h"
 #include "application/setups/editor/defaults/editor_project_defaults.h"
 
@@ -1241,7 +1242,7 @@ namespace editor_project_readwrite {
 					}
 
 					const auto& type = *maybe_type;
-					const auto resource_id = mapped_or_nullptr(resource_map, type);
+					const auto resource_id = mapped_or_nullptr(resource_map, ::current_name_of_renamed_resource_type(type));
 
 					if (resource_id == nullptr) {
 						if (strict) {
