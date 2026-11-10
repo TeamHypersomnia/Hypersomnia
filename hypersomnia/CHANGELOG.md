@@ -4,7 +4,7 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [4.5.0] - 2026-11-14
+## [4.5.0] - 2026-11-10
 
 ### Added
 
@@ -23,6 +23,8 @@
 	- Two separate deadlocks in the WebRTC handling, one of them in the library itself.
 - **Torn-off limbs fly to their own side again.**
 	- The right arm to the right, the left one to the left (broken in 4.4.0).
+- **Copy and paste on Linux work out of the box.**
+	- Wayland, X11 and Flatpak alike - nothing else to install.
 
 ## [4.4.0] - 2026-11-01
 
