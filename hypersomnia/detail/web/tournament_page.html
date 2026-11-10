@@ -265,10 +265,11 @@
 		stroke: rgba(255, 255, 255, 0.22);
 	}
 
-	/* the round being played: framed in the amber rainbow, as its live matches (game_button_frame) */
 	.bracket-round-section.playing .frame-border,
 	.bracket-round-section.playing .frame-corners {
-		stroke: var(--frame-rainbow);
+		stroke: rgba(255, 255, 255, 0.25);
+		stroke-width: 1px;
+		vector-effect: non-scaling-stroke;
 	}
 
 	/* the box's header: the round, then its arena - a thin line under them, so the arena's name has its ground */
@@ -548,7 +549,6 @@
 		background: #120e09;
 	}
 
-	/* a match being played: its score and its teams framed in the moving rainbow */
 	.match-score.live,
 	.team-card.live .players {
 		position: relative;
@@ -565,8 +565,7 @@
 		animation: shimmer 4s linear infinite;
 	}
 
-	.match-score.live::before,
-	.team-card.live .players::before {
+	.match-score.live::before {
 		content: '';
 		position: absolute;
 		inset: -1px;
@@ -574,6 +573,18 @@
 		background: var(--rainbow);
 		background-size: 200% auto;
 		animation: shimmer 4s linear infinite;
+		-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	.team-card.live .players::before {
+		content: '';
+		position: absolute;
+		inset: -1px;
+		padding: 1px;
+		background: rgba(255, 255, 255, 0.25);
 		-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
 		-webkit-mask-composite: xor;
 		mask-composite: exclude;
@@ -927,7 +938,6 @@
 	*/
 
 	const BUTTON_SCALE = 3;
-	let frame_rainbows = 0;
 	const SIDE_L = 8, SIDE_T = 8, SIDE_R = 12, SIDE_B = 12;
 
 	function game_button_frame(box, variant) {
@@ -943,41 +953,6 @@
 			svg.appendChild(p);
 			return p;
 		};
-
-		/*
-			The round being played: its frame's lines in the amber rainbow, moving as the live matches' frames.
-		*/
-
-		if (box.classList.contains('playing')) {
-			const id = `frame-rainbow-${++frame_rainbows}`;
-			const gradient = document.createElementNS(ns, 'linearGradient');
-			gradient.setAttribute('id', id);
-			gradient.setAttribute('x2', '0.5');
-			gradient.setAttribute('spreadMethod', 'repeat');
-
-			['#ffe680', '#ffd700', '#ffb040', '#ff8a3d', '#ff5a3d', '#ff8a3d', '#ffb040', '#ffd700', '#ffe680'].forEach((color, i, all) => {
-				const stop = document.createElementNS(ns, 'stop');
-				stop.setAttribute('offset', String(i / (all.length - 1)));
-				stop.setAttribute('stop-color', color);
-				gradient.appendChild(stop);
-			});
-
-			const move = document.createElementNS(ns, 'animateTransform');
-			move.setAttribute('attributeName', 'gradientTransform');
-			move.setAttribute('type', 'translate');
-			move.setAttribute('from', '0 0');
-			move.setAttribute('to', '0.5 0');
-			move.setAttribute('dur', '4s');
-			move.setAttribute('repeatCount', 'indefinite');
-			// each frame drawn anew starts in the phase of the page's clock - a refresh doesn't restart it
-			move.setAttribute('begin', `${-((performance.now() / 1000) % 4)}s`);
-			gradient.appendChild(move);
-
-			const defs = document.createElementNS(ns, 'defs');
-			defs.appendChild(gradient);
-			svg.appendChild(defs);
-			box.style.setProperty('--frame-rainbow', `url(#${id})`);
-		}
 
 		const inside = path('frame-inside');
 		const border = path('frame-border');
