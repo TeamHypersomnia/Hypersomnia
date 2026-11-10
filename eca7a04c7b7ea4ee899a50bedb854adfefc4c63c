@@ -1,0 +1,1 @@
+Audited: audit #1, 2026-11-09 - libdatachannel recv/onRecv deadlock fix: correct, removes the hang; other hang causes found, fixed in f0c4f6485
