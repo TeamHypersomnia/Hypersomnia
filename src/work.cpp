@@ -7918,7 +7918,7 @@ work_result work(
 						}
 					}
 
-					return false;
+					return enemies_behind_walls_mode::HIDDEN;
 				});
 
 				const bool draw_enemy_crosshairs = visit_current_setup([&](const auto& setup) {
@@ -7943,7 +7943,7 @@ work_result work(
 						return setup.arena_gui.scoreboard.show;
 					}
 
-					return enemies_behind_walls_mode::HIDDEN;
+					return false;
 				});
 
 				return illuminated_rendering_input {
