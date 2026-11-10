@@ -57,6 +57,7 @@ struct test_mode_ruleset {
 	per_actual_faction<test_mode_faction_rules> factions;
 	test_mode_view_rules view;
 	uint32_t round_secs = 120;
+	bool spawn_money = false;
 	std::vector<playtest_spawn> quick_test_spawns;
 	std::vector<bot_test_navigation_end> bot_test_navigation_ends;
 	// END GEN INTROSPECTOR

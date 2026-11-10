@@ -174,6 +174,7 @@ struct editor_quick_test_mode {
 	per_actual_faction<editor_requested_equipment> equipment;
 	uint32_t respawn_time_ms = 1000;
 	uint32_t round_time = 120;
+	bool spawn_money = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_quick_test_mode&) const = default;

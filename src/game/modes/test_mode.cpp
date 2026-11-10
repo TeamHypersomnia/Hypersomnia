@@ -21,6 +21,7 @@
 
 #include "game/components/movement_component.h"
 #include "game/modes/quick_test_spawns.hpp"
+#include "game/modes/test_mode_coin_drops.h"
 #include "game/modes/test_mode_navigation.hpp"
 #include "game/components/crosshair_component.h"
 #include "game/detail/inventory/perform_transfer.h"
@@ -560,7 +561,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 	}
 }
 
-void test_mode::mode_post_solve(const input_type, const mode_entropy&, const logic_step step) {
+void test_mode::mode_post_solve(const input_type in, const mode_entropy&, const logic_step step) {
 	{
 		auto& cosm = step.get_cosmos();
 		const auto& events = step.get_queue<messages::health_event>();
@@ -607,6 +608,8 @@ void test_mode::mode_post_solve(const input_type, const mode_entropy&, const log
 			}
 		}
 	}
+
+	::keep_coins_off_bodies_unless_spawning_money(in.rules.spawn_money, step.get_cosmos());
 }
 
 arena_migrated_session test_mode::emigrate() const {

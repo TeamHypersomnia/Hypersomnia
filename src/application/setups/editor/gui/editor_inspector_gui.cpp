@@ -2920,6 +2920,7 @@ EDIT_FUNCTION(
 
 			FACTION_EQUIPMENT_PROPERTY("Equipment", quick_test.equipment);
 			MULTIPROPERTY("Round time", quick_test.round_time);
+			MULTIPROPERTY("Spawn money", quick_test.spawn_money);
 		}
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 			MULTIPROPERTY("Max team score", bomb_defusal.max_team_score);

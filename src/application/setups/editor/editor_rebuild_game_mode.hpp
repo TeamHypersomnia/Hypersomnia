@@ -299,6 +299,7 @@ auto setup_ruleset_from_editor_mode(
 
 			rules.respawn_after_ms = vars.respawn_time_ms;
 			rules.round_secs = vars.round_time;
+			rules.spawn_money = vars.spawn_money;
 
 			::for_each_faction(
 				[&](const faction_type f) {
