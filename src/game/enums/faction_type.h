@@ -27,6 +27,14 @@ inline bool is_actual_faction(const faction_type f) {
 	}
 }
 
+inline faction_type marker_faction_in_game(const faction_type f) {
+	if (f == faction_type::ANY || f == faction_type::DEFAULT) {
+		return faction_type::RESISTANCE;
+	}
+
+	return f;
+}
+
 inline bool is_waypoint_for_faction(
 	const faction_type waypoint_faction,
 	const faction_type bot_faction

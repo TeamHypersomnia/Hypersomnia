@@ -77,7 +77,8 @@ public:
 		const necessary_images_in_atlas_map& sizes_for_icons,
 		float zoom,
 		vec2 world_cursor_pos,
-		const maybe_layer_filter& filter
+		const maybe_layer_filter& filter,
+		const std::unordered_set<entity_id>& entities_with_hidden_icons
 	) const;
 
 	void do_mousemotion(
@@ -88,7 +89,8 @@ public:
 		vec2 world_cursor_pos,
 		camera_eye eye,
 		bool left_button_pressed,
-		const maybe_layer_filter& filter
+		const maybe_layer_filter& filter,
+		const std::unordered_set<entity_id>& entities_with_hidden_icons
 	);
 
 #if 0

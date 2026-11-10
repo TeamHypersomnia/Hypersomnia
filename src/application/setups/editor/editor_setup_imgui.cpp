@@ -267,6 +267,8 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				toggle_navmesh();
 			}
 
+			ImGui::MenuItem("Bot test paths", nullptr, std::addressof(view.show_bot_test_paths));
+
 			ImGui::Separator();
 
 			const bool is_centered = is_view_centered_at_selection();

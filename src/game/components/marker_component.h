@@ -117,11 +117,7 @@ namespace components {
 		// END GEN INTROSPECTOR
 
 		auto get_faction() const {
-			if (faction == faction_type::ANY || faction == faction_type::DEFAULT) {
-				return faction_type::RESISTANCE;
-			}
-
-			return faction;
+			return ::marker_faction_in_game(faction);
 		}
 	};
 }

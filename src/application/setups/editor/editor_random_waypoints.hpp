@@ -98,8 +98,9 @@ std::vector<random_waypoint> editor_setup::calc_random_waypoints_preview(const u
 
 	const auto* const arena_rules = std::get_if<arena_mode_ruleset>(std::addressof(built_ruleset));
 	const bool gun_game = arena_rules != nullptr && arena_rules->is_gun_game();
+	const auto playtest_only_spawns = arena_rules != nullptr ? arena_rules->playtest_spawns : std::vector<playtest_spawn>();
 
-	auto input = ::gather_random_waypoints_input(built_scene.world, gun_game);
+	auto input = ::gather_random_waypoints_input(built_scene.world, gun_game, playtest_only_spawns);
 	input.seed = seed;
 
 	/*

@@ -15,3 +15,17 @@ inline std::unordered_set<editor_node_id> make_node_set_of_layers_hiding_icons(c
 
 	return result;
 }
+
+inline std::unordered_set<entity_id> make_entity_set_of_layers_hiding_icons(const editor_project& project) {
+	auto result = std::unordered_set<entity_id>();
+
+	for (const auto node_id : ::make_node_set_of_layers_hiding_icons(project)) {
+		project.on_node(node_id, [&](const auto& node, const auto) {
+			if (node.scene_entity_id.is_set()) {
+				result.insert(node.scene_entity_id);
+			}
+		});
+	}
+
+	return result;
+}

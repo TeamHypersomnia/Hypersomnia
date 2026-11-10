@@ -934,7 +934,6 @@ static bool has_team(const point_marker_type type) {
 	switch (type) {
 		case point_marker_type::TEAM_SPAWN:
 		case point_marker_type::QUICK_TEST_SPAWN:
-		case point_marker_type::BOT_TEST_NAVIGATION_END:
 		case point_marker_type::BOT_WAYPOINT_PUSH:
 		case point_marker_type::BOT_WAYPOINT_PATROL:
 			return true;
@@ -1020,8 +1019,8 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 	if (type == point_marker_type::BOT_TEST_NAVIGATION_END) {
 		text_disabled(
 			"Only in the editor's offline playtest of a quick test.\n"
-			"Every bot from a quick_test_spawn walks once to the nearest free one of these\n"
-			"of its faction (Any matches every bot), then stands there facing its direction."
+			"Every bot from a quick_test_spawn walks once to the nearest free one of these,\n"
+			"then stands there facing its direction."
 		);
 
 		MULTIPROPERTY("Sprint", test_navigation_sprint);
@@ -2751,7 +2750,7 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 			text_tooltip("Color used to display portal cells in the navmesh.");
 		}
 
-		PROPERTY("Debug navigation color", debug_navigation_color);
+		PROPERTY("Bot test path color", debug_navigation_color);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("Color used to display navigation debug path in the editor.");

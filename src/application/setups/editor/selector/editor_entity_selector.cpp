@@ -189,13 +189,14 @@ static void get_non_hovering_icons_from(
 	const necessary_images_in_atlas_map& sizes_for_icons,
 	const float zoom,
 	const std::unordered_set<entity_id>& in_container,
+	const std::unordered_set<entity_id>& entities_with_hidden_icons,
 	std::vector<entity_id>& out_non_hovering,
 	T world_range
 ) {
 	auto& vis = thread_local_visible_entities();
 	vis.set_from(cosm, in_container);
 
-	return get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, out_non_hovering, world_range);
+	return get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, entities_with_hidden_icons, out_non_hovering, world_range);
 }
 
 template <class T>
@@ -204,6 +205,7 @@ static void get_non_hovering_icons_from(
 	const necessary_images_in_atlas_map& sizes_for_icons,
 	const float zoom,
 	visible_entities& in_container,
+	const std::unordered_set<entity_id>& entities_with_hidden_icons,
 	std::vector<entity_id>& out_non_hovering,
 	T world_range
 ) {
@@ -224,6 +226,11 @@ static void get_non_hovering_icons_from(
 			const auto
 		) {
 			using W = remove_cref<decltype(world_range)>;
+
+			if (found_in(entities_with_hidden_icons, handle.get_id())) {
+				out_non_hovering.emplace_back(handle.get_id());
+				return;
+			}
 
 			if constexpr(std::is_same_v<W, ltrb>) {
 				if (!get_icon_aabb(tex_id, where).hover(world_range)) {
@@ -254,7 +261,8 @@ void editor_entity_selector::do_mousemotion(
 	const vec2 world_cursor_pos,
 	const camera_eye eye,
 	const bool left_button_pressed,
-	const maybe_layer_filter& filter
+	const maybe_layer_filter& filter,
+	const std::unordered_set<entity_id>& entities_with_hidden_icons
 ) {
 	hovered = {};
 
@@ -318,7 +326,7 @@ void editor_entity_selector::do_mousemotion(
 			}
 		}, layer_order);
 
-		get_non_hovering_icons_from(cosm, sizes_for_icons, eye.zoom, in_rectangular_selection, cache_non_hovering, world_range);
+		get_non_hovering_icons_from(cosm, sizes_for_icons, eye.zoom, in_rectangular_selection, entities_with_hidden_icons, cache_non_hovering, world_range);
 		erase_elements(in_rectangular_selection, cache_non_hovering);
 
 		if (in_rectangular_selection.empty()) {
@@ -361,7 +369,7 @@ void editor_entity_selector::do_mousemotion(
 		}
 	}
 	else {
-		const auto new_hovered = calc_hovered_entity(cosm, sizes_for_icons, eye.zoom, world_cursor_pos, filter);
+		const auto new_hovered = calc_hovered_entity(cosm, sizes_for_icons, eye.zoom, world_cursor_pos, filter, entities_with_hidden_icons);
 
 		if (new_hovered.is_set()) {
 			hovered = new_hovered;
@@ -374,7 +382,8 @@ entity_id editor_entity_selector::calc_hovered_entity(
 	const necessary_images_in_atlas_map& sizes_for_icons,
 	const float zoom,
 	vec2 world_cursor_pos,
-	const maybe_layer_filter& filter
+	const maybe_layer_filter& filter,
+	const std::unordered_set<entity_id>& entities_with_hidden_icons
 ) const {
 	const auto layer_order = get_default_layer_order();
 	auto& vis = cache_visible;
@@ -416,7 +425,7 @@ entity_id editor_entity_selector::calc_hovered_entity(
 		}
 	}, layer_order);
 
-	get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, cache_non_hovering, world_cursor_pos);
+	get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, entities_with_hidden_icons, cache_non_hovering, world_cursor_pos);
 
 	erase_elements(ids, cache_non_hovering);
 

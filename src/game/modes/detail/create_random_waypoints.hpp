@@ -7,6 +7,7 @@
 #include "game/enums/filters.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/modes/ai/random_waypoints_generator.h"
+#include "game/modes/playtest_spawns.hpp"
 
 /*
 	The bots' waypoints of this round, generated as point markers like the author's (see random_waypoints_generator.h) -
@@ -20,7 +21,11 @@
 	The rays refer to the cosmos - use the input only while it lives. Shared by the game and the editor's preview.
 */
 
-inline random_waypoints_input gather_random_waypoints_input(const cosmos& cosm, const bool gun_game) {
+inline random_waypoints_input gather_random_waypoints_input(
+	const cosmos& cosm,
+	const bool gun_game,
+	const std::vector<playtest_spawn>& playtest_only_spawns
+) {
 	const auto& common = cosm.get_common_significant();
 
 	random_waypoints_input input;
@@ -35,6 +40,10 @@ inline random_waypoints_input gather_random_waypoints_input(const cosmos& cosm, 
 		const auto transform = typed_handle.get_logic_transform();
 
 		if (type == point_marker_type::TEAM_SPAWN) {
+			if (::find_playtest_spawn(playtest_only_spawns, typed_handle.get_id()) != nullptr) {
+				return;
+			}
+
 			const auto faction = typed_handle.get_official_faction();
 
 			if (faction == faction_type::METROPOLIS) {
@@ -98,12 +107,13 @@ inline bool create_random_waypoints(
 	allocate_new_entity_access access,
 	cosmos& cosm,
 	const bool gun_game,
+	const std::vector<playtest_spawn>& playtest_only_spawns,
 	const uint32_t seed
 ) {
 	const auto& common = cosm.get_common_significant();
 	const auto mode = common.bot_waypoints.mode;
 
-	auto input = ::gather_random_waypoints_input(cosm, gun_game);
+	auto input = ::gather_random_waypoints_input(cosm, gun_game, playtest_only_spawns);
 	input.seed = seed;
 
 	if (mode == bot_waypoints_mode::AUTOMATIC && !input.existing.empty()) {

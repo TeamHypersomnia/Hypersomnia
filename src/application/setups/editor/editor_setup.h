@@ -60,6 +60,7 @@ struct random_waypoint;
 #include "application/main/miniature_generator.h"
 #include "application/network/network_common.h"
 #include "application/arena/scene_entity_to_node_map.h"
+#include "application/setups/editor/editor_bot_test_paths.h"
 #include "application/arena/synced_dynamic_vars.h"
 #include "steam_rich_presence_pairs.h"
 
@@ -145,6 +146,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	editor_playtest_recordings playtest_recordings;
 
 	scene_entity_to_node_map scene_entity_to_node;
+	editor_bot_test_paths bot_test_paths;
 
 	editor_project project;
 	editor_gui gui;
@@ -554,6 +556,13 @@ public:
 	bool handle_doubleclick_in_layers_gui = false;
 
 	void rebuild_arena(const bool editor_preview = true);
+
+	void build_arena_from(
+		const editor_project& source,
+		bool editor_preview,
+		bool showing_navmesh,
+		scene_entity_to_node_map* entity_to_node
+	);
 
 	const auto& get_paths() const {
 		return paths;

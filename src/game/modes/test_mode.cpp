@@ -28,7 +28,6 @@
 #include "game/detail/pathfinding/pathfinding.h"
 #include "game/detail/path_navigation/navigate_path.hpp"
 #include "game/modes/ai/tasks/interpolate_crosshair.hpp"
-#include "game/detail/pathfinding/pathfinding_bomb.hpp"
 #include "game/messages/game_notification.h"
 #include "game/messages/changed_identities_message.h"
 #include "augs/math/repro_math.h"
@@ -460,55 +459,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 
 	remove_old_lying_items(in, step);
 
-	if (playtesting_context.has_value()) {
-		const bool has_debug_target = 
-			playtesting_context->debug_navigation_end.has_value() ||
-			playtesting_context->debug_navigation_bomb_target.is_set()
-		;
-
-		if (has_debug_target && !players.empty()) {
-			auto& first_player = players.begin()->second;
-			const auto character_id = first_player.controlled_character_id;
-			const auto character = cosm[character_id];
-
-			if (character.alive()) {
-				const auto character_pos = character.get_logic_transform().pos;
-				const auto& navmesh = cosm.get_common_significant().navmesh;
-
-				auto target_transform = transformr();
-				bool has_navigation_target = false;
-				bool use_exact_destination = false;
-
-				if (playtesting_context->debug_navigation_end.has_value()) {
-					target_transform = *playtesting_context->debug_navigation_end;
-					has_navigation_target = true;
-					use_exact_destination = true;
-				}
-				else if (const auto bomb_handle = cosm[playtesting_context->debug_navigation_bomb_target]) {
-					/*
-						Use the stored bomb entity for navigation.
-					*/
-					const auto bomb_target = ::find_bomb_pathfinding_target(
-						bomb_handle,
-						navmesh,
-						character_pos
-					);
-
-					if (bomb_target.has_value()) {
-						target_transform = bomb_target->target_pathfinding_transform;
-						has_navigation_target = true;
-					}
-				}
-
-				if (has_navigation_target) {
-					const bool allow_sprint = true;
-					::navigate_test_character(cosm, first_player.debug_navigation, character, target_transform, use_exact_destination, allow_sprint);
-				}
-			}
-		}
-	}
-
-	::navigate_bots_to_test_navigation_ends(step, in.rules.bot_test_navigation_ends, players);
+	::navigate_bots_to_test_navigation_ends(step, players);
 
 	if (auto character = in.cosm[infinite_ammo_for]) {
 		auto guns = character.get_wielded_guns();
@@ -596,7 +547,7 @@ void test_mode::mode_post_solve(const input_type in, const mode_entropy&, const 
 				*/
 				for (auto& [player_id, player] : players) {
 					if (player.controlled_character_id == teleport.teleported) {
-						player.debug_navigation.reset();
+						player.test_navigation.reset();
 						break;
 					}
 				}

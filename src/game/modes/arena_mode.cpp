@@ -1124,24 +1124,21 @@ void arena_mode::create_character_for_player(
 					},
 					[&](const entity_handle new_character) {
 						const auto playtest_spawn = ::choose_playtest_spawn_for(cosm, in.rules.playtest_spawns, players, id, faction);
+						const bool custom_equipment = playtest_spawn != nullptr && playtest_spawn->custom_equipment;
+						const auto equipment = custom_equipment ? std::addressof(playtest_spawn->equipment) : nullptr;
 
-						if (playtest_spawn != nullptr) {
-							const auto spawn_used = teleport_to_spawn(in, new_character, playtest_spawn->spawn);
-							const auto equipment = playtest_spawn->custom_equipment ? std::addressof(playtest_spawn->equipment) : nullptr;
+						const auto spawn_used =
+							playtest_spawn != nullptr ?
+							teleport_to_spawn(in, new_character, playtest_spawn->spawn) :
+							teleport_to_next_spawn(in, new_character)
+						;
 
-							init_spawned(in, id, new_character, step, changed_identities, equipment != nullptr ? nullptr : transferred, equipment);
-							p.ai_state.source_spawn_point = spawn_used;
-
-							if (p.is_bot) {
-								::start_bot_at_playtest_spawn(p.ai_state, cosm, ai_arena_meta, *playtest_spawn);
-							}
-
-							return;
-						}
-
-						const auto spawn_used = teleport_to_next_spawn(in, new_character);
-						init_spawned(in, id, new_character, step, changed_identities, transferred);
+						init_spawned(in, id, new_character, step, changed_identities, custom_equipment ? nullptr : transferred, equipment);
 						p.ai_state.source_spawn_point = spawn_used;
+
+						if (playtest_spawn != nullptr && p.is_bot) {
+							::start_bot_at_playtest_spawn(p.ai_state, cosm, ai_arena_meta, *playtest_spawn);
+						}
 					}
 				);
 
@@ -1332,7 +1329,7 @@ void arena_mode::setup_round(
 	generated_waypoints_seed = static_cast<uint32_t>(get_round_rng_seed(cosm));
 	generated_waypoints_this_round =
 		num_requested_bots > 0
-		&& ::create_random_waypoints(access, cosm, in.rules.is_gun_game(), generated_waypoints_seed)
+		&& ::create_random_waypoints(access, cosm, in.rules.is_gun_game(), in.rules.playtest_spawns, generated_waypoints_seed)
 	;
 
 	/*

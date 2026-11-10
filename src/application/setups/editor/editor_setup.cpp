@@ -615,7 +615,8 @@ bool editor_setup::handle_input_before_game(
 			world_cursor_pos,
 			current_eye,
 			state[key::LMOUSE],
-			render_layer_filter::all()
+			render_layer_filter::all(),
+			::make_entity_set_of_layers_hiding_icons(project)
 		);
 
 		check_changed();
@@ -2121,7 +2122,8 @@ entity_id editor_setup::get_hovered_entity(const necessary_images_in_atlas_map& 
 		sizes_for_icons,
 		get_camera_eye().zoom,
 		at ? *at : get_world_cursor_pos(),
-		render_layer_filter::all()
+		render_layer_filter::all(),
+		::make_entity_set_of_layers_hiding_icons(project)
 	);
 }
 
@@ -2378,101 +2380,24 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				}
 			}
 		}
+	}
 
-		/*
-			Draw navigation debug visualization.
-			Iterate over DEBUG_NAVIGATION_START and DEBUG_NAVIGATION_END point markers
-			and draw paths between them.
-		*/
+	if (view.show_bot_test_paths) {
+		const auto& navmesh = scene.world.get_common_significant().navmesh;
+		const auto path_color = project.settings.debug_navigation_color;
+		const auto& arrow_image = in.necessary_images.at(assets::necessary_image_id::EDITOR_TOOL_PLAIN_ARROW);
 
-		const auto navigation_color = project.settings.debug_navigation_color;
-		const auto arrow_image_id = assets::necessary_image_id::EDITOR_TOOL_PLAIN_ARROW;
-
-		/*
-			Collect start and end positions.
-		*/
-		std::vector<vec2> navigation_starts;
-		std::vector<vec2> navigation_ends;
-
-		scene.world.for_each_having<invariants::point_marker>(
-			[&](const auto& typed_handle) {
-				const auto& marker = typed_handle.template get<invariants::point_marker>();
-
-				if (marker.type == point_marker_type::DEBUG_NAVIGATION_START) {
-					navigation_starts.push_back(typed_handle.get_logic_transform().pos);
-				}
-				else if (marker.type == point_marker_type::DEBUG_NAVIGATION_END) {
-					navigation_ends.push_back(typed_handle.get_logic_transform().pos);
-				}
+		::draw_bot_test_paths(
+			navmesh,
+			bot_test_paths.get(scene.world, ruleset, project.playtesting.starting_faction),
+			on_screen,
+			[&](const ltrb cell) {
+				triangles.aabb(triangles.default_texture, cell, path_color);
+			},
+			[&](const vec2 center, const real32 degrees) {
+				augs::detail_sprite(triangles.output_buffer, arrow_image, center, degrees, white);
 			}
 		);
-
-		/*
-			For each start, find path to each end.
-		*/
-		pathfinding_context pf_ctx;
-		const auto physics_hints = make_physics_path_hints(scene.world);
-
-		for (const auto& start_pos : navigation_starts) {
-			for (const auto& end_pos : navigation_ends) {
-				const auto all_paths = ::find_path_across_islands_many_full(navmesh, start_pos, end_pos, &physics_hints, &pf_ctx);
-
-				for (const auto& path : all_paths) {
-					if (path.island_index >= navmesh.islands.size()) {
-						continue;
-					}
-
-					const auto& island = navmesh.islands[path.island_index];
-					const auto cell_size = island.cell_size;
-
-					if (cell_size <= 0) {
-						continue;
-					}
-
-					/*
-						Draw path cells.
-					*/
-					for (std::size_t i = 0; i < path.nodes.size(); ++i) {
-						const auto& node = path.nodes[i];
-						const auto world_lt = vec2(island.bound.lt()) + vec2(node.cell_xy) * static_cast<float>(cell_size);
-						const auto world_rb = world_lt + vec2::square(static_cast<float>(cell_size));
-
-						const auto screen_lt = on_screen(world_lt);
-						const auto screen_rb = on_screen(world_rb);
-
-						triangles.aabb(
-							blank_tex,
-							ltrb(screen_lt, screen_rb - screen_lt),
-							navigation_color
-						);
-
-						/*
-							Draw direction arrow at center of tile.
-						*/
-						if (i + 1 < path.nodes.size()) {
-							const auto& next_node = path.nodes[i + 1];
-							const auto dir = vec2i(next_node.cell_xy) - vec2i(node.cell_xy);
-
-							const auto center_world = world_lt + vec2::square(static_cast<float>(cell_size) / 2);
-							const auto center_screen = on_screen(center_world);
-
-							/*
-								Compute rotation angle from direction.
-							*/
-							const auto angle = vec2(dir).degrees();
-
-							augs::detail_sprite(
-								triangles.output_buffer,
-								in.necessary_images.at(arrow_image_id),
-								center_screen,
-								angle,
-								white
-							);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	const auto nodes_hiding_icons = ::make_node_set_of_layers_hiding_icons(project);
@@ -3909,47 +3834,6 @@ arena_playtesting_context editor_setup::make_playtesting_context(const faction_t
 	arena_playtesting_context ctx;
 	ctx.initial_spawn_pos = initial_spawn_pos;
 	ctx.first_player_faction = starting_faction;
-
-	/*
-		Look for DEBUG_NAVIGATION_START and DEBUG_NAVIGATION_END markers.
-		If DEBUG_NAVIGATION_START exists, spawn at that position.
-		If DEBUG_NAVIGATION_END exists, store it for AI navigation testing.
-	*/
-	std::optional<vec2> navigation_start;
-	std::optional<transformr> navigation_end;
-
-	scene.world.for_each_having<invariants::point_marker>(
-		[&](const auto& typed_handle) {
-			const auto& marker = typed_handle.template get<invariants::point_marker>();
-
-			if (marker.type == point_marker_type::DEBUG_NAVIGATION_START) {
-				navigation_start = typed_handle.get_logic_transform().pos;
-			}
-			else if (marker.type == point_marker_type::DEBUG_NAVIGATION_END) {
-				navigation_end = typed_handle.get_logic_transform();
-			}
-		}
-	);
-
-	if (navigation_start.has_value()) {
-		ctx.initial_spawn_pos = *navigation_start;
-	}
-
-	if (navigation_end.has_value()) {
-		ctx.debug_navigation_end = navigation_end;
-	}
-	else {
-		/*
-			Check if there's a planted bomb on the ground to use as navigation target.
-		*/
-		scene.world.for_each_having<invariants::hand_fuse>(
-			[&](const auto& typed_handle) {
-				if (::is_like_plantable_bomb(typed_handle)) {
-					ctx.debug_navigation_bomb_target = typed_handle.get_id();
-				}
-			}
-		);
-	}
 
 	return ctx;
 }

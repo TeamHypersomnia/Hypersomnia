@@ -96,13 +96,13 @@ struct test_mode_player {
 	mode_entity_id controlled_character_id;
 	test_mode_player_stats stats;
 	entity_id dedicated_spawn;
-	entity_id test_navigation_end;
+	std::optional<bot_test_navigation_end> test_navigation_end;
 
 	bool hide_in_scoreboard = false;
 	bool allow_respawn = true;
 	bool is_bot = false;
 
-	std::optional<ai_path_navigation_state> debug_navigation;
+	std::optional<ai_path_navigation_state> test_navigation;
 	std::optional<item_flavour_id> round_start_weapon;
 	// END GEN INTROSPECTOR
 

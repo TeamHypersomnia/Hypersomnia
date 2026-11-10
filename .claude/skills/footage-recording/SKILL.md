@@ -39,9 +39,11 @@ the rule. Also back up the rendered takes: a re-capture overwrites `OUTPUT` - co
 - **quick_test_spawn** (Quick test mode): you spawn on the topmost one (in the layers); every other one gets a bot
   named after the node that stands still, holding the node's equipment (or the mode's). Faction, custom equipment,
   "Bot respawns" (off by default).
-- **bot_test_navigation_end** (Quick test): every quick_test_spawn bot pathfinds once to the nearest free end of its
-  faction (Any matches all) and stands there facing the end's direction. "Sprint" (run otherwise), "Hide weapons on
-  arrival" (like H). The navmesh is generated whenever the map has such ends. The devlog 6 ending (three bots
+- **bot_test_navigation_end** (Quick test): every quick_test_spawn bot pathfinds once to the nearest free end (ends
+  have no faction; bots take them in faction order - Metropolis, Atlantis, Resistance - and within a faction in layer
+  order, each the nearest free end in a straight line) and stands there facing the end's direction. "Sprint" (run
+  otherwise), "Hide weapons on arrival" (like H). The navmesh is generated whenever the map has such ends. The editor
+  draws each bot's path to its end (View > Bot test paths, on by default) - check them before recording. The devlog 6 ending (three bots
   walking to a window to watch the nebula) was staged this way.
 - **Playtest spawn** on team spawns (bomb defusal and other arena modes): a faction with any spawns only there;
   "Bot camps here from the start", "Custom equipment" every round.

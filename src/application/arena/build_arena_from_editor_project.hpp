@@ -389,6 +389,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							return;
 						}
 					}
+
+					if (!in.for_playtesting && ::is_playtest_only_spawn(typed_node, resource->editable.type)) {
+						return;
+					}
 				}
 
 				auto apply_layer_modifiers_on_special_entity = [&](const auto new_entity_id) {

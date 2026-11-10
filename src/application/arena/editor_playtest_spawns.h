@@ -7,6 +7,10 @@
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/editor_rebuild_game_mode.hpp"
 
+inline bool is_playtest_only_spawn(const editor_point_marker_node& node, const point_marker_type type) {
+	return type == point_marker_type::TEAM_SPAWN && node.editable.playtest_spawn;
+}
+
 inline bool is_playtest_marker_node(const editor_point_marker_node& node, const point_marker_type type) {
 	if (type == point_marker_type::TEAM_SPAWN) {
 		return node.editable.playtest_spawn;

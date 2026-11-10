@@ -10,3 +10,7 @@ inline const std::string& current_name_of_renamed_resource_type(const std::strin
 
 	return type;
 }
+
+inline bool is_removed_resource_type(const std::string& type) {
+	return type == "debug_navigation_start" || type == "debug_navigation_end";
+}

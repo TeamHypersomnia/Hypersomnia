@@ -1242,6 +1242,12 @@ namespace editor_project_readwrite {
 					}
 
 					const auto& type = *maybe_type;
+
+					if (::is_removed_resource_type(type)) {
+						skipped_nodes.emplace(id);
+						continue;
+					}
+
 					const auto resource_id = mapped_or_nullptr(resource_map, ::current_name_of_renamed_resource_type(type));
 
 					if (resource_id == nullptr) {
