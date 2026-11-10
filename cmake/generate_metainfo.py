@@ -26,13 +26,8 @@ def github_heading_anchor(heading_text):
 	return slug.replace(" ", "-")
 
 
-def continues_previous_bullet(line):
-	return line.strip() != "" and not line.startswith(("\t", " ", "-", "#", "|"))
-
-
 def parse_changelog(changelog_text):
 	releases = []
-	last_bullets = None
 
 	for line in changelog_text.splitlines():
 		if match := version_heading.match(line):
@@ -43,7 +38,6 @@ def parse_changelog(changelog_text):
 				"sections": []
 			})
 
-			last_bullets = None
 			continue
 
 		if not releases:
@@ -53,22 +47,10 @@ def parse_changelog(changelog_text):
 
 		if match := section_heading.match(line):
 			sections.append((match["name"], []))
-			last_bullets = None
 			continue
 
-		if not sections:
-			continue
-
-		if match := top_level_bullet.match(line):
-			last_bullets = sections[-1][1]
-			last_bullets.append(match["text"])
-			continue
-
-		if last_bullets and continues_previous_bullet(line):
-			last_bullets[-1] += " " + line.strip()
-			continue
-
-		last_bullets = None
+		if sections and (match := top_level_bullet.match(line)):
+			sections[-1][1].append(match["text"])
 
 	return releases
 

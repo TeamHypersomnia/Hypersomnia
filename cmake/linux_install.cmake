@@ -4,15 +4,6 @@ if(LINUX AND NOT BUILD_FOR_WEB AND NOT HEADLESS)
 	set(HYPERSOMNIA_CHANGELOG "${PROJECT_SOURCE_DIR}/hypersomnia/CHANGELOG.md")
 
 	install(TARGETS Hypersomnia RUNTIME DESTINATION bin)
-	set_target_properties(Hypersomnia PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
-
-	if(TARGET freetype)
-		get_target_property(HYPERSOMNIA_FREETYPE_TYPE freetype TYPE)
-
-		if(HYPERSOMNIA_FREETYPE_TYPE STREQUAL "SHARED_LIBRARY")
-			install(TARGETS freetype LIBRARY DESTINATION lib NAMELINK_SKIP)
-		endif()
-	endif()
 
 	install(
 		DIRECTORY

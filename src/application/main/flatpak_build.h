@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdlib>
-#include <optional>
 #include <string>
 #include "augs/filesystem/path_declaration.h"
 #include "augs/string/typesafe_sprintf.h"
@@ -27,7 +26,7 @@ inline augs::path_type get_xdg_config_home() {
 
 inline augs::path_type get_default_appdata_dir() {
 	if constexpr(is_flatpak_build_v) {
-		return get_xdg_config_home() / "Hypersomnia";
+		return ::get_xdg_config_home() / "Hypersomnia";
 	}
 	else {
 		return augs::get_default_documents_dir();
@@ -52,18 +51,12 @@ inline std::string get_no_file_dialog_notice() {
 	}
 }
 
-inline std::optional<std::string> get_flatpak_update_notice(const self_update_result& last_update_result) {
+inline std::string get_update_available_status(const self_update_result& last_update_result) {
 	if constexpr(is_flatpak_build_v) {
-		if (last_update_result.type == self_update_result_type::UPDATE_AVAILABLE) {
-			return typesafe_sprintf(
-				"Version %x is available - update the game through Flathub (it can take a few hours to show up there).",
-				last_update_result.available_version
-			);
-		}
+		return typesafe_sprintf("Version %x is out - Flathub gets it within a few hours.", last_update_result.available_version);
 	}
 	else {
 		(void)last_update_result;
+		return "Updates are available. Restart to install.";
 	}
-
-	return std::nullopt;
 }
