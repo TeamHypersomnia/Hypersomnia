@@ -2517,8 +2517,8 @@ work_result work(
 
 	WEBSTATIC auto changelog = ::load_changelog(CHANGELOG_PATH);
 	WEBSTATIC changelog_view_state changelog_view;
-	WEBSTATIC changelog_window_state changelog_window = std::string("What's new in Hypersomnia?");
-	WEBSTATIC dev_journal_window_state dev_journal_window = std::string("NEW DEV JOURNAL!");
+	WEBSTATIC changelog_window_state changelog_window = std::string("What's new in Hypersomnia?###news");
+	WEBSTATIC dev_journal_window_state dev_journal_window = std::string("What's new in Hypersomnia?###news");
 
 	WEBSTATIC auto is_news_window_open = [&]() {
 		return changelog_window.is_open() || dev_journal_window.is_open();
@@ -2596,7 +2596,6 @@ work_result work(
 	*/
 
 	WEBSTATIC const bool left_tutorial_before_this_run = config.skip_tutorial;
-	(void)left_tutorial_before_this_run;
 
 	WEBSTATIC auto open_changelog_window = [&]() {
 		if (settings_gui.is_open()) {
@@ -2633,7 +2632,9 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_dev_journal_window = [&]() {
-		if (dev_journal_window.perform()) {
+		const bool changelog_continues_in_the_same_popup = ::should_show_changelog(changelog, config.last_seen_changelog_version);
+
+		if (dev_journal_window.perform(changelog_continues_in_the_same_popup)) {
 			change_with_save(
 				[&](auto& cfg) {
 					cfg.dev_journal_seen_premiere_unix_utc = latest_dev_journal_v.premiere_unix_utc;
@@ -4767,10 +4768,10 @@ work_result work(
 
 			const bool joining = params.should_connect || client_start_requested;
 
-			const bool links_out_of_the_game_allowed = !params.is_crazygames;
+			const bool new_crazygames_player = params.is_crazygames && !left_tutorial_before_this_run;
 
-			if (!joining && ::should_show_dev_journal(config.dev_journal_seen_premiere_unix_utc, links_out_of_the_game_allowed)) {
-				dev_journal_window.open_fetching_thumbnail(config.website_url);
+			if (!joining && !new_crazygames_player && ::should_show_dev_journal(config.dev_journal_seen_premiere_unix_utc)) {
+				dev_journal_window.open_fetching_thumbnail(config.website_url, params.is_crazygames);
 			}
 			else if (!joining) {
 				open_changelog_if_unseen();

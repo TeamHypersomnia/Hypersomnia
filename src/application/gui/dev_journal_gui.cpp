@@ -14,10 +14,9 @@
 #include "application/gui/dev_journal_gui.h"
 #include "application/gui/leaderboards_gui.h"
 
-bool should_show_dev_journal(const std::uint64_t seen_premiere_unix_utc, const bool links_out_of_the_game_allowed) {
+bool should_show_dev_journal(const std::uint64_t seen_premiere_unix_utc) {
 #if !IS_PRODUCTION_BUILD
 	(void)seen_premiere_unix_utc;
-	(void)links_out_of_the_game_allowed;
 	return false;
 #else
 	const auto& journal = latest_dev_journal_v;
@@ -27,16 +26,16 @@ bool should_show_dev_journal(const std::uint64_t seen_premiere_unix_utc, const b
 	const bool premiered = journal.premiere_unix_utc <= now && now < journal.shown_until_unix_utc;
 	const bool seen = seen_premiere_unix_utc >= journal.premiere_unix_utc;
 
-	return links_out_of_the_game_allowed && announced && premiered && !seen;
+	return announced && premiered && !seen;
 #endif
 }
 
-void dev_journal_window_state::open_fetching_thumbnail(const std::string& website_url) {
+void dev_journal_window_state::open_fetching_thumbnail(const std::string& website_url, const bool green_blood_thumbnail) {
 	open();
 
 	const auto location_new_for_every_premiere = typesafe_sprintf(
 		"%x?premiere=%x",
-		dev_journal_thumbnail_location_v,
+		green_blood_thumbnail ? dev_journal_green_blood_thumbnail_location_v : dev_journal_thumbnail_location_v,
 		latest_dev_journal_v.premiere_unix_utc
 	);
 
@@ -107,16 +106,15 @@ static bool perform_dev_journal_thumbnail(const vec2u thumbnail_size, const vec2
 	return clicked;
 }
 
-static void center_dev_journal_title(const vec2 area_lt, const vec2 area_size) {
+static void center_larger_text(const char* const text, const vec2 area_lt, const vec2 area_size) {
 	const auto larger_font = ImGui::GetIO().Fonts->Fonts[1];
 
 	ImGui::PushFont(larger_font);
 
-	const auto title = latest_dev_journal_v.title;
-	const auto title_size = vec2(ImGui::CalcTextSize(title));
+	const auto text_size = vec2(ImGui::CalcTextSize(text));
 
-	ImGui::SetCursorPos(static_cast<ImVec2>(area_lt + ((area_size - title_size) / 2).discard_fract()));
-	augs::imgui::text_color(title, leaderboards_tint);
+	ImGui::SetCursorPos(static_cast<ImVec2>(area_lt + ((area_size - text_size) / 2).discard_fract()));
+	augs::imgui::text_color(text, leaderboards_tint);
 
 	ImGui::PopFont();
 }
@@ -157,7 +155,7 @@ static bool perform_watch_button(const float h) {
 	return clicked;
 }
 
-bool dev_journal_window_state::perform() {
+bool dev_journal_window_state::perform(const bool changelog_continues_in_the_same_popup) {
 	using namespace augs::imgui;
 
 	if (!show) {
@@ -188,11 +186,19 @@ bool dev_journal_window_state::perform() {
 	const auto larger_font = ImGui::GetIO().Fonts->Fonts[1];
 
 	const auto button_h = (larger_font->FontSize + style.FramePadding.y * 2) * 1.4f;
-	const auto area_lt = vec2(ImGui::GetCursorPos());
+	const auto thumbnail_margin = vec2(std::round(ImGui::GetFontSize() * 4), std::round(ImGui::GetFontSize() * 1.5f));
+	const auto header_h = std::round(larger_font->FontSize + style.ItemSpacing.y * 2);
+
+	const auto content_lt = vec2(ImGui::GetCursorPos());
+	const auto content_size = vec2(ImGui::GetContentRegionAvail());
+
+	const auto area_lt = content_lt + vec2(thumbnail_margin.x, header_h + thumbnail_margin.y);
 	const auto area_size = vec2(
-		ImGui::GetContentRegionAvail().x,
-		ImGui::GetContentRegionAvail().y - button_h * 2 - style.ItemSpacing.y * 2
+		content_size.x - thumbnail_margin.x * 2,
+		content_size.y - header_h - thumbnail_margin.y * 2 - button_h * 2 - style.ItemSpacing.y * 2
 	);
+
+	::center_larger_text("NEW DEV JOURNAL!", content_lt, vec2(content_size.x, header_h));
 
 	auto button_cols = scoped_button_colors({
 		rgba(255, 255, 255, 45) * leaderboards_tint,
@@ -205,11 +211,11 @@ bool dev_journal_window_state::perform() {
 			return ::perform_dev_journal_thumbnail(*thumbnail_size, area_lt, area_size);
 		}
 
-		::center_dev_journal_title(area_lt, area_size);
+		::center_larger_text(latest_dev_journal_v.title, area_lt, area_size);
 		return false;
 	}();
 
-	ImGui::SetCursorPos(static_cast<ImVec2>(area_lt + vec2(0.0f, area_size.y + style.ItemSpacing.y)));
+	ImGui::SetCursorPos(static_cast<ImVec2>(content_lt + vec2(0.0f, header_h + area_size.y + thumbnail_margin.y * 2)));
 
 	const bool watch_clicked = ::perform_watch_button(button_h);
 
@@ -234,7 +240,10 @@ bool dev_journal_window_state::perform() {
 
 	if (watched || ok_pressed || escape_pressed || !show) {
 		show = false;
-		ImGui::CloseCurrentPopup();
+
+		if (!changelog_continues_in_the_same_popup) {
+			ImGui::CloseCurrentPopup();
+		}
 		return true;
 	}
 
