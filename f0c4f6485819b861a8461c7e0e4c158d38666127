@@ -1,0 +1,1 @@
+Audited: audit #2, 2026-11-10 - WebRTC server: deadlocks, release order, races, web path, DTLS certificate; nothing serious, low findings fixed in this commit
