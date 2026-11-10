@@ -86,6 +86,7 @@ namespace augs {
 		augs::local_entropy filter_inputs(augs::local_entropy local);
 
 		void center_next_window(ImGuiCond);
+		bool is_other_popup_open(const std::string& own_title);
 		void center_next_window(vec2 size_multiplier, ImGuiCond);
 		void set_next_window_rect(xywh, ImGuiCond = ImGuiCond_FirstUseEver);
 

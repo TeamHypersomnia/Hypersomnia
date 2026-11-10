@@ -778,29 +778,6 @@ static bool perform_changelog_view(
 	return ok_pressed;
 }
 
-/*
-	Any open popup other than the changelog's own - e.g. the damaged account key, sign-in or an error.
-*/
-
-static bool is_other_popup_open(const std::string& own_title) {
-	const auto own_id = ImGui::GetID(own_title.c_str());
-
-	/*
-		Only popups still drawn count - one whose window is no longer submitted (e.g. hidden by the changelog itself)
-		stays in the stack and would make the changelog wait for good.
-	*/
-
-	for (const auto& popup : ImGui::GetCurrentContext()->OpenPopupStack) {
-		const bool still_drawn = popup.Window != nullptr && popup.Window->WasActive;
-
-		if (popup.PopupId != own_id && still_drawn) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool changelog_window_state::perform(const changelog_input in) {
 	using namespace augs::imgui;
 
@@ -813,7 +790,7 @@ bool changelog_window_state::perform(const changelog_input in) {
 		Opening it over them would also close them, as both open from the root level.
 	*/
 
-	if (::is_other_popup_open(get_title())) {
+	if (augs::imgui::is_other_popup_open(get_title())) {
 		return false;
 	}
 
@@ -838,7 +815,7 @@ bool changelog_window_state::perform(const changelog_input in) {
 	}
 
 	const bool ok_pressed = ::perform_changelog_view(in, necessary_images, steam_review_opened);
-	const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape);
+	const bool escape_pressed = ImGui::IsKeyPressed(ImGuiKey_Escape, false);
 
 	if (ok_pressed || escape_pressed || !show) {
 		show = false;

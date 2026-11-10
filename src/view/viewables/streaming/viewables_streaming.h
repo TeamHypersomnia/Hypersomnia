@@ -144,6 +144,9 @@ public:
 	augs::graphics::texture link_avatar_tex = augs::image::white_pixel();
 	std::optional<augs::image> requested_link_avatar;
 
+	augs::graphics::texture dev_journal_thumbnail_tex = augs::image::white_pixel();
+	std::optional<augs::image> requested_dev_journal_thumbnail;
+
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;
 

@@ -356,6 +356,20 @@ namespace augs {
 			return ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 		}
 
+		bool is_other_popup_open(const std::string& own_title) {
+			const auto own_id = ImGui::GetID(own_title.c_str());
+
+			for (const auto& popup : ImGui::GetCurrentContext()->OpenPopupStack) {
+				const bool still_drawn = popup.Window != nullptr && popup.Window->WasActive;
+
+				if (popup.PopupId != own_id && still_drawn) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		void center_next_window(ImGuiCond cond) {
 			const auto screen_size = vec2(GetIO().DisplaySize);
 			SetNextWindowPos(ImVec2{ screen_size / 2 }, cond, ImVec2(0.5f, 0.5f));

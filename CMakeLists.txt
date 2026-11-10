@@ -682,6 +682,7 @@ if(HAS_HEAD)
 	"src/application/gui/client/client_gui_state.cpp"
 	"src/application/gui/leaderboards_gui.cpp"
 	"src/application/gui/changelog_gui.cpp"
+	"src/application/gui/dev_journal_gui.cpp"
 	"src/application/gui/changelog_entry.cpp"
 	"src/application/gui/social_sign_in_gui.cpp"
 	"src/view/hud_messages/hud_messages_gui.cpp"

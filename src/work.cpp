@@ -126,6 +126,7 @@
 #include "application/gui/map_catalogue_gui.h"
 #include "application/gui/leaderboards_gui.h"
 #include "application/gui/changelog_gui.h"
+#include "application/gui/dev_journal_gui.h"
 #include "application/gui/social_sign_in_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 #include "application/gui/arena_miniatures.h"
@@ -2517,6 +2518,11 @@ work_result work(
 	WEBSTATIC auto changelog = ::load_changelog(CHANGELOG_PATH);
 	WEBSTATIC changelog_view_state changelog_view;
 	WEBSTATIC changelog_window_state changelog_window = std::string("What's new in Hypersomnia?");
+	WEBSTATIC dev_journal_window_state dev_journal_window = std::string("NEW DEV JOURNAL!");
+
+	WEBSTATIC auto is_news_window_open = [&]() {
+		return changelog_window.is_open() || dev_journal_window.is_open();
+	};
 
 	/*
 		(NEW!) is decided by the version acknowledged before this run: OK saves the newest one at once (so it does not
@@ -2583,7 +2589,7 @@ work_result work(
 	*/
 
 	WEBSTATIC bool reopen_settings_after_changelog = false;
-	WEBSTATIC bool changelog_auto_open_checked = false;
+	WEBSTATIC bool news_auto_open_checked = false;
 
 	/*
 		As at the start - leaving the tutorial for the menu sets skip_tutorial before the menu's first frame.
@@ -2604,6 +2610,38 @@ work_result work(
 
 		changelog_view.selected = ::oldest_unseen_changelog_index(changelog, last_seen_changelog_at_start);
 		changelog_window.open();
+	};
+
+	WEBSTATIC auto open_changelog_if_unseen = [&]() {
+		if (!::should_show_changelog(changelog, config.last_seen_changelog_version)) {
+			return;
+		}
+
+#if PLATFORM_WEB
+		/*
+			A CrazyGames player who has not even left the tutorial yet is new - the release is acknowledged
+			for them quietly, and only the next one opens.
+		*/
+
+		if (params.is_crazygames && !left_tutorial_before_this_run) {
+			acknowledge_changelog();
+			return;
+		}
+#endif
+
+		open_changelog_window();
+	};
+
+	WEBSTATIC auto perform_dev_journal_window = [&]() {
+		if (dev_journal_window.perform()) {
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.dev_journal_seen_premiere_unix_utc = latest_dev_journal_v.premiere_unix_utc;
+				}
+			);
+
+			open_changelog_if_unseen();
+		}
 	};
 
 	WEBSTATIC auto perform_changelog_window = [&]() {
@@ -3465,6 +3503,11 @@ work_result work(
 		if (settings_gui.link_avatar_to_upload.has_value()) {
 			streaming.requested_link_avatar = std::move(*settings_gui.link_avatar_to_upload);
 			settings_gui.link_avatar_to_upload.reset();
+		}
+
+		if (dev_journal_window.thumbnail_to_upload.has_value()) {
+			streaming.requested_dev_journal_thumbnail = std::move(*dev_journal_window.thumbnail_to_upload);
+			dev_journal_window.thumbnail_to_upload.reset();
 		}
 	};
 
@@ -4719,40 +4762,22 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_leaderboards = [&]() {
-		/*
-			A release not acknowledged yet opens the changelog once per run (production builds only - see should_show_changelog).
-		*/
-
-		if (!changelog_auto_open_checked) {
-			changelog_auto_open_checked = true;
-
-			/*
-				Not when this start joins a server (a /game/ link, --connect): the changelog would hold the join until
-				closed - it opens on the next start, still not acknowledged.
-			*/
+		if (!news_auto_open_checked) {
+			news_auto_open_checked = true;
 
 			const bool joining = params.should_connect || client_start_requested;
 
-			if (!joining && ::should_show_changelog(changelog, config.last_seen_changelog_version)) {
-#if PLATFORM_WEB
-				/*
-					A CrazyGames player who has not even left the tutorial yet is new - the release is acknowledged
-					for them quietly, and only the next one opens.
-				*/
+			const bool links_out_of_the_game_allowed = !params.is_crazygames;
 
-				if (params.is_crazygames && !left_tutorial_before_this_run) {
-					acknowledge_changelog();
-				}
-				else {
-					open_changelog_window();
-				}
-#else
-				open_changelog_window();
-#endif
+			if (!joining && ::should_show_dev_journal(config.dev_journal_seen_premiere_unix_utc, links_out_of_the_game_allowed)) {
+				dev_journal_window.open_fetching_thumbnail(config.website_url);
+			}
+			else if (!joining) {
+				open_changelog_if_unseen();
 			}
 		}
 
-		leaderboards_gui.show = !browse_servers_gui.show && !changelog_window.is_open();
+		leaderboards_gui.show = !browse_servers_gui.show && !is_news_window_open();
 
 		const auto now = augs::steady_secs();
 		const auto in = get_identity_input();
@@ -5614,11 +5639,7 @@ work_result work(
 				browse_servers_gui.advance_ping_logic();
 #endif
 
-				/*
-					While the changelog is open, no other window is drawn - only the menu buttons and the logo stay.
-				*/
-
-				const bool changelog_shown = changelog_window.is_open();
+				const bool news_window_shown = is_news_window_open();
 
 #if !PLATFORM_WEB
 				/*
@@ -5626,7 +5647,7 @@ work_result work(
 					(favorite_from_clipboard.hpp) - the browser opens on it.
 				*/
 
-				if (!has_current_setup() && !changelog_shown && browse_servers_gui.clipboard_worth_reading(window.get_times_activated())) {
+				if (!has_current_setup() && !news_window_shown && browse_servers_gui.clipboard_worth_reading(window.get_times_activated())) {
 					const auto* const clipboard = ImGui::GetClipboardText();
 
 					if (browse_servers_gui.take_favorite_from_clipboard(clipboard != nullptr ? clipboard : "", favorites)) {
@@ -5650,18 +5671,18 @@ work_result work(
 				}
 #endif
 
-				if (const bool show_server_browser = (!has_current_setup() || ingame_menu.show) && !changelog_shown) {
+				if (const bool show_server_browser = (!has_current_setup() || ingame_menu.show) && !news_window_shown) {
 					perform_browse_servers();
 				}
 
-				if (ingame_menu.show && !changelog_shown) {
+				if (ingame_menu.show && !news_window_shown) {
 					if (const auto invite = get_invite_input()) {
 						invite_to_join_gui.perform(*invite);
 					}
 				}
 #endif
 
-				if (const bool show_map_catalogue = !has_current_setup() && !changelog_window.is_open()) {
+				if (const bool show_map_catalogue = !has_current_setup() && !is_news_window_open()) {
 					perform_map_catalogue();
 				}
 
@@ -5773,7 +5794,7 @@ work_result work(
 					perform_last_exit_incorrect();
 				}
 
-				if (!has_current_setup() && !changelog_window.is_open()) {
+				if (!has_current_setup() && !is_news_window_open()) {
 #if BUILD_NETWORKING
 					perform_start_client_gui();
 					perform_start_server_gui();
@@ -5781,6 +5802,7 @@ work_result work(
 				}
 
 				perform_changelog_window();
+				perform_dev_journal_window();
 				perform_failed_to_load_arena_popup();
 				perform_abandon_are_you_sure_popup();
 #if !PLATFORM_WEB
@@ -5795,7 +5817,7 @@ work_result work(
 			},
 
 			[&]() {
-				if (!changelog_window.is_open()) {
+				if (!is_news_window_open()) {
 					perform_setup_custom_imgui();
 				}
 			},
@@ -7092,12 +7114,6 @@ work_result work(
 					game_gui_mode = true;
 				}
 
-				/*
-					Any modal shown (e.g. "This key is linked to a Steam account - is it yours?" coming up as the shooting
-					range starts), the changelog or the settings drawn over the game need the cursor - free, never locked
-					by gameplay. Not the ones still open but not drawn (settings hidden in game, a modal of theirs).
-				*/
-
 				const bool settings_shown =
 					settings_gui.is_open()
 					&& !::is_settings_hidden_ingame(config.session.hide_settings_ingame, has_current_setup(), ingame_menu.show)
@@ -7105,7 +7121,7 @@ work_result work(
 
 				const bool window_needs_cursor =
 					ImGui::GetTopMostAndVisiblePopupModal() != nullptr
-					|| changelog_window.is_open()
+					|| is_news_window_open()
 					|| settings_shown
 				;
 
@@ -8021,7 +8037,8 @@ work_result work(
 					std::addressof(streaming.avatar_preview_tex),
 					std::addressof(streaming.ad_hoc.texture),
 					std::addressof(streaming.link_avatar_tex),
-					std::addressof(streaming.arena_miniatures.texture)
+					std::addressof(streaming.arena_miniatures.texture),
+					std::addressof(streaming.dev_journal_thumbnail_tex)
 				);
 			};
 

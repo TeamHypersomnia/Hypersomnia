@@ -533,6 +533,7 @@
     // 3.0.0 came before the changelog - everyone knows it: the changelog opens on the oldest release after it.
     "last_seen_changelog_version": "3.0.0",
     "opened_steam_review": false,
+    "dev_journal_seen_premiere_unix_utc": 0,
 
     "sound": {
         "allow_sounds_without_character_listener": true,
