@@ -755,10 +755,11 @@ namespace editor_project_readwrite {
 			*/
 			project.nodes.pools.for_each_container_reverse([&]<typename P>(const P& pool) {
 				using node_type = typename P::mapped_type;
-				auto defaults = node_type();
 
 				auto write = [&](const node_type& typed_node) {
 					if (const auto resource = project.find_resource(officials, typed_node.resource_id)) {
+						auto defaults = node_type();
+
 						writer.StartObject();
 
 						/* Already stringified with a call to stringify_resource_ids */
