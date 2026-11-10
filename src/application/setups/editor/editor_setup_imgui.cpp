@@ -413,8 +413,8 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.scratchpad.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
-			ImGui::DockBuilderDockWindow(gui.history.get_title().c_str(), dock_id_bottom_right);
 			ImGui::DockBuilderDockWindow(gui.recorded_playtests.get_title().c_str(), dock_id_bottom_right);
+			ImGui::DockBuilderDockWindow(gui.history.get_title().c_str(), dock_id_bottom_right);
 
 			ImGui::DockBuilderDockWindow(gui.toolbar.get_title().c_str(), dock_id_top);
 

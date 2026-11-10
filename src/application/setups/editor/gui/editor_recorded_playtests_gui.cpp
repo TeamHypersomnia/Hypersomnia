@@ -12,7 +12,7 @@
 void editor_recorded_playtests_gui::perform(const editor_recorded_playtests_input in) {
 	using namespace augs::imgui;
 
-	auto window = make_scoped_window();
+	auto window = make_scoped_window(ImGuiWindowFlags_NoFocusOnAppearing);
 
 	if (!window) {
 		return;
