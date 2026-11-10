@@ -2611,6 +2611,14 @@ work_result work(
 		changelog_window.open();
 	};
 
+	WEBSTATIC auto is_new_crazygames_player = [&]() {
+		return params.is_crazygames && !left_tutorial_before_this_run;
+	};
+
+	WEBSTATIC auto changelog_opens_unseen = [&]() {
+		return ::should_show_changelog(changelog, config.last_seen_changelog_version) && !is_new_crazygames_player();
+	};
+
 	WEBSTATIC auto open_changelog_if_unseen = [&]() {
 		if (!::should_show_changelog(changelog, config.last_seen_changelog_version)) {
 			return;
@@ -2622,7 +2630,7 @@ work_result work(
 			for them quietly, and only the next one opens.
 		*/
 
-		if (params.is_crazygames && !left_tutorial_before_this_run) {
+		if (is_new_crazygames_player()) {
 			acknowledge_changelog();
 			return;
 		}
@@ -2632,7 +2640,7 @@ work_result work(
 	};
 
 	WEBSTATIC auto perform_dev_journal_window = [&]() {
-		const bool changelog_continues_in_the_same_popup = ::should_show_changelog(changelog, config.last_seen_changelog_version);
+		const bool changelog_continues_in_the_same_popup = changelog_opens_unseen();
 
 		if (dev_journal_window.perform(changelog_continues_in_the_same_popup)) {
 			change_with_save(
@@ -4768,9 +4776,7 @@ work_result work(
 
 			const bool joining = params.should_connect || client_start_requested;
 
-			const bool new_crazygames_player = params.is_crazygames && !left_tutorial_before_this_run;
-
-			if (!joining && !new_crazygames_player && ::should_show_dev_journal(config.dev_journal_seen_premiere_unix_utc)) {
+			if (!joining && ::should_show_dev_journal(config.dev_journal_seen_premiere_unix_utc)) {
 				dev_journal_window.open_fetching_thumbnail(config.website_url, params.is_crazygames);
 			}
 			else if (!joining) {

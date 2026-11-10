@@ -70,6 +70,11 @@ static bool perform_dev_journal_thumbnail(const vec2u thumbnail_size, const vec2
 	using namespace augs::imgui;
 
 	const auto size = ::fit_keeping_aspect(vec2(thumbnail_size), area_size);
+
+	if (size.x < 1.0f || size.y < 1.0f) {
+		return false;
+	}
+
 	const auto lt = area_lt + ((area_size - size) / 2).discard_fract();
 
 	ImGui::SetCursorPos(static_cast<ImVec2>(lt));
@@ -186,17 +191,15 @@ bool dev_journal_window_state::perform(const bool changelog_continues_in_the_sam
 	const auto larger_font = ImGui::GetIO().Fonts->Fonts[1];
 
 	const auto button_h = (larger_font->FontSize + style.FramePadding.y * 2) * 1.4f;
-	const auto thumbnail_margin = vec2(std::round(ImGui::GetFontSize() * 4), std::round(ImGui::GetFontSize() * 1.5f));
 	const auto header_h = std::round(larger_font->FontSize + style.ItemSpacing.y * 2);
+	const auto buttons_h = button_h * 2 + style.ItemSpacing.y * 2;
 
 	const auto content_lt = vec2(ImGui::GetCursorPos());
 	const auto content_size = vec2(ImGui::GetContentRegionAvail());
 
-	const auto area_lt = content_lt + vec2(thumbnail_margin.x, header_h + thumbnail_margin.y);
-	const auto area_size = vec2(
-		content_size.x - thumbnail_margin.x * 2,
-		content_size.y - header_h - thumbnail_margin.y * 2 - button_h * 2 - style.ItemSpacing.y * 2
-	);
+	const auto thumbnail_margin = (content_size * vec2(0.1f, 0.05f)).discard_fract();
+	const auto area_lt = content_lt + vec2(0.0f, header_h) + thumbnail_margin;
+	const auto area_size = vec2(content_size - vec2(0.0f, header_h + buttons_h) - thumbnail_margin * 2).biggen(vec2::zero);
 
 	::center_larger_text("NEW DEV JOURNAL!", content_lt, vec2(content_size.x, header_h));
 
