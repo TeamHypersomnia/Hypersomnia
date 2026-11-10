@@ -858,7 +858,7 @@ void arena_gui_state::draw_mode_gui(
 
 				auto drawn_current_money = stats.money;
 
-				const auto rb_shift = ::calc_right_bottom_bars_shift(in.config.drawing);
+				const auto rb_shift = ::calc_right_bottom_bars_shift(in.config.drawing, static_cast<int>(in.screen_size.y));
 
 				/*
 					The money bar sits exactly one row above the character's
@@ -1238,7 +1238,7 @@ void arena_gui_state::draw_mode_gui(
 				}
 
 				if (corner == hud_corner_type::RIGHT_BOTTOM) {
-					result += 280 + in.config.drawing.right_bottom_bars_raise;
+					result += 280 + ::calc_right_bottom_bars_raise(in.config.drawing, static_cast<int>(in.screen_size.y));
 				}
 
 				return result;

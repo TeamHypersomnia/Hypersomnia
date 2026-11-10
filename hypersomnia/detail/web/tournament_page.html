@@ -54,11 +54,6 @@
 		padding: 3em 0 0;
 	}
 
-	/*
-		The amber rainbow where it means the top: the WINNERS (and the final's frame, the matches being played).
-		The name and the final's label in plain gold.
-	*/
-
 	.tournament-winner-label {
 		background: var(--rainbow);
 		background-size: 200% auto;
@@ -549,13 +544,15 @@
 		background: #120e09;
 	}
 
-	.match-score.live,
-	.team-card.live .players {
+	.match-score.live {
 		position: relative;
 		border-color: transparent;
 	}
 
-	/* the amber rainbow through its digits and its frame, as the final's label */
+	.team-card.live .players {
+		border-color: rgba(255, 255, 255, 0.25);
+	}
+
 	.match-score.live .score-number {
 		background: var(--rainbow);
 		background-size: 200% auto;
@@ -573,18 +570,6 @@
 		background: var(--rainbow);
 		background-size: 200% auto;
 		animation: shimmer 4s linear infinite;
-		-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-		-webkit-mask-composite: xor;
-		mask-composite: exclude;
-		pointer-events: none;
-	}
-
-	.team-card.live .players::before {
-		content: '';
-		position: absolute;
-		inset: -1px;
-		padding: 1px;
-		background: rgba(255, 255, 255, 0.25);
 		-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
 		-webkit-mask-composite: xor;
 		mask-composite: exclude;
@@ -761,7 +746,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		*, *::after {
+		*, *::before, *::after {
 			animation: none !important;
 			transition: none !important;
 		}
@@ -1049,7 +1034,6 @@
 			box.appendChild(score('match-score scored' + (m.status === 'live' ? ' live' : '')));
 		}
 		else if (m.status === 'starting') {
-			// both teams in, the countdown on - framed as live, nothing scored yet
 			box.appendChild(el('span', 'match-score join starting', 'STARTING'));
 		}
 		else if (m.status === 'waiting') {
@@ -1153,8 +1137,6 @@
 
 		const waiting = m.status === 'waiting' ? (m.server_name || 'waiting...') : '?';
 
-		// a match being played: its players framed as its score
-		// the rainbow frames only a match being played - not one still starting
 		const playing = m.status === 'live' ? 'live' : '';
 
 		pair.appendChild(teamCard(left, decided ? 'won' : playing, waiting));

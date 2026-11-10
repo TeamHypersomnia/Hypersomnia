@@ -349,7 +349,7 @@ void value_bar::rebuild_layouts(
 
 	const auto bottom_pad = static_cast<int>(50 * ImGui::GetTextLineHeight() / 22.0f);
 
-	const auto rb_shift = ::calc_right_bottom_bars_shift(context.dependencies.drawing);
+	const auto rb_shift = ::calc_right_bottom_bars_shift(context.dependencies.drawing, screen_size.y);
 
 	const auto bars_bottom = screen_size.y - bottom_pad - rb_shift;
 

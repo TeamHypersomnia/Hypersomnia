@@ -340,6 +340,8 @@ namespace test_flavours {
 			in.effective_radius = 2100.f;
 
 			::apply_cybernetic_explosion_look(in);
+			in.inner_ring_emits_light = false;
+			in.outer_ring_emits_light = false;
 
 			/* Too big for the particles - very thick thin rings and the flash suffice. */
 			in.explosion_particles.enabled = false;

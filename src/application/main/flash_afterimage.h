@@ -47,18 +47,10 @@ void handle_flash_afterimage(
 	}
 
 	if (!rendering_flash_afterimage) {
-		/* Don't draw the blinding overlay while we are capturing the flash afterimage */
-
 		if (flash_mult > 0) {
 			renderer.call_and_clear_triangles();
 
-			auto flash_overlay_col = flashbang_color;
-
-			/*
-				Only the hue is up to the player - a lower alpha would blind less.
-			*/
-
-			flash_overlay_col.a = 255;
+			auto flash_overlay_col = flashbang_color.with_alpha(255);
 
 			if (viewed_character) {
 				if (const auto sentience = viewed_character.template find<components::sentience>()) {

@@ -231,11 +231,7 @@ void main_menu_setup::draw_overlays(
 	game_logo_rect.set_position({ 70.0f, 50.f });
 	game_logo_rect.set_size(game_logo_size);
 
-	const bool draw_menu_logo = true;
-
-	if (draw_menu_logo) {
-		output.aabb(game_logo, game_logo_rect, white);
-	}
+	output.aabb(game_logo, game_logo_rect, white);
 #endif
 
 	(void)necessarys;
