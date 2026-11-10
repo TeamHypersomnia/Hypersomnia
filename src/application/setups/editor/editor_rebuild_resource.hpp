@@ -401,6 +401,7 @@ void setup_scene_object_from_resource(
 			}
 
 			sprite.neon_alpha_vibration = editable.neon_alpha_vibration;
+			sprite.neon_alpha_vibration.is_enabled = editable.neon_map.is_enabled && editable.neon_alpha_vibration.is_enabled;
 			sprite.vibrate_diffuse_too = editable.vibrate_diffuse_too;
 		}
 
