@@ -12,6 +12,43 @@ summary: Just a hidden scratchpad.
   - suite turniejow szybciej (~90 -> ~50 min): sleepy -> polling (wait_page, wait_list, wait_client_log), wait_live zamiast sleep 5 po Starting ranked, terminy rund z JSON-a strony live zamiast czekania, trap sprzatajacy po Ctrl+C, scalenie zdublowanych case'ow, SHARD dzielacy CASES sam
   - podzial local-testing SKILL.md na rdzen + pliki referencyjne (~200 linii mniej przy kazdym zaladowaniu)
 
+- Efekt pocisku ze strony stref konczyn (devlog6, `~/Downloads/devlog6/limb_zones/index.html`) - wykorzystac kiedys (menu, strona, trailer)
+	- smuga: linia 7 px, round cap, rgba(255, 236, 170, 0.95), poswiata shadowBlur 22 rgba(255, 220, 120, 0.9); przelot 0.09 s, ogon = glowa minus 55% drogi
+	- trafienie: bialy krag 14 -> 44 px, poswiata shadowBlur 36 rgba(255, 60, 40, 1), znika w 0.35 s
+	- odrywana konczyna: sprite odlatuje 260 px w swoja strone z ease-out 1-(1-t)^2, obraca sie, gasnie przez ostatnie 40% z 1 s
+	```js
+	function draw_tracer(from, to, progress) {
+		const head = { x: from.x + (to.x - from.x) * progress, y: from.y + (to.y - from.y) * progress };
+		const tail_progress = Math.max(0, progress - 0.55);
+		const tail = { x: from.x + (to.x - from.x) * tail_progress, y: from.y + (to.y - from.y) * tail_progress };
+		context.save();
+		context.shadowColor = "rgba(255, 220, 120, 0.9)";
+		context.shadowBlur = 22;
+		context.strokeStyle = "rgba(255, 236, 170, 0.95)";
+		context.lineWidth = 7;
+		context.lineCap = "round";
+		context.beginPath();
+		context.moveTo(tail.x, tail.y);
+		context.lineTo(head.x, head.y);
+		context.stroke();
+		context.restore();
+	}
+
+	function draw_impact(point, age_secs) {
+		const life = Math.max(0, 1 - age_secs / 0.35);
+		if (life <= 0) return;
+		context.save();
+		context.globalAlpha = life;
+		context.fillStyle = "#ffffff";
+		context.shadowColor = "rgba(255, 60, 40, 1)";
+		context.shadowBlur = 36;
+		context.beginPath();
+		context.arc(point.x, point.y, 14 + 30 * (1 - life), 0, Math.PI * 2);
+		context.fill();
+		context.restore();
+	}
+	```
+
 - Better keyboard mapping
 	- hotbar_button_0 -> hotbar 0
 	- hotbar_button_1 -> hotbar 1
