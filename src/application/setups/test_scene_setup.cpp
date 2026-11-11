@@ -188,7 +188,6 @@ void test_scene_setup::init(const test_scene_type new_type) {
 		Level0..Level4 are the basic tutorial.
 		The level that the last basic level exits to is the finish screen -
 		no progress HUD is drawn there.
-		Everything reachable from the finish screen onwards is the advanced tutorial.
 	*/
 
 	basic_tutorial_levels.clear();
@@ -256,7 +255,7 @@ void test_scene_setup::init(const test_scene_type new_type) {
 				queue.pop_back();
 
 				for (const auto target : level_edges[current]) {
-					if (target > tutorial_last_basic_level_v && reached.emplace(target).second) {
+					if (target > tutorial_last_basic_level_v && target != tutorial_advanced_end_level_v && reached.emplace(target).second) {
 						advanced_tutorial_levels.push_back(target);
 						queue.push_back(target);
 					}
@@ -512,7 +511,7 @@ bool test_scene_setup::is_tutorial_finish_level() const {
 }
 
 bool test_scene_setup::should_draw_bottom_progress_bar() const {
-	return is_tutorial() && !is_tutorial_finish_level() && !current_tip_portals.empty();
+	return is_tutorial() && !is_tutorial_finish_level() && tutorial.level != tutorial_advanced_end_level_v && !current_tip_portals.empty();
 }
 
 bool test_scene_setup::should_draw_stage_bar() const {
@@ -526,6 +525,11 @@ std::optional<std::pair<uint32_t, uint32_t>> test_scene_setup::get_tutorial_stag
 
 	if (is_tutorial_finish_level()) {
 		return std::nullopt;
+	}
+
+	if (tutorial.challenge) {
+		const auto all_advanced_stages = static_cast<uint32_t>(advanced_tutorial_levels.size());
+		return std::pair { all_advanced_stages, all_advanced_stages };
 	}
 
 	const auto stage_among = [&](const std::vector<uint32_t>& levels) -> std::optional<std::pair<uint32_t, uint32_t>> {
@@ -1851,12 +1855,19 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 				The zeroth stage is just the welcome screen, not a real level.
 			*/
 
-			const auto label_text = formatted_string(
-				stage->first == stage->second ?
-				std::string("Final stage") :
-				typesafe_sprintf("Stage %x/%x", stage->first - 1, stage->second - 1),
-				style(font, in.config.arena_mode_gui.money_bar_color)
-			);
+			const auto label = [&]() -> std::string {
+				if (tutorial.challenge) {
+					return "Surfing challenge";
+				}
+
+				if (stage->first == stage->second) {
+					return "Final stage";
+				}
+
+				return typesafe_sprintf("Stage %x/%x", stage->first - 1, stage->second - 1);
+			}();
+
+			const auto label_text = formatted_string(label, style(font, in.config.arena_mode_gui.money_bar_color));
 
 			/*
 				The label hugs the bar's screen-inward edge:
