@@ -12,6 +12,10 @@
 	- Nebulae and stars behind the windows, glass, lights.
 	- Calm ambient music that keeps playing between stages.
 	- It launches once even if you have completed it before.
+- **Steam achievements for the tutorial.**
+	- First Journey: finish the basic tutorial.
+	- Spacefarer: finish the advanced tutorial.
+	- Certified Surfer: beat the hardcore surfing challenge.
 - **Editor: every playtest is recorded.**
 	- Replay any of them in the Recorded playtests tab, next to History.
 
