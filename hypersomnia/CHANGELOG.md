@@ -4,10 +4,14 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [4.5.0] - 2026-11-10
+## [4.5.0] - 2026-11-11
 
 ### Added
 
+- **The tutorial is now a space station.**
+	- Nebulae and stars behind the windows, glass, lights.
+	- Calm ambient music that keeps playing between stages.
+	- It launches once even if you have completed it before.
 - **Editor: every playtest is recorded.**
 	- Replay any of them in the Recorded playtests tab, next to History.
 
@@ -24,6 +28,8 @@
 	- The right arm to the right, the left one to the left (broken in 4.4.0).
 - **Copy and paste on Linux work out of the box.**
 	- Wayland, X11 and Flatpak alike - nothing else to install.
+- **Impact particles missing on maps full of ambience.**
+	- Glass shards, for one, appeared only sometimes.
 
 ## [4.4.0] - 2026-11-01
 
