@@ -29,6 +29,9 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 0
 
+    - name: Use the global Ubuntu archive - the runners' Azure mirror fails to resolve
+      run: sudo sed -i '/azure\.archive\.ubuntu\.com/d' /etc/apt/apt-mirrors.txt && cat /etc/apt/apt-mirrors.txt
+
     - name: Update packages
       run: sudo apt-get update
 
