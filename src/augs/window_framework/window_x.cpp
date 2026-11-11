@@ -5,6 +5,7 @@
 #include <cmath>
 #include <algorithm>
 #include <thread>
+#include <sstream>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -1071,6 +1072,12 @@ namespace augs {
 
 	bool window::supports_gl_thread() const {
 		return true;
+	}
+
+	std::string window::get_parent_window_for_portal() const {
+		auto out = std::ostringstream();
+		out << "x11:" << std::hex << window_id;
+		return out.str();
 	}
 
 	window::~window() {

@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 
 #if PLATFORM_LINUX
+#include <sstream>
 #include <dlfcn.h>
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
@@ -797,6 +798,20 @@ namespace augs {
 		return true;
 #endif
 	}
+
+#if PLATFORM_LINUX
+	std::string window::get_parent_window_for_portal() const {
+		Display* const display = platform->has_x11 ? glfwGetX11Display() : nullptr;
+
+		if (display == nullptr) {
+			return "";
+		}
+
+		auto out = std::ostringstream();
+		out << "x11:" << std::hex << glfwGetX11Window(platform->window);
+		return out.str();
+	}
+#endif
 
 	window::~window() {
 		destroy();

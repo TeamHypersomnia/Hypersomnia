@@ -93,7 +93,6 @@ namespace augs {
 		GLXWindow glxwindow = 0;
 		xcb_window_t window_id = 0;
 
-		std::string get_parent_window_for_portal() const;
 		xcb_screen_t* screen = 0;
 		GLXDrawable drawable = 0;
 		Display *display = nullptr;
@@ -108,6 +107,11 @@ namespace augs {
 #else
 #error "Unsupported platform!"
 #endif
+
+#if PLATFORM_LINUX
+		std::string get_parent_window_for_portal() const;
+#endif
+
 		/*
 			Some window managers, like i3, do not allow us to set
 			the window geometry directly, which is otherwise useful

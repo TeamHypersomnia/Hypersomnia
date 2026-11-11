@@ -1,4 +1,3 @@
-#include <sstream>
 #include "augs/window_framework/window.h"
 #include "all_paths.h"
 #include "augs/filesystem/file.h"
@@ -124,12 +123,6 @@ namespace augs {
 		}
 
 		return "";
-	}
-
-	std::string window::get_parent_window_for_portal() const {
-		auto out = std::ostringstream();
-		out << "x11:" << std::hex << window_id;
-		return out.str();
 	}
 
 	static bool use_portal_file_chooser() {
