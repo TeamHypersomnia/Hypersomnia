@@ -127,6 +127,7 @@
 #include "application/gui/leaderboards_gui.h"
 #include "application/gui/changelog_gui.h"
 #include "application/gui/dev_journal_gui.h"
+#include "application/tutorial_shown_to_everyone.h"
 #include "application/gui/social_sign_in_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 #include "application/gui/arena_miniatures.h"
@@ -6799,21 +6800,28 @@ work_result work(
 				}
 			}
 			else {
-#if PLATFORM_WEB
-				if (!config.skip_tutorial) {
+				const bool starts_in_tutorial = !config.skip_tutorial || ::tutorial_revision_unseen(config.tutorial_revision_shown);
+
+				auto launch_tutorial_marking_its_revision_shown = [&]() {
+					change_with_save(
+						[&](auto& cfg) {
+							cfg.tutorial_revision_shown = tutorial_revision_shown_to_everyone_v;
+						}
+					);
+
 					launch_setup(activity_type::TUTORIAL);
+				};
+
+#if PLATFORM_WEB
+				if (starts_in_tutorial) {
+					launch_tutorial_marking_its_revision_shown();
 				}
 				else {
 					launch_setup(activity_type::MAIN_MENU);
 				}
 #else
-				/*
-					A new player starts in the tutorial, whatever launch_at_startup says.
-					Anything launched after it sets skip_tutorial - from then on the main menu (or the last activity).
-				*/
-
-				if (!config.skip_tutorial) {
-					launch_setup(activity_type::TUTORIAL);
+				if (starts_in_tutorial) {
+					launch_tutorial_marking_its_revision_shown();
 				}
 				else if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
 					launch_setup(config.get_last_activity());
