@@ -113,7 +113,7 @@ Complete server configuration in a few clicks.
 - [Game guide](#game-guide)
 - [How to build](#how-to-build)
 - [Contributing](#contributing)
-- [Credits 🇵🇱](https://teamhypersomnia.github.io/PressKit/credits)
+- [Credits 🇵🇱](https://hypersomnia.io/credits)
 - [The story behind the code](#the-story-behind-the-code)
 
 # Introduction

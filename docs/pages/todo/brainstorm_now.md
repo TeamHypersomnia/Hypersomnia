@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- early access poprawic opis
+- dodac kosmos do hypersomnia.io
+- zrobic cross-reference z grami wlasnie predkosci postaci i pociskow i zoom zeby dobrac
 - remove comments
 
 - zombie mode
