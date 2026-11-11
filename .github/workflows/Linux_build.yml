@@ -41,8 +41,8 @@ jobs:
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm.sh
 
-    - name: Check that every Steam integration binary exports all of steam_integration.h
-      run: sudo apt-get -y install llvm-20 && cmake/check_steam_integration_exports.sh
+    - name: Check that every committed Steam integration binary exports all of steam_integration.h and links the Steam API
+      run: sudo apt-get -y install llvm-20 && cmake/check_steam_integration_binaries.sh
 
     - name: Install Libsodium
       run: . cmake/linux_actions/install_libsodium.sh
