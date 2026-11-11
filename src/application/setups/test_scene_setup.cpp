@@ -25,6 +25,7 @@
 #include "augs/gui/text/printer.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/tutorial_steam_achievements.h"
+#include "application/setups/tutorial_config_patch.h"
 #include "view/rendering_scripts/minimap_layout.h"
 #include "view/hud_bar_drawing.h"
 #include "view/mode_gui/arena/on_first_touching_portal.hpp"
@@ -1564,6 +1565,8 @@ void test_scene_setup::customize_for_viewing(config_json_table& config) const {
 	nickname = config.client.get_nickname();
 
 	if (is_tutorial()) {
+		::apply_tutorial_config_patch_with_volumes_as_multipliers(config);
+
 		auto& mult = config.session.camera_query_aabb_mult;
 
 		if (std::clamp(mult, 1.0f, 1.7f) == mult) {
