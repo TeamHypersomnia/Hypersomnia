@@ -1592,6 +1592,12 @@ if(BUILD_FOR_WEB)
 
 	# HRTF presets are for OpenAL Soft - the browser does its own HRTF.
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --exclude-file *.mhr")
+
+	find_package(Python3 REQUIRED COMPONENTS Interpreter)
+	set(WEB_PACKAGE_EXCLUDES_RSP "${CMAKE_BINARY_DIR}/web_package_excludes.rsp")
+	set(WRITE_WEB_PACKAGE_EXCLUDES ${Python3_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/web_package_excludes.py" "${HYPERSOMNIA_EXE_RESOURCES_DIR}" "${WEB_PACKAGE_EXCLUDES_RSP}")
+	execute_process(COMMAND ${WRITE_WEB_PACKAGE_EXCLUDES})
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} @${WEB_PACKAGE_EXCLUDES_RSP}")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/default_config.json@/default_config.json")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file ${HYPERSOMNIA_EXE_RESOURCES_DIR}/CHANGELOG.md@/CHANGELOG.md")
 
@@ -2152,6 +2158,10 @@ if(MSVC)
 	endif()
 else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
+endif()
+
+if (BUILD_FOR_WEB)
+	add_custom_command(TARGET Hypersomnia PRE_LINK COMMAND ${WRITE_WEB_PACKAGE_EXCLUDES})
 endif()
 
 # We define libraries upon which Hypersomnia depends.
