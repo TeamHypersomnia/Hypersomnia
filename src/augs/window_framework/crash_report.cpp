@@ -55,7 +55,14 @@ namespace augs {
 	}
 
 	static bool open_in_notepad(const path_type& path) {
-		auto command_line = L"notepad.exe \"" + path.wstring() + L"\"";
+		wchar_t system_directory[MAX_PATH];
+		const auto system_directory_length = GetSystemDirectoryW(system_directory, MAX_PATH);
+
+		if (system_directory_length == 0 || system_directory_length >= MAX_PATH) {
+			return false;
+		}
+
+		auto command_line = L"\"" + std::wstring(system_directory) + L"\\notepad.exe\" \"" + path.wstring() + L"\"";
 		auto startup_info = STARTUPINFOW();
 		startup_info.cb = sizeof(startup_info);
 		auto process_info = PROCESS_INFORMATION();
@@ -213,8 +220,11 @@ namespace augs {
 		SetThreadStackGuarantee(&stack_kept_for_crash_report);
 	}
 
-	void report_crashes(const bool open_log_in_notepad) {
-		open_log_in_notepad_after_crash = open_log_in_notepad;
+	void open_crash_log_in_notepad() {
+		open_log_in_notepad_after_crash = true;
+	}
+
+	void report_crashes() {
 		crash_reports_enabled = true;
 
 		keep_stack_for_crash_report();
@@ -235,7 +245,8 @@ namespace augs {
 }
 #else
 namespace augs {
-	void report_crashes(bool) {}
+	void report_crashes() {}
+	void open_crash_log_in_notepad() {}
 	void keep_stack_for_crash_report() {}
 	void set_error_log_path(const path_type&) {}
 	void stop_reporting_crashes() {}

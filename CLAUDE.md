@@ -6,7 +6,7 @@ A `build` MCP server is available with four tools:
 - `build_file <path>` — compile a single `.cpp` (path relative to repo root) for fast error-checking after edits
 - `build` — full ninja build
 - `build_cmake` — regenerate CMake build files when `CMakeLists.txt` changes
-- `cmake_debug_fast` — generate the fast-building Debug configuration: runs `BUILD_FOLDER_SUFFIX=fast cmake/build.sh Debug x64 -DGENERATE_DEBUG_INFORMATION=0`, creates `build/Debug-x64-clang-fast/` and symlinks `build/current` to it
+- `cmake_debug_fast` — generate the fast-building Debug configuration: runs `BUILD_FOLDER_SUFFIX=fast cmake/build.sh Debug x64 -DGENERATE_DEBUG_INFORMATION=0 -DUSE_GLFW=1` (the GLFW window players get), creates `build/Debug-x64-clang-fast/` and symlinks `build/current` to it
 
 `build`, `build_cmake`, and `build_file` will first run `cmake_debug_fast` if the `build/` folder does not yet exist.
 

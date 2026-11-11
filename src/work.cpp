@@ -473,7 +473,6 @@ extern "C" {
 
 work_result work(
 	const cmd_line_params& parsed_params,
-	const bool log_directory_existed,
 	const int argc,
 	const char* const * const argv
 ) try {
@@ -509,7 +508,6 @@ work_result work(
 
 	(void)argc;
 	(void)argv;
-	(void)log_directory_existed;
 
 #if PLATFORM_WEB
 	call_get_user_geolocation();
@@ -1289,11 +1287,6 @@ work_result work(
 			}
 		);
 	}
-#endif
-
-#if HEADLESS
-#else
-	WEBSTATIC auto last_exit_incorrect_popup = std::optional<simple_popup>();
 #endif
 
 	WEBSTATIC auto freetype_library = std::optional<augs::freetype_raii>();
@@ -2279,14 +2272,6 @@ work_result work(
 		if (failed_to_load_arena_popup.has_value()) {
 			if (failed_to_load_arena_popup->perform()) {
 				failed_to_load_arena_popup = std::nullopt;
-			}
-		}
-	};
-
-	WEBSTATIC auto perform_last_exit_incorrect = [&]() {
-		if (last_exit_incorrect_popup.has_value()) {
-			if (last_exit_incorrect_popup->perform()) {
-				last_exit_incorrect_popup = std::nullopt;
 			}
 		}
 	};
@@ -4743,12 +4728,18 @@ work_result work(
 
 				delete_auxiliary_socket();
 
-				const auto cmd_line = typesafe_sprintf(
-					"--dedicated-server --server-port %x",
-					chosen_port
-				);
+				const auto dedicated_server_arguments = std::vector<std::string> {
+					"--dedicated-server",
+					"--server-port",
+					typesafe_sprintf("%x", chosen_port)
+				};
 
-				augs::restart_application(argc, argv, augs::string_windows_friendly(params.exe_path), { cmd_line });
+				augs::restart_application(
+					argc,
+					argv,
+					augs::string_windows_friendly(params.exe_path),
+					dedicated_server_arguments
+				);
 				displayed_connecting_server_name = "local dedicated server";
 
 				const auto address_str = typesafe_sprintf("%x:%x", config.server_start.ip, chosen_port);
@@ -5801,7 +5792,6 @@ work_result work(
 				*/
 
 				if (!has_current_setup()) {
-					perform_last_exit_incorrect();
 				}
 
 				if (!has_current_setup() && !is_news_window_open()) {
@@ -5958,6 +5948,7 @@ work_result work(
 	};
 
 	::ensure_handler = main_ensure_handler;
+	WEBSTATIC const auto forget_ensure_handler = augs::scope_guard([]() { ::ensure_handler = nullptr; });
 
 	WEBSTATIC bool should_quit = false;
 
@@ -8650,6 +8641,11 @@ work_result work(
 		}
 	};
 
+	request_quit = [&]() {
+		get_write_buffer().should_quit = true;
+		should_quit = true;
+	};
+
 #if WEB_SINGLETHREAD
 #else
 	LOG("Starting game_thread_worker");
@@ -8665,11 +8661,6 @@ work_result work(
 #else
 	WEBSTATIC auto game_thread_joiner = augs::scope_guard([&]() { LOG("game_thread_joiner"); game_thread.join(); });
 #endif
-
-	request_quit = [&]() {
-		get_write_buffer().should_quit = true;
-		should_quit = true;
-	};
 
 	WEBSTATIC renderer_backend_result rendering_result;
 

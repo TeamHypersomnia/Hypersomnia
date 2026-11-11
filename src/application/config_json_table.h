@@ -4,6 +4,7 @@
 #include "3rdparty/imgui/imgui.h"
 
 #include "augs/pad_bytes.h"
+#include "augs/filesystem/path.h"
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
 #include "augs/image/font.h"
@@ -71,7 +72,7 @@ struct config_read_error : public std::runtime_error {
 		const std::string& what
 	) 
 		: std::runtime_error(
-			std::string("There was a problem reading "  + path.string() + ".\n" + what)
+			std::string("There was a problem reading "  + augs::string_windows_friendly(path) + ".\n" + what)
 		)
 	{}
 };

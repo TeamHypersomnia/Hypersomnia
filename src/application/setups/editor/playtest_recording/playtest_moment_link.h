@@ -60,6 +60,10 @@ inline std::optional<std::string> find_playtest_moment_link_field(const std::str
 	return link.substr(value_start, value_end == std::string::npos ? std::string::npos : value_end - value_start);
 }
 
+inline bool is_network_share_path(const std::string& path) {
+	return begins_with(path, "\\\\") || begins_with(path, "//");
+}
+
 inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_link(const std::string& link) {
 	if (!begins_with(link, playtest_moment_link_prefix_v)) {
 		return std::nullopt;
@@ -72,6 +76,10 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 		return std::nullopt;
 	}
 
+	if (::is_network_share_path(*recording)) {
+		return std::nullopt;
+	}
+
 	auto request = playtest_replay_capture_settings();
 	request.recording_json = augs::path_windows_friendly(*recording);
 	request.from_secs = std::max(0.0, std::atof(at->c_str()));
@@ -81,7 +89,12 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 		request.camera = ::parse_playtest_replay_camera(*camera);
 	}
 
-	if (!::is_recording_meta_json(request.recording_json) || !augs::exists(request.recording_json)) {
+	const bool looks_like_a_recording =
+		::is_recording_meta_json(request.recording_json) &&
+		::is_in_recordings_folder_of_its_project(request.recording_json)
+	;
+
+	if (!looks_like_a_recording || !augs::exists(request.recording_json)) {
 		return std::nullopt;
 	}
 

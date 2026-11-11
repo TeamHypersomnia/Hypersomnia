@@ -378,7 +378,7 @@ namespace augs {
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& full_path) {
-		const auto command = typesafe_sprintf("open -R -a Finder \"%x\"", full_path);
+		const auto command = typesafe_sprintf("open -R -a Finder %x", augs::quoted_for_shell(full_path.string()));
 		shell(command);
 	}
 }

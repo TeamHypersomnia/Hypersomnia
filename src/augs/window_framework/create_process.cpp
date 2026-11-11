@@ -8,6 +8,7 @@
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/platform_utils.h"
 #include "augs/ensure.h"
+#include "augs/log.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -16,10 +17,7 @@
 namespace augs {
 	bool spawn_detached_process(const std::string& executable, const std::string& arguments) {
 #if PLATFORM_UNIX
-		(void)executable;
-		(void)arguments;
-
-		const auto cmd = "( \"" + executable + "\" " + arguments + " & )";
+		const auto cmd = "( " + augs::quoted_for_shell(executable) + " " + arguments + " & )";
 		augs::shell(cmd);
 
 		return true;
@@ -54,7 +52,15 @@ namespace augs {
 			&pi            // Pointer to PROCESS_INFORMATION structure
 		);
 
-		return result;
+		if (!result) {
+			LOG("CreateProcess failed with error %x for: %x", GetLastError(), cmd);
+			return false;
+		}
+
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+
+		return true;
 #else
 		(void)executable;
 		(void)arguments;

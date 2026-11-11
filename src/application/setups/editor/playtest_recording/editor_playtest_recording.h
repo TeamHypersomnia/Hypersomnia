@@ -73,6 +73,12 @@ inline augs::path_type project_folder_of_recording(const augs::path_type& record
 	return recording_json.lexically_normal().parent_path().parent_path().parent_path();
 }
 
+inline bool is_in_recordings_folder_of_its_project(const augs::path_type& recording_json) {
+	const auto normal_path = recording_json.lexically_normal();
+
+	return normal_path.parent_path() == ::get_playtest_recordings_folder(::project_folder_of_recording(normal_path));
+}
+
 struct editor_playtest_recording_paths {
 	augs::path_type meta_json;
 	augs::path_type inputs_lz4;

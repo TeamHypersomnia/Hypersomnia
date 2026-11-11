@@ -12,10 +12,6 @@ $base_path = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "My Games\H
 $good_log = Join-Path $base_path "exit_success_debug_log.txt"
 $error_log = Join-Path $base_path "error_log.txt"
 
-Write-Host "Running $target_exe --version"
-
-& $target_exe --version
-
 if ($console_mode -eq 1) { 
 	& $target_exe --unit-tests-only --test-fp-consistency 20000000
 }
@@ -74,5 +70,13 @@ dos2unix $releaseNotesPath
 cd ../
 7z a -sfx $filePath hypersomnia
 
+if ($LastExitCode -ne 0) {
+	exit $LastExitCode
+}
+
 $filePath = "$stem.zip"
 7z a $filePath hypersomnia
+
+if ($LastExitCode -ne 0) {
+	exit $LastExitCode
+}

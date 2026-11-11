@@ -8,7 +8,8 @@ namespace augs {
 	constexpr bool crash_report_saves_the_log_v = false;
 #endif
 
-	void report_crashes(bool open_log_in_notepad);
+	void report_crashes();
+	void open_crash_log_in_notepad();
 	void keep_stack_for_crash_report();
 	void set_error_log_path(const path_type& path);
 	void stop_reporting_crashes();

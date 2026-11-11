@@ -136,7 +136,9 @@ namespace augs {
 		if (ch.msg == message::move || ch.msg == message::resize) {
 			current_rect = get_window_rect_impl();
 			
-			if (!current_settings.fullscreen) {
+			const bool has_visible_area = current_rect.w > 0 && current_rect.h > 0;
+
+			if (!current_settings.fullscreen && has_visible_area) {
 				last_windowed_rect = current_rect;
 			}
 		}

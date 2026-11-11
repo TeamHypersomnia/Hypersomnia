@@ -22,10 +22,10 @@ REPO=$TREE
 . "$HERE/lib.sh"
 
 case "$CONFIG" in
-	debug) DIR=Debug-x64-clang-claude; FLAGS="-DCMAKE_BUILD_TYPE=Debug -DGENERATE_DEBUG_INFORMATION=0" ;;
+	debug) DIR=Debug-x64-clang-claude; FLAGS="-DCMAKE_BUILD_TYPE=Debug -DGENERATE_DEBUG_INFORMATION=0 -DUSE_GLFW=1" ;;
 	headless) DIR=Debug-x64-clang-claude-headless; FLAGS="-DCMAKE_BUILD_TYPE=Debug -DGENERATE_DEBUG_INFORMATION=0 -DHEADLESS=1" ;;
-	release) DIR=Release-x64-clang-claude; FLAGS="-DCMAKE_BUILD_TYPE=Release -DGENERATE_DEBUG_INFORMATION=0" ;;
-	steam) DIR=Debug-x64-clang-claude-steam; FLAGS="-DCMAKE_BUILD_TYPE=Debug -DGENERATE_DEBUG_INFORMATION=0 -DDEVELOP_STEAM_INTEGRATION=1 -DUSE_SYSTEM_FREETYPE=0" ;;
+	release) DIR=Release-x64-clang-claude; FLAGS="-DCMAKE_BUILD_TYPE=Release -DGENERATE_DEBUG_INFORMATION=0 -DUSE_GLFW=1" ;;
+	steam) DIR=Debug-x64-clang-claude-steam; FLAGS="-DCMAKE_BUILD_TYPE=Debug -DGENERATE_DEBUG_INFORMATION=0 -DDEVELOP_STEAM_INTEGRATION=1 -DUSE_SYSTEM_FREETYPE=0 -DUSE_GLFW=1" ;;
 	*) echo "usage: build_claude.sh debug|headless|release|steam [worktree]"; exit 2 ;;
 esac
 
@@ -60,9 +60,15 @@ else
 	echo "(no ccache - sudo pacman -S ccache; building without it)"
 fi
 
-# Configured once; again when ccache came since (the launcher changes every command - one full rebuild fills the cache)
-# or CMAKE_ARGS are given
-if [ ! -f $B/build.ninja ] || [ -n "$CMAKE_ARGS" ] || { [ -n "$LAUNCHER" ] && ! grep -q '^CMAKE_CXX_COMPILER_LAUNCHER:.*ccache' $B/CMakeCache.txt; }; then
+# Configured once; again when ccache came since (the launcher changes every command - one full rebuild fills the cache),
+# when the folder was configured before the GLFW window (the one players get) became the default, or CMAKE_ARGS are given
+WINDOW_BACKEND_IS_STALE=0
+
+if [ "$CONFIG" != headless ] && [ -f $B/CMakeCache.txt ] && ! grep -q '^USE_GLFW:.*=1' $B/CMakeCache.txt; then
+	WINDOW_BACKEND_IS_STALE=1
+fi
+
+if [ ! -f $B/build.ninja ] || [ -n "$CMAKE_ARGS" ] || [ $WINDOW_BACKEND_IS_STALE -eq 1 ] || { [ -n "$LAUNCHER" ] && ! grep -q '^CMAKE_CXX_COMPILER_LAUNCHER:.*ccache' $B/CMakeCache.txt; }; then
 	(cd $B && CC=clang CXX=clang++ cmake -G Ninja -DARCHITECTURE=x64 -D_CMAKE_TOOLCHAIN_PREFIX=llvm- \
 		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 $FLAGS $LAUNCHER $CMAKE_ARGS $TREE > $B/cmake_claude.log 2>&1) ||
 		{ tail -30 $B/cmake_claude.log; exit 1; }

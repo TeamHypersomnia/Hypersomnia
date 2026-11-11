@@ -61,6 +61,7 @@ namespace augs {
 			); 
 
 			if ( g_hInputFile == INVALID_HANDLE_VALUE ) {
+				CloseHandle(g_hChildStd_IN_Wr);
 				ErrorExit(("CreateFile")); 
 			}
 

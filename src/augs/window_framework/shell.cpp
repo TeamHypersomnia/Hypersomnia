@@ -50,6 +50,7 @@ namespace augs {
 }
 #elif PLATFORM_UNIX
 #include <cstdlib>
+#include <unistd.h>
 
 namespace augs {
 	int shell(const std::string& s) {
@@ -72,7 +73,8 @@ namespace augs {
 		const auto command = typesafe_sprintf("open %x", augs::quoted_for_shell(full_path.string()));
 #else
 		const char* const visual = std::getenv("VISUAL");
-		const bool has_text_editor = visual != nullptr && visual[0] != '\0';
+		const bool started_from_terminal = isatty(STDIN_FILENO) && isatty(STDOUT_FILENO);
+		const bool has_text_editor = started_from_terminal && visual != nullptr && visual[0] != '\0';
 
 		const auto command =
 			has_text_editor ?
@@ -131,6 +133,16 @@ namespace augs {
 }
 
 #include "augs/templates/container_templates.h"
+
+static std::string quoted_argument(const std::string& argument) {
+#if PLATFORM_UNIX
+	return augs::quoted_for_shell(argument);
+#else
+	const bool needs_quotes = argument.empty() || argument.find_first_of(" \t") != std::string::npos;
+
+	return needs_quotes ? "\"" + argument + "\"" : argument;
+#endif
+}
 
 namespace augs {
 	int restart_application(
@@ -194,7 +206,7 @@ namespace augs {
 				}
 			}
 
-			previous_arguments += arg + " ";
+			previous_arguments += ::quoted_argument(arg) + " ";
 
 			/* Prevent duplicate flags */
 			erase_element(added_arguments, arg);
@@ -223,10 +235,14 @@ namespace augs {
 #include <Lmcons.h>
 namespace augs {
 	std::string get_user_name() {
-		char username[UNLEN + 1]; // UNLEN is defined in Lmcons.h
-		DWORD username_len = UNLEN + 1;
-		GetUserNameA(username, &username_len);
-		return std::string(username);
+		wchar_t username[UNLEN + 1];
+		auto username_length_with_terminator = static_cast<DWORD>(UNLEN + 1);
+
+		if (!GetUserNameW(username, &username_length_with_terminator)) {
+			return "";
+		}
+
+		return wstr_to_utf8(username);
 	}
 }
 

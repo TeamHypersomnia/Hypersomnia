@@ -126,7 +126,6 @@ extern bool log_to_live_file;
 
 work_result work(
 	const cmd_line_params& parsed_params,
-	bool log_directory_existed,
 	int argc,
 	const char* const * const argv
 );
@@ -154,6 +153,9 @@ int main(const int argc, const char* const * const argv) {
 		we need to call this in order to be able to write non-English characters. 
 	*/
 
+	augs::report_crashes();
+	const auto stop_reporting_crashes_at_exit = augs::scope_guard([]() { augs::stop_reporting_crashes(); });
+
 	std::setlocale(LC_ALL, "");
 	std::setlocale(LC_NUMERIC, "C");
 
@@ -172,12 +174,12 @@ int main(const int argc, const char* const * const argv) {
 
 	const bool logs_open = ::logs_open_for_player(params);
 
-	if (!logs_open) {
+	if (logs_open) {
+		augs::open_crash_log_in_notepad();
+	}
+	else {
 		augs::disable_text_editor();
 	}
-
-	augs::report_crashes(logs_open);
-	const auto stop_reporting_crashes_at_exit = augs::scope_guard([]() { augs::stop_reporting_crashes(); });
 
 	if (params.version_line_only) {
 		std::cout << hypersomnia_version().get_version_string() << std::endl;
@@ -312,8 +314,6 @@ int main(const int argc, const char* const * const argv) {
 	}
 #endif
 
-	const bool log_directory_existed = augs::exists(LOGS_DIR);
-
 	/* 
 		LOGS_DIR is always in APPDATA_DIR
 		so it will create the documents dir as well.
@@ -407,7 +407,6 @@ int main(const int argc, const char* const * const argv) {
 
 	const auto completed_work_result = work(
 		params,
-		log_directory_existed,
 		argc,
 		argv
 	);
@@ -417,7 +416,13 @@ int main(const int argc, const char* const * const argv) {
 	{
 		auto save_success_logs = [&]() {
 			const auto logs = program_log::get_current().get_complete(); 
-			augs::save_as_text(get_exit_success_path(), logs); 
+
+			try {
+				augs::save_as_text(get_exit_success_path(), logs); 
+			}
+			catch (const std::exception& err) {
+				LOG("Could not save the log of a successful exit: %x", err.what());
+			}
 		};
 
 		auto save_failure_logs = [&]() {
@@ -426,6 +431,17 @@ int main(const int argc, const char* const * const argv) {
 
 			augs::save_as_text(error_log_path, logs);
 			augs::open_text_editor(error_log_path);
+		};
+
+		auto relaunch = [&](const std::vector<std::string>& added_arguments) {
+			const auto relaunch_result = augs::restart_application(argc, argv, executable, added_arguments);
+
+			if (relaunch_result != EXIT_SUCCESS) {
+				LOG("Failed to relaunch the application.");
+				save_failure_logs();
+			}
+
+			return relaunch_result;
 		};
 
 		LOG(::describe_work_result(completed_work_result));
@@ -451,21 +467,21 @@ int main(const int argc, const char* const * const argv) {
 
 			case work_result::RELAUNCH_DEDICATED_SERVER: {
 				save_success_logs();
-				return augs::restart_application(argc, argv, executable, { "--suppress-server-webhook" });
+				return relaunch({ "--suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_MASTERSERVER: {
 				save_failure_logs();
-				return augs::restart_application(argc, argv, executable, {});
+				return relaunch({});
 			}
 
 			case work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER: {
 				save_success_logs();
-				return augs::restart_application(argc, argv, executable, { "--update-once-now --suppress-server-webhook" });
+				return relaunch({ "--update-once-now", "--suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
-				return augs::restart_application(argc, argv, executable, { "--upgraded-successfully" });
+				return relaunch({ "--upgraded-successfully" });
 			}
 
 			default: 

@@ -79,10 +79,10 @@ namespace augs {
 #else
 			const auto glsl_version = "#version 130";
 #endif
-			create(shader_type, std::string(glsl_version) + "\n" + "// " + path.string() + "\n" + file_to_string(path));
+			create(shader_type, std::string(glsl_version) + "\n" + "// " + augs::string_windows_friendly(path) + "\n" + file_to_string(path));
 		}
 		catch (const augs::file_open_error& err) {
-			const auto cwd = std::filesystem::current_path().string();
+			const auto cwd = augs::string_windows_friendly(std::filesystem::current_path());
 			
 			throw shader_error(
 				"Failed to load shader file %x:\n%x (cwd: %x)", path, err.what(), cwd

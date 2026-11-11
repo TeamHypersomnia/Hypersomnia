@@ -6,6 +6,13 @@ on:
       - master
     tags-ignore: [ '*' ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[ds only]') && !contains(github.event.head_commit.message, '[lin only]') && !contains(github.event.head_commit.message, '[mac only]')"
@@ -92,15 +99,28 @@ jobs:
         cd cmake\steam_integration
         mkdir build
         cd build
-        cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja ..
-        ninja install
+        cmake -DBUILD_STEAM=0 -DCMAKE_BUILD_TYPE=Release -G Ninja .. || exit /b 1
+        ninja install || exit /b 1
         cd ..\..\..\
         dir
         mkdir build
         cd build
         dir
-        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_CXX_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_LINKER="C:\Program Files\LLVM\bin\lld-link.exe" -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%HYPERSOMNIA_BUILD_TYPE% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" ..
-        ninja
+        cmake -G Ninja -DLINK_STEAM_INTEGRATION=1 -DCMAKE_C_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_CXX_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_LINKER="C:\Program Files\LLVM\bin\lld-link.exe" -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%HYPERSOMNIA_BUILD_TYPE% -DOUTPUT_TO_HYPERSOMNIA_FOLDER=1 -DOPENSSL_ROOT_DIR="C:\Program Files\OpenSSL" .. || exit /b 1
+        ninja || exit /b 1
+      shell: cmd
+
+    - name: Check that the shipped binaries import no runtime missing on a fresh Windows
+      run: |
+        for /f "delims=" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath') do set "VS_PATH=%%i"
+        call "%VS_PATH%\VC\Auxiliary\Build\vcvarsall.bat" x64
+        dumpbin /dependents hypersomnia\Hypersomnia.exe > exe_imports.txt || exit /b 1
+        dumpbin /dependents hypersomnia\steam_integration.dll > stub_imports.txt || exit /b 1
+        type exe_imports.txt
+        type stub_imports.txt
+        findstr /I "VCRUNTIME MSVCP api-ms-win-crt ucrtbase CONCRT VCOMP libssl libcrypto OpenAL32" exe_imports.txt stub_imports.txt && exit /b 1
+        findstr /I "steam_api64" stub_imports.txt && exit /b 1
+        exit /b 0
       shell: cmd
 
     - name: Run tests and package

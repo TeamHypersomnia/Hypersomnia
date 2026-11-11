@@ -36,7 +36,6 @@ static std::string web_pending_paste;
 static const char* web_GetClipboardText(void*) {
 	thread_local std::string clip_storage;
 
-	LOG("web_GetClipboardText");
 	{
 		std::scoped_lock lk(clipboard_lk);
 		clip_storage = web_clipboard;
@@ -46,8 +45,6 @@ static const char* web_GetClipboardText(void*) {
 }
 
 static void web_SetClipboardText(void*, const char* text) {
-	LOG("web_SetClipboardText");
-
 	{
 		std::scoped_lock lk(clipboard_lk);
 		web_clipboard = text;

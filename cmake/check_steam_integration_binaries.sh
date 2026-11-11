@@ -83,6 +83,16 @@ check_links_steam_api() {
 	fi
 }
 
+check_links_no_visual_cpp_runtime() {
+	local binary_label=$1
+	local dependencies=$2
+
+	if grep -qiE 'VCRUNTIME|MSVCP|api-ms-win-crt|ucrtbase' <<< "$dependencies"; then
+		echo "$binary_label links the Visual C++ runtime dynamically - a fresh Windows does not have it; rebuild it with the static runtime (steambuilders) and commit it." >&2
+		any_check_failed=1
+	fi
+}
+
 linux_symbols=$(linux_exports)
 macos_arm64_symbols=$(macos_exports arm64)
 macos_x86_64_symbols=$(macos_exports x86_64)
@@ -102,6 +112,8 @@ check_links_steam_api "bin/linux/libsteam_integration.so" "$linux_libraries" "li
 check_links_steam_api "bin/macos/libsteam_integration.dylib (arm64)" "$macos_arm64_libraries" "libsteam_api.dylib"
 check_links_steam_api "bin/macos/libsteam_integration.dylib (x86_64)" "$macos_x86_64_libraries" "libsteam_api.dylib"
 check_links_steam_api "bin/windows/steam_integration.dll" "$windows_libraries" "steam_api64.dll"
+
+check_links_no_visual_cpp_runtime "bin/windows/steam_integration.dll" "$windows_libraries"
 
 if [ $any_check_failed -eq 1 ]; then
 	exit 1

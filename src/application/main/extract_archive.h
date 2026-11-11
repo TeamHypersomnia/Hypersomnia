@@ -118,8 +118,13 @@ struct archive_extractor {
 
 		completed_extraction = launch_async(
 			[this, resolved_command]() {
-				auto pipe = augs::pipe(resolved_command);
-				worker(pipe);
+				try {
+					auto pipe = augs::pipe(resolved_command);
+					worker(pipe);
+				}
+				catch (const std::runtime_error& err) {
+					LOG("Failed to start the extraction of the update: %x", err.what());
+				}
 			}
 		);
 	}

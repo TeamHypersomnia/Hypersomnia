@@ -218,8 +218,53 @@ static GLFWmonitor* get_current_monitor(GLFWwindow* window) {
 	return glfwGetPrimaryMonitor();
 }
 
+static bool overlaps_any_monitor(const xywhi rect) {
+	int count = 0;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+	if (monitors == nullptr || count == 0) {
+		return true;
+	}
+
+	const auto window_area = ltrbi(rect);
+
+	for (int i = 0; i < count; ++i) {
+		int mx, my, mw, mh;
+		glfwGetMonitorWorkarea(monitors[i], &mx, &my, &mw, &mh);
+
+		if (window_area.hover(ltrbi(xywhi(mx, my, mw, mh)))) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static xywhi usable_window_rect(xywhi rect) {
+	const auto defaults = augs::window_settings();
+
+	if (rect.w <= 0 || rect.h <= 0) {
+		rect.set_size(defaults.size);
+	}
+
+	if (!::overlaps_any_monitor(rect)) {
+		rect.set_position(defaults.position);
+	}
+
+	return rect;
+}
+
+static augs::window_settings with_usable_windowed_rect(augs::window_settings settings) {
+	const auto usable_rect = ::usable_window_rect(settings.make_window_rect());
+
+	settings.position = usable_rect.get_position();
+	settings.size = usable_rect.get_size();
+
+	return settings;
+}
+
 namespace augs {
-	window::window(const window_settings& settings) 
+	window::window(const window_settings& requested_settings) 
 		: platform(std::make_unique<window::platform_data>())
 	{
 		LOG("GLFW: calling glfwInit.");
@@ -241,6 +286,8 @@ namespace augs {
 		
 		std::filesystem::current_path(previous_path);
 
+		const auto settings = ::with_usable_windowed_rect(requested_settings);
+
 		auto& window = platform->window;
 
 		LOG("GLFW: setting version hints via glfwWindowHint.");
@@ -261,18 +308,22 @@ namespace augs {
 			GLFWmonitor* primary = glfwGetPrimaryMonitor();
 
 			if (primary) {
-				const GLFWvidmode* mode = glfwGetVideoMode(primary);
-				window = glfwCreateWindow(mode->width, mode->height, settings.name.c_str(), settings.fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
+				if (const GLFWvidmode* mode = glfwGetVideoMode(primary)) {
+					window = glfwCreateWindow(mode->width, mode->height, settings.name.c_str(), primary, NULL);
+				}
 			}
 		}
 		else {
 			window = glfwCreateWindow(settings.size.x, settings.size.y, settings.name.c_str(), NULL, NULL);
-			glfwSetWindowPos(window, settings.position.x, settings.position.y);
 		}
 
 		if (window == nullptr) {
 			destroy();
 			throw window_error("glfwCreateWindow failed.");
+		}
+
+		if (!settings.fullscreen) {
+			glfwSetWindowPos(window, settings.position.x, settings.position.y);
 		}
 
 		glfwSetErrorCallback(error_callback);
@@ -558,8 +609,9 @@ namespace augs {
 	}
 #endif
 
-	void window::set_window_rect(const xywhi r) {
+	void window::set_window_rect(const xywhi requested_rect) {
 		auto& window = platform->window;
+		const auto r = ::usable_window_rect(requested_rect);
 		LOG("SETTING WINDOW RECT: %x", r);
 
 		glfwSetWindowPos(window, r.x, r.y);

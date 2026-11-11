@@ -30,8 +30,6 @@
 	- Two separate deadlocks in the WebRTC handling, one of them in the library itself.
 - **Torn-off limbs fly to their own side again.**
 	- The right arm to the right, the left one to the left (broken in 4.4.0).
-- **Copy and paste on Linux work out of the box.**
-	- Wayland, X11 and Flatpak alike - nothing else to install.
 - **Impact particles missing on maps full of ambience.**
 	- Glass shards, for one, appeared only sometimes.
 

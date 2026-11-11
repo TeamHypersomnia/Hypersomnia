@@ -7,6 +7,8 @@
 #include <condition_variable>
 #include <functional>
 
+#include "augs/window_framework/crash_report.h"
+
 namespace augs {
 #if WEB_SINGLETHREAD
 	class thread_pool {
@@ -72,6 +74,8 @@ namespace augs {
 
 		auto make_continuous_worker() {
 			return [this] {
+				augs::keep_stack_for_crash_report();
+
 				for (;;) {
 					std::function<void()> task;
 

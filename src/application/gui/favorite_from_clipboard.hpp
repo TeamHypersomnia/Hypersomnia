@@ -20,14 +20,14 @@ bool browse_servers_gui_state::take_favorite_from_clipboard(const std::string& c
 		return false;
 	}
 
-	const auto found = connect_target::find_server_identifiers(clipboard);
+	const auto found = unlisted_server_fields::find(clipboard);
 
-	if (!found.has_value() || !::is_pasted_address(found->address)) {
+	if (!found.has_value()) {
 		return false;
 	}
 
 	const auto address = connect_target::without_default_port(found->address);
-	const auto name = found->name.substr(0, max_server_name_length_v);
+	const auto& name = found->name;
 	const bool already_there = favorites.contains_manual(found->key, address);
 
 	if (already_there && clipboard_at_start) {
