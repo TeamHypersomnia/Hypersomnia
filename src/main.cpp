@@ -170,11 +170,13 @@ int main(const int argc, const char* const * const argv) {
 
 	auto params = cmd_line_params(argc, argv);
 
-	if (params.no_open_logs) {
+	const bool logs_open = ::logs_open_for_player(params);
+
+	if (!logs_open) {
 		augs::disable_text_editor();
 	}
 
-	augs::report_crashes(::crash_reports_shown_to_player(params));
+	augs::report_crashes(logs_open);
 	const auto stop_reporting_crashes_at_exit = augs::scope_guard([]() { augs::stop_reporting_crashes(); });
 
 	if (params.version_line_only) {

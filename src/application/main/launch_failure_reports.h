@@ -7,7 +7,7 @@
 
 #include "cmd_line_params.h"
 
-inline bool crash_reports_shown_to_player(const cmd_line_params& params) {
+inline bool logs_open_for_player(const cmd_line_params& params) {
 	return params.type == app_type::GAME_CLIENT && !params.unit_tests_only && !params.no_open_logs;
 }
 

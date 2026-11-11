@@ -59,7 +59,7 @@ namespace augs {
 
 	void open_text_editor(const path_type& on_file) {
 		if (text_editor_disabled) {
-			LOG("Not opening %x in a text editor (--no-open-logs).", on_file);
+			LOG("Not opening %x in a text editor.", on_file);
 			return;
 		}
 
