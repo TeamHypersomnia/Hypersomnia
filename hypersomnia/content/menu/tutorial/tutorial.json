@@ -1219,22 +1219,27 @@
             "id": "@calm_ambient_loop",
             "spatialize": false,
             "loop": true
+        },
+        {
+            "path": "space/sfx/collision_glass.ogg",
+            "file_hash": "033a00b00fb44f1058c659de53b0fd7077a24ce25e81d16a5bcca405299ab26e",
+            "id": "@collision_glass",
+            "max_distance": 2700.0,
+            "reference_distance": 700.0
         }
     ],
     "materials": [
         {
             "id": "space_glass",
             "default_collision": {
-                "sound": "glass_damage_sound",
-                "max_pitch": 6.85699987411499,
-                "collision_sound_sensitivity": 1.1690000295639038
+                "sound": "@collision_glass"
             },
             "damage_sound": {
-                "gain": 1.0290000438690186,
-                "pitch": 0.3490000069141388,
                 "id": "glass_damage_sound"
             },
+            "silence_damager_destruction_sound": true,
             "damage_particles": {
+                "color": [142, 186, 197, 255],
                 "id": "glass_damage"
             },
             "gunshot_decals": {
@@ -1249,8 +1254,8 @@
                 "variant_1": "gunshot_decal_glass_1",
                 "variant_2": "gunshot_decal_glass_2"
             },
-            "max_ricochet_angle": 7.473999977111816,
-            "penetrability": 2.6019999980926514
+            "max_ricochet_angle": 40.0,
+            "penetrability": 2.0
         },
         {
             "id": "space_wall",
