@@ -7,6 +7,7 @@ Serves a Hypersomnia web build for local testing: python3 webserve.py <build dir
   the page's relative assets (Hypersomnia.js, assets/common.js...) resolve by their name wherever they are requested from.
 """
 import http.server
+import json
 import os
 import sys
 
@@ -27,7 +28,49 @@ TYPES = {
 }
 
 
+CLEAR_USER_DATA_PATH = "/clear-user-data"
+IDBFS_MOUNT_POINTS_FROM_COMMON_JS = ["/user", "/hypersomnia_keys"]
+
+CLEAR_USER_DATA_PAGE = """<!doctype html>
+<meta charset="utf-8">
+<title>Clearing user data</title>
+<pre id="log">Clearing the game's user data of this origin...</pre>
+<script>
+const log = text => { console.log(text); document.getElementById("log").textContent += "\\n" + text; };
+
+const delete_database = name => new Promise(resolve => {
+	const request = indexedDB.deleteDatabase(name);
+	request.onsuccess = () => { log("deleted " + name); resolve(); };
+	request.onerror = () => { log("failed to delete " + name); resolve(); };
+	request.onblocked = () => log(name + " is still open - close the game's tab");
+});
+
+(async () => {
+	const listed = indexedDB.databases ? (await indexedDB.databases()).map(database => database.name) : [];
+
+	for (const name of new Set([...%s, ...listed])) {
+		await delete_database(name);
+	}
+
+	localStorage.clear();
+	sessionStorage.clear();
+	log("done - starting the game");
+	location.replace("/");
+})();
+</script>
+""" % json.dumps(IDBFS_MOUNT_POINTS_FROM_COMMON_JS)
+
+
 class Handler(http.server.BaseHTTPRequestHandler):
+	def send_clear_user_data_page(self):
+		body = CLEAR_USER_DATA_PAGE.encode("utf-8")
+		self.send_response(200)
+		self.send_header("Content-Type", "text/html")
+		self.send_header("Content-Length", str(len(body)))
+		self.send_header("Cache-Control", "no-store")
+		self.end_headers()
+		self.wfile.write(body)
+
 	def resolve(self):
 		path = self.path.split("?", 1)[0]
 
@@ -42,6 +85,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
 		return os.path.join(ROOT, "Hypersomnia.html")
 
 	def do_GET(self):
+		if self.path.split("?", 1)[0] == CLEAR_USER_DATA_PATH:
+			self.send_clear_user_data_page()
+			return
+
 		file = self.resolve()
 
 		# Nothing outside the build and its assets (a symlink), whatever ../ the path holds
