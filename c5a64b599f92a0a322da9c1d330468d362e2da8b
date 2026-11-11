@@ -1,1 +1,1 @@
-Audited: audit #8, 2026-11-11 - static CRT steam_integration, binary check, Windows wielding link, GLFW portal parent, CI apt mirrors; nothing serious, fixes in b50d1fbbe
+Audited: audit #8, 2026-11-11 - static CRT steam_integration, binary check, Windows wielding link, GLFW portal parent, CI apt mirrors; nothing serious, fixes in b50d1fbbe and d9266aac7 (whole-tree CMP0091 MSVC runtime)
