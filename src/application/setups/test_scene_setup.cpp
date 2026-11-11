@@ -1822,7 +1822,15 @@ void test_scene_setup::draw_tutorial_hud(const draw_setup_gui_input& in) {
 				return num_transitions;
 			}();
 
-			appearance.splits = std::min(max_hud_bar_splits_v, is_basic ? num_transitions : advanced_splits);
+			const auto splits = [&]() {
+				if (tutorial.challenge) {
+					return 1;
+				}
+
+				return is_basic ? num_transitions : advanced_splits;
+			}();
+
+			appearance.splits = std::min(max_hud_bar_splits_v, splits);
 
 			/*
 				Widened so that the bar's bright border
