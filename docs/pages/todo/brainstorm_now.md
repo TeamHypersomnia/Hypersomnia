@@ -9,6 +9,9 @@ summary: That which we are brainstorming at the moment.
 - early access poprawic opis
 - dodac kosmos do hypersomnia.io
 - zrobic cross-reference z grami wlasnie predkosci postaci i pociskow i zoom zeby dobrac
+- kosmiczne assety tutoriala jako oficjalne (content/gfx + test_scene_images/flavours, tutorial.json bez lokalnych plikow)
+	- najpierw CC0: mglawice, gwiazdy, mgla, muzyka
+	- kafelki Aske4 dopiero po potwierdzeniu licencji
 - remove comments
 
 - zombie mode
