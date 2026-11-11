@@ -4,18 +4,17 @@
 #include "augs/log.h"
 #include "steam_integration.h"
 
-constexpr std::uint32_t tutorial_advanced_end_level_v = 20;
-
 inline const char* get_tutorial_steam_achievement_api_name(
 	const std::uint32_t entered_level,
 	const bool left_surfing_challenge,
-	const std::optional<std::uint32_t> basic_finish_level
+	const std::optional<std::uint32_t> basic_finish_level,
+	const std::uint32_t advanced_end_level
 ) {
 	if (basic_finish_level.has_value() && entered_level == *basic_finish_level) {
 		return "TUTORIAL_BASIC";
 	}
 
-	if (entered_level == tutorial_advanced_end_level_v) {
+	if (entered_level == advanced_end_level) {
 		return left_surfing_challenge ? "SURFING_CHALLENGE" : "TUTORIAL_ADVANCED";
 	}
 
@@ -25,12 +24,14 @@ inline const char* get_tutorial_steam_achievement_api_name(
 inline void unlock_tutorial_steam_achievement(
 	const std::uint32_t entered_level,
 	const bool left_surfing_challenge,
-	const std::optional<std::uint32_t> basic_finish_level
+	const std::optional<std::uint32_t> basic_finish_level,
+	const std::uint32_t advanced_end_level
 ) {
 	const auto api_name = ::get_tutorial_steam_achievement_api_name(
 		entered_level,
 		left_surfing_challenge,
-		basic_finish_level
+		basic_finish_level,
+		advanced_end_level
 	);
 
 	if (api_name != nullptr) {

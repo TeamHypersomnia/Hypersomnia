@@ -98,6 +98,7 @@ static void give_rifles_to_range_column(test_mode& mode, const std::vector<std::
 */
 
 constexpr uint32_t tutorial_last_basic_level_v = 4;
+constexpr uint32_t tutorial_advanced_end_level_v = 20;
 
 /* Based on the height of the character's value bars (their 16px icons). */
 constexpr int tutorial_hud_bar_h_v = 16;
@@ -1493,7 +1494,13 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 						uint32_t new_level = 0;
 
 						if (typesafe_sscanf(name, "entry%x", new_level)) {
-							::unlock_tutorial_steam_achievement(new_level, left_surfing_challenge, tutorial_finish_level);
+							::unlock_tutorial_steam_achievement(
+								new_level,
+								left_surfing_challenge,
+								tutorial_finish_level,
+								tutorial_advanced_end_level_v
+							);
+
 							tutorial.level = new_level;
 							restart_arena();
 							return true;

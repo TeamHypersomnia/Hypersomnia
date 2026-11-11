@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -eo pipefail
 
 steam_integration_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/steam_integration"
 
@@ -20,7 +20,7 @@ find_llvm_tool() {
 llvm_nm=$(find_llvm_tool llvm-nm)
 llvm_readobj=$(find_llvm_tool llvm-readobj)
 
-declared_functions=$(grep DLL_EXPORT "$steam_integration_dir/steam_integration.h" | grep -oE '\bsteam_[a-z_]+\(' | tr -d '(' | sort -u)
+declared_functions=$(sed -nE 's/^[[:space:]]*DLL_EXPORT[^(]*[^A-Za-z0-9_]([A-Za-z_][A-Za-z0-9_]*)\(.*/\1/p' "$steam_integration_dir/steam_integration.h" | sort -u)
 
 if [ -z "$declared_functions" ]; then
 	echo "No DLL_EXPORT functions found in steam_integration.h." >&2
@@ -54,10 +54,15 @@ check_binary() {
 	done
 }
 
-check_binary "bin/linux/libsteam_integration.so" "$(linux_exports)"
-check_binary "bin/macos/libsteam_integration.dylib (arm64)" "$(macos_exports arm64)"
-check_binary "bin/macos/libsteam_integration.dylib (x86_64)" "$(macos_exports x86_64)"
-check_binary "bin/windows/steam_integration.dll" "$(windows_exports)"
+linux_symbols=$(linux_exports)
+macos_arm64_symbols=$(macos_exports arm64)
+macos_x86_64_symbols=$(macos_exports x86_64)
+windows_symbols=$(windows_exports)
+
+check_binary "bin/linux/libsteam_integration.so" "$linux_symbols"
+check_binary "bin/macos/libsteam_integration.dylib (arm64)" "$macos_arm64_symbols"
+check_binary "bin/macos/libsteam_integration.dylib (x86_64)" "$macos_x86_64_symbols"
+check_binary "bin/windows/steam_integration.dll" "$windows_symbols"
 
 if [ $any_missing -eq 1 ]; then
 	exit 1
