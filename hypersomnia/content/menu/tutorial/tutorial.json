@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-11-11 17:17:20.925347 UTC"
+        "version_timestamp": "2026-11-11 21:44:28.594970 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -322,7 +322,7 @@
                 ]
             },
             "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.12,
+            "rotate_continuously_degrees_per_sec": 0.11999999731779099,
             "neon_alpha_vibration": {
                 "lower": 169
             },
@@ -341,7 +341,7 @@
             },
             "color": [255, 255, 255, 133],
             "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.13,
+            "rotate_continuously_degrees_per_sec": 0.12999999523162842,
             "as_nonphysical": {
                 "cover_background_neons": true
             }
@@ -405,36 +405,10 @@
             }
         },
         {
-            "path": "space/floor/space_tile_010.png",
-            "file_hash": "c5c160e844873f6dcefd93c17515ce8ef2252e6ac327df0ba7ddf44d2be3875f",
-            "id": "@space_tile_010",
+            "path": "space/floor/space_floor_64.png",
+            "file_hash": "622a3c576f718133db1b3ac1e07fbf35be86548d6b02a1cc74ed51b399c88b1e",
+            "id": "@space_floor_64",
             "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/space_tile_011.png",
-            "file_hash": "29263455b7fdebe1ad7fed8e589c683db45a5fa7215a029c72a7b3eacdd3fe35",
-            "id": "@space_tile_011",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/space_floor_256.png",
-            "file_hash": "7c88e8186fedc9c1b7fae0260b364ef4c10c4598c48bd325b7649225cc869a1d",
-            "id": "@space_floor_256",
-            "size": [256, 256],
             "as_nonphysical": {
                 "OFF_custom_footstep": {
                     "sound": {
@@ -457,9 +431,35 @@
             }
         },
         {
-            "path": "space/floor/space_floor_64.png",
-            "file_hash": "622a3c576f718133db1b3ac1e07fbf35be86548d6b02a1cc74ed51b399c88b1e",
-            "id": "@space_floor_64",
+            "path": "space/floor/space_floor_256.png",
+            "file_hash": "7c88e8186fedc9c1b7fae0260b364ef4c10c4598c48bd325b7649225cc869a1d",
+            "id": "@space_floor_256",
+            "size": [256, 256],
+            "as_nonphysical": {
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "id": "footstep_air_duct"
+                    }
+                }
+            }
+        },
+        {
+            "path": "space/floor/space_tile_010.png",
+            "file_hash": "c5c160e844873f6dcefd93c17515ce8ef2252e6ac327df0ba7ddf44d2be3875f",
+            "id": "@space_tile_010",
+            "size": [64, 64],
+            "as_nonphysical": {
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "id": "footstep_air_duct"
+                    }
+                }
+            }
+        },
+        {
+            "path": "space/floor/space_tile_011.png",
+            "file_hash": "29263455b7fdebe1ad7fed8e589c683db45a5fa7215a029c72a7b3eacdd3fe35",
+            "id": "@space_tile_011",
             "size": [64, 64],
             "as_nonphysical": {
                 "OFF_custom_footstep": {
@@ -738,6 +738,570 @@
             "as_nonphysical": {
                 "full_illumination": true
             }
+        },
+        {
+            "path": "space/stars/field_stars_small_1.png",
+            "file_hash": "1f88023d5082fc82efd006cfb749a022309a5c616ce5ef0e68a64ee641c06b29",
+            "id": "@field_stars_small_1",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.1599999964237213,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@stars_small_1_01"
+                    },
+                    {
+                        "sprite": "@stars_small_1_02"
+                    },
+                    {
+                        "sprite": "@stars_small_1_03"
+                    },
+                    {
+                        "sprite": "@stars_small_1_04"
+                    },
+                    {
+                        "sprite": "@stars_small_1_05"
+                    },
+                    {
+                        "sprite": "@stars_small_1_06"
+                    },
+                    {
+                        "sprite": "@stars_small_1_07"
+                    },
+                    {
+                        "sprite": "@stars_small_1_08"
+                    },
+                    {
+                        "sprite": "@stars_small_1_09"
+                    },
+                    {
+                        "sprite": "@stars_small_1_10"
+                    },
+                    {
+                        "sprite": "@stars_small_1_11"
+                    },
+                    {
+                        "sprite": "@stars_small_1_12"
+                    },
+                    {
+                        "sprite": "@stars_small_1_13",
+                        "weight": 0.10000000149011612
+                    },
+                    {
+                        "sprite": "@stars_small_1_14",
+                        "weight": 0.10000000149011612
+                    }
+                ],
+                "stars_per_million_square_units": 71.76000213623047,
+                "seed": 1
+            }
+        },
+        {
+            "path": "space/stars/field_stars_small_2.png",
+            "file_hash": "cf95318708a44b9f99c0b4f930d20287f0be46914d7e221edcb31099fde912cd",
+            "id": "@field_stars_small_2",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.15000000596046448,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@stars_small_2_01"
+                    },
+                    {
+                        "sprite": "@stars_small_2_02"
+                    },
+                    {
+                        "sprite": "@stars_small_2_03"
+                    },
+                    {
+                        "sprite": "@stars_small_2_04"
+                    },
+                    {
+                        "sprite": "@stars_small_2_05"
+                    },
+                    {
+                        "sprite": "@stars_small_2_06"
+                    },
+                    {
+                        "sprite": "@stars_small_2_07"
+                    },
+                    {
+                        "sprite": "@stars_small_2_08"
+                    },
+                    {
+                        "sprite": "@stars_small_2_09"
+                    },
+                    {
+                        "sprite": "@stars_small_2_10"
+                    },
+                    {
+                        "sprite": "@stars_small_2_11"
+                    },
+                    {
+                        "sprite": "@stars_small_2_12"
+                    },
+                    {
+                        "sprite": "@stars_small_2_13",
+                        "weight": 0.10000000149011612
+                    },
+                    {
+                        "sprite": "@stars_small_2_14",
+                        "weight": 0.10000000149011612
+                    }
+                ],
+                "stars_per_million_square_units": 172.6199951171875,
+                "seed": 2
+            }
+        },
+        {
+            "path": "space/stars/field_starsbig_1_1_pc.png",
+            "file_hash": "6c623dd411c6b0b73bf415a4e3d54fae4904af75c273fde57aa6dc7d5db27f6c",
+            "id": "@field_starsbig_1_1_pc",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.18000000715255737,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@starsbig_1_1_pc_01"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_02"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_03"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_04"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_05"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_06"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_07"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_08"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_09"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_10"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_11"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_12"
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_13",
+                        "weight": 0.10000000149011612
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_14",
+                        "weight": 0.10000000149011612
+                    }
+                ],
+                "stars_per_million_square_units": 304.2200012207031,
+                "seed": 3
+            }
+        },
+        {
+            "path": "space/stars/field_starsbig_1_2_pc.png",
+            "file_hash": "436d402d2763fb4662a8e798b234dbb9e0eebddd6e14814b750df918786b5e8c",
+            "id": "@field_starsbig_1_2_pc",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.1899999976158142,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@starsbig_1_2_pc_01"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_02"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_03"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_04"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_05"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_06"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_07"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_08"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_09"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_10"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_11"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_12"
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_13",
+                        "weight": 0.10000000149011612
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_14",
+                        "weight": 0.10000000149011612
+                    }
+                ],
+                "stars_per_million_square_units": 193.60000610351563,
+                "seed": 4
+            }
+        },
+        {
+            "path": "space/stars/stars_small_1_01.png",
+            "file_hash": "79fd48f583043fc4432650bfeef894379c0ab58609b0765bd1aa8d0029cf5a5a",
+            "id": "@stars_small_1_01",
+            "size": [7, 7]
+        },
+        {
+            "path": "space/stars/stars_small_1_02.png",
+            "file_hash": "0ddaedac35090acfaea771b84feae8ca9f6ec8d8c142ea3241f705a6e6822ce3",
+            "id": "@stars_small_1_02",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/stars_small_1_03.png",
+            "file_hash": "04fc889cf414e719296baa46c790baad1299013ad2d46f09bfd45023c3185f7f",
+            "id": "@stars_small_1_03",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/stars_small_1_04.png",
+            "file_hash": "e2aabadcdb52c13b37463a9d291d47025fd32d65e9a5f147d91e5fb2f8a349b3",
+            "id": "@stars_small_1_04",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/stars_small_1_05.png",
+            "file_hash": "96f6ba4407a22e8cb91fad6989adbf165c64b76b561a7bacd36905aa200f3697",
+            "id": "@stars_small_1_05",
+            "size": [10, 10]
+        },
+        {
+            "path": "space/stars/stars_small_1_06.png",
+            "file_hash": "354d2c3ab2dd1becc4b22333412f4a803f9feeae5377f02315822f7b06349eeb",
+            "id": "@stars_small_1_06",
+            "size": [11, 10]
+        },
+        {
+            "path": "space/stars/stars_small_1_07.png",
+            "file_hash": "415dba6f4e95d20442990256f7806341dc5ad9c013bf21aa235917562c1af464",
+            "id": "@stars_small_1_07",
+            "size": [11, 11]
+        },
+        {
+            "path": "space/stars/stars_small_1_08.png",
+            "file_hash": "5164c1ba1bb7e769bba007ed12877fbf89957f7d1cce6462e782622d19b06ce5",
+            "id": "@stars_small_1_08",
+            "size": [12, 12]
+        },
+        {
+            "path": "space/stars/stars_small_1_09.png",
+            "file_hash": "a0904f2c6c34354cacc89af6dc8ac953a3d99b16fc536dda3a1d6dbab31d455e",
+            "id": "@stars_small_1_09",
+            "size": [13, 13]
+        },
+        {
+            "path": "space/stars/stars_small_1_10.png",
+            "file_hash": "488b9ff1b8f89f5dc749cf8c284135c3fbca7bb6c2c56832994da4b8764e4a93",
+            "id": "@stars_small_1_10",
+            "size": [14, 14]
+        },
+        {
+            "path": "space/stars/stars_small_1_11.png",
+            "file_hash": "4fe004fc8cfecd76c0b6d794ebe2dccfb0ff923bbfb05fd7c952676021241d5c",
+            "id": "@stars_small_1_11",
+            "size": [17, 14]
+        },
+        {
+            "path": "space/stars/stars_small_1_12.png",
+            "file_hash": "7518d98a7d1975ba5d66b39c266d6f44b9900f756833c191ab63961f766a33ad",
+            "id": "@stars_small_1_12",
+            "size": [23, 19]
+        },
+        {
+            "path": "space/stars/stars_small_1_13.png",
+            "file_hash": "5d2daa97b64884fafd14666e114790c9db499e667f11f3ef3b2b1dbac9211e94",
+            "id": "@stars_small_1_13",
+            "size": [37, 37]
+        },
+        {
+            "path": "space/stars/stars_small_1_14.png",
+            "file_hash": "932a889323307df8ee6f5942de0c71f603639e84ac976a9823c9297c0b320b96",
+            "id": "@stars_small_1_14",
+            "size": [37, 37]
+        },
+        {
+            "path": "space/stars/stars_small_2_01.png",
+            "file_hash": "fb070807d2583186d671a4e55dd5e436e533e2fa507efa7b52d1bd09fe4f46da",
+            "id": "@stars_small_2_01",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_02.png",
+            "file_hash": "758df36f091e35939533993a1402275d1b9ab036fbc8bc66671ebe29a20c0fd6",
+            "id": "@stars_small_2_02",
+            "size": [4, 4]
+        },
+        {
+            "path": "space/stars/stars_small_2_03.png",
+            "file_hash": "6fdf6959142eb7d45f1ae0a33cc8ddf648f66dd47e5863f36ac2842bb5395441",
+            "id": "@stars_small_2_03",
+            "size": [5, 4]
+        },
+        {
+            "path": "space/stars/stars_small_2_04.png",
+            "file_hash": "d6d7c9a15bfede9fa88b723fdde2eccb61ac9c9c48041e000668523a809d6b7d",
+            "id": "@stars_small_2_04",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_05.png",
+            "file_hash": "d133be3382f83cfd58b48712282c0e16514d9c86c90f129fcc8ec43022b5ace7",
+            "id": "@stars_small_2_05",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_06.png",
+            "file_hash": "f69d42a16e9e509778a6973b269937247232a4a24f384cd5fbef43bb0f06d07b",
+            "id": "@stars_small_2_06",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_07.png",
+            "file_hash": "db3513b6cd73e5126cf7f9319dd10fe7bce9f0ed54b6aa4a2deae9e7e2072c50",
+            "id": "@stars_small_2_07",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_08.png",
+            "file_hash": "a3109b04d1220d8298b88f0e32fdd7ed36db7ae5749b04022b20927ce41c760e",
+            "id": "@stars_small_2_08",
+            "size": [8, 7]
+        },
+        {
+            "path": "space/stars/stars_small_2_09.png",
+            "file_hash": "1638eb58c860fdba4b7a6b443d18be05df73a2879b30bbb5d7a15356f7b0e3aa",
+            "id": "@stars_small_2_09",
+            "size": [7, 8]
+        },
+        {
+            "path": "space/stars/stars_small_2_10.png",
+            "file_hash": "c90b48cf50f9bde356c1de3be4f9aa7300ead3c7ca1f0473025bc8b637272199",
+            "id": "@stars_small_2_10",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/stars_small_2_11.png",
+            "file_hash": "d1bd3db35f5e3356df43a838af2ada4ad4c463a800d32a24e6fa844731f9b4c4",
+            "id": "@stars_small_2_11",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/stars_small_2_12.png",
+            "file_hash": "d32fac2387dc258e00966d3b3ff816d8addff503e2f23eb22fe78addd6367681",
+            "id": "@stars_small_2_12",
+            "size": [9, 10]
+        },
+        {
+            "path": "space/stars/stars_small_2_13.png",
+            "file_hash": "b97cf1eb14a3cc6505b67c33854836e91b2a80dc8f6f74470f8403f62651ded2",
+            "id": "@stars_small_2_13",
+            "size": [13, 14]
+        },
+        {
+            "path": "space/stars/stars_small_2_14.png",
+            "file_hash": "40675a428db16aa737c5516e56257185383a216b75a8a6ca7ff7b05cad301bca",
+            "id": "@stars_small_2_14",
+            "size": [14, 14]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_01.png",
+            "file_hash": "8bce1f3d4ce0737cefe1942d85c46e1cb23f0733368334c7791314dd741bc2bf",
+            "id": "@starsbig_1_1_pc_01",
+            "size": [4, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_02.png",
+            "file_hash": "aef97effebf306a2c3fcc10fef0564b00d8f4d31926b29968081501de7f5f255",
+            "id": "@starsbig_1_1_pc_02",
+            "size": [4, 4]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_03.png",
+            "file_hash": "015566b3e673332aa6ae945ad4db02825a11677ad45280466fbb10180f65b36b",
+            "id": "@starsbig_1_1_pc_03",
+            "size": [4, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_04.png",
+            "file_hash": "a084a71f431beec944d9aff7ba5d4b68402e0edee6cf0ff075669484e4b6bde6",
+            "id": "@starsbig_1_1_pc_04",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_05.png",
+            "file_hash": "0b5c837851444e7ffda0d376a9a26556de779687873157f6d264434c8908fcc7",
+            "id": "@starsbig_1_1_pc_05",
+            "size": [4, 4]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_06.png",
+            "file_hash": "db036538eeb692fba283b3a4bf8c17a569c9d11bd85239cc9de7a3bf0b045edf",
+            "id": "@starsbig_1_1_pc_06",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_07.png",
+            "file_hash": "d87f8b2f2f94052f0dff69afd85ace14b87f1cec75974830f532864aece81661",
+            "id": "@starsbig_1_1_pc_07",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_08.png",
+            "file_hash": "31ec13604df18d1f0720755e863b08e5f6360b02091ea0fca9628c891050b10e",
+            "id": "@starsbig_1_1_pc_08",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_09.png",
+            "file_hash": "6aaa8182f5e70f058327684e0261ebe3d26974f3d9bce1d123c367230bc7f654",
+            "id": "@starsbig_1_1_pc_09",
+            "size": [7, 7]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_10.png",
+            "file_hash": "74f96df340b4ec2c355500c7c7f3656c3031abe7f02fdcb82a6ff72ed398af8d",
+            "id": "@starsbig_1_1_pc_10",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_11.png",
+            "file_hash": "f3cd0cb910ca1baabb80629140f7fa7b5818d82d9d0601620d2ef3d8bae8181e",
+            "id": "@starsbig_1_1_pc_11",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_12.png",
+            "file_hash": "4dfb9a2a4e84181721f95bd6d278763c23ba656c56cc746d37ba6928d5d27985",
+            "id": "@starsbig_1_1_pc_12",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_13.png",
+            "file_hash": "d4143039d660ad714e311dbc08836c40664a99c33abf7b1acebdcec8b1f9a1a4",
+            "id": "@starsbig_1_1_pc_13",
+            "size": [12, 12]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_14.png",
+            "file_hash": "28c218afca6942b4278d8272609b508195bc6d45c4f1eed2609971bc85e99cf9",
+            "id": "@starsbig_1_1_pc_14",
+            "size": [13, 12]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_01.png",
+            "file_hash": "8e3b98ff2e2de73267d6674a8a38775aee204160dba317404af08567bdaf19ff",
+            "id": "@starsbig_1_2_pc_01",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_02.png",
+            "file_hash": "2cb9c830045df00e32b5bf7a95ee008a77611847abcbe93a081d1a6321d2ed09",
+            "id": "@starsbig_1_2_pc_02",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_03.png",
+            "file_hash": "36ade016cfbbd30c90e95143129ba3b3251084e75fc3f626b0782a33fdf26b7e",
+            "id": "@starsbig_1_2_pc_03",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_04.png",
+            "file_hash": "78a2bb1dcbbd2f54fdfe7bb6acc865f42dcb60db8eec5199867508485c5b5d8e",
+            "id": "@starsbig_1_2_pc_04",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_05.png",
+            "file_hash": "a46c7159f85e077dc26761ef8a675218aac13d07f3453df532d568ac39a256b5",
+            "id": "@starsbig_1_2_pc_05",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_06.png",
+            "file_hash": "b2f408c0612148b2daa86524eca366f3fb6b09d18118b0e1f3f1b542c054666b",
+            "id": "@starsbig_1_2_pc_06",
+            "size": [4, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_07.png",
+            "file_hash": "a673a83520b1d7cb4fae7a4d962837ffe7b6e85b8eaf0e6e4cf89cf4581a95e3",
+            "id": "@starsbig_1_2_pc_07",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_08.png",
+            "file_hash": "64da5d212dd022119f686041272f593fa23b7f493d086f439ee724ec2ae198e5",
+            "id": "@starsbig_1_2_pc_08",
+            "size": [7, 7]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_09.png",
+            "file_hash": "277bfc5698cea8e107e98e90822fae147a2d8873ae7db4a9dafaccae9499a0d2",
+            "id": "@starsbig_1_2_pc_09",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_10.png",
+            "file_hash": "59b5d529eebd2275979258a897d8ce715aa3424fdb1c2c51e75d1ae824afde54",
+            "id": "@starsbig_1_2_pc_10",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_11.png",
+            "file_hash": "0f9a1934475e573e9eb3e07ed6a89cf4bc5541d589eb5b18344362ddc2b03479",
+            "id": "@starsbig_1_2_pc_11",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_12.png",
+            "file_hash": "5c3aa63c8beeaaf455e9f0ffeb1609da0f320cf284e669a970ed693b32e5d913",
+            "id": "@starsbig_1_2_pc_12",
+            "size": [9, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_13.png",
+            "file_hash": "a740f24ea3aca5bee88d0d85e1310ca5bee50cb2f0656068cfee2b0414c87bb5",
+            "id": "@starsbig_1_2_pc_13",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_14.png",
+            "file_hash": "231f282c186557d7e8471173e5f228433f23ad9b2a5267cfad805aa25fdb509c",
+            "id": "@starsbig_1_2_pc_14",
+            "size": [9, 9]
         },
         {
             "path": "space/wall/space_tile_003.png",
@@ -1103,618 +1667,6 @@
             "id": "@calm_ambient_loop",
             "spatialize": false,
             "loop": true
-        },
-        {
-            "path": "space/stars/stars_small_1_01.png",
-            "file_hash": "79fd48f583043fc4432650bfeef894379c0ab58609b0765bd1aa8d0029cf5a5a",
-            "id": "@stars_small_1_01",
-            "size": [7, 7]
-        },
-        {
-            "path": "space/stars/stars_small_1_02.png",
-            "file_hash": "0ddaedac35090acfaea771b84feae8ca9f6ec8d8c142ea3241f705a6e6822ce3",
-            "id": "@stars_small_1_02",
-            "size": [8, 8]
-        },
-        {
-            "path": "space/stars/stars_small_1_03.png",
-            "file_hash": "04fc889cf414e719296baa46c790baad1299013ad2d46f09bfd45023c3185f7f",
-            "id": "@stars_small_1_03",
-            "size": [9, 9]
-        },
-        {
-            "path": "space/stars/stars_small_1_04.png",
-            "file_hash": "e2aabadcdb52c13b37463a9d291d47025fd32d65e9a5f147d91e5fb2f8a349b3",
-            "id": "@stars_small_1_04",
-            "size": [9, 9]
-        },
-        {
-            "path": "space/stars/stars_small_1_05.png",
-            "file_hash": "96f6ba4407a22e8cb91fad6989adbf165c64b76b561a7bacd36905aa200f3697",
-            "id": "@stars_small_1_05",
-            "size": [10, 10]
-        },
-        {
-            "path": "space/stars/stars_small_1_06.png",
-            "file_hash": "354d2c3ab2dd1becc4b22333412f4a803f9feeae5377f02315822f7b06349eeb",
-            "id": "@stars_small_1_06",
-            "size": [11, 10]
-        },
-        {
-            "path": "space/stars/stars_small_1_07.png",
-            "file_hash": "415dba6f4e95d20442990256f7806341dc5ad9c013bf21aa235917562c1af464",
-            "id": "@stars_small_1_07",
-            "size": [11, 11]
-        },
-        {
-            "path": "space/stars/stars_small_1_08.png",
-            "file_hash": "5164c1ba1bb7e769bba007ed12877fbf89957f7d1cce6462e782622d19b06ce5",
-            "id": "@stars_small_1_08",
-            "size": [12, 12]
-        },
-        {
-            "path": "space/stars/stars_small_1_09.png",
-            "file_hash": "a0904f2c6c34354cacc89af6dc8ac953a3d99b16fc536dda3a1d6dbab31d455e",
-            "id": "@stars_small_1_09",
-            "size": [13, 13]
-        },
-        {
-            "path": "space/stars/stars_small_1_10.png",
-            "file_hash": "488b9ff1b8f89f5dc749cf8c284135c3fbca7bb6c2c56832994da4b8764e4a93",
-            "id": "@stars_small_1_10",
-            "size": [14, 14]
-        },
-        {
-            "path": "space/stars/stars_small_1_11.png",
-            "file_hash": "4fe004fc8cfecd76c0b6d794ebe2dccfb0ff923bbfb05fd7c952676021241d5c",
-            "id": "@stars_small_1_11",
-            "size": [17, 14]
-        },
-        {
-            "path": "space/stars/stars_small_1_12.png",
-            "file_hash": "7518d98a7d1975ba5d66b39c266d6f44b9900f756833c191ab63961f766a33ad",
-            "id": "@stars_small_1_12",
-            "size": [23, 19]
-        },
-        {
-            "path": "space/stars/stars_small_1_13.png",
-            "file_hash": "5d2daa97b64884fafd14666e114790c9db499e667f11f3ef3b2b1dbac9211e94",
-            "id": "@stars_small_1_13",
-            "size": [37, 37]
-        },
-        {
-            "path": "space/stars/stars_small_1_14.png",
-            "file_hash": "932a889323307df8ee6f5942de0c71f603639e84ac976a9823c9297c0b320b96",
-            "id": "@stars_small_1_14",
-            "size": [37, 37]
-        },
-        {
-            "path": "space/stars/field_stars_small_1.png",
-            "file_hash": "1f88023d5082fc82efd006cfb749a022309a5c616ce5ef0e68a64ee641c06b29",
-            "id": "@star_field_stars_small_1",
-            "size": [4096, 4096],
-            "rotate_continuously_degrees_per_sec": 0.16,
-            "star_field": {
-                "stars": [
-                    {
-                        "sprite": "@stars_small_1_01",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_02",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_03",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_04",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_05",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_06",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_07",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_08",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_09",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_10",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_11",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_12",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_1_13",
-                        "weight": 0.1
-                    },
-                    {
-                        "sprite": "@stars_small_1_14",
-                        "weight": 0.1
-                    }
-                ],
-                "stars_per_million_square_units": 71.76,
-                "seed": 1
-            }
-        },
-        {
-            "path": "space/stars/stars_small_2_01.png",
-            "file_hash": "fb070807d2583186d671a4e55dd5e436e533e2fa507efa7b52d1bd09fe4f46da",
-            "id": "@stars_small_2_01",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/stars_small_2_02.png",
-            "file_hash": "758df36f091e35939533993a1402275d1b9ab036fbc8bc66671ebe29a20c0fd6",
-            "id": "@stars_small_2_02",
-            "size": [4, 4]
-        },
-        {
-            "path": "space/stars/stars_small_2_03.png",
-            "file_hash": "6fdf6959142eb7d45f1ae0a33cc8ddf648f66dd47e5863f36ac2842bb5395441",
-            "id": "@stars_small_2_03",
-            "size": [5, 4]
-        },
-        {
-            "path": "space/stars/stars_small_2_04.png",
-            "file_hash": "d6d7c9a15bfede9fa88b723fdde2eccb61ac9c9c48041e000668523a809d6b7d",
-            "id": "@stars_small_2_04",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/stars_small_2_05.png",
-            "file_hash": "d133be3382f83cfd58b48712282c0e16514d9c86c90f129fcc8ec43022b5ace7",
-            "id": "@stars_small_2_05",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/stars_small_2_06.png",
-            "file_hash": "f69d42a16e9e509778a6973b269937247232a4a24f384cd5fbef43bb0f06d07b",
-            "id": "@stars_small_2_06",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/stars_small_2_07.png",
-            "file_hash": "db3513b6cd73e5126cf7f9319dd10fe7bce9f0ed54b6aa4a2deae9e7e2072c50",
-            "id": "@stars_small_2_07",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/stars_small_2_08.png",
-            "file_hash": "a3109b04d1220d8298b88f0e32fdd7ed36db7ae5749b04022b20927ce41c760e",
-            "id": "@stars_small_2_08",
-            "size": [8, 7]
-        },
-        {
-            "path": "space/stars/stars_small_2_09.png",
-            "file_hash": "1638eb58c860fdba4b7a6b443d18be05df73a2879b30bbb5d7a15356f7b0e3aa",
-            "id": "@stars_small_2_09",
-            "size": [7, 8]
-        },
-        {
-            "path": "space/stars/stars_small_2_10.png",
-            "file_hash": "c90b48cf50f9bde356c1de3be4f9aa7300ead3c7ca1f0473025bc8b637272199",
-            "id": "@stars_small_2_10",
-            "size": [8, 8]
-        },
-        {
-            "path": "space/stars/stars_small_2_11.png",
-            "file_hash": "d1bd3db35f5e3356df43a838af2ada4ad4c463a800d32a24e6fa844731f9b4c4",
-            "id": "@stars_small_2_11",
-            "size": [8, 8]
-        },
-        {
-            "path": "space/stars/stars_small_2_12.png",
-            "file_hash": "d32fac2387dc258e00966d3b3ff816d8addff503e2f23eb22fe78addd6367681",
-            "id": "@stars_small_2_12",
-            "size": [9, 10]
-        },
-        {
-            "path": "space/stars/stars_small_2_13.png",
-            "file_hash": "b97cf1eb14a3cc6505b67c33854836e91b2a80dc8f6f74470f8403f62651ded2",
-            "id": "@stars_small_2_13",
-            "size": [13, 14]
-        },
-        {
-            "path": "space/stars/stars_small_2_14.png",
-            "file_hash": "40675a428db16aa737c5516e56257185383a216b75a8a6ca7ff7b05cad301bca",
-            "id": "@stars_small_2_14",
-            "size": [14, 14]
-        },
-        {
-            "path": "space/stars/field_stars_small_2.png",
-            "file_hash": "cf95318708a44b9f99c0b4f930d20287f0be46914d7e221edcb31099fde912cd",
-            "id": "@star_field_stars_small_2",
-            "size": [4096, 4096],
-            "rotate_continuously_degrees_per_sec": 0.15,
-            "star_field": {
-                "stars": [
-                    {
-                        "sprite": "@stars_small_2_01",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_02",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_03",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_04",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_05",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_06",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_07",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_08",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_09",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_10",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_11",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_12",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@stars_small_2_13",
-                        "weight": 0.1
-                    },
-                    {
-                        "sprite": "@stars_small_2_14",
-                        "weight": 0.1
-                    }
-                ],
-                "stars_per_million_square_units": 172.62,
-                "seed": 2
-            }
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_01.png",
-            "file_hash": "8bce1f3d4ce0737cefe1942d85c46e1cb23f0733368334c7791314dd741bc2bf",
-            "id": "@starsbig_1_1_pc_01",
-            "size": [4, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_02.png",
-            "file_hash": "aef97effebf306a2c3fcc10fef0564b00d8f4d31926b29968081501de7f5f255",
-            "id": "@starsbig_1_1_pc_02",
-            "size": [4, 4]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_03.png",
-            "file_hash": "015566b3e673332aa6ae945ad4db02825a11677ad45280466fbb10180f65b36b",
-            "id": "@starsbig_1_1_pc_03",
-            "size": [4, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_04.png",
-            "file_hash": "a084a71f431beec944d9aff7ba5d4b68402e0edee6cf0ff075669484e4b6bde6",
-            "id": "@starsbig_1_1_pc_04",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_05.png",
-            "file_hash": "0b5c837851444e7ffda0d376a9a26556de779687873157f6d264434c8908fcc7",
-            "id": "@starsbig_1_1_pc_05",
-            "size": [4, 4]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_06.png",
-            "file_hash": "db036538eeb692fba283b3a4bf8c17a569c9d11bd85239cc9de7a3bf0b045edf",
-            "id": "@starsbig_1_1_pc_06",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_07.png",
-            "file_hash": "d87f8b2f2f94052f0dff69afd85ace14b87f1cec75974830f532864aece81661",
-            "id": "@starsbig_1_1_pc_07",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_08.png",
-            "file_hash": "31ec13604df18d1f0720755e863b08e5f6360b02091ea0fca9628c891050b10e",
-            "id": "@starsbig_1_1_pc_08",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_09.png",
-            "file_hash": "6aaa8182f5e70f058327684e0261ebe3d26974f3d9bce1d123c367230bc7f654",
-            "id": "@starsbig_1_1_pc_09",
-            "size": [7, 7]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_10.png",
-            "file_hash": "74f96df340b4ec2c355500c7c7f3656c3031abe7f02fdcb82a6ff72ed398af8d",
-            "id": "@starsbig_1_1_pc_10",
-            "size": [8, 8]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_11.png",
-            "file_hash": "f3cd0cb910ca1baabb80629140f7fa7b5818d82d9d0601620d2ef3d8bae8181e",
-            "id": "@starsbig_1_1_pc_11",
-            "size": [8, 8]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_12.png",
-            "file_hash": "4dfb9a2a4e84181721f95bd6d278763c23ba656c56cc746d37ba6928d5d27985",
-            "id": "@starsbig_1_1_pc_12",
-            "size": [9, 9]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_13.png",
-            "file_hash": "d4143039d660ad714e311dbc08836c40664a99c33abf7b1acebdcec8b1f9a1a4",
-            "id": "@starsbig_1_1_pc_13",
-            "size": [12, 12]
-        },
-        {
-            "path": "space/stars/starsbig_1_1_pc_14.png",
-            "file_hash": "28c218afca6942b4278d8272609b508195bc6d45c4f1eed2609971bc85e99cf9",
-            "id": "@starsbig_1_1_pc_14",
-            "size": [13, 12]
-        },
-        {
-            "path": "space/stars/field_starsbig_1_1_pc.png",
-            "file_hash": "6c623dd411c6b0b73bf415a4e3d54fae4904af75c273fde57aa6dc7d5db27f6c",
-            "id": "@star_field_starsbig_1_1_pc",
-            "size": [4096, 4096],
-            "rotate_continuously_degrees_per_sec": 0.18,
-            "star_field": {
-                "stars": [
-                    {
-                        "sprite": "@starsbig_1_1_pc_01",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_02",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_03",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_04",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_05",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_06",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_07",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_08",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_09",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_10",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_11",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_12",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_13",
-                        "weight": 0.1
-                    },
-                    {
-                        "sprite": "@starsbig_1_1_pc_14",
-                        "weight": 0.1
-                    }
-                ],
-                "stars_per_million_square_units": 304.22,
-                "seed": 3
-            }
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_01.png",
-            "file_hash": "8e3b98ff2e2de73267d6674a8a38775aee204160dba317404af08567bdaf19ff",
-            "id": "@starsbig_1_2_pc_01",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_02.png",
-            "file_hash": "2cb9c830045df00e32b5bf7a95ee008a77611847abcbe93a081d1a6321d2ed09",
-            "id": "@starsbig_1_2_pc_02",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_03.png",
-            "file_hash": "36ade016cfbbd30c90e95143129ba3b3251084e75fc3f626b0782a33fdf26b7e",
-            "id": "@starsbig_1_2_pc_03",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_04.png",
-            "file_hash": "78a2bb1dcbbd2f54fdfe7bb6acc865f42dcb60db8eec5199867508485c5b5d8e",
-            "id": "@starsbig_1_2_pc_04",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_05.png",
-            "file_hash": "a46c7159f85e077dc26761ef8a675218aac13d07f3453df532d568ac39a256b5",
-            "id": "@starsbig_1_2_pc_05",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_06.png",
-            "file_hash": "b2f408c0612148b2daa86524eca366f3fb6b09d18118b0e1f3f1b542c054666b",
-            "id": "@starsbig_1_2_pc_06",
-            "size": [4, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_07.png",
-            "file_hash": "a673a83520b1d7cb4fae7a4d962837ffe7b6e85b8eaf0e6e4cf89cf4581a95e3",
-            "id": "@starsbig_1_2_pc_07",
-            "size": [5, 5]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_08.png",
-            "file_hash": "64da5d212dd022119f686041272f593fa23b7f493d086f439ee724ec2ae198e5",
-            "id": "@starsbig_1_2_pc_08",
-            "size": [7, 7]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_09.png",
-            "file_hash": "277bfc5698cea8e107e98e90822fae147a2d8873ae7db4a9dafaccae9499a0d2",
-            "id": "@starsbig_1_2_pc_09",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_10.png",
-            "file_hash": "59b5d529eebd2275979258a897d8ce715aa3424fdb1c2c51e75d1ae824afde54",
-            "id": "@starsbig_1_2_pc_10",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_11.png",
-            "file_hash": "0f9a1934475e573e9eb3e07ed6a89cf4bc5541d589eb5b18344362ddc2b03479",
-            "id": "@starsbig_1_2_pc_11",
-            "size": [6, 6]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_12.png",
-            "file_hash": "5c3aa63c8beeaaf455e9f0ffeb1609da0f320cf284e669a970ed693b32e5d913",
-            "id": "@starsbig_1_2_pc_12",
-            "size": [9, 8]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_13.png",
-            "file_hash": "a740f24ea3aca5bee88d0d85e1310ca5bee50cb2f0656068cfee2b0414c87bb5",
-            "id": "@starsbig_1_2_pc_13",
-            "size": [8, 8]
-        },
-        {
-            "path": "space/stars/starsbig_1_2_pc_14.png",
-            "file_hash": "231f282c186557d7e8471173e5f228433f23ad9b2a5267cfad805aa25fdb509c",
-            "id": "@starsbig_1_2_pc_14",
-            "size": [9, 9]
-        },
-        {
-            "path": "space/stars/field_starsbig_1_2_pc.png",
-            "file_hash": "436d402d2763fb4662a8e798b234dbb9e0eebddd6e14814b750df918786b5e8c",
-            "id": "@star_field_starsbig_1_2_pc",
-            "size": [4096, 4096],
-            "rotate_continuously_degrees_per_sec": 0.19,
-            "star_field": {
-                "stars": [
-                    {
-                        "sprite": "@starsbig_1_2_pc_01",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_02",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_03",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_04",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_05",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_06",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_07",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_08",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_09",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_10",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_11",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_12",
-                        "weight": 1.0
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_13",
-                        "weight": 0.1
-                    },
-                    {
-                        "sprite": "@starsbig_1_2_pc_14",
-                        "weight": 0.1
-                    }
-                ],
-                "stars_per_million_square_units": 193.6,
-                "seed": 4
-            }
         }
     ],
     "materials": [
@@ -5002,6 +4954,7 @@
         {
             "id": "Level21",
             "nodes": [
+                "sp_fog (23)",
                 "Level21 island",
                 "exit19",
                 "point_light (106)",
@@ -5734,6 +5687,12 @@
         }
     ],
     "nodes": [
+        {
+            "id": "sp_fog (23)",
+            "type": "@fog_start",
+            "pos": [136384.0, 106944.0],
+            "size": [5000, 5000]
+        },
         {
             "id": "dev_floor_256 (1)",
             "type": "@space_floor_256",
@@ -9255,9 +9214,9 @@
         },
         {
             "id": "sp_fog (1)",
-            "type": "@fog_soft",
-            "pos": [-21373.716796875, 30383.611328125],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-21248.0, 31756.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (1)",
@@ -9832,7 +9791,7 @@
         },
         {
             "id": "sp_stars_small_2 (1)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [-22016.0, 28992.0],
             "size": [10240, 10240]
         },
@@ -9862,19 +9821,19 @@
         },
         {
             "id": "sp_stars_small_1 (1)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [-22016.0, 28992.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (1)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [-22016.0, 28992.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (1)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [-22016.0, 28992.0],
             "size": [10240, 10240]
         },
@@ -10472,25 +10431,25 @@
         },
         {
             "id": "sp_stars_small_2 (2)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_stars_small_1 (2)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_starsbig_1_2_pc (2)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_starsbig_1_1_pc (2)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
@@ -10508,9 +10467,9 @@
         },
         {
             "id": "sp_fog (2)",
-            "type": "@fog_soft",
-            "pos": [-15052.6220703125, 30571.099609375],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-15168.0, 31948.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (117)",
@@ -11136,7 +11095,7 @@
         },
         {
             "id": "sp_stars_small_2 (3)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [-14528.0, 29312.0],
             "size": [10240, 10240]
         },
@@ -11166,19 +11125,19 @@
         },
         {
             "id": "sp_stars_small_1 (3)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [-14528.0, 29312.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (3)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [-14528.0, 29312.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (3)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [-14528.0, 29312.0],
             "size": [10240, 10240]
         },
@@ -11196,9 +11155,9 @@
         },
         {
             "id": "sp_fog (3)",
-            "type": "@fog_soft",
-            "pos": [53937.703125, 106136.1796875],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [53888.0, 107532.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (176)",
@@ -11804,25 +11763,25 @@
         },
         {
             "id": "sp_stars_small_2 (4)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [54224.0, 104432.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_stars_small_1 (4)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [54224.0, 104432.0],
             "size": [78848, 78848]
         },
         {
             "id": "sp_starsbig_1_2_pc (4)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [54224.0, 104432.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_starsbig_1_1_pc (4)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [54224.0, 104432.0],
             "size": [73728, 73728]
         },
@@ -11840,9 +11799,9 @@
         },
         {
             "id": "sp_fog (4)",
-            "type": "@fog_soft",
-            "pos": [-9939.0810546875, 110376.484375],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-10048.0, 111756.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (244)",
@@ -12663,25 +12622,25 @@
         },
         {
             "id": "sp_stars_small_2 (5)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [-4992.0, 97680.0],
             "size": [50176, 50176]
         },
         {
             "id": "sp_stars_small_1 (5)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [-4992.0, 97680.0],
             "size": [52224, 52224]
         },
         {
             "id": "sp_starsbig_1_2_pc (5)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [-4992.0, 97680.0],
             "size": [50176, 50176]
         },
         {
             "id": "sp_starsbig_1_1_pc (5)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [-4992.0, 97680.0],
             "size": [50176, 50176]
         },
@@ -12699,9 +12658,9 @@
         },
         {
             "id": "sp_fog (5)",
-            "type": "@fog_soft",
-            "pos": [42028.0, 50816.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [40628.0, 50816.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (302)",
@@ -13505,25 +13464,25 @@
         },
         {
             "id": "sp_stars_small_2 (6)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (6)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (6)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (6)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
@@ -13541,9 +13500,9 @@
         },
         {
             "id": "sp_fog (6)",
-            "type": "@fog_soft",
-            "pos": [23852.0, 50944.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [22452.0, 50944.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (391)",
@@ -13962,25 +13921,25 @@
         },
         {
             "id": "sp_stars_small_2 (7)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (7)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (7)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (7)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
@@ -13998,9 +13957,9 @@
         },
         {
             "id": "sp_fog (7)",
-            "type": "@fog_soft",
-            "pos": [51371.953125, 28410.64453125],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [49972.0, 28416.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wood (1)",
@@ -14681,25 +14640,25 @@
         },
         {
             "id": "sp_stars_small_2 (8)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [54656.0, 28352.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_stars_small_1 (8)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [54656.0, 28352.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (8)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [54656.0, 28352.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_starsbig_1_1_pc (8)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [54656.0, 28352.0],
             "size": [13312, 13312]
         },
@@ -14717,9 +14676,9 @@
         },
         {
             "id": "sp_fog (8)",
-            "type": "@fog_soft",
-            "pos": [35796.0, 28544.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [37196.0, 28544.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wood (8)",
@@ -15149,25 +15108,25 @@
         },
         {
             "id": "sp_stars_small_2 (9)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (9)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (9)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (9)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
@@ -15185,9 +15144,9 @@
         },
         {
             "id": "sp_fog (9)",
-            "type": "@fog_soft",
-            "pos": [15339.9990234375, 28416.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [13940.0, 28416.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (518)",
@@ -15615,25 +15574,25 @@
         },
         {
             "id": "sp_stars_small_2 (10)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (10)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (10)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (10)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
@@ -15651,9 +15610,9 @@
         },
         {
             "id": "sp_fog (10)",
-            "type": "@fog_soft",
-            "pos": [13996.0009765625, 20288.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [12596.0, 20288.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wood (12)",
@@ -16383,7 +16342,7 @@
         },
         {
             "id": "sp_stars_small_2 (11)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
@@ -16397,19 +16356,19 @@
         },
         {
             "id": "sp_stars_small_1 (11)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (11)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_1_pc (11)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
@@ -16427,9 +16386,9 @@
         },
         {
             "id": "sp_fog (11)",
-            "type": "@fog_soft",
-            "pos": [57215.99609375, 13331.9990234375],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [57216.0, 14732.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (619)",
@@ -16986,25 +16945,25 @@
         },
         {
             "id": "sp_stars_small_2 (12)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [57216.0, 9696.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_stars_small_1 (12)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [57216.0, 9696.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (12)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [57216.0, 9696.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_starsbig_1_1_pc (12)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [57216.0, 9696.0],
             "size": [13312, 13312]
         },
@@ -17022,9 +16981,9 @@
         },
         {
             "id": "sp_fog (12)",
-            "type": "@fog_soft",
-            "pos": [47424.0, 14484.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [47424.0, 15884.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (659)",
@@ -17342,25 +17301,25 @@
         },
         {
             "id": "sp_stars_small_2 (13)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [47424.0, 13216.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_stars_small_1 (13)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [47424.0, 13216.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (13)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [47424.0, 13216.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_starsbig_1_1_pc (13)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [47424.0, 13216.0],
             "size": [9216, 9216]
         },
@@ -17378,9 +17337,9 @@
         },
         {
             "id": "sp_fog (13)",
-            "type": "@fog_soft",
-            "pos": [38365.44921875, 14357.99609375],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [38400.0, 15756.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (689)",
@@ -17900,7 +17859,7 @@
         },
         {
             "id": "sp_stars_small_2 (14)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [37888.0, 10240.0],
             "size": [14336, 14336]
         },
@@ -17914,19 +17873,19 @@
         },
         {
             "id": "sp_stars_small_1 (14)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [37888.0, 10240.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (14)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [37888.0, 10240.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_starsbig_1_1_pc (14)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [37888.0, 10240.0],
             "size": [14336, 14336]
         },
@@ -17944,9 +17903,9 @@
         },
         {
             "id": "sp_fog (14)",
-            "type": "@fog_soft",
-            "pos": [25344.0, 340.00048828125],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [25344.0, 1740.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (740)",
@@ -18342,25 +18301,25 @@
         },
         {
             "id": "sp_stars_small_2 (15)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [25344.0, -1856.0],
             "size": [11264, 11264]
         },
         {
             "id": "sp_stars_small_1 (15)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [25344.0, -1856.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (15)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [25344.0, -1856.0],
             "size": [11264, 11264]
         },
         {
             "id": "sp_starsbig_1_1_pc (15)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [25344.0, -1856.0],
             "size": [11264, 11264]
         },
@@ -18378,9 +18337,9 @@
         },
         {
             "id": "sp_fog (15)",
-            "type": "@fog_soft",
-            "pos": [24404.0, 9471.9990234375],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [25804.0, 9472.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wood (16)",
@@ -18842,25 +18801,25 @@
         },
         {
             "id": "sp_stars_small_2 (16)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (16)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (16)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (16)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
@@ -18878,9 +18837,9 @@
         },
         {
             "id": "sp_fog (16)",
-            "type": "@fog_soft",
-            "pos": [19072.0, 148.00048828125],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [19072.0, 1548.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (828)",
@@ -19306,25 +19265,25 @@
         },
         {
             "id": "sp_stars_small_2 (17)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [19072.0, -3776.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_stars_small_1 (17)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [19072.0, -3776.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (17)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [19072.0, -3776.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_starsbig_1_1_pc (17)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [19072.0, -3776.0],
             "size": [14336, 14336]
         },
@@ -19342,9 +19301,9 @@
         },
         {
             "id": "sp_fog (17)",
-            "type": "@fog_soft",
-            "pos": [11456.0, 148.00051879882813],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [11456.0, 1548.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (860)",
@@ -19574,25 +19533,25 @@
         },
         {
             "id": "sp_stars_small_2 (18)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [11456.0, -1472.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_stars_small_1 (18)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [11456.0, -1472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (18)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [11456.0, -1472.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (18)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [11456.0, -1472.0],
             "size": [10240, 10240]
         },
@@ -19610,9 +19569,9 @@
         },
         {
             "id": "sp_fog (18)",
-            "type": "@fog_soft",
-            "pos": [139.600830078125, 46904.39453125],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-128.0, 48140.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wood (19)",
@@ -20702,7 +20661,7 @@
         },
         {
             "id": "sp_stars_small_2 (19)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [4608.0, 44640.0],
             "size": [17408, 17408]
         },
@@ -20716,19 +20675,19 @@
         },
         {
             "id": "sp_stars_small_1 (19)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [4608.0, 44640.0],
             "size": [20480, 20480]
         },
         {
             "id": "sp_starsbig_1_2_pc (19)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [4608.0, 44640.0],
             "size": [17408, 17408]
         },
         {
             "id": "sp_starsbig_1_1_pc (19)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [4608.0, 44640.0],
             "size": [17408, 17408]
         },
@@ -20746,9 +20705,9 @@
         },
         {
             "id": "sp_fog (19)",
-            "type": "@fog_soft",
-            "pos": [-0.00007940189971122891, 27732.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-0.0, 29132.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (984)",
@@ -21071,25 +21030,25 @@
         },
         {
             "id": "sp_stars_small_2 (20)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [0.0, 26240.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_stars_small_1 (20)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [0.0, 26240.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (20)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [0.0, 26240.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_starsbig_1_1_pc (20)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [0.0, 26240.0],
             "size": [9216, 9216]
         },
@@ -21107,9 +21066,9 @@
         },
         {
             "id": "sp_fog (20)",
-            "type": "@fog_soft",
-            "pos": [134.1639862060547, 18803.671875],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-0.0, 20172.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (1014)",
@@ -21628,14 +21587,14 @@
         },
         {
             "id": "sp_stars_small_2 (21)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_planet (2)",
             "type": "@planet_red",
-            "pos": [-1346.9000244140625, 18016.0],
+            "pos": [-1346.972412109375, 18015.85546875],
             "rotation": -21.0,
             "size": [661, 662],
             "orbit_around": "sp_nebula_red (21)"
@@ -21650,19 +21609,19 @@
         },
         {
             "id": "sp_stars_small_1 (21)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (21)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (21)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
@@ -21680,9 +21639,9 @@
         },
         {
             "id": "sp_fog (21)",
-            "type": "@fog_soft",
-            "pos": [-0.00008360335777979344, 10068.0],
-            "size": [2600, 2600]
+            "type": "@fog_start",
+            "pos": [-0.0, 11468.0],
+            "size": [5000, 5000]
         },
         {
             "id": "sp_wall (1053)",
@@ -22058,25 +22017,25 @@
         },
         {
             "id": "sp_stars_small_2 (22)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [0.0, 7936.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_stars_small_1 (22)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [0.0, 7936.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (22)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [0.0, 7936.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (22)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [0.0, 7936.0],
             "size": [10240, 10240]
         },
@@ -22347,25 +22306,25 @@
         },
         {
             "id": "sp_stars_small_2 (23)",
-            "type": "@star_field_stars_small_2",
+            "type": "@field_stars_small_2",
             "pos": [0.0, -1408.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_stars_small_1 (23)",
-            "type": "@star_field_stars_small_1",
+            "type": "@field_stars_small_1",
             "pos": [0.0, -1408.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (23)",
-            "type": "@star_field_starsbig_1_2_pc",
+            "type": "@field_starsbig_1_2_pc",
             "pos": [0.0, -1408.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_starsbig_1_1_pc (23)",
-            "type": "@star_field_starsbig_1_1_pc",
+            "type": "@field_starsbig_1_1_pc",
             "pos": [0.0, -1408.0],
             "size": [14336, 14336]
         },
@@ -29252,7 +29211,7 @@
             "id": "sp_window_light (14)",
             "type": "point_light",
             "pos": [-992.0, 18016.0],
-            "color": [255, 117, 104, 255],
+            "color": [255, 0, 104, 255],
             "falloff": {
                 "radius": 931.7509765625
             },
