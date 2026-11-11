@@ -835,21 +835,30 @@ void enqueue_illuminated_rendering_jobs(
 		{
 			const bool draw_bullet_shadows = in.drawing.draw_bullet_shadows;
 
+			const auto ground_star_field_locations =
+				in.shaders.illuminated.has_value() ?
+				star_field_uniform_locations::of(*in.shaders.illuminated) :
+				star_field_uniform_locations()
+			;
+
 			auto job = [
 				draw_bullet_shadows,
 				missile_shadow_offset,
 				&visible,
 				&cosm,
 				ground_in = make_drawing_input(D::GROUND),
+				ground_star_fields = star_field_gpu_target { std::addressof(dedicated[D::GROUND]), ground_star_field_locations },
 				ground_shadow_casters_in = make_drawing_input(D::GROUND_SHADOW_CASTERS),
 				&finishing_traces,
 				h2 = make_helper(D::MISSILES),
 				missiles_in = make_drawing_input(D::MISSILES),
 				missiles_shadows  = make_drawing_input(D::MISSILES_SHADOWS)
-			]() {
+			]() mutable {
 				/*
 					Ground sprites that cast shadows go to their own buffer, drawn above decals and corpses.
 				*/
+
+				const auto ground_with_star_fields_in = ::with_star_fields_on_gpu(ground_in, std::addressof(ground_star_fields));
 
 				visible.for_each<
 					render_layer::GROUND,
@@ -859,7 +868,7 @@ void enqueue_illuminated_rendering_jobs(
 					const auto render = handle.template find<invariants::render>();
 					const bool casts_shadow = render != nullptr && render->casts_foreground_shadow;
 
-					::draw_entity(handle, casts_shadow ? ground_shadow_casters_in : ground_in);
+					::draw_entity(handle, casts_shadow ? ground_shadow_casters_in : ground_with_star_fields_in);
 				});
 
 				h2.draw<

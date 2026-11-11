@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <array>
 
 #include "augs/graphics/rgba.h"
@@ -83,16 +84,23 @@ namespace augs {
 
 			void set_projection(const std::array<float, 16> matrix) const;
 
-			void set_uniform(const GLint id, const vec2) const;
-			void set_uniform(const GLint id, const vec2i) const;
-			void set_uniform(const GLint id, const rgba) const;
-			void set_uniform(const GLint id, const rgba::rgb_type) const;
-			void set_uniform(const GLint id, const vec3) const;
-			void set_uniform(const GLint id, const vec4) const;
-			void set_uniform(const GLint id, const float) const;
-			void set_uniform(const GLint id, const int) const;
+			static void set_uniform(const GLint id, const vec2);
+			static void set_uniform(const GLint id, const vec2i);
+			static void set_uniform(const GLint id, const rgba);
+			static void set_uniform(const GLint id, const rgba::rgb_type);
+			static void set_uniform(const GLint id, const vec3);
+			static void set_uniform(const GLint id, const vec4);
+			static void set_uniform(const GLint id, const float);
+			static void set_uniform(const GLint id, const int);
 
 		public:
+			static void set_uniform_of_current(const set_uniform_command&);
+			static void set_vec4_array_of_current(const GLint id, const std::vector<vec4>& values);
+
+			GLint get_common_uniform_location(const common_uniform_name name) const {
+				return uniform_map[name];
+			}
+
 			shader_program(
 				shader&& vertex,
 				shader&& fragment

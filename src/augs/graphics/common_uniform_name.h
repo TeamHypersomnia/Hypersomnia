@@ -48,6 +48,15 @@ namespace augs {
 		global_time,
 		zoom,
 		portal_mode,
+		star_field_mode,
+		star_field_transform,
+		star_field_area,
+		star_field_cells,
+		star_field_density,
+		star_field_look,
+		star_field_color,
+		star_field_seed,
+		star_field_types,
 
 		COUNT
 		// END GEN INTROSPECTOR

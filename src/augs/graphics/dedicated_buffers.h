@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/enum/enum_array.h"
+#include "augs/graphics/procedural_quads.h"
 
 namespace augs {
 	enum class dedicated_buffer {
@@ -101,11 +102,13 @@ namespace augs {
 		vertex_triangle_buffer triangles;
 		vertex_line_buffer lines;
 		special_buffer specials;
+		std::vector<procedural_quads_draw> procedural_quads;
 
 		void clear() {
 			triangles.clear();
 			lines.clear();
 			specials.clear();
+			procedural_quads.clear();
 		}
 	};
 

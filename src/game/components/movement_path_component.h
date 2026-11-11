@@ -7,6 +7,7 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/organisms/scare_source.h"
+#include "game/detail/movement_orbit.h"
 
 using avoidance_rank_type = int8_t;
 
@@ -32,6 +33,7 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::movement_path
 		real32 continuous_rotation_speed = 0.f;
 		augs::maybe<organism_wandering_def> organism_wandering;
+		augs::maybe<movement_orbit_def> orbit;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -44,6 +46,8 @@ namespace components {
 		real32 last_speed = 0.f;
 		augs::enum_array<vec2, startle_type> startle;
 		real32 next_bubble_in_ms = -1.f;
+		augs::maybe<vec2> orbit_start;
+		augs::maybe<vec2> orbit_center;
 		// END GEN INTROSPECTOR
 
 		void add_startle(const startle_type type, const vec2 amount) {

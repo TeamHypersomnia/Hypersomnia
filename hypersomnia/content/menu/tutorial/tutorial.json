@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2026-11-11 00:52:36.951884 UTC"
+        "version_timestamp": "2026-11-11 17:17:20.925347 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -35,6 +35,7 @@
                     "electric_armor": true
                 }
             },
+            "round_time": 0,
             "spawn_money": true
         }
     },
@@ -321,7 +322,7 @@
                 ]
             },
             "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.6000000238418579,
+            "rotate_continuously_degrees_per_sec": 0.12,
             "neon_alpha_vibration": {
                 "lower": 169
             },
@@ -340,38 +341,10 @@
             },
             "color": [255, 255, 255, 133],
             "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.5,
+            "rotate_continuously_degrees_per_sec": 0.13,
             "as_nonphysical": {
                 "cover_background_neons": true
             }
-        },
-        {
-            "path": "space/bg/stars_small_1.png",
-            "file_hash": "af70f437551081d51ba064bc987033e1c496e7125279a0e1f8b733c761b05617",
-            "id": "@stars_small_1",
-            "size": [4096, 4096],
-            "rotate_continuously_degrees_per_sec": 0.5
-        },
-        {
-            "path": "space/bg/stars_small_2.png",
-            "file_hash": "3ba13aa408e8e2347a82f0b314e1b52c260b5c37b90a71b45d2ccb35b0db3e2f",
-            "id": "@stars_small_2",
-            "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.10000000149011612
-        },
-        {
-            "path": "space/bg/starsbig_1_1_pc.png",
-            "file_hash": "0c614fa8cbe3b64a12e0c2188214579df73bbb42991c89a355c0e0c268930e40",
-            "id": "@starsbig_1_1_pc",
-            "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.20000000298023224
-        },
-        {
-            "path": "space/bg/starsbig_1_2_pc.png",
-            "file_hash": "29f5f01c3b457c9593b8aebc1cba85842b83c403b918bd2c8144b9e0858aa826",
-            "id": "@starsbig_1_2_pc",
-            "size": [1024, 1024],
-            "rotate_continuously_degrees_per_sec": 0.30000001192092896
         },
         {
             "path": "space/collider.png",
@@ -448,6 +421,45 @@
             "path": "space/floor/space_tile_011.png",
             "file_hash": "29263455b7fdebe1ad7fed8e589c683db45a5fa7215a029c72a7b3eacdd3fe35",
             "id": "@space_tile_011",
+            "size": [64, 64],
+            "as_nonphysical": {
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "id": "footstep_air_duct"
+                    }
+                }
+            }
+        },
+        {
+            "path": "space/floor/space_floor_256.png",
+            "file_hash": "7c88e8186fedc9c1b7fae0260b364ef4c10c4598c48bd325b7649225cc869a1d",
+            "id": "@space_floor_256",
+            "size": [256, 256],
+            "as_nonphysical": {
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "id": "footstep_air_duct"
+                    }
+                }
+            }
+        },
+        {
+            "path": "space/floor/space_floor_128.png",
+            "file_hash": "a061301c621fc82fc1ba94f8f4c29f0dad1596e0f55ea376c06b3b7d48a365e8",
+            "id": "@space_floor_128",
+            "size": [128, 128],
+            "as_nonphysical": {
+                "OFF_custom_footstep": {
+                    "sound": {
+                        "id": "footstep_air_duct"
+                    }
+                }
+            }
+        },
+        {
+            "path": "space/floor/space_floor_64.png",
+            "file_hash": "622a3c576f718133db1b3ac1e07fbf35be86548d6b02a1cc74ed51b399c88b1e",
+            "id": "@space_floor_64",
             "size": [64, 64],
             "as_nonphysical": {
                 "OFF_custom_footstep": {
@@ -680,6 +692,54 @@
             }
         },
         {
+            "path": "space/planets/planet_blue.png",
+            "file_hash": "402f966372b15857037f304ef2ab10b6651ce7c71bc31cbe83217f5c64aab6bf",
+            "id": "@planet_blue",
+            "stretch_when_resized": true,
+            "orbit": {
+                "degrees_per_sec": 0.20000000298023224
+            },
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
+            "path": "space/planets/planet_blue_ringed.png",
+            "file_hash": "15644f7ea9af83bbb879bac5c61bec5ec2cd8bf3f877dba0622dc98defd2ecc4",
+            "id": "@planet_blue_ringed",
+            "stretch_when_resized": true,
+            "orbit": {
+                "degrees_per_sec": 0.20000000298023224
+            },
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
+            "path": "space/planets/planet_gold_ringed.png",
+            "file_hash": "293a3238cbc4b0ac75fe2f4ec56830cc62dec42f0ea9a4ebb71a38d60c9009ab",
+            "id": "@planet_gold_ringed",
+            "stretch_when_resized": true,
+            "orbit": {
+                "degrees_per_sec": 0.20000000298023224
+            },
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
+            "path": "space/planets/planet_red.png",
+            "file_hash": "7a5aefae0dc4d497d99542f5698003f365949b326c5c4923f22317088f88d56a",
+            "id": "@planet_red",
+            "stretch_when_resized": true,
+            "orbit": {
+                "degrees_per_sec": 0.20000000298023224
+            },
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
             "path": "space/wall/space_tile_003.png",
             "file_hash": "43c47752ffd78cba11ed482362d004a3de551dee70cebbd262292b7e865f78d7",
             "id": "@space_tile_003",
@@ -731,6 +791,19 @@
             "path": "space/wall/space_tile_007.png",
             "file_hash": "6a7a6a1019961eee311f7b02c5b4aaa4954de407172b7ebbb8464502d898d7d1",
             "id": "@space_tile_007",
+            "domain": "PHYSICAL",
+            "size": [64, 64],
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true,
+                "material": "!space_glass",
+                "illuminate_like_wall": false
+            }
+        },
+        {
+            "path": "space/wall/space_tile_007_corner.png",
+            "file_hash": "2ef54af635c83eb0fe1da1afc25929be5691a8b41aa7c4db8b81e248cd47327a",
+            "id": "@space_tile_007_corner",
             "domain": "PHYSICAL",
             "size": [64, 64],
             "as_physical": {
@@ -1030,6 +1103,618 @@
             "id": "@calm_ambient_loop",
             "spatialize": false,
             "loop": true
+        },
+        {
+            "path": "space/stars/stars_small_1_01.png",
+            "file_hash": "79fd48f583043fc4432650bfeef894379c0ab58609b0765bd1aa8d0029cf5a5a",
+            "id": "@stars_small_1_01",
+            "size": [7, 7]
+        },
+        {
+            "path": "space/stars/stars_small_1_02.png",
+            "file_hash": "0ddaedac35090acfaea771b84feae8ca9f6ec8d8c142ea3241f705a6e6822ce3",
+            "id": "@stars_small_1_02",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/stars_small_1_03.png",
+            "file_hash": "04fc889cf414e719296baa46c790baad1299013ad2d46f09bfd45023c3185f7f",
+            "id": "@stars_small_1_03",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/stars_small_1_04.png",
+            "file_hash": "e2aabadcdb52c13b37463a9d291d47025fd32d65e9a5f147d91e5fb2f8a349b3",
+            "id": "@stars_small_1_04",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/stars_small_1_05.png",
+            "file_hash": "96f6ba4407a22e8cb91fad6989adbf165c64b76b561a7bacd36905aa200f3697",
+            "id": "@stars_small_1_05",
+            "size": [10, 10]
+        },
+        {
+            "path": "space/stars/stars_small_1_06.png",
+            "file_hash": "354d2c3ab2dd1becc4b22333412f4a803f9feeae5377f02315822f7b06349eeb",
+            "id": "@stars_small_1_06",
+            "size": [11, 10]
+        },
+        {
+            "path": "space/stars/stars_small_1_07.png",
+            "file_hash": "415dba6f4e95d20442990256f7806341dc5ad9c013bf21aa235917562c1af464",
+            "id": "@stars_small_1_07",
+            "size": [11, 11]
+        },
+        {
+            "path": "space/stars/stars_small_1_08.png",
+            "file_hash": "5164c1ba1bb7e769bba007ed12877fbf89957f7d1cce6462e782622d19b06ce5",
+            "id": "@stars_small_1_08",
+            "size": [12, 12]
+        },
+        {
+            "path": "space/stars/stars_small_1_09.png",
+            "file_hash": "a0904f2c6c34354cacc89af6dc8ac953a3d99b16fc536dda3a1d6dbab31d455e",
+            "id": "@stars_small_1_09",
+            "size": [13, 13]
+        },
+        {
+            "path": "space/stars/stars_small_1_10.png",
+            "file_hash": "488b9ff1b8f89f5dc749cf8c284135c3fbca7bb6c2c56832994da4b8764e4a93",
+            "id": "@stars_small_1_10",
+            "size": [14, 14]
+        },
+        {
+            "path": "space/stars/stars_small_1_11.png",
+            "file_hash": "4fe004fc8cfecd76c0b6d794ebe2dccfb0ff923bbfb05fd7c952676021241d5c",
+            "id": "@stars_small_1_11",
+            "size": [17, 14]
+        },
+        {
+            "path": "space/stars/stars_small_1_12.png",
+            "file_hash": "7518d98a7d1975ba5d66b39c266d6f44b9900f756833c191ab63961f766a33ad",
+            "id": "@stars_small_1_12",
+            "size": [23, 19]
+        },
+        {
+            "path": "space/stars/stars_small_1_13.png",
+            "file_hash": "5d2daa97b64884fafd14666e114790c9db499e667f11f3ef3b2b1dbac9211e94",
+            "id": "@stars_small_1_13",
+            "size": [37, 37]
+        },
+        {
+            "path": "space/stars/stars_small_1_14.png",
+            "file_hash": "932a889323307df8ee6f5942de0c71f603639e84ac976a9823c9297c0b320b96",
+            "id": "@stars_small_1_14",
+            "size": [37, 37]
+        },
+        {
+            "path": "space/stars/field_stars_small_1.png",
+            "file_hash": "1f88023d5082fc82efd006cfb749a022309a5c616ce5ef0e68a64ee641c06b29",
+            "id": "@star_field_stars_small_1",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.16,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@stars_small_1_01",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_02",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_03",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_04",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_05",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_06",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_07",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_08",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_09",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_10",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_11",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_12",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_1_13",
+                        "weight": 0.1
+                    },
+                    {
+                        "sprite": "@stars_small_1_14",
+                        "weight": 0.1
+                    }
+                ],
+                "stars_per_million_square_units": 71.76,
+                "seed": 1
+            }
+        },
+        {
+            "path": "space/stars/stars_small_2_01.png",
+            "file_hash": "fb070807d2583186d671a4e55dd5e436e533e2fa507efa7b52d1bd09fe4f46da",
+            "id": "@stars_small_2_01",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_02.png",
+            "file_hash": "758df36f091e35939533993a1402275d1b9ab036fbc8bc66671ebe29a20c0fd6",
+            "id": "@stars_small_2_02",
+            "size": [4, 4]
+        },
+        {
+            "path": "space/stars/stars_small_2_03.png",
+            "file_hash": "6fdf6959142eb7d45f1ae0a33cc8ddf648f66dd47e5863f36ac2842bb5395441",
+            "id": "@stars_small_2_03",
+            "size": [5, 4]
+        },
+        {
+            "path": "space/stars/stars_small_2_04.png",
+            "file_hash": "d6d7c9a15bfede9fa88b723fdde2eccb61ac9c9c48041e000668523a809d6b7d",
+            "id": "@stars_small_2_04",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_05.png",
+            "file_hash": "d133be3382f83cfd58b48712282c0e16514d9c86c90f129fcc8ec43022b5ace7",
+            "id": "@stars_small_2_05",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_06.png",
+            "file_hash": "f69d42a16e9e509778a6973b269937247232a4a24f384cd5fbef43bb0f06d07b",
+            "id": "@stars_small_2_06",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_07.png",
+            "file_hash": "db3513b6cd73e5126cf7f9319dd10fe7bce9f0ed54b6aa4a2deae9e7e2072c50",
+            "id": "@stars_small_2_07",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/stars_small_2_08.png",
+            "file_hash": "a3109b04d1220d8298b88f0e32fdd7ed36db7ae5749b04022b20927ce41c760e",
+            "id": "@stars_small_2_08",
+            "size": [8, 7]
+        },
+        {
+            "path": "space/stars/stars_small_2_09.png",
+            "file_hash": "1638eb58c860fdba4b7a6b443d18be05df73a2879b30bbb5d7a15356f7b0e3aa",
+            "id": "@stars_small_2_09",
+            "size": [7, 8]
+        },
+        {
+            "path": "space/stars/stars_small_2_10.png",
+            "file_hash": "c90b48cf50f9bde356c1de3be4f9aa7300ead3c7ca1f0473025bc8b637272199",
+            "id": "@stars_small_2_10",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/stars_small_2_11.png",
+            "file_hash": "d1bd3db35f5e3356df43a838af2ada4ad4c463a800d32a24e6fa844731f9b4c4",
+            "id": "@stars_small_2_11",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/stars_small_2_12.png",
+            "file_hash": "d32fac2387dc258e00966d3b3ff816d8addff503e2f23eb22fe78addd6367681",
+            "id": "@stars_small_2_12",
+            "size": [9, 10]
+        },
+        {
+            "path": "space/stars/stars_small_2_13.png",
+            "file_hash": "b97cf1eb14a3cc6505b67c33854836e91b2a80dc8f6f74470f8403f62651ded2",
+            "id": "@stars_small_2_13",
+            "size": [13, 14]
+        },
+        {
+            "path": "space/stars/stars_small_2_14.png",
+            "file_hash": "40675a428db16aa737c5516e56257185383a216b75a8a6ca7ff7b05cad301bca",
+            "id": "@stars_small_2_14",
+            "size": [14, 14]
+        },
+        {
+            "path": "space/stars/field_stars_small_2.png",
+            "file_hash": "cf95318708a44b9f99c0b4f930d20287f0be46914d7e221edcb31099fde912cd",
+            "id": "@star_field_stars_small_2",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.15,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@stars_small_2_01",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_02",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_03",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_04",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_05",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_06",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_07",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_08",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_09",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_10",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_11",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_12",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@stars_small_2_13",
+                        "weight": 0.1
+                    },
+                    {
+                        "sprite": "@stars_small_2_14",
+                        "weight": 0.1
+                    }
+                ],
+                "stars_per_million_square_units": 172.62,
+                "seed": 2
+            }
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_01.png",
+            "file_hash": "8bce1f3d4ce0737cefe1942d85c46e1cb23f0733368334c7791314dd741bc2bf",
+            "id": "@starsbig_1_1_pc_01",
+            "size": [4, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_02.png",
+            "file_hash": "aef97effebf306a2c3fcc10fef0564b00d8f4d31926b29968081501de7f5f255",
+            "id": "@starsbig_1_1_pc_02",
+            "size": [4, 4]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_03.png",
+            "file_hash": "015566b3e673332aa6ae945ad4db02825a11677ad45280466fbb10180f65b36b",
+            "id": "@starsbig_1_1_pc_03",
+            "size": [4, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_04.png",
+            "file_hash": "a084a71f431beec944d9aff7ba5d4b68402e0edee6cf0ff075669484e4b6bde6",
+            "id": "@starsbig_1_1_pc_04",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_05.png",
+            "file_hash": "0b5c837851444e7ffda0d376a9a26556de779687873157f6d264434c8908fcc7",
+            "id": "@starsbig_1_1_pc_05",
+            "size": [4, 4]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_06.png",
+            "file_hash": "db036538eeb692fba283b3a4bf8c17a569c9d11bd85239cc9de7a3bf0b045edf",
+            "id": "@starsbig_1_1_pc_06",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_07.png",
+            "file_hash": "d87f8b2f2f94052f0dff69afd85ace14b87f1cec75974830f532864aece81661",
+            "id": "@starsbig_1_1_pc_07",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_08.png",
+            "file_hash": "31ec13604df18d1f0720755e863b08e5f6360b02091ea0fca9628c891050b10e",
+            "id": "@starsbig_1_1_pc_08",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_09.png",
+            "file_hash": "6aaa8182f5e70f058327684e0261ebe3d26974f3d9bce1d123c367230bc7f654",
+            "id": "@starsbig_1_1_pc_09",
+            "size": [7, 7]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_10.png",
+            "file_hash": "74f96df340b4ec2c355500c7c7f3656c3031abe7f02fdcb82a6ff72ed398af8d",
+            "id": "@starsbig_1_1_pc_10",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_11.png",
+            "file_hash": "f3cd0cb910ca1baabb80629140f7fa7b5818d82d9d0601620d2ef3d8bae8181e",
+            "id": "@starsbig_1_1_pc_11",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_12.png",
+            "file_hash": "4dfb9a2a4e84181721f95bd6d278763c23ba656c56cc746d37ba6928d5d27985",
+            "id": "@starsbig_1_1_pc_12",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_13.png",
+            "file_hash": "d4143039d660ad714e311dbc08836c40664a99c33abf7b1acebdcec8b1f9a1a4",
+            "id": "@starsbig_1_1_pc_13",
+            "size": [12, 12]
+        },
+        {
+            "path": "space/stars/starsbig_1_1_pc_14.png",
+            "file_hash": "28c218afca6942b4278d8272609b508195bc6d45c4f1eed2609971bc85e99cf9",
+            "id": "@starsbig_1_1_pc_14",
+            "size": [13, 12]
+        },
+        {
+            "path": "space/stars/field_starsbig_1_1_pc.png",
+            "file_hash": "6c623dd411c6b0b73bf415a4e3d54fae4904af75c273fde57aa6dc7d5db27f6c",
+            "id": "@star_field_starsbig_1_1_pc",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.18,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@starsbig_1_1_pc_01",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_02",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_03",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_04",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_05",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_06",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_07",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_08",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_09",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_10",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_11",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_12",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_13",
+                        "weight": 0.1
+                    },
+                    {
+                        "sprite": "@starsbig_1_1_pc_14",
+                        "weight": 0.1
+                    }
+                ],
+                "stars_per_million_square_units": 304.22,
+                "seed": 3
+            }
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_01.png",
+            "file_hash": "8e3b98ff2e2de73267d6674a8a38775aee204160dba317404af08567bdaf19ff",
+            "id": "@starsbig_1_2_pc_01",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_02.png",
+            "file_hash": "2cb9c830045df00e32b5bf7a95ee008a77611847abcbe93a081d1a6321d2ed09",
+            "id": "@starsbig_1_2_pc_02",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_03.png",
+            "file_hash": "36ade016cfbbd30c90e95143129ba3b3251084e75fc3f626b0782a33fdf26b7e",
+            "id": "@starsbig_1_2_pc_03",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_04.png",
+            "file_hash": "78a2bb1dcbbd2f54fdfe7bb6acc865f42dcb60db8eec5199867508485c5b5d8e",
+            "id": "@starsbig_1_2_pc_04",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_05.png",
+            "file_hash": "a46c7159f85e077dc26761ef8a675218aac13d07f3453df532d568ac39a256b5",
+            "id": "@starsbig_1_2_pc_05",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_06.png",
+            "file_hash": "b2f408c0612148b2daa86524eca366f3fb6b09d18118b0e1f3f1b542c054666b",
+            "id": "@starsbig_1_2_pc_06",
+            "size": [4, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_07.png",
+            "file_hash": "a673a83520b1d7cb4fae7a4d962837ffe7b6e85b8eaf0e6e4cf89cf4581a95e3",
+            "id": "@starsbig_1_2_pc_07",
+            "size": [5, 5]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_08.png",
+            "file_hash": "64da5d212dd022119f686041272f593fa23b7f493d086f439ee724ec2ae198e5",
+            "id": "@starsbig_1_2_pc_08",
+            "size": [7, 7]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_09.png",
+            "file_hash": "277bfc5698cea8e107e98e90822fae147a2d8873ae7db4a9dafaccae9499a0d2",
+            "id": "@starsbig_1_2_pc_09",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_10.png",
+            "file_hash": "59b5d529eebd2275979258a897d8ce715aa3424fdb1c2c51e75d1ae824afde54",
+            "id": "@starsbig_1_2_pc_10",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_11.png",
+            "file_hash": "0f9a1934475e573e9eb3e07ed6a89cf4bc5541d589eb5b18344362ddc2b03479",
+            "id": "@starsbig_1_2_pc_11",
+            "size": [6, 6]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_12.png",
+            "file_hash": "5c3aa63c8beeaaf455e9f0ffeb1609da0f320cf284e669a970ed693b32e5d913",
+            "id": "@starsbig_1_2_pc_12",
+            "size": [9, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_13.png",
+            "file_hash": "a740f24ea3aca5bee88d0d85e1310ca5bee50cb2f0656068cfee2b0414c87bb5",
+            "id": "@starsbig_1_2_pc_13",
+            "size": [8, 8]
+        },
+        {
+            "path": "space/stars/starsbig_1_2_pc_14.png",
+            "file_hash": "231f282c186557d7e8471173e5f228433f23ad9b2a5267cfad805aa25fdb509c",
+            "id": "@starsbig_1_2_pc_14",
+            "size": [9, 9]
+        },
+        {
+            "path": "space/stars/field_starsbig_1_2_pc.png",
+            "file_hash": "436d402d2763fb4662a8e798b234dbb9e0eebddd6e14814b750df918786b5e8c",
+            "id": "@star_field_starsbig_1_2_pc",
+            "size": [4096, 4096],
+            "rotate_continuously_degrees_per_sec": 0.19,
+            "star_field": {
+                "stars": [
+                    {
+                        "sprite": "@starsbig_1_2_pc_01",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_02",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_03",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_04",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_05",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_06",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_07",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_08",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_09",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_10",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_11",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_12",
+                        "weight": 1.0
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_13",
+                        "weight": 0.1
+                    },
+                    {
+                        "sprite": "@starsbig_1_2_pc_14",
+                        "weight": 0.1
+                    }
+                ],
+                "stars_per_million_square_units": 193.6,
+                "seed": 4
+            }
         }
     ],
     "materials": [
@@ -1379,6 +2064,8 @@
                 "sp_floor (96)",
                 "sp_floor (97)",
                 "sp_floor (98)",
+                "sp_planet (1)",
+                "sp_planet (2)",
                 "sp_stars_small_2 (21)",
                 "sp_stars_small_1 (21)",
                 "sp_starsbig_1_2_pc (21)",
@@ -1777,6 +2464,7 @@
                 "sp_floor (92)",
                 "sp_floor (93)",
                 "sp_floor (94)",
+                "sp_planet (3)",
                 "sp_stars_small_2 (19)",
                 "sp_stars_small_1 (19)",
                 "sp_starsbig_1_2_pc (19)",
@@ -2452,6 +3140,7 @@
                 "sp_floor_crack (338)",
                 "sp_floor (69)",
                 "sp_floor (70)",
+                "sp_planet (4)",
                 "sp_stars_small_2 (14)",
                 "sp_stars_small_1 (14)",
                 "sp_starsbig_1_2_pc (14)",
@@ -3050,6 +3739,7 @@
                 "sp_floor (64)",
                 "sp_floor (65)",
                 "sp_floor (66)",
+                "sp_planet (5)",
                 "sp_stars_small_2 (11)",
                 "sp_stars_small_1 (11)",
                 "sp_starsbig_1_2_pc (11)",
@@ -4881,6 +5571,9 @@
                 "sp_floor (6)",
                 "sp_floor (7)",
                 "sp_floor (8)",
+                "sp_planet (9)",
+                "sp_planet (10)",
+                "sp_planet (11)",
                 "sp_stars_small_2 (1)",
                 "sp_stars_small_1 (1)",
                 "sp_starsbig_1_2_pc (1)",
@@ -5025,6 +5718,9 @@
                 "sp_floor (21)",
                 "sp_floor (22)",
                 "sp_floor (23)",
+                "sp_planet (6)",
+                "sp_planet (7)",
+                "sp_planet (8)",
                 "sp_stars_small_2 (3)",
                 "sp_stars_small_1 (3)",
                 "sp_starsbig_1_2_pc (3)",
@@ -5040,56 +5736,56 @@
     "nodes": [
         {
             "id": "dev_floor_256 (1)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 640.0],
             "size": [1536, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (2)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, -640.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (3)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 7552.0],
             "size": [1536, 768],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (4)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 9600.0],
             "size": [1536, 2304],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (6)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 16768.0],
             "size": [1536, 256],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (7)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 18432.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (9)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 16000.0],
             "size": [1536, 256],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (10)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, -2688.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
@@ -5117,35 +5813,35 @@
         },
         {
             "id": "dev_floor_128",
-            "type": "dev_floor_128",
+            "type": "@space_floor_128",
             "pos": [960.0, 15360.0],
             "size": [384, 512],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_128 (1)",
-            "type": "dev_floor_128",
+            "type": "@space_floor_128",
             "pos": [1856.0, 15360.0],
             "size": [384, 512],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (13)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 6400.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (15)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 25728.0],
             "size": [1536, 256],
             "color": [0, 0, 255, 255]
         },
         {
             "id": "dev_floor_256 (16)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 27392.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -5159,21 +5855,21 @@
         },
         {
             "id": "dev_floor_256 (21)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-128.0, 46400.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (14)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [1408.0, 44160.0],
             "size": [256, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (18)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-128.0, 44800.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
@@ -5186,7 +5882,7 @@
         },
         {
             "id": "dev_floor_256 (19)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [2176.0, 44160.0],
             "size": [512, 768],
             "color": [0, 255, 0, 255]
@@ -5211,7 +5907,7 @@
         },
         {
             "id": "dev_floor_256 (20)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [5376.0, 44288.0],
             "size": [256, 512],
             "color": [0, 255, 0, 255]
@@ -5236,7 +5932,7 @@
         },
         {
             "id": "dev_floor_256 (22)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [3328.0, 42240.0],
             "size": [256, 512],
             "color": [0, 255, 0, 255]
@@ -5249,7 +5945,7 @@
         },
         {
             "id": "dev_floor_256 (23)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [3840.0, 42368.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
@@ -5262,14 +5958,14 @@
         },
         {
             "id": "dev_floor_256 (24)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, -1664.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (25)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [8000.0, 44800.0],
             "size": [256, 1024],
             "color": [0, 255, 0, 255]
@@ -5289,7 +5985,7 @@
         },
         {
             "id": "dev_floor_256 (26)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [8448.0, 44800.0],
             "size": [256, 1024],
             "color": [0, 255, 0, 255]
@@ -5314,7 +6010,7 @@
         },
         {
             "id": "dev_floor_256 (29)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [11456.0, -192.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -5349,7 +6045,7 @@
         },
         {
             "id": "dev_floor_256 (28)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [11456.0, -1792.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5370,28 +6066,28 @@
         },
         {
             "id": "dev_floor_256 (32)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [19072.0, -3328.0],
             "size": [1536, 2304],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (33)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [19072.0, -1600.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (35)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [19072.0, -192.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (30)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [19072.0, -2048.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5405,35 +6101,35 @@
         },
         {
             "id": "dev_floor_256 (31)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [19072.0, -6080.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (34)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [11456.0, -2624.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (36)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [3328.0, 43392.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (37)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [6528.0, 44288.0],
             "size": [512, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (39)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [9216.0, 43648.0],
             "size": [512, 768],
             "color": [0, 255, 0, 255]
@@ -5446,7 +6142,7 @@
         },
         {
             "id": "dev_floor_256 (41)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [22464.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
@@ -5454,7 +6150,7 @@
         },
         {
             "id": "dev_floor_256 (42)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [24064.0, 9472.0],
             "size": [2048, 1280],
             "color": [0, 255, 0, 255]
@@ -5553,7 +6249,7 @@
         },
         {
             "id": "dev_floor_256 (43)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [20672.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
@@ -5568,7 +6264,7 @@
         },
         {
             "id": "dev_floor_256 (44)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "active": false,
             "pos": [25344.0, -6080.0],
             "size": [1536, 2304],
@@ -5576,7 +6272,7 @@
         },
         {
             "id": "dev_floor_256 (45)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "active": false,
             "pos": [25344.0, -7744.0],
             "size": [1536, 1024],
@@ -5584,42 +6280,42 @@
         },
         {
             "id": "dev_floor_256 (46)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [25344.0, -1408.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (48)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [25344.0, 0.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (49)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [25344.0, -1920.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (50)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [25344.0, -2432.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (51)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [25344.0, -2944.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (52)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "active": false,
             "pos": [25344.0, -4032.0],
             "size": [1536, 256],
@@ -5634,28 +6330,28 @@
         },
         {
             "id": "dev_floor_256 (53)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 8960.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (54)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 12160.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (55)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 12608.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (56)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 14016.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -5674,7 +6370,7 @@
         },
         {
             "id": "dev_floor_256 (47)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 11456.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5700,7 +6396,7 @@
         },
         {
             "id": "dev_floor_256 (57)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 8320.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5714,7 +6410,7 @@
         },
         {
             "id": "dev_floor_256 (58)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 7808.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5754,14 +6450,14 @@
         },
         {
             "id": "dev_floor_256 (63)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 11456.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (65)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [47424.0, 14144.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -5786,28 +6482,28 @@
         },
         {
             "id": "dev_floor_256 (62)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 10432.0],
             "size": [1536, 512],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (66)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 9280.0],
             "size": [1536, 512],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (64)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 8064.0],
             "size": [1536, 512],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (59)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 8448.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5862,7 +6558,7 @@
         },
         {
             "id": "dev_floor_256 (60)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 12992.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -5876,21 +6572,21 @@
         },
         {
             "id": "dev_floor_256 (61)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [57216.0, 6912.0],
             "size": [1536, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_64",
-            "type": "dev_floor_64",
+            "type": "@space_floor_64",
             "pos": [57216.0, 8992.0],
             "size": [1536, 64],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_128 (2)",
-            "type": "dev_floor_128",
+            "type": "@space_floor_128",
             "pos": [57216.0, 7744.0],
             "size": [1536, 128],
             "color": [255, 0, 0, 255]
@@ -5909,7 +6605,7 @@
         },
         {
             "id": "dev_floor_256 (67)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 7296.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -5999,7 +6695,7 @@
         },
         {
             "id": "dev_floor_256 (68)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [7680.0, 43648.0],
             "size": [256, 768],
             "color": [0, 255, 0, 255]
@@ -6012,35 +6708,35 @@
         },
         {
             "id": "dev_floor_256 (69)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [8896.0, 44800.0],
             "size": [256, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (70)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [9344.0, 44800.0],
             "size": [256, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (27)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [3328.0, 42880.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (72)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [3840.0, 42880.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (73)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [14336.0, 20288.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255]
@@ -6054,7 +6750,7 @@
         },
         {
             "id": "dev_floor_256 (74)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [17024.0, 20288.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
@@ -6084,7 +6780,7 @@
         },
         {
             "id": "dev_floor_256 (75)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [19072.0, 20288.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
@@ -6105,7 +6801,7 @@
         },
         {
             "id": "dev_floor_256 (76)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [20096.0, 20288.0],
             "size": [512, 1536],
             "color": [0, 255, 0, 255]
@@ -6134,21 +6830,21 @@
         },
         {
             "id": "dev_floor_256 (78)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [22784.0, 20288.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (79)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [15680.0, 28416.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (80)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [17088.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
@@ -6197,14 +6893,14 @@
         },
         {
             "id": "dev_floor_256 (81)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [20736.0, 20288.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (77)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [22272.0, 20288.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
@@ -6227,7 +6923,7 @@
         },
         {
             "id": "dev_floor_256 (83)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [35456.0, 28544.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255],
@@ -6256,7 +6952,7 @@
         },
         {
             "id": "dev_floor_256 (82)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [32384.0, 28160.0],
             "rotation": -90.0,
             "size": [768, 256],
@@ -6282,7 +6978,7 @@
         },
         {
             "id": "dev_floor_256 (84)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [32000.0, 28928.0],
             "rotation": -90.0,
             "size": [256, 512],
@@ -6291,7 +6987,7 @@
         },
         {
             "id": "dev_floor_256 (85)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [33664.0, 28544.0],
             "rotation": -90.0,
             "size": [1536, 512],
@@ -6355,7 +7051,7 @@
         },
         {
             "id": "dev_floor_256 (87)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [54528.0, 28288.0],
             "size": [512, 512],
             "color": [0, 255, 0, 255],
@@ -6363,7 +7059,7 @@
         },
         {
             "id": "dev_floor_256 (89)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [51712.0, 28416.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255],
@@ -6386,7 +7082,7 @@
         },
         {
             "id": "dev_floor_256 (86)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [53248.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255],
@@ -6394,7 +7090,7 @@
         },
         {
             "id": "dev_floor_256 (88)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [54016.0, 28416.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255],
@@ -6409,7 +7105,7 @@
         },
         {
             "id": "dev_floor_256 (90)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [56192.0, 28416.0],
             "size": [512, 1536],
             "color": [0, 255, 0, 255],
@@ -6438,7 +7134,7 @@
         },
         {
             "id": "dev_floor_256 (91)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [56960.0, 28672.0],
             "size": [512, 512],
             "color": [0, 255, 0, 255],
@@ -6446,7 +7142,7 @@
         },
         {
             "id": "dev_floor_256 (92)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [31232.0, 28928.0],
             "rotation": -90.0,
             "size": [256, 768],
@@ -6455,84 +7151,84 @@
         },
         {
             "id": "dev_floor_256 (93)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [15744.0, 20288.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (95)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [16384.0, 20288.0],
             "size": [512, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (94)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [25600.0, 50944.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (96)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [24192.0, 50944.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (98)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [26240.0, 50944.0],
             "size": [1024, 1536],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (99)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [27904.0, 50944.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (100)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [28416.0, 50944.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (101)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [28928.0, 50944.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (97)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [46464.0, 50944.0],
             "size": [256, 1280],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (103)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [45184.0, 51200.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (104)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [43776.0, 50816.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (105)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [42368.0, 50816.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255]
@@ -6560,49 +7256,49 @@
         },
         {
             "id": "dev_floor_256 (106)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [45952.0, 50432.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (102)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [46976.0, 50816.0],
             "size": [256, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (107)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-10048.0, 110016.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (110)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-10048.0, 108608.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (111)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-10048.0, 99136.0],
             "size": [1536, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (113)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-10048.0, 98240.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (108)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [4608.0, 91392.0],
             "size": [1280, 768],
             "color": [0, 255, 0, 255]
@@ -6763,14 +7459,14 @@
         },
         {
             "id": "dev_floor_256 (117)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [7168.0, 43648.0],
             "size": [256, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (40)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [18752.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
@@ -6778,7 +7474,7 @@
         },
         {
             "id": "dev_floor_256 (118)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [21184.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
@@ -6786,14 +7482,14 @@
         },
         {
             "id": "dev_floor_256 (119)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 17024.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (120)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [512.0, 15360.0],
             "size": [512, 512],
             "color": [0, 255, 0, 255]
@@ -6824,14 +7520,14 @@
         },
         {
             "id": "dev_floor_256 (127)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [53888.0, 104384.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (128)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [53888.0, 105792.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -6858,7 +7554,7 @@
         },
         {
             "id": "dev_floor_256 (126)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [53888.0, 108608.0],
             "size": [1536, 1280],
             "color": [0, 255, 0, 255]
@@ -7015,14 +7711,14 @@
         },
         {
             "id": "dev_floor_256 (123)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-15168.0, 28544.0],
             "size": [2048, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (129)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-15168.0, 30208.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
@@ -7044,7 +7740,7 @@
         },
         {
             "id": "dev_floor_256 (124)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-14016.0, 28928.0],
             "size": [256, 512],
             "color": [255, 0, 255, 255]
@@ -7119,14 +7815,14 @@
         },
         {
             "id": "dev_floor_256 (133)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [136000.0, 107264.0],
             "size": [1024, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (135)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [136512.0, 106368.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
@@ -8367,7 +9063,7 @@
         },
         {
             "id": "dev_floor_256 (138)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "active": false,
             "pos": [25344.0, -4544.0],
             "size": [1536, 256],
@@ -8375,28 +9071,28 @@
         },
         {
             "id": "dev_floor_256 (139)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [5376.0, 43648.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (140)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [17600.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (141)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [18112.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (142)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [18688.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
@@ -8458,7 +9154,7 @@
         },
         {
             "id": "dev_floor_256 (38)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-22400.0, 28736.0],
             "size": [256, 512],
             "color": [255, 217, 0, 255],
@@ -8466,7 +9162,7 @@
         },
         {
             "id": "dev_floor_256 (71)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-21248.0, 28352.0],
             "size": [2048, 256],
             "color": [0, 255, 0, 255],
@@ -8474,7 +9170,7 @@
         },
         {
             "id": "dev_floor_256 (143)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [-21248.0, 30016.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255],
@@ -8524,35 +9220,35 @@
         },
         {
             "id": "dev_floor_256 (146)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [2176.0, 15360.0],
             "size": [256, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (147)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [0.0, 25216.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (148)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [47424.0, 12288.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (149)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [38400.0, 6528.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (150)",
-            "type": "dev_floor_256",
+            "type": "@space_floor_256",
             "pos": [20352.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
@@ -9136,25 +9832,49 @@
         },
         {
             "id": "sp_stars_small_2 (1)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [-22016.0, 28992.0],
             "size": [10240, 10240]
         },
         {
+            "id": "sp_planet (9)",
+            "type": "@planet_blue",
+            "pos": [-20547.80078125, 26528.0],
+            "rotation": -15.600000381469727,
+            "size": [710, 710],
+            "orbit_around": "sp_nebula_red (1)"
+        },
+        {
+            "id": "sp_planet (10)",
+            "type": "@planet_gold_ringed",
+            "pos": [-21884.19921875, 26531.0],
+            "rotation": -13.0,
+            "size": [870, 514],
+            "orbit_around": "sp_nebula_red (1)"
+        },
+        {
+            "id": "sp_planet (11)",
+            "type": "@planet_red",
+            "pos": [-21216.0, 26700.5],
+            "rotation": -21.0,
+            "size": [529, 530],
+            "orbit_around": "sp_nebula_red (1)"
+        },
+        {
             "id": "sp_stars_small_1 (1)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [-22016.0, 28992.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (1)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [-22016.0, 28992.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (1)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [-22016.0, 28992.0],
             "size": [10240, 10240]
         },
@@ -9752,25 +10472,25 @@
         },
         {
             "id": "sp_stars_small_2 (2)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_stars_small_1 (2)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_starsbig_1_2_pc (2)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_starsbig_1_1_pc (2)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [137216.5, 104944.0],
             "size": [73728, 73728]
         },
@@ -10416,25 +11136,49 @@
         },
         {
             "id": "sp_stars_small_2 (3)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [-14528.0, 29312.0],
             "size": [10240, 10240]
         },
         {
+            "id": "sp_planet (6)",
+            "type": "@planet_blue_ringed",
+            "pos": [-14476.7998046875, 26732.5],
+            "rotation": -8.699999809265137,
+            "size": [1209, 651],
+            "orbit_around": "sp_nebula_red (3)"
+        },
+        {
+            "id": "sp_planet (7)",
+            "type": "@planet_red",
+            "pos": [-15168.0, 26925.599609375],
+            "rotation": -21.0,
+            "size": [485, 486],
+            "orbit_around": "sp_nebula_red (3)"
+        },
+        {
+            "id": "sp_planet (8)",
+            "type": "@planet_gold_ringed",
+            "pos": [-15859.2001953125, 26692.5],
+            "rotation": -13.0,
+            "size": [932, 551],
+            "orbit_around": "sp_nebula_red (3)"
+        },
+        {
             "id": "sp_stars_small_1 (3)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [-14528.0, 29312.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (3)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [-14528.0, 29312.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (3)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [-14528.0, 29312.0],
             "size": [10240, 10240]
         },
@@ -11060,25 +11804,25 @@
         },
         {
             "id": "sp_stars_small_2 (4)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [54224.0, 104432.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_stars_small_1 (4)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [54224.0, 104432.0],
             "size": [78848, 78848]
         },
         {
             "id": "sp_starsbig_1_2_pc (4)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [54224.0, 104432.0],
             "size": [73728, 73728]
         },
         {
             "id": "sp_starsbig_1_1_pc (4)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [54224.0, 104432.0],
             "size": [73728, 73728]
         },
@@ -11919,25 +12663,25 @@
         },
         {
             "id": "sp_stars_small_2 (5)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [-4992.0, 97680.0],
             "size": [50176, 50176]
         },
         {
             "id": "sp_stars_small_1 (5)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [-4992.0, 97680.0],
             "size": [52224, 52224]
         },
         {
             "id": "sp_starsbig_1_2_pc (5)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [-4992.0, 97680.0],
             "size": [50176, 50176]
         },
         {
             "id": "sp_starsbig_1_1_pc (5)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [-4992.0, 97680.0],
             "size": [50176, 50176]
         },
@@ -12761,25 +13505,25 @@
         },
         {
             "id": "sp_stars_small_2 (6)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (6)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (6)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (6)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [44864.0, 50816.0],
             "size": [12288, 12288]
         },
@@ -13218,25 +13962,25 @@
         },
         {
             "id": "sp_stars_small_2 (7)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (7)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (7)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (7)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [26688.0, 50944.0],
             "size": [12288, 12288]
         },
@@ -13937,25 +14681,25 @@
         },
         {
             "id": "sp_stars_small_2 (8)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [54656.0, 28352.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_stars_small_1 (8)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [54656.0, 28352.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (8)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [54656.0, 28352.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_starsbig_1_1_pc (8)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [54656.0, 28352.0],
             "size": [13312, 13312]
         },
@@ -14405,25 +15149,25 @@
         },
         {
             "id": "sp_stars_small_2 (9)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (9)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (9)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (9)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [33088.0, 28544.0],
             "size": [12288, 12288]
         },
@@ -14871,25 +15615,25 @@
         },
         {
             "id": "sp_stars_small_2 (10)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (10)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (10)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (10)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [18112.0, 28416.0],
             "size": [12288, 12288]
         },
@@ -15639,25 +16383,33 @@
         },
         {
             "id": "sp_stars_small_2 (11)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
         {
+            "id": "sp_planet (5)",
+            "type": "@planet_red",
+            "pos": [18880.0, 18800.0],
+            "rotation": -21.0,
+            "size": [705, 706],
+            "orbit_around": "sp_nebula_red (11)"
+        },
+        {
             "id": "sp_stars_small_1 (11)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (11)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_1_pc (11)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [18944.0, 20288.0],
             "size": [16384, 16384]
         },
@@ -16234,25 +16986,25 @@
         },
         {
             "id": "sp_stars_small_2 (12)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [57216.0, 9696.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_stars_small_1 (12)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [57216.0, 9696.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (12)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [57216.0, 9696.0],
             "size": [13312, 13312]
         },
         {
             "id": "sp_starsbig_1_1_pc (12)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [57216.0, 9696.0],
             "size": [13312, 13312]
         },
@@ -16590,25 +17342,25 @@
         },
         {
             "id": "sp_stars_small_2 (13)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [47424.0, 13216.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_stars_small_1 (13)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [47424.0, 13216.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (13)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [47424.0, 13216.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_starsbig_1_1_pc (13)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [47424.0, 13216.0],
             "size": [9216, 9216]
         },
@@ -17148,25 +17900,33 @@
         },
         {
             "id": "sp_stars_small_2 (14)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [37888.0, 10240.0],
             "size": [14336, 14336]
         },
         {
+            "id": "sp_planet (4)",
+            "type": "@planet_gold_ringed",
+            "pos": [37082.0, 11968.0],
+            "rotation": -13.0,
+            "size": [994, 587],
+            "orbit_around": "sp_nebula_red (14)"
+        },
+        {
             "id": "sp_stars_small_1 (14)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [37888.0, 10240.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (14)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [37888.0, 10240.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_starsbig_1_1_pc (14)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [37888.0, 10240.0],
             "size": [14336, 14336]
         },
@@ -17582,25 +18342,25 @@
         },
         {
             "id": "sp_stars_small_2 (15)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [25344.0, -1856.0],
             "size": [11264, 11264]
         },
         {
             "id": "sp_stars_small_1 (15)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [25344.0, -1856.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (15)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [25344.0, -1856.0],
             "size": [11264, 11264]
         },
         {
             "id": "sp_starsbig_1_1_pc (15)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [25344.0, -1856.0],
             "size": [11264, 11264]
         },
@@ -18082,25 +18842,25 @@
         },
         {
             "id": "sp_stars_small_2 (16)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_stars_small_1 (16)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (16)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (16)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [21280.0, 9472.0],
             "size": [12288, 12288]
         },
@@ -18546,25 +19306,25 @@
         },
         {
             "id": "sp_stars_small_2 (17)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [19072.0, -3776.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_stars_small_1 (17)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [19072.0, -3776.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (17)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [19072.0, -3776.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_starsbig_1_1_pc (17)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [19072.0, -3776.0],
             "size": [14336, 14336]
         },
@@ -18814,25 +19574,25 @@
         },
         {
             "id": "sp_stars_small_2 (18)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [11456.0, -1472.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_stars_small_1 (18)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [11456.0, -1472.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (18)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [11456.0, -1472.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (18)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [11456.0, -1472.0],
             "size": [10240, 10240]
         },
@@ -19942,25 +20702,33 @@
         },
         {
             "id": "sp_stars_small_2 (19)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [4608.0, 44640.0],
             "size": [17408, 17408]
         },
         {
+            "id": "sp_planet (3)",
+            "type": "@planet_blue",
+            "pos": [-1488.0, 45184.0],
+            "rotation": -15.600000381469727,
+            "size": [710, 710],
+            "orbit_around": "sp_nebula_red (19)"
+        },
+        {
             "id": "sp_stars_small_1 (19)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [4608.0, 44640.0],
             "size": [20480, 20480]
         },
         {
             "id": "sp_starsbig_1_2_pc (19)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [4608.0, 44640.0],
             "size": [17408, 17408]
         },
         {
             "id": "sp_starsbig_1_1_pc (19)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [4608.0, 44640.0],
             "size": [17408, 17408]
         },
@@ -20303,25 +21071,25 @@
         },
         {
             "id": "sp_stars_small_2 (20)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [0.0, 26240.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_stars_small_1 (20)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [0.0, 26240.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (20)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [0.0, 26240.0],
             "size": [9216, 9216]
         },
         {
             "id": "sp_starsbig_1_1_pc (20)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [0.0, 26240.0],
             "size": [9216, 9216]
         },
@@ -20345,7 +21113,7 @@
         },
         {
             "id": "sp_wall (1014)",
-            "type": "@space_tile_003",
+            "type": "@space_tile_007_corner",
             "pos": [-800.0, 15072.0]
         },
         {
@@ -20356,7 +21124,7 @@
         },
         {
             "id": "sp_corner_glass_top (2)",
-            "type": "@space_tile_013",
+            "type": "@space_tile_007",
             "pos": [-736.0, 15072.0],
             "rotation": 180.0,
             "flip_horizontally": true
@@ -20370,7 +21138,7 @@
         },
         {
             "id": "sp_corner_glass_left (1)",
-            "type": "@space_tile_013",
+            "type": "@space_tile_007",
             "pos": [-800.0, 15136.0],
             "rotation": 90.0
         },
@@ -20860,25 +21628,41 @@
         },
         {
             "id": "sp_stars_small_2 (21)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
         {
+            "id": "sp_planet (2)",
+            "type": "@planet_red",
+            "pos": [-1346.9000244140625, 18016.0],
+            "rotation": -21.0,
+            "size": [661, 662],
+            "orbit_around": "sp_nebula_red (21)"
+        },
+        {
+            "id": "sp_planet (1)",
+            "type": "@planet_blue_ringed",
+            "pos": [-1046.9000244140625, 14825.099609375],
+            "rotation": -8.699999809265137,
+            "size": [1209, 651],
+            "orbit_around": "sp_nebula_red (21)"
+        },
+        {
             "id": "sp_stars_small_1 (21)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (21)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_1_pc (21)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [1152.0, 16768.0],
             "size": [12288, 12288]
         },
@@ -21274,25 +22058,25 @@
         },
         {
             "id": "sp_stars_small_2 (22)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [0.0, 7936.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_stars_small_1 (22)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [0.0, 7936.0],
             "size": [12288, 12288]
         },
         {
             "id": "sp_starsbig_1_2_pc (22)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [0.0, 7936.0],
             "size": [10240, 10240]
         },
         {
             "id": "sp_starsbig_1_1_pc (22)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [0.0, 7936.0],
             "size": [10240, 10240]
         },
@@ -21563,25 +22347,25 @@
         },
         {
             "id": "sp_stars_small_2 (23)",
-            "type": "@stars_small_2",
+            "type": "@star_field_stars_small_2",
             "pos": [0.0, -1408.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_stars_small_1 (23)",
-            "type": "@stars_small_1",
+            "type": "@star_field_stars_small_1",
             "pos": [0.0, -1408.0],
             "size": [16384, 16384]
         },
         {
             "id": "sp_starsbig_1_2_pc (23)",
-            "type": "@starsbig_1_2_pc",
+            "type": "@star_field_starsbig_1_2_pc",
             "pos": [0.0, -1408.0],
             "size": [14336, 14336]
         },
         {
             "id": "sp_starsbig_1_1_pc (23)",
-            "type": "@starsbig_1_1_pc",
+            "type": "@star_field_starsbig_1_1_pc",
             "pos": [0.0, -1408.0],
             "size": [14336, 14336]
         },
@@ -21606,7 +22390,7 @@
             "id": "sp_corner_light_red",
             "type": "point_light",
             "pos": [-608.0, 14880.0],
-            "color": [255, 60, 30, 255],
+            "color": [255, 117, 104, 255],
             "falloff": {
                 "radius": 800.0
             },
@@ -21619,7 +22403,7 @@
             "id": "sp_corner_light_blue_far",
             "type": "point_light",
             "pos": [-416.0, 14816.0],
-            "color": [70, 90, 255, 90],
+            "color": [255, 117, 104, 255],
             "falloff": {
                 "radius": 650.0
             },
@@ -26761,6 +27545,7 @@
             "id": "sp_window_light (11)",
             "type": "point_light",
             "pos": [18912.0, 19168.0],
+            "color": [255, 117, 104, 255],
             "falloff": {
                 "radius": 931.7509765625
             },
@@ -27241,6 +28026,7 @@
             "id": "sp_window_light (12)",
             "type": "point_light",
             "pos": [37408.0, 12000.0],
+            "color": [255, 174, 71, 255],
             "falloff": {
                 "radius": 931.7509765625
             },
@@ -28129,6 +28915,7 @@
             "id": "sp_window_light (13)",
             "type": "point_light",
             "pos": [-1120.0, 45216.0],
+            "color": [145, 202, 255, 255],
             "falloff": {
                 "radius": 931.7509765625
             },
@@ -28465,6 +29252,7 @@
             "id": "sp_window_light (14)",
             "type": "point_light",
             "pos": [-992.0, 18016.0],
+            "color": [255, 117, 104, 255],
             "falloff": {
                 "radius": 931.7509765625
             },
@@ -28894,7 +29682,7 @@
             "id": "sp_corner_light_red (1)",
             "type": "point_light",
             "pos": [-977.0, 15297.0],
-            "color": [255, 60, 30, 255],
+            "color": [124, 214, 255, 255],
             "falloff": {
                 "radius": 800.0
             },
@@ -30758,7 +31546,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Welcome to Hypersomnia!\nPress {MOVE_FORWARD}, {MOVE_BACKWARD}, {MOVE_LEFT}, {MOVE_RIGHT} to move around.\nGo up!"
         },
@@ -30787,7 +31575,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Move your mouse to look around."
         },
@@ -30816,7 +31604,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "{SPRINT} to sprint.\nQuickly run over the red tiles!"
         },
@@ -30912,7 +31700,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {DASH} to dash.\nDash over the red floors!"
         },
@@ -31003,7 +31791,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Let us begin!\nEnter the yellow portal."
         },
@@ -31053,7 +31841,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Running costs Stamina.\nWalk or stand still to regenerate Stamina faster."
         },
@@ -31082,7 +31870,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Stealth is very important."
         },
@@ -31167,7 +31955,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Time to shoot things up.\nPick up the weapon on the floor."
         },
@@ -31243,7 +32031,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Pick up magazines and press {RELOAD} to reload."
         },
@@ -31272,7 +32060,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SHOOT} to shoot.\nKill the Resistance soldier to continue.\nWatch your ammo! You can always restart this level ({ESCAPE})."
         },
@@ -31301,7 +32089,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {TOGGLE_WEAPON_LASER} to toggle laser. Only you can see it!\nDashed lines indicate a physical obstacle."
         },
@@ -31330,7 +32118,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can't see enemies behind obstacles.\nBullets can penetrate them - depending on the gun."
         },
@@ -31359,7 +32147,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {HOLSTER} to hide your gun.\nYou will fit in tight corridors."
         },
@@ -31388,7 +32176,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {LAST_USED_WEAPON} to pull your gun back.\n{LAST_USED_WEAPON} now quickly switches between the gun and empty hands."
         },
@@ -31417,7 +32205,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "To skip the Tutorial, press {ESCAPE}.\nThen click \"Quit to menu\"."
         },
@@ -31446,7 +32234,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {DROP} to drop your weapon.\nThis frees inventory space."
         },
@@ -31475,7 +32263,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Tip: double-tapping {RELOAD} reloads faster.\nThis drops the mag to the ground. You can pick it up later!"
         },
@@ -31504,7 +32292,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Tip: try shooting while reloading!\nThis will fire the bullet left in the chamber."
         },
@@ -31533,7 +32321,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can dual-wield any two weapons."
         },
@@ -31609,7 +32397,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Hold two numbers to dual-wield. E.g. {HOTBAR_0} and {HOTBAR_1}.\nThen press {SHOOT_SECONDARY} to shoot the second weapon.\nNow kill both enemies at the same time."
         },
@@ -31661,7 +32449,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Hold {HOTBAR_0} and {HOTBAR_1} to dual wield Deagles.\nUse their massive recoil to quickly jump over the red floor."
         },
@@ -31690,7 +32478,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You move really slow when dual-wielding.\nHowever, you can compensate with kickback!"
         },
@@ -31766,7 +32554,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Aim in the opposite direction (down).\n{SPRINT} and {MOVE_FORWARD} while shooting both Deagles."
         },
@@ -31795,7 +32583,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Good job!"
         },
@@ -31824,7 +32612,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "{RELOAD} will automatically reload both weapons."
         },
@@ -31853,7 +32641,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Your weapons show on the hotbar.\nPress a corresponding number ({HOTBAR_0} or {HOTBAR_1}) to pull one out."
         },
@@ -31882,7 +32670,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Tip: press the same number (e.g. {HOTBAR_0}) several times in a row.\nThis toggles between right-handed and left-handed stance!\n"
         },
@@ -31911,7 +32699,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Tip: gun recoil is the same every time.\nYou can learn the pattern!"
         },
@@ -31940,7 +32728,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Shoot the glassy surface from an angle.\nKill 4 enemies camping behind the corners."
         },
@@ -31969,7 +32757,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Bullets can bounce against walls!\nGlass is the easiest to ricochet off."
         },
@@ -32045,7 +32833,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "ALL surfaces can bounce bullets - including wood!\nKill 2 enemies that hide behind orange boxes."
         },
@@ -32099,7 +32887,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Good job!"
         },
@@ -32128,7 +32916,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "A third one won't fit..."
         },
@@ -32157,7 +32945,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Inventory space is limited.\nTry picking up both sniper rifles."
         },
@@ -32233,7 +33021,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You are also painfully slow."
         },
@@ -32262,7 +33050,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "This is when having a Backpack is useful.\nPick it up."
         },
@@ -32291,7 +33079,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Guns weigh 50% less!\nAnd you can pick a third one."
         },
@@ -32321,7 +33109,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "It's time for the Deagle trick..\n..but with two Awkas instead.\nHold {HOTBAR_0} and {HOTBAR_1} to dual-wield."
         },
@@ -32351,7 +33139,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can skip this part if you have no mouse wheel.\nIn that case enter the portal to the left."
         },
@@ -32380,7 +33168,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can use the laser ({TOGGLE_WEAPON_LASER}) with knives too.\nAim for headshots, especially with the strong attack."
         },
@@ -32409,7 +33197,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SHOOT} for a fast, weak attack.\nPress {SHOOT_SECONDARY} for a strong, slow attack."
         },
@@ -32438,7 +33226,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Time to chop things up.\nPick up the red knife."
         },
@@ -32514,7 +33302,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "The faster you are, the harder you hit.\nAttack with {SHOOT_SECONDARY} while sprinting full speed."
         },
@@ -32543,7 +33331,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can throw two knives at once!\nSimply {THROW_TWO_KNIVES}."
         },
@@ -32572,7 +33360,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "For better aim, dual-wield knives by holding {HOTBAR_0} and {HOTBAR_1}.\nThen {THROW_KNIFE} or {THROW_TWO_KNIVES}."
         },
@@ -32601,7 +33389,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press strong attack while running.\n({SPRINT} + {MOVE_FORWARD}, then {SHOOT_SECONDARY})"
         },
@@ -32630,7 +33418,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can toss knives in ANY situation. Even while reloading a gun!\nTry it out! {THROW_KNIFE} or {THROW_TWO_KNIVES}. This can save your life."
         },
@@ -32763,7 +33551,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Will you manage?\nOr will you perish?"
         },
@@ -32815,7 +33603,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Assault Rattle has a cool feature.\nIts strong attack lets you jump!"
         },
@@ -32868,7 +33656,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Good job!"
         },
@@ -32897,7 +33685,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Thrown knives can bounce against walls and kill enemies."
         },
@@ -32926,7 +33714,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "These enemies can only be killed with headshots.\nCan you kill two in one shot? What about three?"
         },
@@ -32955,7 +33743,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Headshots deal 3x damage.\nThey're based on accuracy. They are not random."
         },
@@ -32984,7 +33772,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Use {LAST_USED_WEAPON} to quickly switch to the last used gun."
         },
@@ -33013,7 +33801,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You run faster with empty hands."
         },
@@ -33065,7 +33853,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Time to blow things up.\nBut first let's wear some protection."
         },
@@ -33116,7 +33904,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SHOOT} to throw. Hold to cook it (watch out!).\nUse {TOGGLE_WEAPON_LASER} to see what you can throw over."
         },
@@ -33145,7 +33933,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Grenades land exactly where the crosshair is.\nTry throwing them close."
         },
@@ -33174,7 +33962,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "There are other kinds of grenades.\nPED (blue ones) instantly destroy armor and PE."
         },
@@ -33203,7 +33991,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Flashbangs blind and deafen nearby enemies.\nTest it on yourself with {SHOOT_SECONDARY}."
         },
@@ -33232,7 +34020,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Yellow ones drain stamina and throw enemies away.\nThey also force gun ignition - great against rocket launchers."
         },
@@ -33283,7 +34071,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Just like knives, you can toss grenades in any situation -\neven while shooting or reloading!"
         },
@@ -33312,7 +34100,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "{THROW_FORCE_GRENADE} quickly tosses a Force Grenade.\n{THROW_PED_GRENADE} tosses PED grenades.\n{THROW_FLASHBANG} tosses Flashbangs."
         },
@@ -33364,7 +34152,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Tip: To reach around corners, bounce grenades against walls.\n{SPRINT} to quickly double the distance."
         },
@@ -33416,7 +34204,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "When playing Resistance, you must detonate the bomb to win.\nIf you don't plant it within the time limit, you lose the round."
         },
@@ -33474,7 +34262,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Often, there is more than one bombsite - named A, B and C.\nDetonating any single one wins the round for Resistance."
         },
@@ -33510,7 +34298,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "The bomb could end up on the ground due to your teammate dying."
         },
@@ -33539,7 +34327,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "First, enter the bombsite - it's always marked with red lines.\nIt is usually defended by Metropolis players."
         },
@@ -33606,7 +34394,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Quick! Grab the Defuse kit.\nYou will defuse TWICE as fast!"
         },
@@ -33635,7 +34423,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Quick! Retake the bombsite and defuse the bomb!"
         },
@@ -33687,7 +34475,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Kill the terrorists first!"
         },
@@ -33716,7 +34504,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Another bomb's already ticking!"
         },
@@ -33746,7 +34534,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You did well! Good job!"
         },
@@ -33776,7 +34564,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "When you kill the enemy carrying the bomb,\nyou can steal it and run away! Try it!"
         },
@@ -33805,7 +34593,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Avoid the explosion! Take cover!"
         },
@@ -33834,7 +34622,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Guess what - you can toss knives and nades while planting!\nTry it out!"
         },
@@ -33863,7 +34651,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Electric Armor makes PE absorb all damage.\nIt is effectively a second HP bar."
         },
@@ -33892,7 +34680,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Cons? You walk a little slower and glow in the dark.\nOkay, let's pick up some grenades!"
         },
@@ -33944,7 +34732,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SPECIAL_ACTION_BUTTON_1} to cast Haste.\nYou will run faster for a while."
         },
@@ -33973,7 +34761,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can cast Spells.\nThey consume PE (Personal Electricity)."
         },
@@ -34047,7 +34835,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "{SPECIAL_ACTION_BUTTON_2} will restore your Health."
         },
@@ -34076,7 +34864,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Just like HP, PE slowly regenerates.\nWithout enough PE, spells appear grayed out."
         },
@@ -34105,7 +34893,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "{SPECIAL_ACTION_BUTTON_3} will restore your Stamina."
         },
@@ -34157,7 +34945,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SPECIAL_ACTION_BUTTON_2} to launch three massive explosions.\nThese cannot hurt you."
         },
@@ -34186,7 +34974,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You can counter Spell users with Blunaz.\nIt instantly drains victim's PE - but is otherwise useless."
         },
@@ -34215,7 +35003,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SPECIAL_ACTION_BUTTON_3} to cast three magic missiles.\nWatch out, you can die from the explosion! "
         },
@@ -34244,7 +35032,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Let's try some offensive spells.\nIn the Tutorial, they won't consume PE."
         },
@@ -34295,7 +35083,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Press {SPECIAL_ACTION_BUTTON_1} for a small, instant explosion."
         },
@@ -34324,7 +35112,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "It is a great alternative to PED grenades.\nTry it on yourself!"
         },
@@ -34376,7 +35164,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Surfing with portals is possible!"
         },
@@ -34410,7 +35198,6 @@
             "pos": [-36944.0, 93856.0],
             "size": [20000, 72063],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -34433,7 +35220,6 @@
             "pos": [24144.0, 93856.0],
             "size": [20000, 72063],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -34456,7 +35242,6 @@
             "pos": [-6400.0, 67824.0],
             "size": [41088, 20000],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -34479,7 +35264,6 @@
             "pos": [-6400.0, 119888.0],
             "size": [41088, 20000],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -34530,7 +35314,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -34556,7 +35340,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_impulse": {
                 "amount": 0.0
@@ -34580,7 +35364,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_impulse": {
                 "amount": 0.0
@@ -34663,7 +35447,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_impulse": {
                 "amount": 0.0
@@ -34787,7 +35571,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Bullet trajectory ({TOGGLE_WEAPON_LASER}) must cross the enemy's head.\nIt's possible to headshot even from the side!"
         },
@@ -34816,7 +35600,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Good job!\n"
         },
@@ -34845,7 +35629,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "This way, enemies can die without ever seeing you!"
         },
@@ -34874,7 +35658,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Hold {MOVE_FORWARD} and then press {DASH}."
         },
@@ -34903,7 +35687,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Hold {MOVE_RIGHT} and then press {DASH}.\nDash direction is the same as movement direction."
         },
@@ -35027,7 +35811,6 @@
             "pos": [16112.0, 102208.0],
             "size": [20000, 102720],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35050,7 +35833,6 @@
             "pos": [93072.0, 102208.0],
             "size": [20000, 102720],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35073,7 +35855,6 @@
             "pos": [54592.0, 60848.0],
             "size": [56960, 20000],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35096,7 +35877,6 @@
             "pos": [54592.0, 143568.0],
             "size": [56960, 20000],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35147,7 +35927,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -35181,7 +35961,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "This track requires you to make a full circle.\nGood luck."
         },
@@ -35344,7 +36124,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Congratulations!\nYou now have basic surfing skills!"
         },
@@ -35388,7 +36168,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -35422,7 +36202,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You have completed the Tutorial!\nThank you for playing!"
         },
@@ -35510,7 +36290,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -35642,7 +36422,6 @@
             "pos": [98736.0, 102912.0],
             "size": [20000, 102720],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35665,7 +36444,6 @@
             "pos": [175696.0, 102912.0],
             "size": [20000, 102720],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35688,7 +36466,6 @@
             "pos": [137216.0, 61552.0],
             "size": [56960, 20000],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35711,7 +36488,6 @@
             "pos": [137216.0, 144272.0],
             "size": [56960, 20000],
             "color_preset": "PINK",
-            "ignore_airborne_characters": false,
             "hide_on_minimap": true,
             "enter_time_ms": 0.0,
             "OFF_rings_effect": {},
@@ -35829,7 +36605,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -36026,7 +36802,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -36213,7 +36989,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Aim in the opposite direction (down).\n{SPRINT} and {MOVE_FORWARD} - THEN shoot both Awkas."
         },
@@ -36242,7 +37018,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Tip: there are 3 enemies,\neach hiding behind a crate."
         },
@@ -36271,7 +37047,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "First pick up the Bilmer."
         },
@@ -36300,7 +37076,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "A backpack will let you carry lots of grenades."
         },
@@ -36329,7 +37105,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Now take as many as you want!"
         },
@@ -36382,7 +37158,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Knives can be thrown quickly.\nAim at the enemy and spam {THROW_KNIFE}."
         },
@@ -36468,7 +37244,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -36494,7 +37270,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
@@ -36528,7 +37304,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "You have completed the Basic Tutorial!\nThank you for playing!"
         },
@@ -36741,7 +37517,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Excellent work!"
         },
@@ -36770,7 +37546,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "{WALK_SILENTLY} to walk silently over the blue floor."
         },
@@ -36799,7 +37575,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Excellent!"
         },
@@ -36828,7 +37604,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Nice work!"
         },
@@ -36857,7 +37633,7 @@
                 "id": null
             },
             "ambience_particles": {
-                "scale_amounts": 0.15
+                "scale_amounts": 0.15000000596046448
             },
             "context_tip": "Well done!"
         }

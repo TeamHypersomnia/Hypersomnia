@@ -38,6 +38,7 @@
 #include "application/setups/editor/defaults/editor_node_defaults.h"
 #include "application/setups/editor/defaults/editor_project_defaults.h"
 #include "application/setups/editor/gui/id_widget_handler.h"
+#include "application/setups/editor/gui/editor_star_field_gui.h"
 
 struct default_widget_handler {
 	template <class... Args>
@@ -746,8 +747,7 @@ static bool reset_button(
 	return request_defaults;
 }
 
-EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& resource) {
-	auto special_handler = default_widget_handler();
+EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& resource, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 
 	bool last_result = false;
@@ -776,6 +776,11 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& 
 
 	if (resource.editable.color_wave_speed.is_enabled) {
 		MULTIPROPERTY("Randomize color wave offset", randomize_color_wave_offset);
+	}
+
+	if (resource.editable.orbit.is_enabled) {
+		MULTIPROPERTY("Orbit around", orbit_around);
+		tooltip_on_hover("The node this sprite circles around during the game, e.g. the center of a rotating nebula,\nso that a planet drifts together with the sky.\nIf you leave it empty, the orbit's Radius and Center direction from the resource decide the center.");
 	}
 
 	const bool is_animation = !resource.animation_frames.empty() || (resource.official_tag.has_value() && std::holds_alternative<test_dynamic_decorations>(resource.official_tag.value()));
@@ -1965,6 +1970,48 @@ EDIT_FUNCTION(
 		}
 	}
 
+	if (insp.domain != editor_sprite_domain::PHYSICAL) {
+		MULTIPROPERTY("Orbit", orbit.is_enabled);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Moves along a circle during the game - like planets - but stands still in the editor view.\nThe sprite keeps its rotation, so its lit side stays where it is.\nThe circle's center lies Radius away from where the node stands, in Center direction.");
+		}
+
+		if (insp.orbit.is_enabled) {
+			auto indent = scoped_indent();
+			MULTIPROPERTY("Radius", orbit.value.radius);
+			MULTIPROPERTY("Center direction", orbit.value.center_direction_degrees);
+			MULTIPROPERTY("Degrees per sec", orbit.value.degrees_per_sec);
+		}
+	}
+
+	if (insp.domain == editor_sprite_domain::BACKGROUND) {
+		MULTIPROPERTY("Star field", star_field.is_enabled);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Instead of its own image, fills the node's whole area with stars picked at random from the list below.\nOnly the visible stars are computed, so the area can be as big as the sky.\nRotate continuously spins the whole field around the node's center.");
+		}
+
+		if (insp.star_field.is_enabled) {
+			auto indent = scoped_indent();
+
+			MULTIPROPERTY("Stars per 1000x1000", star_field.value.stars_per_million_square_units);
+			MULTIPROPERTY("Seed", star_field.value.seed);
+			MULTIPROPERTY("Min scale", star_field.value.min_scale);
+			MULTIPROPERTY("Max scale", star_field.value.max_scale);
+			MULTIPROPERTY("Min brightness", star_field.value.min_brightness);
+
+			::edit_star_field_stars(
+				result,
+				insp.star_field.value.stars,
+				es,
+				[&](const std::string& label, auto& resource_id) {
+					return edit_property(result, label, special_handler, resource_id);
+				}
+			);
+		}
+	}
+
 	if (insp.domain == editor_sprite_domain::PHYSICAL) {
 		MULTIPROPERTY("Cover background neons", as_physical.cover_background_neons);
 		MULTIPROPERTY("Illuminate like wall", as_physical.illuminate_like_wall);
@@ -2057,14 +2104,12 @@ EDIT_FUNCTION(
 	else {
 		MULTIPROPERTY("Cover background neons", as_nonphysical.cover_background_neons);
 		{
-			const bool full_illumination_already = insp.domain == editor_sprite_domain::FOREGROUND && insp.as_nonphysical.full_illumination;
+			const bool full_illumination_already = insp.as_nonphysical.full_illumination;
 			auto disabled = maybe_disabled_only_cols(full_illumination_already);
 			MULTIPROPERTY("Illuminate like wall", as_nonphysical.illuminate_like_wall);
 		}
 
-		if (insp.domain == editor_sprite_domain::FOREGROUND) {
-			MULTIPROPERTY("Full illumination", as_nonphysical.full_illumination);
-		}
+		MULTIPROPERTY("Full illumination", as_nonphysical.full_illumination);
 
 		ImGui::Separator();
 
@@ -3767,7 +3812,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				);
 			}
 
-			changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
+			changed = perform_editable_gui(edited_copy, cmd.entries, *resource, id_handler);
 		}
 		else if constexpr(std::is_same_v<N, editor_prefab_node>) {
 			const auto resource = in.setup.find_resource(node.resource_id);

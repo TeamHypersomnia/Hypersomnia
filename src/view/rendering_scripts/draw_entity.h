@@ -28,6 +28,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"
+#include "view/rendering_scripts/star_field_on_gpu.h"
 #include "view/rendering_scripts/owned_decals.h"
 #include "game/components/torso_component.hpp"
 
@@ -202,6 +203,18 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 			return result;
 		}();
+
+		if constexpr(H::template has<invariants::star_field>()) {
+			const auto& star_field = typed_handle.template get<invariants::star_field>();
+
+			if (star_field.is_enabled()) {
+				if (in.star_fields_on_gpu != nullptr) {
+					::queue_star_field_on_gpu(*in.star_fields_on_gpu, star_field, sprite, input, in.manager);
+				}
+
+				return;
+			}
+		}
 
 		if constexpr(!for_gui) {
 			if constexpr(H::template has<components::hand_fuse>()) {
@@ -847,6 +860,12 @@ FORCE_INLINE void specific_draw_neon_map(
 ) {
 	if constexpr(typed_handle.template has<components::sprite>()) {
 		if (typed_handle.template get<components::sprite>().disable_neon_map) {
+			return;
+		}
+	}
+
+	if constexpr(typed_handle.template has<invariants::star_field>()) {
+		if (typed_handle.template get<invariants::star_field>().is_enabled()) {
 			return;
 		}
 	}

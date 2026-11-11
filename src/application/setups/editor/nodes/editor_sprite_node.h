@@ -4,8 +4,10 @@
 #include "augs/math/transform.h"
 #include "application/setups/editor/nodes/editor_node_base.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
+#include "application/setups/editor/nodes/editor_typed_node_id.h"
 
 struct editor_sprite_resource;
+struct editor_sprite_node;
 
 struct editor_sprite_node_editable {
 	// GEN INTROSPECTOR struct editor_sprite_node_editable
@@ -24,6 +26,8 @@ struct editor_sprite_node_editable {
 	float animation_speed_factor = 1.0f;
 	real32 penetrability = 1.0f;
 	real32 shadow_height_mult = 1.0f;
+
+	editor_typed_node_id<editor_sprite_node> orbit_around;
 	// END GEN INTROSPECTOR
 };
 

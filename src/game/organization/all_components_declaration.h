@@ -51,6 +51,7 @@ namespace invariants {
 	struct melee;
 	struct melee_fighter;
 	struct decal;
+	struct star_field;
 }
 
 namespace components {
@@ -212,7 +213,8 @@ using invariant_list_t = List<
 	invariants::touch_collectible,
 	invariants::melee,
 	invariants::melee_fighter,
-	invariants::decal
+	invariants::decal,
+	invariants::star_field
 >;
 
 template <class... Types>

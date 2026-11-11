@@ -45,6 +45,29 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				transform.rotation += rotation_speed * delta.in_seconds();
 			}
 
+			if (movement_path_def.orbit.is_enabled) {
+				auto& movement_path = subject.template get<components::movement_path>();
+				auto& transform = subject.template get<components::transform>();
+
+				const auto& orbit = movement_path_def.orbit.value;
+
+				if (!movement_path.orbit_start.is_enabled) {
+					movement_path.orbit_start.emplace(transform.pos);
+				}
+
+				const auto start = movement_path.orbit_start.value;
+
+				const auto center =
+					movement_path.orbit_center.is_enabled ?
+					movement_path.orbit_center.value :
+					orbit.calc_center_seen_from(start)
+				;
+
+				movement_path.path_time += delta.in_seconds();
+				transform.pos = ::orbit_position(center, start, orbit.degrees_per_sec, movement_path.path_time);
+				cosm.get_solvable_inferred({}).tree_of_npo.infer_cache_for(subject);
+			}
+
 			if (movement_path_def.organism_wandering.is_enabled) {
 				auto& movement_path = subject.template get<components::movement_path>();
 

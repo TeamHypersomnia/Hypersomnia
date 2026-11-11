@@ -6,6 +6,7 @@
 class interpolation_system;
 struct randomizing_system;
 class images_in_atlas_map;
+struct star_field_gpu_target;
 
 struct specific_draw_input {
 	const augs::drawer drawer;
@@ -20,6 +21,7 @@ struct specific_draw_input {
 	const camera_cone cone;
 	const bool draw_long_bullet_neons = true;
 	const float bullets_alpha = 1.0f;
+	star_field_gpu_target* const star_fields_on_gpu = nullptr;
 
 	template <class T>
 	auto make_input_for() const {

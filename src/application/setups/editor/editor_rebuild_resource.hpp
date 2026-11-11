@@ -163,7 +163,7 @@ void allocate_flavours_and_assets_for_resource(
 			create_as(plain_sprited_body());
 		}
 		else {
-			if (n_frames > 1) {
+			if (n_frames > 1 || editable.orbit.is_enabled) {
 				create_as(dynamic_decoration());
 			}
 			else {
@@ -328,6 +328,14 @@ void setup_scene_object_from_resource(
 			render.layer = [&]() {
 				switch (domain) {
 					case editor_sprite_domain::BACKGROUND:
+						if (editable.draws_star_field()) {
+							return render_layer::GROUND;
+						}
+
+						if (editable.as_nonphysical.full_illumination) {
+							return render_layer::GROUND_DECALS;
+						}
+
 						return render_layer::GROUND;
 					case editor_sprite_domain::FOREGROUND:
 						if (editable.as_nonphysical.full_illumination) {
@@ -407,6 +415,14 @@ void setup_scene_object_from_resource(
 
 		if (auto animation = scene.template find<invariants::animation>()) {
 			animation->id = resource.scene_animation_id; 
+		}
+
+		if (auto movement_path = scene.template find<invariants::movement_path>()) {
+			movement_path->orbit = editable.orbit;
+		}
+
+		if (auto star_field = scene.template find<invariants::star_field>()) {
+			*star_field = editable.draws_star_field() ? ::to_game_star_field(editable.star_field.value, find_resource) : invariants::star_field();
 		}
 
 		auto& physical = editable.as_physical;

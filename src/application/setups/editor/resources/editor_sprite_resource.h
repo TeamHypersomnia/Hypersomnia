@@ -7,6 +7,8 @@
 #include "augs/drawing/sprite.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "game/detail/movement_orbit.h"
+#include "application/setups/editor/resources/editor_star_field.h"
 #include "view/viewables/regeneration/neon_maps.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
@@ -113,6 +115,8 @@ struct editor_sprite_resource_editable {
 
 	augs::maybe<float> color_wave_speed = augs::maybe<float>(1.0f, false);
 	augs::maybe<float> rotate_continuously_degrees_per_sec = augs::maybe<float>(360.0f, false);
+	augs::maybe<movement_orbit_def> orbit;
+	augs::maybe<editor_star_field> star_field;
 
 	augs::maybe<intensity_vibration_input> neon_alpha_vibration;
 	bool vibrate_diffuse_too = false;
@@ -122,6 +126,10 @@ struct editor_sprite_resource_editable {
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_sprite_resource_editable&) const = default;
+
+	bool draws_star_field() const {
+		return domain == editor_sprite_domain::BACKGROUND && star_field.is_enabled;
+	}
 };
 
 struct editor_sprite_node;

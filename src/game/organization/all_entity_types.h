@@ -196,7 +196,8 @@ struct static_decoration {
 	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::render,
-		invariants::ground
+		invariants::ground,
+		invariants::star_field
 	>;
 
 	using component_list = type_list<
@@ -220,7 +221,8 @@ struct dynamic_decoration {
 		invariants::animation,
 		invariants::render,
 		invariants::ground,
-		invariants::movement_path
+		invariants::movement_path,
+		invariants::star_field
 	>;
 
 	using component_list = type_list<

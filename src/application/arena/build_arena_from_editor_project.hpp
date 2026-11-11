@@ -12,6 +12,7 @@
 
 #include "application/arena/build_arena_from_editor_project.h"
 #include "application/arena/missile_node_shot.h"
+#include "application/arena/orbit_around_node.h"
 #include "application/arena/editor_playtest_spawns.h"
 #include "application/setups/editor/detail/has_custom_scene_flavour_id.h"
 #include "game/cosmos/change_common_significant.hpp"
@@ -611,6 +612,9 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 								}
 							);
 						}
+					}
+					else if constexpr(std::is_same_v<node_type, editor_sprite_node>) {
+						::set_orbit_center_at_orbited_node(typed_dependent, project, scene.world);
 					}
 				});
 			}

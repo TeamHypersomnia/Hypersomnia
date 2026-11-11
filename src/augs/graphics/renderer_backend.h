@@ -24,6 +24,7 @@ struct renderer_backend_result {
 namespace augs {
 	struct dedicated_buffers;
 	struct drawcall_command;
+	struct procedural_quads_draw;
 
 	namespace graphics {
 		struct renderer_error : error_with_typesafe_sprintf {
@@ -83,6 +84,7 @@ namespace augs {
 			void finish_single_coverage();
 
 			void perform(const drawcall_command&);
+			void perform_procedural_quads(const procedural_quads_draw&);
 
 		public:
 			unsigned get_max_texture_size() const;

@@ -100,14 +100,20 @@ struct id_widget_handler {
 					modified = true;
 					property = chosen_id;
 				},
-				[&](const auto& node) { 
-					if (const auto resource = setup.find_resource(node.resource_id)) {
-						if (resource->editable.type == area_marker_type::PORTAL) {
-							return true;
+				[&](const auto& node) {
+					if constexpr(std::is_same_v<R, editor_area_marker_node>) {
+						if (const auto resource = setup.find_resource(node.resource_id)) {
+							if (resource->editable.type == area_marker_type::PORTAL) {
+								return true;
+							}
 						}
-					}
 
-					return false;
+						return false;
+					}
+					else {
+						(void)node;
+						return true;
+					}
 				},
 				none_label,
 				show_icon

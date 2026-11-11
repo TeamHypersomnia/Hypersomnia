@@ -235,6 +235,38 @@ namespace augs {
 #endif
 		}
 
+		void renderer_backend::perform_procedural_quads(const procedural_quads_draw& draw) {
+#if BUILD_OPENGL
+			if (draw.quad_count == 0) {
+				return;
+			}
+
+			for (const auto& uniform : draw.uniforms_before) {
+				shader_program::set_uniform_of_current(uniform);
+			}
+
+			if (draw.vec4_array_uniform_id != -1 && !draw.vec4_array.empty()) {
+				shader_program::set_vec4_array_of_current(draw.vec4_array_uniform_id, draw.vec4_array);
+			}
+
+			GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
+			GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
+			GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
+
+			GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(draw.quad_count * 6)));
+
+			GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
+			GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
+			GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
+
+			for (const auto& uniform : draw.uniforms_after) {
+				shader_program::set_uniform_of_current(uniform);
+			}
+#else
+			(void)draw;
+#endif
+		}
+
 		void renderer_backend::perform(
 			renderer_backend_result& output,
 			const renderer_command* const c, 
@@ -269,18 +301,36 @@ namespace augs {
 							perform(translated_cmd);
 						}
 
-						if (const auto triangles_n = buffers.triangles.size(); triangles_n > 0) {
+						auto perform_triangles = [&](const std::size_t first, const std::size_t count) {
+							if (count == 0) {
+								return;
+							}
+
 							drawcall_command translated_cmd;
 
-							translated_cmd.triangles = buffers.triangles.data();
-							translated_cmd.count = triangles_n;
+							translated_cmd.triangles = buffers.triangles.data() + first;
+							translated_cmd.count = static_cast<uint32_t>(count);
 
 							if (buffers.specials.size() > 0) {
-								translated_cmd.specials = buffers.specials.data();
+								translated_cmd.specials = buffers.specials.data() + first * 3;
 							}
 
 							perform(translated_cmd);
+						};
+
+						const auto triangles_n = buffers.triangles.size();
+						std::size_t triangles_drawn = 0;
+
+						for (const auto& procedural : buffers.procedural_quads) {
+							const auto split = std::min(static_cast<std::size_t>(procedural.after_triangles), triangles_n);
+
+							perform_triangles(triangles_drawn, split - std::min(split, triangles_drawn));
+							triangles_drawn = std::max(triangles_drawn, split);
+
+							perform_procedural_quads(procedural);
 						}
+
+						perform_triangles(triangles_drawn, triangles_n - triangles_drawn);
 					};
 
 					if constexpr(std::is_invocable_v<C, A>) {
