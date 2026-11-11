@@ -3944,6 +3944,38 @@
                 "sp_edge_light (67)",
                 "sp_edge_light (68)",
                 "sp_edge_light (69)",
+                "sp_edge_light (321)",
+                "sp_edge_light (322)",
+                "sp_edge_light (323)",
+                "sp_edge_light (324)",
+                "sp_edge_light (325)",
+                "sp_edge_light (326)",
+                "sp_edge_light (327)",
+                "sp_edge_light (328)",
+                "sp_edge_light (329)",
+                "sp_edge_light (330)",
+                "sp_edge_light (331)",
+                "sp_edge_light (332)",
+                "sp_edge_light (333)",
+                "sp_edge_light (334)",
+                "sp_edge_light (335)",
+                "sp_edge_light (336)",
+                "sp_edge_light (337)",
+                "sp_edge_light (338)",
+                "sp_edge_light (339)",
+                "sp_edge_light (340)",
+                "sp_edge_light (341)",
+                "sp_edge_light (342)",
+                "sp_edge_light (343)",
+                "sp_edge_light (344)",
+                "sp_edge_light (345)",
+                "sp_edge_light (346)",
+                "sp_edge_light (347)",
+                "sp_edge_light (348)",
+                "sp_edge_light (349)",
+                "sp_edge_light (350)",
+                "sp_edge_light (351)",
+                "sp_edge_light (352)",
                 "sp_wall (244)",
                 "sp_wall (245)",
                 "sp_wall (246)",
@@ -4002,12 +4034,22 @@
                 "sp_wall (299)",
                 "sp_wall (300)",
                 "sp_wall (301)",
+                "sp_wall (1104)",
+                "sp_wall (1105)",
+                "sp_wall (1106)",
+                "sp_wall (1107)",
+                "sp_wall (1108)",
+                "sp_wall (1109)",
                 "sp_collider (28)",
                 "sp_collider (29)",
                 "sp_collider (30)",
                 "sp_collider (31)",
                 "sp_collider (32)",
                 "sp_collider (33)",
+                "sp_collider (138)",
+                "sp_collider (139)",
+                "sp_collider (140)",
+                "sp_collider (141)",
                 "sp_floor_crack (67)",
                 "sp_floor_crack (68)",
                 "sp_floor_crack (69)",
@@ -11060,8 +11102,9 @@
         },
         {
             "id": "sp_wall (244)",
-            "type": "@space_tile_003",
-            "pos": [-10848.0, 97760.0]
+            "type": "@space_tile_004",
+            "pos": [-10848.0, 97760.0],
+            "rotation": -90.0
         },
         {
             "id": "sp_wall (245)",
@@ -11071,7 +11114,7 @@
         },
         {
             "id": "sp_wall (246)",
-            "type": "@space_tile_003",
+            "type": "@space_tile_004",
             "pos": [-9248.0, 97760.0],
             "rotation": 90.0
         },
@@ -11083,14 +11126,14 @@
         },
         {
             "id": "sp_wall (248)",
-            "type": "@space_tile_003",
+            "type": "@space_tile_004",
             "pos": [4000.0, 90976.0]
         },
         {
             "id": "sp_wall (249)",
-            "type": "@space_tile_003",
+            "type": "@space_tile_004",
             "pos": [4000.0, 91808.0],
-            "rotation": -90.0
+            "rotation": 180.0
         },
         {
             "id": "sp_wall (250)",
@@ -11452,6 +11495,43 @@
             "size": [768, 64]
         },
         {
+            "id": "sp_wall (1104)",
+            "type": "@space_tile_004",
+            "pos": [-10848.0, 94368.0],
+            "rotation": -90.0,
+            "size": [6720, 64]
+        },
+        {
+            "id": "sp_wall (1105)",
+            "type": "@space_tile_003",
+            "pos": [-10848.0, 90976.0]
+        },
+        {
+            "id": "sp_wall (1106)",
+            "type": "@space_tile_004",
+            "pos": [-3424.0, 90976.0],
+            "size": [14784, 64]
+        },
+        {
+            "id": "sp_wall (1107)",
+            "type": "@space_tile_004",
+            "pos": [-9248.0, 94784.0],
+            "rotation": 90.0,
+            "size": [5888, 64]
+        },
+        {
+            "id": "sp_wall (1108)",
+            "type": "@space_tile_anterior",
+            "pos": [-9248.0, 91808.0]
+        },
+        {
+            "id": "sp_wall (1109)",
+            "type": "@space_tile_004",
+            "pos": [-2624.0, 91808.0],
+            "rotation": 180.0,
+            "size": [13184, 64]
+        },
+        {
             "id": "sp_collider (28)",
             "type": "@collider",
             "pos": [5376.0, 90816.0],
@@ -11486,6 +11566,30 @@
             "type": "@collider",
             "pos": [-10048.0, 111264.0],
             "size": [1664, 320]
+        },
+        {
+            "id": "sp_collider (138)",
+            "type": "@collider",
+            "pos": [-11040.0, 94208.0],
+            "size": [320, 7040]
+        },
+        {
+            "id": "sp_collider (139)",
+            "type": "@collider",
+            "pos": [-3616.0, 90816.0],
+            "size": [15168, 256]
+        },
+        {
+            "id": "sp_collider (140)",
+            "type": "@collider",
+            "pos": [-9088.0, 94784.0],
+            "size": [256, 5888]
+        },
+        {
+            "id": "sp_collider (141)",
+            "type": "@collider",
+            "pos": [-2624.0, 92000.0],
+            "size": [13184, 320]
         },
         {
             "id": "sp_floor_crack (67)",
@@ -25253,6 +25357,390 @@
             "id": "sp_edge_light (69)",
             "type": "point_light",
             "pos": [6752.0, 91424.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (321)",
+            "type": "point_light",
+            "pos": [-11040.0, 97184.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (322)",
+            "type": "point_light",
+            "pos": [-11040.0, 95968.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (323)",
+            "type": "point_light",
+            "pos": [-11040.0, 94752.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (324)",
+            "type": "point_light",
+            "pos": [-11040.0, 93536.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (325)",
+            "type": "point_light",
+            "pos": [-11040.0, 92320.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (326)",
+            "type": "point_light",
+            "pos": [-9056.0, 97184.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (327)",
+            "type": "point_light",
+            "pos": [-9056.0, 95968.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (328)",
+            "type": "point_light",
+            "pos": [-9056.0, 94752.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (329)",
+            "type": "point_light",
+            "pos": [-9056.0, 93536.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (330)",
+            "type": "point_light",
+            "pos": [-9056.0, 92320.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (331)",
+            "type": "point_light",
+            "pos": [3360.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (332)",
+            "type": "point_light",
+            "pos": [2080.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (333)",
+            "type": "point_light",
+            "pos": [800.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (334)",
+            "type": "point_light",
+            "pos": [-480.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (335)",
+            "type": "point_light",
+            "pos": [-1760.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (336)",
+            "type": "point_light",
+            "pos": [-3040.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (337)",
+            "type": "point_light",
+            "pos": [-4320.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (338)",
+            "type": "point_light",
+            "pos": [-5600.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (339)",
+            "type": "point_light",
+            "pos": [-6880.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (340)",
+            "type": "point_light",
+            "pos": [-8160.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (341)",
+            "type": "point_light",
+            "pos": [-9440.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (342)",
+            "type": "point_light",
+            "pos": [-10720.0, 90784.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (343)",
+            "type": "point_light",
+            "pos": [3360.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (344)",
+            "type": "point_light",
+            "pos": [2080.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (345)",
+            "type": "point_light",
+            "pos": [800.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (346)",
+            "type": "point_light",
+            "pos": [-480.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (347)",
+            "type": "point_light",
+            "pos": [-1760.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (348)",
+            "type": "point_light",
+            "pos": [-3040.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (349)",
+            "type": "point_light",
+            "pos": [-4320.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (350)",
+            "type": "point_light",
+            "pos": [-5600.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (351)",
+            "type": "point_light",
+            "pos": [-6880.0, 92000.0],
+            "falloff": {
+                "radius": 931.7509765625
+            },
+            "wall_falloff": {
+                "radius": 1.0
+            },
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "sp_edge_light (352)",
+            "type": "point_light",
+            "pos": [-8160.0, 92000.0],
             "falloff": {
                 "radius": 931.7509765625
             },
