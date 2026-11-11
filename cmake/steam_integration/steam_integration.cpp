@@ -142,6 +142,14 @@ extern "C" {
 		return SteamUser()->GetAuthTicketForWebApi(identity);
 	}
 
+	bool steam_unlock_achievement(const char* api_name) {
+		if (const auto stats = SteamUserStats(); stats != nullptr) {
+			return stats->SetAchievement(api_name) && stats->StoreStats();
+		}
+
+		return false;
+	}
+
 	void steam_run_callbacks(steam_callback_handler_type callback_handler, void* ctx) {
 		CGameManager_object->callback_handler = callback_handler;
 		CGameManager_object->ctx = ctx;
@@ -198,6 +206,10 @@ extern "C" {
 
 	uint32_t steam_request_auth_ticket(const char*) {
 		return 34320;
+	}
+
+	bool steam_unlock_achievement(const char*) {
+		return false;
 	}
 
 	void steam_run_callbacks(steam_callback_handler_type, void*) {

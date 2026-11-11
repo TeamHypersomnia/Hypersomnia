@@ -23,6 +23,7 @@
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/gui/text/printer.h"
 #include "application/setups/draw_setup_gui_input.h"
+#include "application/tutorial_steam_achievements.h"
 #include "view/rendering_scripts/minimap_layout.h"
 #include "view/hud_bar_drawing.h"
 #include "view/mode_gui/arena/on_first_touching_portal.hpp"
@@ -360,7 +361,7 @@ void test_scene_setup::restart_arena() {
 	const bool restarted_same_level = last_set_up_level == tutorial.level;
 	last_set_up_level = tutorial.level;
 
-	if (const bool completed = is_tutorial_finish_level() || tutorial.level == 20) {
+	if (const bool completed = is_tutorial_finish_level() || tutorial.level == tutorial_advanced_end_level_v) {
 		if (!restarted_same_level) {
 			web_sdk_happy_time();
 		}
@@ -1487,10 +1488,12 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 					}
 
 					if (begins_with(name, "entry")) {
+						const bool left_surfing_challenge = tutorial.challenge;
 						tutorial.challenge = false;
 						uint32_t new_level = 0;
 
 						if (typesafe_sscanf(name, "entry%x", new_level)) {
+							::unlock_tutorial_steam_achievement(new_level, left_surfing_challenge, tutorial_finish_level);
 							tutorial.level = new_level;
 							restart_arena();
 							return true;

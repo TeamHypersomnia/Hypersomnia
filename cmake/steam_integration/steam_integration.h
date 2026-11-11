@@ -34,6 +34,8 @@ extern "C" {
 	DLL_EXPORT void steam_run_callbacks(steam_callback_handler_type, void* ctx);
 
 	DLL_EXPORT uint32_t steam_request_auth_ticket(const char* identity);
+
+	DLL_EXPORT bool steam_unlock_achievement(const char* api_name);
 }
 
 #undef DLL_EXPORT
