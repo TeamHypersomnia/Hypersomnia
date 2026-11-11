@@ -1,3 +1,3 @@
 Audited: audit #5, 2026-11-10 - all platform utilities on every platform (clean audit F): X11 clipboard, portal, open_url, reveal, file dialogs, exec/shell; fixes folded in: updater path quoting, X11 event size, clipboard manager handoff, portal timeout and parent window, dialogs start in HOME, log fallback, web reveal buttons; deferred: Windows non-ASCII paths, restart argument quoting
 
-Audited: audits #11-#13, 2026-11-12 - current state of the platform shell (Windows start, logs and crash reports; DLL imports and CI packaging; clipboard, dialogs, shell wrappers on every platform); fixes in 0ffd1d093
+Audited: audits #11-#13, 2026-11-12 - current state of the platform shell (Windows start, logs and crash reports; DLL imports and CI packaging; clipboard, dialogs, shell wrappers on every platform); fixes in 62b9ecb00
