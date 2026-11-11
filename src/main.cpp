@@ -10,6 +10,7 @@
 #include "application/main/verify_signature.h"
 #include "application/main/server_key.h"
 #include "application/main/flatpak_build.h"
+#include "application/main/launch_failure_reports.h"
 #if !PLATFORM_WEB
 #include "application/setups/server/server_join_string.h"
 #endif
@@ -172,6 +173,9 @@ int main(const int argc, const char* const * const argv) {
 		augs::disable_text_editor();
 	}
 
+	const bool failures_shown_in_dialogs = ::player_sees_failure_dialogs(params);
+	augs::report_crashes(failures_shown_in_dialogs);
+
 	if (params.version_line_only) {
 		std::cout << hypersomnia_version().get_version_string() << std::endl;
 
@@ -241,6 +245,10 @@ int main(const int argc, const char* const * const argv) {
 	set_cwd_to_exe_path = true;
 #endif
 
+	if (::game_files_only_next_to_executable()) {
+		set_cwd_to_exe_path = true;
+	}
+
 	if (params.unit_tests_only) {
 		set_cwd_to_exe_path = false;
 	}
@@ -248,9 +256,9 @@ int main(const int argc, const char* const * const argv) {
 	if (set_cwd_to_exe_path) {
 		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
 			exe_path.replace_filename("");
-			std::cerr << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+			std::cerr << "CHANGING CWD TO: " << augs::string_windows_friendly(exe_path) << std::endl;
 			std::filesystem::current_path(exe_path);
-			std::cerr << "CHANGED CWD TO: " << exe_path.string() << std::endl;
+			std::cerr << "CHANGED CWD TO: " << augs::string_windows_friendly(exe_path) << std::endl;
 		}
 	}
 #endif
@@ -324,6 +332,8 @@ int main(const int argc, const char* const * const argv) {
 			::live_log_path = params.live_log_path;
 		}
 	}
+
+	::start_startup_and_crash_logs(params);
 
 	/*
 		Now that the documents/logs folder exists,
@@ -403,6 +413,8 @@ int main(const int argc, const char* const * const argv) {
 		argv
 	);
 
+	const auto last_logs_of_work = program_log::get_current().get_last(log_entries_in_failure_dialog_v);
+
 	LOG_NVPS(completed_work_result);
 
 	{
@@ -437,6 +449,11 @@ int main(const int argc, const char* const * const argv) {
 
 			case work_result::FAILURE: {
 				save_failure_logs();
+
+				if (failures_shown_in_dialogs) {
+					::show_failure_dialog(last_logs_of_work, get_exit_failure_path());
+				}
+
 				return EXIT_FAILURE;
 			}
 

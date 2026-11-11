@@ -9068,7 +9068,7 @@ catch (const augs::audio_error& err) {
 	return work_result::FAILURE;
 }
 catch (const augs::window_error& err) {
-	LOG("Failed to create an OpenGL window:\n%x", err.what());
+	LOG("Failed to create an OpenGL window:\n%x\nMake sure the graphics card driver is installed - the game needs OpenGL 3.2.", err.what());
 	return work_result::FAILURE;
 }
 catch (const augs::graphics::renderer_error& err) {

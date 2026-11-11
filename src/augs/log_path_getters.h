@@ -8,3 +8,5 @@ std::string get_ensure_failed_path();
 std::string get_exit_success_path();
 std::string get_exit_failure_path();
 std::string get_dumped_log_path();
+std::string get_crash_log_path();
+std::string get_startup_log_path();

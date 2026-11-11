@@ -33,7 +33,11 @@ public:
 	std::size_t get_init_logs_count_nomutex() const;
 
 	std::string get_complete() const;
+	std::string get_complete_nomutex() const;
+	std::string get_last(std::size_t entries_count) const;
 };
+
+void start_startup_log_file(const std::string& path);
 
 template <class... A>
 FORCE_NOINLINE void LOG(const std::string& f, A&&... a) {

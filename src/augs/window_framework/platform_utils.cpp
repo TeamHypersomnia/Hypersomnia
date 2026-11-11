@@ -150,6 +150,19 @@ namespace augs {
 
 		return path_type();
 	}
+
+	path_type get_executable_path() {
+		const auto longest_windows_path = 32768;
+		auto path = std::wstring(longest_windows_path, L'\0');
+		const auto length = GetModuleFileNameW(NULL, path.data(), static_cast<DWORD>(path.size()));
+
+		if (length == 0 || length == path.size()) {
+			return path_type();
+		}
+
+		path.resize(length);
+		return path_type(path);
+	}
 }
 #elif PLATFORM_MACOS
 #include <sysdir.h>  // for sysdir_start_search_path_enumeration

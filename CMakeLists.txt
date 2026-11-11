@@ -802,6 +802,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/viewables/all_viewables_defs.cpp"
 	"src/augs/ensure.cpp"
 	"src/augs/window_framework/shell.cpp"
+	"src/augs/window_framework/crash_report.cpp"
 	"src/augs/misc/action_list/action_list.cpp"
 	"src/augs/misc/enum/enum_bitset.cpp"
 	"src/augs/misc/readable_bytesize.cpp"

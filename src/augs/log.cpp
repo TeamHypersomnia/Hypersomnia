@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cstddef>
+#include <fstream>
 #include <string>
 #include <thread>
 #include <mutex>
@@ -37,6 +39,7 @@ augs::mutex log_mutex;
 bool log_to_live_file = false;
 std::string log_timestamp_format;
 std::string live_log_path;
+std::ofstream startup_log_file;
 app_type current_app_type;
 
 std::string get_path_in_log_files(const std::string& name) {
@@ -59,6 +62,14 @@ std::string get_dumped_log_path() {
 	return get_path_in_log_files("dumped_debug_log.txt");
 }
 
+std::string get_crash_log_path() {
+	return get_path_in_log_files("crash_debug_log.txt");
+}
+
+std::string get_startup_log_path() {
+	return get_path_in_log_files("startup_debug_log.txt");
+}
+
 program_log program_log::global_instance = 10000;
 
 program_log::program_log(const unsigned max_all_entries) 
@@ -78,6 +89,13 @@ void program_log::mark_last_init_log() {
 	auto lock = augs::scoped_lock(log_mutex);
 
 	init_logs_count = all_entries.size();
+	startup_log_file.close();
+}
+
+void start_startup_log_file(const std::string& path) {
+	auto lock = augs::scoped_lock(log_mutex);
+
+	startup_log_file.open(path, std::ios::out | std::ios::trunc);
 }
 
 std::size_t program_log::get_init_logs_count() const {
@@ -93,10 +111,27 @@ std::size_t program_log::get_init_logs_count_nomutex() const {
 std::string program_log::get_complete() const {
 	auto lock = augs::scoped_lock(log_mutex);
 
+	return get_complete_nomutex();
+}
+
+std::string program_log::get_complete_nomutex() const {
 	auto logs = std::string();
 
 	for (const auto& e : all_entries) {
 		logs += e.text + '\n';
+	}
+
+	return logs;
+}
+
+std::string program_log::get_last(const std::size_t entries_count) const {
+	auto lock = augs::scoped_lock(log_mutex);
+
+	const auto first = all_entries.size() - std::min(entries_count, all_entries.size());
+	auto logs = std::string();
+
+	for (auto i = first; i < all_entries.size(); ++i) {
+		logs += all_entries[i].text + '\n';
 	}
 
 	return logs;
@@ -143,6 +178,10 @@ static void log_entry_now(const std::string& s, const bool highlighted) {
 		if (log_to_live_file) {
 			std::ofstream recording_file(live_log_path, std::ios::out | std::ios::app);
 			recording_file << f << std::endl;
+		}
+
+		if (startup_log_file.is_open()) {
+			startup_log_file << f << std::endl;
 		}
 	};
 
