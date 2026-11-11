@@ -4,6 +4,9 @@
 # Unless you are indeed releasing a binary, use Debug or RelWithDebInfo.
 
 cmake_minimum_required(VERSION 3.10)
+cmake_policy(SET CMP0091 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 project(Hypersomnia)
 enable_language(C ASM)
@@ -1785,13 +1788,6 @@ else()
 		string(REPLACE "/debug" "" CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO})
 	endif()
 endif()
-
-# We configure MSVC to use static runtime libraries ("/MT" switch),
-# instead of DLL ones.
-# The definition of this function is found in cmake/configure_runtime_library.cmake
-
-include(configure_runtime_library)
-configure_msvc_runtime()
 
 # As some libraries do not use the preferred target_include_directories,
 # we must manually acquire the directories that they add via include_directories.
