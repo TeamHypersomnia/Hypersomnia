@@ -14,6 +14,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/window_framework/event.h"
 #include "augs/window_framework/window.h"
+#include "augs/window_framework/crash_report.h"
 #include "application/main/game_frame_buffer.h"
 
 /*
@@ -249,6 +250,8 @@ void run_with_gl_thread(augs::window& window, window_thread_bridge& bridge, F&& 
 	auto gl_thread = [&]() {
 		try {
 			return std::thread([&window, &bridge, &gl_frame]() {
+				augs::keep_stack_for_crash_report();
+
 				auto error = std::exception_ptr();
 
 				try {

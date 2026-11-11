@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include "augs/filesystem/path.h"
+#include "augs/window_framework/platform_utils.h"
 #include "augs/app_type.h"
 #include "augs/network/network_types.h"
 #include "application/activity_type.h"
@@ -421,8 +422,12 @@ struct cmd_line_params {
 	}
 
 	cmd_line_params(const int argc, const char* const * const argv) {
+#if PLATFORM_WINDOWS || PLATFORM_MACOS
+		exe_path = augs::get_executable_path();
+#else
 		exe_path = argv[0];
-		complete_command_line = exe_path.string();
+#endif
+		complete_command_line = augs::string_windows_friendly(exe_path);
 
 		parse(argc, argv, 1);
 

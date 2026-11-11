@@ -45,24 +45,20 @@ augs::path_type get_log_file_path(const std::string& name) {
 	return LOGS_DIR / (get_preffix_for(current_app_type) + name);
 }
 
-std::string get_path_in_log_files(const std::string& name) {
-	return get_log_file_path(name).string();
+augs::path_type get_exit_success_path() {
+	return ::get_log_file_path("exit_success_debug_log.txt");
 }
 
-std::string get_exit_success_path() {
-	return get_path_in_log_files("exit_success_debug_log.txt");
-}
-
-std::string get_dumped_log_path() {
-	return get_path_in_log_files("dumped_debug_log.txt");
+augs::path_type get_dumped_log_path() {
+	return ::get_log_file_path("dumped_debug_log.txt");
 }
 
 augs::path_type get_error_log_path() {
-	return get_log_file_path("error_log.txt");
+	return ::get_log_file_path("error_log.txt");
 }
 
 augs::path_type get_startup_log_path() {
-	return get_log_file_path("startup_log.txt");
+	return ::get_log_file_path("startup_log.txt");
 }
 
 program_log program_log::global_instance = 10000;

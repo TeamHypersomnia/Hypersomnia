@@ -161,7 +161,7 @@ std::string make_desync_dump_section(const std::string& title, const ArenaHandle
 }
 
 struct desync_dump {
-	std::string path;
+	augs::path_type path;
 	std::string text;
 
 	template <class ArenaHandle>
@@ -171,7 +171,7 @@ struct desync_dump {
 		const uint32_t expected_hash,
 		const uint32_t actual_hash
 	) {
-		path = get_path_in_log_files(typesafe_sprintf("desync.%x.step%x.txt", augs::date_time().get_readable_for_file_long(), step));
+		path = get_log_file_path(typesafe_sprintf("desync.%x.step%x.txt", augs::date_time().get_readable_for_file_long(), step));
 
 		text = typesafe_sprintf("Desync detected at step %x. Server's hash: %x, client's: %x.\n\n", step, expected_hash, actual_hash);
 		text += ::make_desync_dump_section("Client after the rest of the steps received in that frame", referential);

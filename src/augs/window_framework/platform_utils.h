@@ -12,6 +12,10 @@ namespace augs {
 
 	bool is_character_newline(unsigned i);
 	augs::path_type get_executable_path();
+
+#if PLATFORM_WINDOWS
+	augs::path_type get_module_path(void* module);
+#endif
 	augs::path_type get_default_documents_dir();
 
 	/*

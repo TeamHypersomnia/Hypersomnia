@@ -54,23 +54,40 @@ namespace augs {
 		}
 	}
 
-	static void open_in_notepad(const path_type& path) {
+	static bool open_in_notepad(const path_type& path) {
 		auto command_line = L"notepad.exe \"" + path.wstring() + L"\"";
 		auto startup_info = STARTUPINFOW();
 		startup_info.cb = sizeof(startup_info);
 		auto process_info = PROCESS_INFORMATION();
 
-		if (CreateProcessW(nullptr, command_line.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startup_info, &process_info)) {
-			CloseHandle(process_info.hThread);
-			CloseHandle(process_info.hProcess);
+		const auto started = CreateProcessW(
+			nullptr,
+			command_line.data(),
+			nullptr,
+			nullptr,
+			FALSE,
+			0,
+			nullptr,
+			nullptr,
+			&startup_info,
+			&process_info
+		);
+
+		if (!started) {
+			return false;
 		}
+
+		CloseHandle(process_info.hThread);
+		CloseHandle(process_info.hProcess);
+		return true;
 	}
 
-	static void show_unsaved_crash_dialog(const std::string& crash_reason) {
-		const auto unsaved_path = error_log_path.empty() ? std::wstring() : L"\n\n" + error_log_path.wstring();
-		const auto text = widen("Hypersomnia has crashed.\n\n" + crash_reason + "\n\nThe log could not be saved.") + unsaved_path;
+	static void show_crash_dialog(const std::string& crash_reason, const std::string& log_state) {
+		const auto log_path = error_log_path.empty() ? std::wstring() : L"\n" + error_log_path.wstring();
+		const auto text = widen("Hypersomnia has crashed.\n\n" + crash_reason + "\n\n" + log_state) + log_path;
+		const auto style = MB_OK | MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND;
 
-		MessageBoxW(nullptr, text.c_str(), L"Hypersomnia", MB_OK | MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND);
+		MessageBoxW(nullptr, text.c_str(), L"Hypersomnia", style);
 	}
 
 	static void report_crash_and_exit(const std::string& crash_reason, const UINT exit_code) {
@@ -88,11 +105,11 @@ namespace augs {
 		const bool log_saved = save_error_log(crash_reason);
 
 		if (open_log_in_notepad_after_crash) {
-			if (log_saved) {
-				open_in_notepad(error_log_path);
+			if (!log_saved) {
+				show_crash_dialog(crash_reason, "The log could not be saved.");
 			}
-			else {
-				show_unsaved_crash_dialog(crash_reason);
+			else if (!open_in_notepad(error_log_path)) {
+				show_crash_dialog(crash_reason, "The log was saved to:");
 			}
 		}
 
@@ -124,17 +141,9 @@ namespace augs {
 		const auto flags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
 
 		if (GetModuleHandleExW(flags, static_cast<LPCWSTR>(address), &module)) {
-			const auto longest_windows_path = 32768;
-			auto module_path = std::wstring(longest_windows_path, L'\0');
-			const auto length = GetModuleFileNameW(module, module_path.data(), static_cast<DWORD>(module_path.size()));
-
-			if (length > 0 && length < module_path.size()) {
-				module_path.resize(length);
-
-				const auto module_name = path_type(module_path).filename();
+			if (const auto module_path = get_module_path(module); !module_path.empty()) {
 				const auto offset = reinterpret_cast<std::uintptr_t>(address) - reinterpret_cast<std::uintptr_t>(module);
-
-				return typesafe_sprintf("%x+0x%h", string_windows_friendly(module_name), offset);
+				return typesafe_sprintf("%x+0x%h", string_windows_friendly(module_path.filename()), offset);
 			}
 		}
 
@@ -176,17 +185,18 @@ namespace augs {
 				std::rethrow_exception(current);
 			}
 			catch (const std::exception& err) {
-				return std::string("Uncaught exception: ") + err.what();
+				return std::string("Exception: ") + err.what();
 			}
 			catch (...) {
-				return "Uncaught exception of an unknown type.";
+				return "Exception of an unknown type.";
 			}
 		}
 
 		return "abort() was called.";
 	}
 
-	static void report_abort(int) {
+	static void report_abort(const int signal_number) {
+		std::signal(signal_number, report_abort);
 		report_crash_and_exit(describe_abort(), abort_exit_code_v);
 	}
 
@@ -198,12 +208,16 @@ namespace augs {
 		report_crash_and_exit("Pure virtual function call.", abort_exit_code_v);
 	}
 
+	void keep_stack_for_crash_report() {
+		auto stack_kept_for_crash_report = ULONG(64 * 1024);
+		SetThreadStackGuarantee(&stack_kept_for_crash_report);
+	}
+
 	void report_crashes(const bool open_log_in_notepad) {
 		open_log_in_notepad_after_crash = open_log_in_notepad;
 		crash_reports_enabled = true;
 
-		auto stack_kept_for_crash_report = ULONG(64 * 1024);
-		SetThreadStackGuarantee(&stack_kept_for_crash_report);
+		keep_stack_for_crash_report();
 
 		previous_exception_filter = SetUnhandledExceptionFilter(report_unhandled_exception);
 		std::signal(SIGABRT, report_abort);
@@ -222,6 +236,7 @@ namespace augs {
 #else
 namespace augs {
 	void report_crashes(bool) {}
+	void keep_stack_for_crash_report() {}
 	void set_error_log_path(const path_type&) {}
 	void stop_reporting_crashes() {}
 }

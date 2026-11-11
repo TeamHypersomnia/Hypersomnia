@@ -15,7 +15,6 @@
 #include "augs/log_path_getters.h"
 
 extern std::function<void()> ensure_handler;
-//void (*ensure_handler)() = nullptr;
 
 void save_log_and_terminate() {
 	if (ensure_handler) {

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include "augs/window_framework/shell.h"
+#include "augs/window_framework/platform_utils.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -9,8 +10,6 @@
 #endif
 
 namespace augs {
-	std::wstring widen(const std::string& s);
-
 	class pipe {
 #if PLATFORM_UNIX
 		std::shared_ptr<FILE> pipe_fd;

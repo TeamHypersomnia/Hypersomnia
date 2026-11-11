@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "augs/log_direct.h"
+#include "augs/filesystem/path_declaration.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
 #include "augs/build_settings/compiler_defines.h"

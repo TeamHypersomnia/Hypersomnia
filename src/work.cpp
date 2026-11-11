@@ -110,6 +110,7 @@
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
+#include "augs/window_framework/crash_report.h"
 #include "augs/audio/audio_context.h"
 #include "augs/audio/audio_command_buffers.h"
 #include "augs/drawing/drawing.hpp"
@@ -1045,8 +1046,8 @@ work_result work(
 	LOG("Initializing ImGui.");
 
 #if !HEADLESS
-	WEBSTATIC const auto imgui_ini_path = (USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini")).string();
-	WEBSTATIC const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
+	WEBSTATIC const auto imgui_ini_path = augs::string_windows_friendly(USER_DIR / (get_preffix_for(current_app_type) + "imgui.ini"));
+	WEBSTATIC const auto imgui_log_path = augs::string_windows_friendly(get_log_file_path("imgui_log.txt"));
 
 	WEBSTATIC const auto imgui_raii = augs::imgui::context_raii(
 		imgui_ini_path.c_str(),
@@ -1149,7 +1150,7 @@ work_result work(
 	WEBSTATIC server_network_info server_stats;
 	(void)server_stats;
 
-	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
+	dump_detailed_sizeof_information(get_log_file_path("detailed_sizeofs.txt"));
 
 	WEBSTATIC auto last_saved_config_ptr = std::make_unique<config_json_table>(config);
 	WEBSTATIC auto& last_saved_config = *last_saved_config_ptr;
@@ -2317,7 +2318,7 @@ work_result work(
 	WEBSTATIC auto playtest_moment_links = playtest_moment_link_watcher();
 
 	LOG("Logging all audio devices.");
-	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
+	augs::log_all_audio_devices(get_log_file_path("audio_devices.txt"));
 
 	WEBSTATIC const auto num_pool_workers = config.performance.get_num_pool_workers();
 	LOG("Creating the thread pool with %x workers.", num_pool_workers);
@@ -4747,7 +4748,7 @@ work_result work(
 					chosen_port
 				);
 
-				augs::restart_application(argc, argv, params.exe_path.string(), { cmd_line });
+				augs::restart_application(argc, argv, augs::string_windows_friendly(params.exe_path), { cmd_line });
 				displayed_connecting_server_name = "local dedicated server";
 
 				const auto address_str = typesafe_sprintf("%x:%x", config.server_start.ip, chosen_port);
@@ -8652,7 +8653,10 @@ work_result work(
 #if WEB_SINGLETHREAD
 #else
 	LOG("Starting game_thread_worker");
-	WEBSTATIC auto game_thread = std::thread(game_thread_worker);
+	WEBSTATIC auto game_thread = std::thread([&]() {
+		augs::keep_stack_for_crash_report();
+		game_thread_worker();
+	});
 #endif
 
 	WEBSTATIC auto audio_thread_joiner = augs::scope_guard([&]() { LOG("audio_thread_joiner"); audio_buffers.quit(); });

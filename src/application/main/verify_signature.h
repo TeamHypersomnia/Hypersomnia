@@ -42,7 +42,7 @@ inline ssh_verification_result verify_ssh_signature(
 
 	try {
 		LOG("Pipe command: %x", verification_command);
-		const auto verification_result = augs::pipe::execute(verification_command, verified_file.string());
+		const auto verification_result = augs::pipe::execute(verification_command, augs::string_windows_friendly(verified_file));
 		LOG("Pipe result: %x", verification_result);
 
 		if (::begins_with(verification_result, verification_success)) {

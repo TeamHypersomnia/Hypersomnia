@@ -151,17 +151,30 @@ namespace augs {
 		return path_type();
 	}
 
-	path_type get_executable_path() {
-		const auto longest_windows_path = 32768;
-		auto path = std::wstring(longest_windows_path, L'\0');
-		const auto length = GetModuleFileNameW(NULL, path.data(), static_cast<DWORD>(path.size()));
+	path_type get_module_path(void* const module) {
+		const auto longest_windows_path = std::size_t(32768);
+		auto path = std::wstring(MAX_PATH, L'\0');
 
-		if (length == 0 || length == path.size()) {
-			return path_type();
+		while (path.size() <= longest_windows_path) {
+			const auto length = GetModuleFileNameW(static_cast<HMODULE>(module), path.data(), static_cast<DWORD>(path.size()));
+
+			if (length == 0) {
+				return path_type();
+			}
+
+			if (length < path.size()) {
+				path.resize(length);
+				return path_type(path);
+			}
+
+			path.resize(path.size() * 2);
 		}
 
-		path.resize(length);
-		return path_type(path);
+		return path_type();
+	}
+
+	path_type get_executable_path() {
+		return get_module_path(nullptr);
 	}
 }
 #elif PLATFORM_MACOS
@@ -233,7 +246,7 @@ namespace augs {
 		const auto utf8_length = static_cast<int>(utf8.size());
 		const auto wide_length = MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8_length, nullptr, 0);
 
-		auto wide = std::wstring(wide_length, L'\0');
+		auto wide = std::wstring(static_cast<std::size_t>(wide_length), L'\0');
 		MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8_length, wide.data(), wide_length);
 
 		return wide;

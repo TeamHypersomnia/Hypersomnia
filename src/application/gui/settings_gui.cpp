@@ -4693,15 +4693,13 @@ void settings_gui_state::perform(
 						text("User folder location: %x (%x)", USER_DIR, std::filesystem::absolute(USER_DIR));
 
 						if (ImGui::Button("Dump debug log")) {
-							get_dumped_log_path();
-							
 							const auto logs = program_log::get_current().get_complete();
-							auto failure_log_path = augs::path_type(get_dumped_log_path());
+							auto dumped_log_path = get_dumped_log_path();
 
-							augs::save_as_text(failure_log_path, logs);
+							augs::save_as_text(dumped_log_path, logs);
 
-							augs::open_text_editor(failure_log_path.string());
-							augs::open_text_editor(failure_log_path.replace_filename("").string());
+							augs::open_text_editor(dumped_log_path);
+							augs::open_text_editor(dumped_log_path.replace_filename(""));
 						}
 #endif
 

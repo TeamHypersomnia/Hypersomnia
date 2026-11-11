@@ -6,6 +6,7 @@
 #endif
 
 #include "augs/window_framework/shell.h"
+#include "augs/window_framework/platform_utils.h"
 #include "augs/ensure.h"
 
 #if PLATFORM_WINDOWS
@@ -13,10 +14,6 @@
 #endif
 
 namespace augs {
-#if PLATFORM_WINDOWS
-	std::wstring widen(const std::string& s);
-#endif
-
 	bool spawn_detached_process(const std::string& executable, const std::string& arguments) {
 #if PLATFORM_UNIX
 		(void)executable;

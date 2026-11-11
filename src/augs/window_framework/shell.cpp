@@ -3,6 +3,7 @@
 
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/create_process.h"
+#include "augs/window_framework/platform_utils.h"
 #include "augs/string/string_templates.h"
 #include "augs/misc/mutex.h"
 #include "all_paths.h"
@@ -27,8 +28,6 @@ namespace augs {
 #undef max
 
 namespace augs {
-	std::wstring widen(const std::string& s); 
-
 	int shell(const std::string& s) {
 		/*
 			Without the query - a link page's address confirms the link (see settings_gui).

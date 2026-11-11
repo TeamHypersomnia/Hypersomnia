@@ -213,11 +213,7 @@ int main(const int argc, const char* const * const argv) {
 		}
 	}
 
-#if defined(__APPLE__) || PLATFORM_WINDOWS
-	const auto exe_path = augs::get_executable_path();
-#else
-	const auto exe_path = params.exe_path;
-#endif
+	const auto executable = augs::string_windows_friendly(params.exe_path);
 
 	const bool is_appimage = !params.appimage_path.empty();
 
@@ -255,11 +251,11 @@ int main(const int argc, const char* const * const argv) {
 	}
 
 	if (set_cwd_to_exe_path) {
-		if (auto exe_path = augs::get_executable_path(); !exe_path.empty()) {
-			exe_path.replace_filename("");
-			std::cerr << "CHANGING CWD TO: " << augs::string_windows_friendly(exe_path) << std::endl;
-			std::filesystem::current_path(exe_path);
-			std::cerr << "CHANGED CWD TO: " << augs::string_windows_friendly(exe_path) << std::endl;
+		if (auto executable_folder = augs::get_executable_path(); !executable_folder.empty()) {
+			executable_folder.replace_filename("");
+			std::cerr << "CHANGING CWD TO: " << augs::string_windows_friendly(executable_folder) << std::endl;
+			std::filesystem::current_path(executable_folder);
+			std::cerr << "CHANGED CWD TO: " << augs::string_windows_friendly(executable_folder) << std::endl;
 		}
 	}
 #endif
@@ -453,21 +449,21 @@ int main(const int argc, const char* const * const argv) {
 
 			case work_result::RELAUNCH_DEDICATED_SERVER: {
 				save_success_logs();
-				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), { "--suppress-server-webhook" });
+				return augs::restart_application(argc, argv, executable, { "--suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_MASTERSERVER: {
 				save_failure_logs();
-				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), {});
+				return augs::restart_application(argc, argv, executable, {});
 			}
 
 			case work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER: {
 				save_success_logs();
-				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), { "--update-once-now --suppress-server-webhook" });
+				return augs::restart_application(argc, argv, executable, { "--update-once-now --suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
-				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), { "--upgraded-successfully" });
+				return augs::restart_application(argc, argv, executable, { "--upgraded-successfully" });
 			}
 
 			default: 
