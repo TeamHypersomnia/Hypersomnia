@@ -185,6 +185,7 @@ public:
 	session_id_type next_session_id = session_id_type::first();
 	std::optional<arena_playtesting_context> playtesting_context;
 	entity_id infinite_ammo_for;
+	uint32_t sound_clock = 0;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);
@@ -217,6 +218,8 @@ public:
 		update_logic_speed(in);
 
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
+
+		++sound_clock;
 
 		return standard_solver()(
 			step_input, 
@@ -358,8 +361,8 @@ public:
 		return true;
 	}
 
-	uint32_t continuous_sounds_clock(const_input in) const {
-		return in.cosm.get_total_steps_passed();
+	uint32_t continuous_sounds_clock(const_input) const {
+		return sound_clock;
 	}
 
 	uint32_t get_num_bot_players() const {

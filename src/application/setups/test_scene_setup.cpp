@@ -410,6 +410,17 @@ void test_scene_setup::restart_arena() {
 		project.clear_cached_scene_node_data();
 		opponents.clear();
 
+		const auto music_clock_continued_across_levels = get_arena_handle().on_mode(
+			[]<typename M>(const M& typed_mode) {
+				if constexpr(std::is_same_v<M, test_mode>) {
+					return typed_mode.sound_clock;
+				}
+				else {
+					return uint32_t(0);
+				}
+			}
+		);
+
 		::build_arena_from_editor_project(
 			get_arena_handle(),
 			{
@@ -421,6 +432,14 @@ void test_scene_setup::restart_arena() {
 				nullptr,
 				false, /* for_playtesting */
 				false /* editor_preview */
+			}
+		);
+
+		get_arena_handle().on_mode(
+			[music_clock_continued_across_levels]<typename M>(M& typed_mode) {
+				if constexpr(std::is_same_v<M, test_mode>) {
+					typed_mode.sound_clock = music_clock_continued_across_levels;
+				}
 			}
 		);
 
