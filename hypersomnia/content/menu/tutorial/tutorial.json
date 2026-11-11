@@ -51,18 +51,6 @@
             "size": [548, 73]
         },
         {
-            "path": "captions/glass.png",
-            "file_hash": "ad952aaf897e1a14d2676b0b28332c3bd470fb8d27bb5077d15faa911625cf79",
-            "id": "@captions/glass.png",
-            "neon_map": {
-                "light_colors": [[255, 255, 255, 255, 1.0]
-                ]
-            },
-            "color": [0, 180, 255, 255],
-            "neon_color": [0, 180, 255, 255],
-            "size": [293, 68]
-        },
-        {
             "path": "captions/menu.png",
             "file_hash": "9f7f4cd25afef47abc48b91e87a2cb1d498032d4eb6b857d1b48f0a4a3f6b993",
             "id": "@menu",
@@ -73,16 +61,6 @@
             "color": [0, 255, 0, 255],
             "neon_color": [0, 255, 0, 255],
             "size": [281, 73]
-        },
-        {
-            "path": "captions/metal.png",
-            "file_hash": "d918c3bc85e974a066078d23c4409b4dce2b09b75673e844b8feea2f59ebfb65",
-            "id": "@captions/metal.png",
-            "neon_map": {
-                "light_colors": [[255, 255, 255, 255, 1.0]
-                ]
-            },
-            "size": [291, 66]
         },
         {
             "path": "captions/range.png",
@@ -107,30 +85,6 @@
             "color": [255, 0, 255, 255],
             "neon_color": [255, 0, 255, 255],
             "size": [613, 74]
-        },
-        {
-            "path": "captions/vent.png",
-            "file_hash": "34d7519a5c3ba91d9db2c315b69783ee4dc32a02c4ea6222edf52d81f217a9fb",
-            "id": "@captions/vent.png",
-            "neon_map": {
-                "light_colors": [[255, 255, 255, 255, 1.0]
-                ]
-            },
-            "color": [0, 255, 126, 255],
-            "neon_color": [0, 255, 126, 255],
-            "size": [236, 66]
-        },
-        {
-            "path": "captions/wood.png",
-            "file_hash": "8c633cd48dc37d6088c5c6cd79982328ab27eaab81b54186930345153404d1f3",
-            "id": "@captions/wood.png",
-            "neon_map": {
-                "light_colors": [[255, 255, 255, 255, 1.0]
-                ]
-            },
-            "color": [255, 127, 0, 255],
-            "neon_color": [255, 127, 0, 255],
-            "size": [235, 68]
         },
         {
             "path": "gfx/arrow.gif",
@@ -190,23 +144,6 @@
                 "custom_footstep": {
                     "sound": {
                         "id": "footstep_floor"
-                    }
-                }
-            }
-        },
-        {
-            "path": "gfx/water_room_floor_2.png",
-            "file_hash": "9d7d4e14d04d6bda52e7c7b59ed0f177caadf5e3a486fde33f1fce82883e0826",
-            "id": "@water_room_floor_2",
-            "color": [255, 132, 132, 255],
-            "neon_color": [255, 255, 255, 106],
-            "size": [64, 64],
-            "OFF_rotate_continuously_degrees_per_sec": 1.0,
-            "as_nonphysical": {
-                "custom_footstep": {
-                    "sound": {
-                        "gain": 0.6000000238418579,
-                        "pitch": 0.8999999761581421
                     }
                 }
             }
@@ -363,48 +300,6 @@
             }
         },
         {
-            "path": "space/floor/floor_good_0.png",
-            "file_hash": "1c9ea9a1474b1311d8541161fb970e9a1d2ae426f3d96e985eb3d8fb04a4b606",
-            "id": "@floor_good_0",
-            "size": [64, 64],
-            "as_physical": {
-                "material": "!space_wall"
-            },
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/floor_good_1.png",
-            "file_hash": "ba807f054c08b73166521316ade8a6df25db63607bdefa53d8f07be533bba24e",
-            "id": "@floor_good_1",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/floor_good_2.png",
-            "file_hash": "de962815899c426620423a68dd4a8795403ac1654509ec1a75f1969f7e2903e4",
-            "id": "@floor_good_2",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
             "path": "space/floor/space_floor_64.png",
             "file_hash": "622a3c576f718133db1b3ac1e07fbf35be86548d6b02a1cc74ed51b399c88b1e",
             "id": "@space_floor_64",
@@ -444,74 +339,9 @@
             }
         },
         {
-            "path": "space/floor/space_tile_010.png",
-            "file_hash": "c5c160e844873f6dcefd93c17515ce8ef2252e6ac327df0ba7ddf44d2be3875f",
-            "id": "@space_tile_010",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
             "path": "space/floor/space_tile_011.png",
             "file_hash": "29263455b7fdebe1ad7fed8e589c683db45a5fa7215a029c72a7b3eacdd3fe35",
             "id": "@space_tile_011",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/space_tile_012.png",
-            "file_hash": "d4225e8c1f83d7de5bcabdd9349a18825a291745c1158b927e00060d88e682ca",
-            "id": "@space_tile_012",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/space_tile_020.png",
-            "file_hash": "3b4acc21b7c98ba96c328c9adaf20bd2a7866b374a44c4af955dc5f0878fab41",
-            "id": "@space_tile_020",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/space_tile_021.png",
-            "file_hash": "ba0ad4880ea56dfc176aed71ac6850ead36a966e63d184662b6d883c8fd8938b",
-            "id": "@space_tile_021",
-            "size": [64, 64],
-            "as_nonphysical": {
-                "OFF_custom_footstep": {
-                    "sound": {
-                        "id": "footstep_air_duct"
-                    }
-                }
-            }
-        },
-        {
-            "path": "space/floor/space_tile_022.png",
-            "file_hash": "3c726f19dc40fdc79403f1ef430c5480e8edaae2d4155eebbbc578ce6650c635",
-            "id": "@space_tile_022",
             "size": [64, 64],
             "as_nonphysical": {
                 "OFF_custom_footstep": {
@@ -653,32 +483,6 @@
             }
         },
         {
-            "path": "space/fog.png",
-            "file_hash": "f279a7c2fd6dbe710f0f3643dd4f65c23774a61c3c0eb0c8536b0e7f96ed0abf",
-            "id": "@fog",
-            "domain": "FOREGROUND",
-            "color": [200, 200, 150, 90],
-            "size": [2000, 2000],
-            "stretch_when_resized": true,
-            "rotate_continuously_degrees_per_sec": 3.0,
-            "as_nonphysical": {
-                "full_illumination": true
-            }
-        },
-        {
-            "path": "space/fog_soft.png",
-            "file_hash": "ced32f815c67721380be4f77e59414967abbbc8ad45dc6ed28f7e434e77a8cdd",
-            "id": "@fog_soft",
-            "domain": "FOREGROUND",
-            "color": [200, 200, 150, 90],
-            "size": [2000, 2000],
-            "stretch_when_resized": true,
-            "rotate_continuously_degrees_per_sec": 3.0,
-            "as_nonphysical": {
-                "full_illumination": true
-            }
-        },
-        {
             "path": "space/fog_start.png",
             "file_hash": "f22fbd20b75aa0875a5b97a930e3d8bb3deb30e7805d91512fdbd387904c2db8",
             "id": "@fog_start",
@@ -693,7 +497,7 @@
         },
         {
             "path": "space/planets/planet_blue.png",
-            "file_hash": "402f966372b15857037f304ef2ab10b6651ce7c71bc31cbe83217f5c64aab6bf",
+            "file_hash": "2603104434ab50f55746d92f8e4591e5301601c887809e99f494913336c4bc6f",
             "id": "@planet_blue",
             "stretch_when_resized": true,
             "orbit": {
@@ -705,7 +509,7 @@
         },
         {
             "path": "space/planets/planet_blue_ringed.png",
-            "file_hash": "15644f7ea9af83bbb879bac5c61bec5ec2cd8bf3f877dba0622dc98defd2ecc4",
+            "file_hash": "72d0324e98716d4ead5431ebc182658c46b9027000ba8f60f52e0eccd82bad67",
             "id": "@planet_blue_ringed",
             "stretch_when_resized": true,
             "orbit": {
@@ -717,7 +521,7 @@
         },
         {
             "path": "space/planets/planet_gold_ringed.png",
-            "file_hash": "293a3238cbc4b0ac75fe2f4ec56830cc62dec42f0ea9a4ebb71a38d60c9009ab",
+            "file_hash": "90d4fa3c0e3039283be2ccc3ff0336f36c351b1d353668a2a790dc6de541bfdd",
             "id": "@planet_gold_ringed",
             "stretch_when_resized": true,
             "orbit": {
@@ -729,7 +533,7 @@
         },
         {
             "path": "space/planets/planet_red.png",
-            "file_hash": "7a5aefae0dc4d497d99542f5698003f365949b326c5c4923f22317088f88d56a",
+            "file_hash": "ff4888ff6e2abdd9e24dd3766942bc1078983798a22bcb7ae0e7f07dd8f18ca9",
             "id": "@planet_red",
             "stretch_when_resized": true,
             "orbit": {
@@ -1328,18 +1132,6 @@
             }
         },
         {
-            "path": "space/wall/space_tile_005.png",
-            "file_hash": "bf3c9eaa961218638698504f8dde9fc7c9a152124c8b9111b101e52afc460488",
-            "id": "@space_tile_005",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
             "path": "space/wall/space_tile_006.png",
             "file_hash": "7c202af62784f9cc2fc8952a880983191325b0a38a71d33248b7e6a169717a18",
             "id": "@space_tile_006",
@@ -1378,30 +1170,6 @@
             }
         },
         {
-            "path": "space/wall/space_tile_008.png",
-            "file_hash": "367833f6617f7dc25e9ebc5984cdd798ca3147d3502235544ffebafe83f654de",
-            "id": "@space_tile_008",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_009.png",
-            "file_hash": "733b3b2fc5d7132f6f37d8ceb718b1b19c449477bb8f1cecee507458c00cba36",
-            "id": "@space_tile_009",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
             "path": "space/wall/space_tile_013.png",
             "file_hash": "b246e40288e49e59e2f2fa1a039752a11aef0a120864f66137f9308a8ad7c580",
             "id": "@space_tile_013",
@@ -1415,225 +1183,9 @@
             }
         },
         {
-            "path": "space/wall/space_tile_015.png",
-            "file_hash": "878267539b08343567d58461d9a6ae63d954946156c873ba892068894731bc2a",
-            "id": "@space_tile_015",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_023.png",
-            "file_hash": "b09170cad2fa06e84db986793c7beaaf758c20f985d54b9467029ca032eebaf2",
-            "id": "@space_tile_023",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_024.png",
-            "file_hash": "b794a4cb8656fbc168c4f103e9c57309fc906ef44b7e683166330e8f2a91c572",
-            "id": "@space_tile_024",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_025.png",
-            "file_hash": "ee10be4ad66a9f39361adc520f2d56b4e549098c7766de4a2c62c5186ab43767",
-            "id": "@space_tile_025",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_028.png",
-            "file_hash": "9782567d34268f6c8ae7302f7d742e9035672227609be0f8062ebeae76730194",
-            "id": "@space_tile_028",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_043.png",
-            "file_hash": "606d7fbba798d5eccb14933c0fe1820d59ffa89ba9410a0c8d081067f69532d1",
-            "id": "@space_tile_043",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_044.png",
-            "file_hash": "6236664775d9cb825d5097f65b736fd5c952631dad8cd34e4f1576f9d2af34d6",
-            "id": "@space_tile_044",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_045.png",
-            "file_hash": "32b9b669b53db93847ba155894d5dc397343261fa1b6b79a4e55e04cba889bf6",
-            "id": "@space_tile_045",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_046.png",
-            "file_hash": "b2802e5da2010f6cbd8d77527a7dfc294a74b656bba60b2cb769ade241e555ed",
-            "id": "@space_tile_046",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_047.png",
-            "file_hash": "9bb9ec8af65725aa787128d1a3d67776fef438cae0ae396539e3159b9f0f55d7",
-            "id": "@space_tile_047",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_048.png",
-            "file_hash": "011b84b2e7e1db3f8d79d4b0840327689649de153dd7d91f4ae0dbb81b61cb6b",
-            "id": "@space_tile_048",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_049.png",
-            "file_hash": "84987f51b467730e619c5d71cf096673620a672cd3ec654151fce528a516c07e",
-            "id": "@space_tile_049",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_053.png",
-            "file_hash": "f76c79e74ae79aaf516b27fd78ff2e5f854e11131fcd4593be7011def669e847",
-            "id": "@space_tile_053",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_055.png",
-            "file_hash": "18d0953577484ce6fe2c6a1d206659f9c764eb9ba9c873778424b107a789f630",
-            "id": "@space_tile_055",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_056.png",
-            "file_hash": "8e5e6c6de5e164913fe7af71b2a019119ad98dab78135ee22c83776ae949f294",
-            "id": "@space_tile_056",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_057.png",
-            "file_hash": "dfea4124407069c336be94b53091044d570581524e5db9d9e9e1b28878fefaa2",
-            "id": "@space_tile_057",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_063.png",
-            "file_hash": "caab3af99c143486810ecfbbed2832fc74d3f332bfc529a8875274379b4ba879",
-            "id": "@space_tile_063",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
             "path": "space/wall/space_tile_064.png",
             "file_hash": "7df52c6d8e95c3afe4fd33586d38048a4c1744679d7256ff8ad05d223dcbae6f",
             "id": "@space_tile_064",
-            "domain": "PHYSICAL",
-            "size": [64, 64],
-            "as_physical": {
-                "is_static": true,
-                "material": "!space_wall",
-                "illuminate_like_wall": false
-            }
-        },
-        {
-            "path": "space/wall/space_tile_065.png",
-            "file_hash": "2ad982277a0eac6473b1a214a1351034ad032ed5d0207da377c45d4399b209b8",
-            "id": "@space_tile_065",
             "domain": "PHYSICAL",
             "size": [64, 64],
             "as_physical": {
