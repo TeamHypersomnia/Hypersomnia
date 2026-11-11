@@ -67,6 +67,10 @@ static EM_BOOL Emscripten_HandlePointerLockChange(int eventType, const Emscripte
 
 	return 0;
 }
+
+static void exit_pointer_lock_also_taken_by_sdl_warp_fallback_regrab() {
+	emscripten_exit_pointerlock();
+}
 #endif
 
 namespace augs {
@@ -392,6 +396,10 @@ namespace augs {
 
 		if (SDL_SetRelativeMouseMode(relative) == 0) {
 #if PLATFORM_WEB
+			if (!clip) {
+				::exit_pointer_lock_also_taken_by_sdl_warp_fallback_regrab();
+			}
+
 			platform->pointer_lock_ignore_timer.reset();
 #endif
 			return true; // Successfully set the relative mouse mode
