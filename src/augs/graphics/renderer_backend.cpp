@@ -245,7 +245,7 @@ namespace augs {
 				shader_program::set_uniform_of_current(uniform);
 			}
 
-			if (draw.vec4_array_uniform_id != -1 && !draw.vec4_array.empty()) {
+			if (draw.vec4_array_uniform_id != -1) {
 				shader_program::set_vec4_array_of_current(draw.vec4_array_uniform_id, draw.vec4_array);
 			}
 

@@ -847,7 +847,11 @@ void enqueue_illuminated_rendering_jobs(
 				&visible,
 				&cosm,
 				ground_in = make_drawing_input(D::GROUND),
-				ground_star_fields = star_field_gpu_target { std::addressof(dedicated[D::GROUND]), ground_star_field_locations },
+				ground_star_fields = star_field_gpu_target {
+					std::addressof(dedicated[D::GROUND]),
+					ground_star_field_locations,
+					cone.get_visible_world_rect_aabb()
+				},
 				ground_shadow_casters_in = make_drawing_input(D::GROUND_SHADOW_CASTERS),
 				&finishing_traces,
 				h2 = make_helper(D::MISSILES),

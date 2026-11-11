@@ -31,8 +31,10 @@ def main():
 	lines = ['--exclude-file %s\n' % shlex.quote(as_literal_fnmatch_pattern(path)) for path in sorted(git_ignored_paths())]
 	new_content = ''.join(lines)
 
-	if os.path.exists(RESPONSE_FILE) and open(RESPONSE_FILE, encoding='utf-8').read() == new_content:
-		return
+	if os.path.exists(RESPONSE_FILE):
+		with open(RESPONSE_FILE, encoding='utf-8') as existing:
+			if existing.read() == new_content:
+				return
 
 	with open(RESPONSE_FILE, 'w', encoding='utf-8') as response_file:
 		response_file.write(new_content)

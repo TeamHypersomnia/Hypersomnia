@@ -284,6 +284,10 @@ namespace augs {
 		}
 
 		void shader_program::set_vec4_array_of_current(const GLint id, const std::vector<vec4>& values) {
+			if (values.empty()) {
+				return;
+			}
+
 			GL_CHECK(glUniform4fv(id, static_cast<GLsizei>(values.size()), values.data()->data()));
 			(void)id;
 			(void)values;

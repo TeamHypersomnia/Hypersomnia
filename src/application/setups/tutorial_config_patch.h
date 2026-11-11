@@ -8,7 +8,10 @@ inline const rapidjson::Document& get_tutorial_config_patch() {
 		const auto path = augs::path_type("content/menu/tutorial_config.json");
 
 		try {
-			return augs::json_document_from(path);
+			auto loaded_patch = augs::json_document_from(path);
+			auto scratch_config_proving_the_patch_applies = config_json_table();
+			augs::read_json(loaded_patch, scratch_config_proving_the_patch_applies);
+			return loaded_patch;
 		}
 		catch (const augs::json_deserialization_error& err) {
 			LOG("Failed to load %x:\n%x\nThe tutorial will apply no patch to config.", path, err.what());

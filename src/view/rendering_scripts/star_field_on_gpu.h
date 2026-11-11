@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 #include "augs/math/vec2.h"
@@ -12,6 +13,14 @@
 #include "game/components/sprite_component.h"
 #include "game/components/star_field_component.h"
 #include "view/rendering_scripts/draw_entity_input.h"
+
+inline constexpr std::size_t star_field_types_vec4_count_declared_in_illuminated_vsh = 48;
+inline constexpr std::size_t vec4s_per_star_field_type_v = 3;
+
+static_assert(
+	MAX_STAR_FIELD_STAR_TYPES * vec4s_per_star_field_type_v
+	== star_field_types_vec4_count_declared_in_illuminated_vsh
+);
 
 inline constexpr real32 star_field_cell_size_v = 512.f;
 inline constexpr real32 star_field_offscreen_margin_v = 64.f;
@@ -63,19 +72,20 @@ struct star_field_view {
 inline star_field_view calc_star_field_view(
 	const invariants::star_field& field,
 	const invariants::sprite& field_sprite,
-	const sprite_drawing_input& field_input
+	const sprite_drawing_input& field_input,
+	const ltrb visible_world
 ) {
 	auto view = star_field_view();
 
 	view.center = field_input.renderable_transform.pos;
 
-	const auto rotation_degrees = field_input.renderable_transform.rotation + ::calc_star_field_spin_degrees(field_sprite, field_input.global_time_seconds);
+	const auto spin_degrees = ::calc_star_field_spin_degrees(field_sprite, field_input.global_time_seconds);
+	const auto rotation_degrees = field_input.renderable_transform.rotation + spin_degrees;
 	const auto radians = rotation_degrees * DEG_TO_RAD<real32>;
 	view.rotation_cos = static_cast<real32>(std::cos(radians));
 	view.rotation_sin = static_cast<real32>(std::sin(radians));
 
 	const auto field_half_size = vec2(field_sprite.get_size()) / 2;
-	const auto visible_world = field_input.cone.get_visible_world_rect_aabb();
 
 	const vec2 visible_corners[4] = {
 		visible_world.lt(),
@@ -86,7 +96,10 @@ inline star_field_view calc_star_field_view(
 
 	auto to_local = [&](const vec2 world) {
 		const auto offset = world - view.center;
-		return vec2(offset.x * view.rotation_cos + offset.y * view.rotation_sin, -offset.x * view.rotation_sin + offset.y * view.rotation_cos);
+		return vec2(
+			offset.x * view.rotation_cos + offset.y * view.rotation_sin,
+			-offset.x * view.rotation_sin + offset.y * view.rotation_cos
+		);
 	};
 
 	auto visible_lt = to_local(visible_corners[0]);
@@ -109,8 +122,15 @@ inline star_field_view calc_star_field_view(
 
 	const auto cell_size = star_field_cell_size_v;
 
-	view.first_cell = vec2i(static_cast<int>(std::floor(view.drawn_area.l / cell_size)), static_cast<int>(std::floor(view.drawn_area.t / cell_size)));
-	view.last_cell = vec2i(static_cast<int>(std::floor(view.drawn_area.r / cell_size)), static_cast<int>(std::floor(view.drawn_area.b / cell_size)));
+	auto cell_of = [cell_size](const vec2 local) {
+		return vec2i(
+			static_cast<int>(std::floor(local.x / cell_size)),
+			static_cast<int>(std::floor(local.y / cell_size))
+		);
+	};
+
+	view.first_cell = cell_of(view.drawn_area.lt());
+	view.last_cell = cell_of(view.drawn_area.rb());
 
 	const auto stars_per_cell = field.stars_per_million_square_units * cell_size * cell_size / 1000000.f;
 	view.whole_stars_per_cell = static_cast<int>(stars_per_cell);
@@ -156,13 +176,22 @@ struct star_field_uniform_locations {
 	}
 
 	bool all_found() const {
-		return mode != -1 && transform != -1 && area != -1 && cells != -1 && density != -1 && look != -1 && color != -1 && seed != -1 && types != -1;
+		const GLint all[] = { mode, transform, area, cells, density, look, color, seed, types };
+
+		for (const auto location : all) {
+			if (location == -1) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 };
 
 struct star_field_gpu_target {
 	augs::triangles_and_specials* buffer = nullptr;
 	star_field_uniform_locations locations;
+	ltrb visible_world_unscaled_by_query_mult;
 
 	bool is_usable() const {
 		return buffer != nullptr && locations.all_found();
@@ -172,7 +201,7 @@ struct star_field_gpu_target {
 template <class M>
 std::vector<vec4> make_star_field_type_table(const invariants::star_field& field, const M& manager) {
 	std::vector<vec4> table;
-	table.reserve(field.star_types.size() * 3);
+	table.reserve(field.star_types.size() * vec4s_per_star_field_type_v);
 
 	auto cumulative_weight = 0.f;
 
@@ -208,7 +237,7 @@ void queue_star_field_on_gpu(
 		return;
 	}
 
-	const auto view = ::calc_star_field_view(field, field_sprite, field_input);
+	const auto view = ::calc_star_field_view(field, field_sprite, field_input, target.visible_world_unscaled_by_query_mult);
 
 	if (view.is_empty()) {
 		return;
@@ -216,7 +245,11 @@ void queue_star_field_on_gpu(
 
 	const auto cell_count = view.calc_cell_count();
 	const auto slots_per_cell = view.calc_slots_per_cell();
-	const auto quad_count = static_cast<uint64_t>(cell_count.x) * static_cast<uint64_t>(cell_count.y) * static_cast<uint64_t>(slots_per_cell);
+	const auto quad_count =
+		static_cast<uint64_t>(cell_count.x)
+		* static_cast<uint64_t>(cell_count.y)
+		* static_cast<uint64_t>(slots_per_cell)
+	;
 
 	if (quad_count == 0 || quad_count > max_star_field_quads_v) {
 		return;
@@ -234,8 +267,18 @@ void queue_star_field_on_gpu(
 		{ locations.mode, 1 },
 		{ locations.transform, vec4 { view.center.x, view.center.y, view.rotation_cos, view.rotation_sin } },
 		{ locations.area, vec4 { view.drawn_area.l, view.drawn_area.t, view.drawn_area.r, view.drawn_area.b } },
-		{ locations.cells, vec4 { static_cast<float>(view.first_cell.x), static_cast<float>(view.first_cell.y), static_cast<float>(cell_count.x), static_cast<float>(slots_per_cell) } },
-		{ locations.density, vec4 { static_cast<float>(view.whole_stars_per_cell), view.chance_of_one_more_star, star_field_cell_size_v, static_cast<float>(field.star_types.size()) } },
+		{ locations.cells, vec4 {
+			static_cast<float>(view.first_cell.x),
+			static_cast<float>(view.first_cell.y),
+			static_cast<float>(cell_count.x),
+			static_cast<float>(slots_per_cell)
+		} },
+		{ locations.density, vec4 {
+			static_cast<float>(view.whole_stars_per_cell),
+			view.chance_of_one_more_star,
+			star_field_cell_size_v,
+			static_cast<float>(field.star_types.size())
+		} },
 		{ locations.look, vec4 { field.min_scale, field.max_scale, field.min_brightness, view.total_weight } },
 		{ locations.color, view.color },
 		{ locations.seed, static_cast<int>(field.seed) }

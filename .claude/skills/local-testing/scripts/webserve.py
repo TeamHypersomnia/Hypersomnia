@@ -46,7 +46,17 @@ const delete_database = name => new Promise(resolve => {
 });
 
 (async () => {
-	const listed = indexedDB.databases ? (await indexedDB.databases()).map(database => database.name) : [];
+	const list_databases = async () => {
+		try {
+			return indexedDB.databases ? (await indexedDB.databases()).map(database => database.name) : [];
+		}
+		catch (error) {
+			log("could not list the databases (" + error + "), deleting the known ones");
+			return [];
+		}
+	};
+
+	const listed = await list_databases();
 
 	for (const name of new Set([...%s, ...listed])) {
 		await delete_database(name);

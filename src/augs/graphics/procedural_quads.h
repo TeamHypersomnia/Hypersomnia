@@ -1,7 +1,5 @@
 #pragma once
-#include <array>
 #include <cstdint>
-#include <variant>
 #include <vector>
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
