@@ -169,6 +169,7 @@
 #include "application/setups/server/server_setup.h"
 #else
 #include "application/setups/all_setups.h"
+#include "application/setups/tutorial_stage_particles.h"
 #include "application/setups/editor/editor_setup_for_each_highlight.hpp"
 #endif
 
@@ -6268,6 +6269,7 @@ work_result work(
 
 	WEBSTATIC bool pending_new_state_sample = true;
 	WEBSTATIC auto last_sampled_cosmos = cosmos_id_type(-1);
+	WEBSTATIC uint32_t tutorial_stages_built_at_last_particles_clear = 0;
 
 	WEBSTATIC augs::timer state_changed_timer;
 
@@ -6411,6 +6413,14 @@ work_result work(
 			}
 			else {
 				resample_if_different();
+
+				if constexpr(std::is_same_v<S, test_scene_setup>) {
+					::clear_particles_left_by_previous_tutorial_stage(
+						setup.get_stages_built(),
+						tutorial_stages_built_at_last_particles_clear,
+						get_audiovisuals().get<particles_simulation_system>()
+					);
+				}
 			}
 		});
 

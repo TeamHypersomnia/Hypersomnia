@@ -444,6 +444,7 @@ void test_scene_setup::restart_arena() {
 		);
 
 		clean_step_number = scene.world.get_clock().now.step;
+		++stages_built;
 	}
 
 	restart_mode();
