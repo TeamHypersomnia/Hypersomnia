@@ -77,6 +77,15 @@ One run with alternating phases cancels out scene, thermal and clock differences
   for `ninja|clang++|cc1plus|ld.lld|Hypersomnia|Xvfb` above ~3% CPU, and drop and rerun a run that had any.
   Also drop runs whose `BENCHPROF` shows `Debug details` (~0.4-0.5 ms) - the user opened the performance overlay in the window.
   A game started from Claude's shell inherits nice 5 (only root can lower it) - fine when the machine is idle.
+- **Log the game window's focus and visibility in every run:** start
+  `python3 .claude/skills/benchmark-rendering/watch_window_visibility.py <game pid> <log>` right after launching the game
+  (with `timeout`, the game's own pid: `pgrep -P <timeout's pid>`). The game sets neither `_NET_WM_PID` nor `WM_CLASS`,
+  so the script remembers the windows that existed at its start and follows the first new one with "Hypersomnia" in its title.
+  Every 0.5 s it reads the i3 tree and logs each change as `WINDOW <secs>: focused=0/1 visible=0/1 <why hidden>`, then a summary
+  of focused and visible seconds. i3 hides a window in two separate ways and the log names which one: `another workspace shown`
+  and `another tab shown` (a back tab of a tabbed or stacked container), plus `scratchpad`. Verified 2026-11-11: switching tabs
+  away and back during a run showed up within 0.5 s. Without a compositor a hidden window keeps rendering and its GPU times stay valid,
+  but lost focus or a hidden window means the user was at the desk - report it next to the result and check the `top` samples of that run.
 - **Name the benchmark binary:** a symlink in `build/current` (e.g. `HypersomniaBenchJedrula -> Hypersomnia`) makes the process
   distinct from the user's game. Kill it with `pkill -x HypersomniaBenc` (comm is cut to 15 chars) - `pkill -f <pattern>`
   kills Claude's own shell, whose command line contains the pattern.
