@@ -19,7 +19,7 @@ namespace augs {
 namespace augs {
 	int shell(const std::string&) { return 0; }
 
-	void open_text_editor(const std::string&) {}
+	void open_text_editor(const path_type&) {}
 }
 #elif PLATFORM_WINDOWS
 #include <Windows.h>
@@ -40,12 +40,13 @@ namespace augs {
 		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));
 	}
 
-	void open_text_editor(const std::string& on_file) {
+	void open_text_editor(const path_type& on_file) {
 		if (text_editor_disabled) {
 			return;
 		}
 
-		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
+		const auto quoted_path = L"\"" + std::filesystem::absolute(on_file).wstring() + L"\"";
+		ShellExecuteW(NULL, NULL, quoted_path.c_str(), NULL, NULL, SW_SHOW);
 	}
 }
 #elif PLATFORM_UNIX
@@ -57,7 +58,7 @@ namespace augs {
 		return std::system(s.c_str());
 	}
 
-	void open_text_editor(const std::string& on_file) {
+	void open_text_editor(const path_type& on_file) {
 		if (text_editor_disabled) {
 			LOG("Not opening %x in a text editor (--no-open-logs).", on_file);
 			return;
@@ -66,7 +67,7 @@ namespace augs {
 #if HEADLESS
 		(void)on_file;
 #else
-		const auto full_path = std::filesystem::absolute(augs::path_type(on_file));
+		const auto full_path = std::filesystem::absolute(on_file);
 
 #if PLATFORM_MACOS
 		const auto command = typesafe_sprintf("open %x", augs::quoted_for_shell(full_path.string()));

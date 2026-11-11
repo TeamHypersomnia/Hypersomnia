@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <optional>
 #include <vector>
 #include <cstring>
 
@@ -15,6 +16,8 @@ struct log_entry {
 class program_log {
 	static program_log global_instance;
 	unsigned max_all_entries;
+
+	std::string get_complete_nomutex() const;
 
 public:
 	void push_entry(const log_entry&);
@@ -33,11 +36,10 @@ public:
 	std::size_t get_init_logs_count_nomutex() const;
 
 	std::string get_complete() const;
-	std::string get_complete_nomutex() const;
-	std::string get_last(std::size_t entries_count) const;
+	std::optional<std::string> try_get_complete_with(const log_entry& last_entry);
 };
 
-void start_startup_log_file(const std::string& path);
+void start_startup_log_file(const augs::path_type& path);
 
 template <class... A>
 FORCE_NOINLINE void LOG(const std::string& f, A&&... a) {

@@ -10,6 +10,7 @@
 #include "augs/window_framework/window.h"
 #endif
 #include "augs/window_framework/shell.h"
+#include "augs/window_framework/crash_report.h"
 #include "augs/build_settings/compiler_defines.h"
 #include "augs/log_path_getters.h"
 
@@ -34,12 +35,13 @@ void save_log_and_terminate() {
 	
 	LOG("\nIf the game crashes repeatedly, consider deleting the \"cache\" folder.");
 
-	const auto logs = program_log::get_current().get_complete();
-	const auto failure_log_path = augs::path_type(get_ensure_failed_path());
+	if constexpr(!augs::crash_report_saves_the_log_v) {
+		const auto logs = program_log::get_current().get_complete();
+		const auto error_log_path = get_error_log_path();
 
-	augs::save_as_text(failure_log_path, logs);
-
-	augs::open_text_editor(failure_log_path.string());
+		augs::save_as_text(error_log_path, logs);
+		augs::open_text_editor(error_log_path);
+	}
 
 #if !IS_PRODUCTION_BUILD
 	/* If we're not in production, trigger a debugger break so that we know the trace */

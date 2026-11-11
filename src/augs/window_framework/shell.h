@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+#include "augs/filesystem/path_declaration.h"
+
 namespace augs {
 #if PLATFORM_WEB
 	constexpr bool reveal_in_explorer_available_v = false;
@@ -26,7 +28,7 @@ namespace augs {
 
 	int shell(const std::string&);
 	void open_url(const std::string&);
-	void open_text_editor(const std::string& on_file);
+	void open_text_editor(const path_type& on_file);
 
 	/*
 		After this, open_text_editor does nothing - e.g. tests, where an editor opened on a failure log

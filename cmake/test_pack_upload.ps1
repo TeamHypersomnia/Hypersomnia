@@ -10,8 +10,7 @@ $target_exe = ".\Hypersomnia.exe"
 $base_path = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "My Games\Hypersomnia\logs"
 
 $good_log = Join-Path $base_path "exit_success_debug_log.txt"
-$fail_log = Join-Path $base_path "exit_failure_debug_log.txt"
-$ensr_log = Join-Path $base_path "ensure_failed_debug_log.txt"
+$error_log = Join-Path $base_path "error_log.txt"
 
 Write-Host "Running $target_exe --version"
 
@@ -30,11 +29,8 @@ if ($exitCode -ne 0) {
 	$mesg = "Test " + $configuration + " launch failed with result: " + $exitCode
 	Write-Host $mesg -ForegroundColor red
 	
-	Write-Host "Ensure failed log:" -ForegroundColor red
-	cat $ensr_log -ErrorAction SilentlyContinue
-	
-	Write-Host "Failure log:" -ForegroundColor red
-	cat $fail_log -ErrorAction SilentlyContinue
+	Write-Host "Error log:" -ForegroundColor red
+	cat $error_log -ErrorAction SilentlyContinue
 	$host.SetShouldExit($exitCode) 
 	exit
 }

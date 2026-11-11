@@ -225,8 +225,18 @@ namespace augs {
 		return ret;
 	}
 	
-	std::wstring widen(const std::string& s) {
-		return std::wstring(s.begin(), s.end());
+	std::wstring widen(const std::string& utf8) {
+		if (utf8.empty()) {
+			return std::wstring();
+		}
+
+		const auto utf8_length = static_cast<int>(utf8.size());
+		const auto wide_length = MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8_length, nullptr, 0);
+
+		auto wide = std::wstring(wide_length, L'\0');
+		MultiByteToWideChar(CP_UTF8, 0, utf8.data(), utf8_length, wide.data(), wide_length);
+
+		return wide;
 	}
 }
 #endif

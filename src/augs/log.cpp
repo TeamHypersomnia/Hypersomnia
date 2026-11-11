@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cstddef>
 #include <fstream>
 #include <string>
@@ -42,32 +41,28 @@ std::string live_log_path;
 std::ofstream startup_log_file;
 app_type current_app_type;
 
-std::string get_path_in_log_files(const std::string& name) {
-	return (LOGS_DIR / (get_preffix_for(current_app_type) + name)).string();
+augs::path_type get_log_file_path(const std::string& name) {
+	return LOGS_DIR / (get_preffix_for(current_app_type) + name);
 }
 
-std::string get_ensure_failed_path() {
-	return get_path_in_log_files("ensure_failed_debug_log.txt");
+std::string get_path_in_log_files(const std::string& name) {
+	return get_log_file_path(name).string();
 }
 
 std::string get_exit_success_path() {
 	return get_path_in_log_files("exit_success_debug_log.txt");
 }
 
-std::string get_exit_failure_path() {
-	return get_path_in_log_files("exit_failure_debug_log.txt");
-}
-
 std::string get_dumped_log_path() {
 	return get_path_in_log_files("dumped_debug_log.txt");
 }
 
-std::string get_crash_log_path() {
-	return get_path_in_log_files("crash_debug_log.txt");
+augs::path_type get_error_log_path() {
+	return get_log_file_path("error_log.txt");
 }
 
-std::string get_startup_log_path() {
-	return get_path_in_log_files("startup_debug_log.txt");
+augs::path_type get_startup_log_path() {
+	return get_log_file_path("startup_log.txt");
 }
 
 program_log program_log::global_instance = 10000;
@@ -92,7 +87,7 @@ void program_log::mark_last_init_log() {
 	startup_log_file.close();
 }
 
-void start_startup_log_file(const std::string& path) {
+void start_startup_log_file(const augs::path_type& path) {
 	auto lock = augs::scoped_lock(log_mutex);
 
 	startup_log_file.open(path, std::ios::out | std::ios::trunc);
@@ -124,17 +119,21 @@ std::string program_log::get_complete_nomutex() const {
 	return logs;
 }
 
-std::string program_log::get_last(const std::size_t entries_count) const {
-	auto lock = augs::scoped_lock(log_mutex);
-
-	const auto first = all_entries.size() - std::min(entries_count, all_entries.size());
-	auto logs = std::string();
-
-	for (auto i = first; i < all_entries.size(); ++i) {
-		logs += all_entries[i].text + '\n';
+std::optional<std::string> program_log::try_get_complete_with(const log_entry& last_entry) {
+#if WEB_SINGLETHREAD
+	push_entry(last_entry);
+	return get_complete_nomutex();
+#else
+	if (!log_mutex.try_lock()) {
+		return std::nullopt;
 	}
 
+	push_entry(last_entry);
+	auto logs = get_complete_nomutex();
+	log_mutex.unlock();
+
 	return logs;
+#endif
 }
 
 std::string& LOG_THREAD_PREFFIX() {

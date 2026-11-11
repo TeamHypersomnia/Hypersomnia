@@ -126,7 +126,7 @@ Run the game under `Xvfb :77 -screen 0 1280x720x24` with a 1280x720 non-fullscre
 `import -window root shot.png` to screenshot, read the image, and `python3 xinput.py click x y` to click.
 A fresh appdata starts in the tutorial: `xinput.py key Escape` opens the menu (Settings at ~156,555).
 The appdata remembers the last connect string - the first screen may be a reconnect dialog with Abort.
-A failure log is saved in `<appdata>/logs/` (`exit_failure_debug_log.txt`, `ensure_failed_debug_log.txt`) - read it yourself.
+A failure log is saved in `<appdata>/logs/error_log.txt` (a failure or a failed ensure, on Windows also a crash - the cause at the end) - read it yourself.
 The account and identity UI (Link with Steam, Restore, Backup, RCON levels): **`identity_ui.md`**.
 
 ## Gameplay checks - measure in the log, not in screenshots

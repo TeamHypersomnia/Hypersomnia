@@ -6,6 +6,7 @@
 #include "augs/log_path_getters.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/shell.h"
+#include "augs/misc/scope_guard.h"
 
 #include "application/main/verify_signature.h"
 #include "application/main/server_key.h"
@@ -173,8 +174,8 @@ int main(const int argc, const char* const * const argv) {
 		augs::disable_text_editor();
 	}
 
-	const bool failures_shown_in_dialogs = ::player_sees_failure_dialogs(params);
-	augs::report_crashes(failures_shown_in_dialogs);
+	augs::report_crashes(::crash_reports_shown_to_player(params));
+	const auto stop_reporting_crashes_at_exit = augs::scope_guard([]() { augs::stop_reporting_crashes(); });
 
 	if (params.version_line_only) {
 		std::cout << hypersomnia_version().get_version_string() << std::endl;
@@ -212,7 +213,7 @@ int main(const int argc, const char* const * const argv) {
 		}
 	}
 
-#ifdef __APPLE__    
+#if defined(__APPLE__) || PLATFORM_WINDOWS
 	const auto exe_path = augs::get_executable_path();
 #else
 	const auto exe_path = params.exe_path;
@@ -333,7 +334,7 @@ int main(const int argc, const char* const * const argv) {
 		}
 	}
 
-	::start_startup_and_crash_logs(params);
+	::start_startup_and_error_logs(params);
 
 	/*
 		Now that the documents/logs folder exists,
@@ -413,8 +414,6 @@ int main(const int argc, const char* const * const argv) {
 		argv
 	);
 
-	const auto last_logs_of_work = program_log::get_current().get_last(log_entries_in_failure_dialog_v);
-
 	LOG_NVPS(completed_work_result);
 
 	{
@@ -425,10 +424,10 @@ int main(const int argc, const char* const * const argv) {
 
 		auto save_failure_logs = [&]() {
 			const auto logs = program_log::get_current().get_complete(); 
-			const auto failure_log_path = get_exit_failure_path();
+			const auto error_log_path = get_error_log_path();
 
-			augs::save_as_text(failure_log_path, logs);
-			augs::open_text_editor(failure_log_path);
+			augs::save_as_text(error_log_path, logs);
+			augs::open_text_editor(error_log_path);
 		};
 
 		LOG(::describe_work_result(completed_work_result));
@@ -449,31 +448,26 @@ int main(const int argc, const char* const * const argv) {
 
 			case work_result::FAILURE: {
 				save_failure_logs();
-
-				if (failures_shown_in_dialogs) {
-					::show_failure_dialog(last_logs_of_work, get_exit_failure_path());
-				}
-
 				return EXIT_FAILURE;
 			}
 
 			case work_result::RELAUNCH_DEDICATED_SERVER: {
 				save_success_logs();
-				return augs::restart_application(argc, argv, exe_path.string(), { "--suppress-server-webhook" });
+				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), { "--suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_MASTERSERVER: {
 				save_failure_logs();
-				return augs::restart_application(argc, argv, exe_path.string(), {});
+				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), {});
 			}
 
 			case work_result::RELAUNCH_AND_UPDATE_DEDICATED_SERVER: {
 				save_success_logs();
-				return augs::restart_application(argc, argv, exe_path.string(), { "--update-once-now --suppress-server-webhook" });
+				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), { "--update-once-now --suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
-				return augs::restart_application(argc, argv, exe_path.string(), { "--upgraded-successfully" });
+				return augs::restart_application(argc, argv, augs::string_windows_friendly(exe_path), { "--upgraded-successfully" });
 			}
 
 			default: 
