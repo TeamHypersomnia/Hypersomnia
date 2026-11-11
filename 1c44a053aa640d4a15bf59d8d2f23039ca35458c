@@ -1,3 +1,3 @@
 Audited: audit #5, 2026-11-10 - Flatpak update notice, install cmake, metainfo generator (diff audit E2); nothing serious
 
-Audited: audits #11-#13, 2026-11-12 - current state of the platform shell (Windows start, logs and crash reports; DLL imports and CI packaging; clipboard, dialogs, shell wrappers on every platform); fixes in 0ffd1d093
+Audited: audits #11-#13, 2026-11-12 - current state of the platform shell (Windows start, logs and crash reports; DLL imports and CI packaging; clipboard, dialogs, shell wrappers on every platform); fixes in 62b9ecb00
