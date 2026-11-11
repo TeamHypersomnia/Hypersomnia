@@ -35,6 +35,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/templates/thread_pool.h"
 #include "game/detail/find_absolute_or_local_transform.h"
+#include "view/audiovisual_state/systems/map_ambience_particle_layer.h"
 
 using emi_inst = particles_simulation_system::emission_instance;
 
@@ -723,7 +724,8 @@ void update_component_related_cache(
 				}
 				else {
 					try {
-						caches.try_emplace(id, particles_simulation_system::continuous_particles_cache { { particles->start.positioning, *particles, manager, rng, settings }, { typed_handle.get_name() } });
+						const auto emplaced = caches.try_emplace(id, particles_simulation_system::continuous_particles_cache { { particles->start.positioning, *particles, manager, rng, settings }, { typed_handle.get_name() } });
+						::move_map_ambience_to_its_own_particle_pool(typed_handle, emplaced.first->second.cache.emission_instances);
 					}
 					catch (const particles_simulation_system::effect_not_found&) {
 

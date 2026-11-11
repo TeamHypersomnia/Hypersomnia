@@ -21,6 +21,8 @@ enum class particle_layer {
 	*/
 	OVERLAY_SMOKES,
 
+	MAP_AMBIENCE_ILLUMINATING_PARTICLES,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

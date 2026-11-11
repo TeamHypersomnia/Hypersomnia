@@ -1433,6 +1433,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	within_strict_fow([&]() {
 		draw_particles(particle_layer::NEONING_PARTICLES);
+		draw_particles(particle_layer::MAP_AMBIENCE_ILLUMINATING_PARTICLES);
 		draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
 		/* Always on top of all the other particles. */
