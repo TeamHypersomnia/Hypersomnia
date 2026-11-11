@@ -6,6 +6,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/detail/explosive/like_explosive.h"
 #include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/inventory/manage_shoulder_storage.hpp"
 #include "game/detail/inventory/drop_oldest_items_to_fit.hpp"
 
