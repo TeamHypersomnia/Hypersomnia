@@ -2109,7 +2109,9 @@ EDIT_FUNCTION(
 			MULTIPROPERTY("Illuminate like wall", as_nonphysical.illuminate_like_wall);
 		}
 
-		MULTIPROPERTY("Full illumination", as_nonphysical.full_illumination);
+		if (!insp.draws_star_field()) {
+			MULTIPROPERTY("Full illumination", as_nonphysical.full_illumination);
+		}
 
 		ImGui::Separator();
 
