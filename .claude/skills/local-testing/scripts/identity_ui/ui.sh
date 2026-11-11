@@ -23,7 +23,7 @@ conf)
 	mkdir -p $U/$name/user/conf.d
 	cat > $U/$name/user/conf.d/test.json <<J
 { "identity_broker_url": "$broker", "website_url": "$SITE", "server_list_provider": "http://127.0.0.1:1",
-  "launch_at_startup": "MAIN_MENU", "skip_tutorial": true, "prompted_for_sign_in_once": true,
+  "launch_at_startup": "MAIN_MENU", "skip_tutorial": true, "tutorial_revision_shown": 1000000, "prompted_for_sign_in_once": true,
   "window": { "fullscreen": false, "size": [1280, 720] },
   "main_menu": { "leaderboards_provider_url": "$SITE/leaderboards" },
   "client": { "nickname": "${NICK:-uitest}" } }

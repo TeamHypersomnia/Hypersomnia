@@ -11,7 +11,7 @@ A=$S/ranked_report/${PLAYER:-alice}
 BIN=${BIN:-$REPO/build/Debug-x64-clang-claude/Hypersomnia}
 [ -d $A/user ] || { echo "run scenario_ranked_report.sh first"; exit 1; }
 cat > $A/user/conf.d/menu.json <<J
-{ "launch_at_startup": "MAIN_MENU", "window": { "fullscreen": false, "size": [1280, 720] },
+{ "launch_at_startup": "MAIN_MENU", "skip_tutorial": true, "tutorial_revision_shown": 1000000, "window": { "fullscreen": false, "size": [1280, 720] },
   "main_menu": { "leaderboards_provider_url": "$BROKER_URL/leaderboards" }, "website_url": "$BROKER_URL" }
 J
 cd $REPO/hypersomnia

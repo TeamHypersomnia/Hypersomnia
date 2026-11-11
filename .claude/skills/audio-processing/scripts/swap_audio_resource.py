@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -9,38 +8,22 @@ import sys
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPTS_DIR, '..', '..', '..', '..'))
 BLAKE3_DIR = os.path.join(REPO_ROOT, 'src', '3rdparty', 'blake3')
-B3SUM = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), 'hypersomnia-b3sum')
+BLAKE3_STDIN_HASHER = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), 'hypersomnia-blake3-stdin')
 
 
-def built_b3sum():
-	if not os.path.exists(B3SUM):
-		sources = [os.path.join(SCRIPTS_DIR, 'b3sum.c')] + [os.path.join(BLAKE3_DIR, name) for name in ['blake3.c', 'blake3_dispatch.c', 'blake3_portable.c']]
+def built_blake3_stdin_hasher():
+	if not os.path.exists(BLAKE3_STDIN_HASHER):
+		sources = [os.path.join(BLAKE3_DIR, name) for name in ['example.c', 'blake3.c', 'blake3_dispatch.c', 'blake3_portable.c']]
 		portable_only = ['-DBLAKE3_NO_SSE2', '-DBLAKE3_NO_SSE41', '-DBLAKE3_NO_AVX2', '-DBLAKE3_NO_AVX512']
-		os.makedirs(os.path.dirname(B3SUM), exist_ok=True)
-		subprocess.run(['cc', '-O2', '-I' + BLAKE3_DIR] + portable_only + sources + ['-o', B3SUM], check=True)
+		os.makedirs(os.path.dirname(BLAKE3_STDIN_HASHER), exist_ok=True)
+		subprocess.run(['cc', '-O2', '-I' + BLAKE3_DIR] + portable_only + sources + ['-o', BLAKE3_STDIN_HASHER], check=True)
 
-	return B3SUM
+	return BLAKE3_STDIN_HASHER
 
 
 def blake3_of(path):
-	return subprocess.check_output([built_b3sum(), path]).decode().split()[0]
-
-
-def resource_block_span(text, resource_id):
-	anchor = text.index('"id": %s' % json.dumps(resource_id))
-	start = text.rindex('{', 0, anchor)
-	depth = 0
-
-	for i in range(start, len(text)):
-		if text[i] == '{':
-			depth += 1
-		elif text[i] == '}':
-			depth -= 1
-
-			if depth == 0:
-				return start, i + 1
-
-	raise ValueError(resource_id)
+	with open(path, 'rb') as contents:
+		return subprocess.check_output([built_blake3_stdin_hasher()], stdin=contents).decode().strip()
 
 
 def game_is_running():
@@ -54,20 +37,26 @@ def main():
 		sys.exit('Hypersomnia is running - close it first, the editor would overwrite the project')
 
 	text = open(project_json).read()
-	start, end = resource_block_span(text, resource_id)
-	block = text[start:end]
-	resource_path = json.loads(block)['path']
-	destination = os.path.join(os.path.dirname(os.path.abspath(project_json)), resource_path)
+	resource = next((r for r in json.loads(text).get('external_resources', []) if r.get('id') == resource_id), None)
 
-	if not os.path.samefile(new_audio, destination):
+	if resource is None:
+		sys.exit('%s is not a resource of %s' % (resource_id, project_json))
+
+	old_hash_field = '"file_hash": %s' % json.dumps(resource.get('file_hash', ''))
+
+	if not resource.get('file_hash') or text.count(old_hash_field) != 1:
+		sys.exit('%s has no file_hash of its own to replace - save the project in the editor first' % resource_id)
+
+	destination = os.path.join(os.path.dirname(os.path.abspath(project_json)), resource['path'])
+
+	if not (os.path.exists(destination) and os.path.samefile(new_audio, destination)):
 		shutil.copyfile(new_audio, destination)
 
 	new_hash = blake3_of(destination)
-	block = re.sub(r'"file_hash": "[0-9a-f]+"', lambda _: '"file_hash": "%s"' % new_hash, block, count=1)
-	updated = text[:start] + block + text[end:]
+	updated = text.replace(old_hash_field, '"file_hash": %s' % json.dumps(new_hash))
 	json.loads(updated)
 	open(project_json, 'w').write(updated)
-	print('%s -> %s, file_hash %s' % (resource_id, resource_path, new_hash))
+	print('%s -> %s, file_hash %s' % (resource_id, resource['path'], new_hash))
 
 
 if __name__ == '__main__':

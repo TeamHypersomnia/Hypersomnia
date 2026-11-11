@@ -81,7 +81,7 @@ wait_listening $T/server.out
 
 mkdir -p $T/alice/user/conf.d $T/bob/user/conf.d
 echo "{ \"identity_broker_url\": \"http://127.0.0.1:$PROXY\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"alice\" },
-  \"launch_at_startup\": \"MAIN_MENU\", \"skip_tutorial\": true, \"window\": { \"fullscreen\": false, \"size\": [1280, 720] } }" > $T/alice/user/conf.d/test.json
+  \"launch_at_startup\": \"MAIN_MENU\", \"skip_tutorial\": true, \"tutorial_revision_shown\": 1000000, \"window\": { \"fullscreen\": false, \"size\": [1280, 720] } }" > $T/alice/user/conf.d/test.json
 echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"bob\" } }" > $T/bob/user/conf.d/test.json
 
 start_client() {

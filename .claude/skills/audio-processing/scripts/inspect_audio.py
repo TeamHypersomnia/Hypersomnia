@@ -22,6 +22,7 @@ LAST_NOTE_SEARCH_BEFORE_TURN_SECS = 1.0
 RING_OUT_DROPS_DB = [10, 15, 20]
 HIGH_PASS_NEEDED_BASS_RISE_DB = 12
 SUGGESTED_HIGH_PASS_HZ = 250
+FLUX_MEDIAN_CHUNK_SECS = 30.0
 
 
 def framed_magnitudes(mono, from_secs, to_secs, hop=HOP):
@@ -92,6 +93,20 @@ def save_spectrogram(mono, from_secs, to_secs, out_png, marks):
 	plt.savefig(out_png, dpi=65)
 
 
+def whole_track_flux_median(mono):
+	length_secs = len(mono) / SR
+	fluxes = []
+
+	for start in np.arange(0.0, length_secs, FLUX_MEDIAN_CHUNK_SECS):
+		end = min(length_secs, start + FLUX_MEDIAN_CHUNK_SECS + FRAME / SR)
+
+		if (end - start) * SR > 2 * FRAME:
+			magnitudes, _ = framed_magnitudes(mono, start, end)
+			fluxes.append(spectral_flux(magnitudes)[1:])
+
+	return float(np.median(np.concatenate(fluxes)))
+
+
 def note_onsets(bands, flux, flux_median, times):
 	audible = bands > bands.max(axis=1, keepdims=True) - AUDIBLE_BELOW_LOUDEST_DB
 	onsets = []
@@ -129,7 +144,7 @@ def suggest_riff(mono, flux_median, riff_from, next_theme_near, total_fade_secs)
 	latest_fade_from = turn - MIN_FORWARD_SECS
 	backward_reaches = turn - (total_fade_secs - (turn - latest_fade_from))
 	turn_index = int(np.argmin(np.abs(times - turn)))
-	reached = (times >= backward_reaches) & (times <= turn)
+	reached = (times >= min(backward_reaches, times[turn_index])) & (times <= times[turn_index])
 	bass_rise = float((bands[reached, :BASS_BANDS] - bands[turn_index, :BASS_BANDS]).max())
 	audible_bass = bool(np.any(bands[reached, :BASS_BANDS] > bands[reached].max(axis=1, keepdims=True) - AUDIBLE_BELOW_LOUDEST_DB))
 	print('riff from %.2f, next theme near %.2f:' % (riff_from, next_theme_near))
@@ -154,8 +169,7 @@ def main():
 	if command == 'suggest':
 		riffs = [tuple(float(x) for x in r.split('-')) for r in sys.argv[3].split(',')]
 		total_fade_secs = float(sys.argv[4]) if len(sys.argv) > 4 else 6.0
-		whole, _ = framed_magnitudes(mono, 0.0, len(mono) / SR - FRAME / SR)
-		flux_median = float(np.median(spectral_flux(whole)[1:]))
+		flux_median = whole_track_flux_median(mono)
 
 		for riff_from, next_theme_near in riffs:
 			suggest_riff(mono, flux_median, riff_from, next_theme_near, total_fade_secs)

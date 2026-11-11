@@ -9,6 +9,7 @@
 
 #include "application/config_json_table.h"
 #include "application/setups/test_scene_setup.h"
+#include "application/setups/test_mode_sound_clock.h"
 
 #include "application/setups/editor/packaged_official_content.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
@@ -412,41 +413,24 @@ void test_scene_setup::restart_arena() {
 		project.clear_cached_scene_node_data();
 		opponents.clear();
 
-		const auto music_clock_continued_across_levels = get_arena_handle().on_mode(
-			[]<typename M>(const M& typed_mode) {
-				if constexpr(std::is_same_v<M, test_mode>) {
-					return typed_mode.sound_clock;
+		::rebuild_keeping_sound_clock(get_arena_handle(), [&]() {
+			::build_arena_from_editor_project(
+				get_arena_handle(),
+				{
+					project,
+					"",
+					get_paths().project_folder,
+					official,
+					std::addressof(entity_to_node),
+					nullptr,
+					false, /* for_playtesting */
+					false /* editor_preview */
 				}
-				else {
-					return uint32_t(0);
-				}
-			}
-		);
-
-		::build_arena_from_editor_project(
-			get_arena_handle(),
-			{
-				project,
-				"",
-				get_paths().project_folder,
-				official,
-				std::addressof(entity_to_node),
-				nullptr,
-				false, /* for_playtesting */
-				false /* editor_preview */
-			}
-		);
-
-		get_arena_handle().on_mode(
-			[music_clock_continued_across_levels]<typename M>(M& typed_mode) {
-				if constexpr(std::is_same_v<M, test_mode>) {
-					typed_mode.sound_clock = music_clock_continued_across_levels;
-				}
-			}
-		);
+			);
+		});
 
 		clean_step_number = scene.world.get_clock().now.step;
-		++stages_built;
+		++arena_rebuilds;
 	}
 
 	restart_mode();

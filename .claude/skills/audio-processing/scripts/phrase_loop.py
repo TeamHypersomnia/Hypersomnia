@@ -38,7 +38,7 @@ def envelope_db(mono, hop_secs):
 def quietest_point(mono, around_secs, search_secs):
 	hop_secs = 0.01
 	env = envelope_db(mono, hop_secs)
-	lo = int((around_secs - search_secs) / hop_secs)
+	lo = max(0, int((around_secs - search_secs) / hop_secs))
 	hi = int((around_secs + search_secs) / hop_secs)
 	smoothed = np.convolve(np.pad(env, 4, mode='edge'), np.ones(9) / 9, mode='same')[4:-4]
 	return (lo + int(np.argmin(smoothed[lo:hi]))) * hop_secs
@@ -80,7 +80,7 @@ def mirrored_around(audio, from_sample, turn_sample, samples, backward_high_pass
 	forward_length = turn_sample - from_sample
 	half_splice = int(MIRROR_SPLICE_SECS / 2 * SR)
 	k = np.arange(samples)
-	forward = audio[np.minimum(from_sample + k, turn_sample + half_splice)]
+	forward = audio[np.minimum(from_sample + k, min(turn_sample + half_splice, len(audio) - 1))]
 	backward = audio[np.maximum(0, turn_sample - (k - forward_length))]
 
 	if backward_high_pass_hz > 0:
@@ -101,6 +101,15 @@ def mirrored_part_never_louder_than_the_decay(extension, forward_length):
 
 
 def tail_of_own_sustain(audio, fade_start_sample, turn_secs, samples, backward_high_pass_hz, fade_power):
+	forward_length = int(turn_secs * SR) - fade_start_sample
+
+	if not int(MIRROR_DECAY_FIT_SECS * SR) <= forward_length < samples:
+		raise ValueError('turn %.2f s must be at least %.1f s after the fadeout start (%.2f s) and before the fadeout ends' % (
+			turn_secs,
+			MIRROR_DECAY_FIT_SECS,
+			fade_start_sample / SR
+		))
+
 	extension, forward_length = mirrored_around(audio, fade_start_sample, int(turn_secs * SR), samples, backward_high_pass_hz)
 	extension = mirrored_part_never_louder_than_the_decay(extension, forward_length)
 	return extension * overall_fade_gain(samples, fade_power)[:, None]
@@ -140,7 +149,7 @@ def build_loop(config, audio):
 		gap = np.zeros((int((tail_after_riff_secs + config['silence_after_tail_secs']) * SR), 2))
 		fade_in_secs = phrase.get('fade_in_secs', min(config['default_fade_in_secs'], FADE_IN_MAX_SHARE_OF_PHRASE * (end - start)))
 		body = faded_in(samples, fade_in_secs)
-		body[-riff_fade:] = 0.0
+		body[len(body) - riff_fade:] = 0.0
 		fade_start_sample = int(start * SR) + len(samples) - riff_fade
 		tail = tail_of_own_sustain(
 			audio,

@@ -21,7 +21,8 @@ One run with alternating phases cancels out scene, thermal and clock differences
   `../build/current/Hypersomnia /range`. It's a URL-style location argument (`src/cmd_line_params.h`, also `/menu`, `/editor`, `/tutorial`).
   Confirm in the log: `Activity SHOOTING_RANGE was specified from the command line.` and `Launched mode: SHOOTING_RANGE`.
   Without it, the game launches `last_activity` from `hypersomnia/user/runtime_prefs.json` - which is whatever the user
-  did last (editor, menu, a server...) - and only if `skip_tutorial` is true, else the tutorial.
+  did last (editor, menu, a server...) - and only if `skip_tutorial` is true and `tutorial_revision_shown` has reached
+  `tutorial_revision_shown_to_everyone_v` (`src/application/tutorial_shown_to_everyone.h`), else the tutorial.
   `launch_at_startup: MAIN_MENU` in the config would send it to the menu too.
 - A different scene (editor, a map on a server) needs a different measuring setup - ask the user if the range isn't representative.
 - **A specific map, with a fixed camera:** open it in the editor with `--edit <project dir>`, e.g.

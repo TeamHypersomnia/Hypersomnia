@@ -116,7 +116,7 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	*/
 
 	std::optional<uint32_t> last_set_up_level;
-	uint32_t stages_built = 0;
+	uint32_t arena_rebuilds = 0;
 
 	/*
 		Tutorial progress HUD state.
@@ -403,8 +403,8 @@ public:
 		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
 	}
 
-	uint32_t get_stages_built() const {
-		return stages_built;
+	uint32_t get_arena_rebuilds() const {
+		return arena_rebuilds;
 	}
 
 	bool is_tutorial() const {

@@ -169,7 +169,7 @@
 #include "application/setups/server/server_setup.h"
 #else
 #include "application/setups/all_setups.h"
-#include "application/setups/tutorial_stage_particles.h"
+#include "application/setups/test_scene_rebuild_particles.h"
 #include "application/setups/editor/editor_setup_for_each_highlight.hpp"
 #endif
 
@@ -6269,7 +6269,7 @@ work_result work(
 
 	WEBSTATIC bool pending_new_state_sample = true;
 	WEBSTATIC auto last_sampled_cosmos = cosmos_id_type(-1);
-	WEBSTATIC uint32_t tutorial_stages_built_at_last_particles_clear = 0;
+	WEBSTATIC uint32_t test_scene_rebuilds_at_last_particles_clear = 0;
 
 	WEBSTATIC augs::timer state_changed_timer;
 
@@ -6415,9 +6415,9 @@ work_result work(
 				resample_if_different();
 
 				if constexpr(std::is_same_v<S, test_scene_setup>) {
-					::clear_particles_left_by_previous_tutorial_stage(
-						setup.get_stages_built(),
-						tutorial_stages_built_at_last_particles_clear,
+					::clear_particles_after_test_scene_rebuild(
+						setup.get_arena_rebuilds(),
+						test_scene_rebuilds_at_last_particles_clear,
 						get_audiovisuals().get<particles_simulation_system>()
 					);
 				}
@@ -6810,36 +6810,23 @@ work_result work(
 				}
 			}
 			else {
-				const bool starts_in_tutorial = !config.skip_tutorial || ::tutorial_revision_unseen(config.tutorial_revision_shown);
-
-				auto launch_tutorial_marking_its_revision_shown = [&]() {
+				if (::starts_in_tutorial(config)) {
 					change_with_save(
 						[&](auto& cfg) {
-							cfg.tutorial_revision_shown = tutorial_revision_shown_to_everyone_v;
+							::mark_tutorial_revision_shown(cfg);
 						}
 					);
 
 					launch_setup(activity_type::TUTORIAL);
-				};
-
-#if PLATFORM_WEB
-				if (starts_in_tutorial) {
-					launch_tutorial_marking_its_revision_shown();
 				}
-				else {
-					launch_setup(activity_type::MAIN_MENU);
-				}
-#else
-				if (starts_in_tutorial) {
-					launch_tutorial_marking_its_revision_shown();
-				}
+#if !PLATFORM_WEB
 				else if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
 					launch_setup(config.get_last_activity());
 				}
+#endif
 				else {
 					launch_setup(activity_type::MAIN_MENU);
 				}
-#endif
 			}
 		}
 	}

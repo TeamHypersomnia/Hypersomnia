@@ -37,7 +37,7 @@ db.prepare("INSERT OR REPLACE INTO key_devices (child_id, device, os, last_cert_
 process.exit(0);' $ID_A $STEAM_ID)
 
 echo "{ \"identity_broker_url\": \"$BROKER_URL\", \"server_list_provider\": \"http://127.0.0.1:1\", \"client\": { \"nickname\": \"alice\" },
-  \"launch_at_startup\": \"MAIN_MENU\", \"skip_tutorial\": true, \"window\": { \"fullscreen\": false, \"size\": [1280, 720] } }" > $T/alice/user/conf.d/test.json
+  \"launch_at_startup\": \"MAIN_MENU\", \"skip_tutorial\": true, \"tutorial_revision_shown\": 1000000, \"window\": { \"fullscreen\": false, \"size\": [1280, 720] } }" > $T/alice/user/conf.d/test.json
 cp "$HERE/identity_ui/imgui_big.ini" $T/alice/user/imgui.ini
 
 start_client() {

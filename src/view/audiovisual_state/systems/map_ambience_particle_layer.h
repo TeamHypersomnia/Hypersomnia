@@ -2,9 +2,7 @@
 #include <type_traits>
 #include "game/enums/particle_layer.h"
 #include "game/cosmos/typed_entity_handle_declaration.h"
-
-struct area_sensor;
-struct particles_decoration;
+#include "game/organization/all_entity_types_declaration.h"
 
 template <class E>
 constexpr bool emits_map_ambience_v =
@@ -29,8 +27,5 @@ void move_map_ambience_to_its_own_particle_pool(const H&, EmissionInstances& emi
 			auto& layer = instance.source_emission.target_layer;
 			layer = ::map_ambience_layer_instead_of(layer);
 		}
-	}
-	else {
-		(void)emission_instances;
 	}
 }

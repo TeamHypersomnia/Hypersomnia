@@ -1,5 +1,6 @@
 {
     "skip_tutorial": false,
+    "tutorial_revision_shown": 0,
     "launch_at_startup": "MAIN_MENU", // or: "LAST_ACTIVITY" (the default of development builds)
     "last_activity": "TUTORIAL",
 
