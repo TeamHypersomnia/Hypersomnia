@@ -1,0 +1,11 @@
+{
+	"riff_fade_secs": 2.5,
+	"tail_after_riff_secs": 3.5,
+	"silence_after_tail_secs": 2.5,
+	"default_fade_in_secs": 3.0,
+	"phrases": [
+		{"start": 0.0, "end_quietest_near": 16.4, "fade_in_secs": 1.5, "turn": 16.3, "backward_high_pass_hz": 250, "tail_after_riff_secs": 4.5, "fade_power": 2.5},
+		{"start": 13.5, "end": 37.55, "fade_in_secs": 3.0, "turn": 37.25, "backward_high_pass_hz": 250},
+		{"start": 34.35, "fade_from": 52.7, "fade_in_secs": 3.0, "turn": 54.6, "backward_high_pass_hz": 250}
+	]
+}
