@@ -1,7 +1,9 @@
+#include <sstream>
 #include <GLFW/glfw3.h>
 
+#define GLFW_SELECTS_PLATFORM_AT_RUNTIME (GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 4))
+
 #if PLATFORM_LINUX
-#include <sstream>
 #include <dlfcn.h>
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
@@ -788,7 +790,7 @@ namespace augs {
 		*/
 
 		return false;
-#elif PLATFORM_LINUX && (GLFW_VERSION_MAJOR > 3 || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 4))
+#elif PLATFORM_LINUX && GLFW_SELECTS_PLATFORM_AT_RUNTIME
 		/*
 			Wayland: GLFW resizes and rescales the surface on this thread, which the GL thread's swaps commit.
 		*/
@@ -801,11 +803,11 @@ namespace augs {
 
 #if PLATFORM_LINUX
 	std::string window::get_parent_window_for_portal() const {
-		Display* const display = platform->has_x11 ? glfwGetX11Display() : nullptr;
-
-		if (display == nullptr) {
+#if GLFW_SELECTS_PLATFORM_AT_RUNTIME
+		if (glfwGetPlatform() != GLFW_PLATFORM_X11) {
 			return "";
 		}
+#endif
 
 		auto out = std::ostringstream();
 		out << "x11:" << std::hex << glfwGetX11Window(platform->window);
