@@ -1,4 +1,4 @@
 Audited: audit #9, 2026-11-11 - Windows launch failure reports (crash handler, startup log, failure dialog, cwd fallback); fixes in 2f5cb344d
 Audited: audit #10, 2026-11-11 - Windows launch failure reports (with 2f5cb344d); fixes in 5bb41625b
 
-Audited: audits #11-#13, 2026-11-12 - current state of the platform shell (Windows start, logs and crash reports; DLL imports and CI packaging; clipboard, dialogs, shell wrappers on every platform); fixes in 0ffd1d093
+Audited: audits #11-#13, 2026-11-12 - current state of the platform shell (Windows start, logs and crash reports; DLL imports and CI packaging; clipboard, dialogs, shell wrappers on every platform); fixes in 62b9ecb00
