@@ -148,11 +148,6 @@ int main(const int argc, const char* const * const argv) {
 #error "Unsupported platform!"
 #endif
 
-	/* 
-		At least on Linux, 
-		we need to call this in order to be able to write non-English characters. 
-	*/
-
 	augs::report_crashes();
 	const auto stop_reporting_crashes_at_exit = augs::scope_guard([]() { augs::stop_reporting_crashes(); });
 
@@ -429,8 +424,13 @@ int main(const int argc, const char* const * const argv) {
 			const auto logs = program_log::get_current().get_complete(); 
 			const auto error_log_path = get_error_log_path();
 
-			augs::save_as_text(error_log_path, logs);
-			augs::open_text_editor(error_log_path);
+			try {
+				augs::save_as_text(error_log_path, logs);
+				augs::open_text_editor(error_log_path);
+			}
+			catch (const std::exception& err) {
+				LOG("Could not save the log of a failure: %x", err.what());
+			}
 		};
 
 		auto relaunch = [&](const std::vector<std::string>& added_arguments) {

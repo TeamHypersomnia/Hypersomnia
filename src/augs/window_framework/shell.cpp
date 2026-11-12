@@ -138,10 +138,35 @@ static std::string quoted_argument(const std::string& argument) {
 #if PLATFORM_UNIX
 	return augs::quoted_for_shell(argument);
 #else
-	const bool needs_quotes = argument.empty() || argument.find_first_of(" \t") != std::string::npos;
+	auto quoted = std::string("\"");
+	auto pending_backslashes = std::size_t(0);
 
-	return needs_quotes ? "\"" + argument + "\"" : argument;
+	for (const auto character : argument) {
+		if (character == '\\') {
+			++pending_backslashes;
+			continue;
+		}
+
+		if (character == '"') {
+			quoted.append(pending_backslashes * 2 + 1, '\\');
+		}
+		else {
+			quoted.append(pending_backslashes, '\\');
+		}
+
+		quoted += character;
+		pending_backslashes = 0;
+	}
+
+	quoted.append(pending_backslashes * 2, '\\');
+	quoted += '"';
+
+	return quoted;
 #endif
+}
+
+static bool is_flag(const std::string& argument) {
+	return begins_with(argument, "--");
 }
 
 namespace augs {
@@ -152,6 +177,7 @@ namespace augs {
 		std::vector<std::string> added_arguments
 	) {
 		auto previous_arguments = std::string();
+		auto propagated_arguments = std::vector<std::string>();
 
 		bool is_appimage = false;
 
@@ -207,15 +233,20 @@ namespace augs {
 			}
 
 			previous_arguments += ::quoted_argument(arg) + " ";
-
-			/* Prevent duplicate flags */
-			erase_element(added_arguments, arg);
+			propagated_arguments.push_back(arg);
 		}
 
 		auto all_added_arguments = std::string();
 
-		for (const auto& a : added_arguments) {
-			all_added_arguments += a + " ";
+		for (std::size_t i = 0; i < added_arguments.size(); ++i) {
+			const auto& added = added_arguments[i];
+
+			const bool takes_a_value = i + 1 < added_arguments.size() && !::is_flag(added_arguments[i + 1]);
+			const bool already_given = ::is_flag(added) && !takes_a_value && found_in(propagated_arguments, added);
+
+			if (!already_given) {
+				all_added_arguments += ::quoted_argument(added) + " ";
+			}
 		}
 
 		if (all_added_arguments.size() > 0) {

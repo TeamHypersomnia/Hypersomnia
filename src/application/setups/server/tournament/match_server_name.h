@@ -2,24 +2,7 @@
 #include <string>
 #include <vector>
 #include "augs/network/network_types.h"
-
-/*
-	At most max_bytes of a UTF-8 string - never cut inside a character.
-*/
-
-inline std::string utf8_prefix(const std::string& s, const std::size_t max_bytes) {
-	if (s.size() <= max_bytes) {
-		return s;
-	}
-
-	auto n = max_bytes;
-
-	while (n > 0 && (static_cast<unsigned char>(s[n]) & 0xC0) == 0x80) {
-		--n;
-	}
-
-	return s.substr(0, n);
-}
+#include "augs/string/utf8_prefix.h"
 
 /*
 	A match's server name by its teams' nicknames - "[alice, bob] vs [carol, dave]", as the players look for theirs.
@@ -64,14 +47,14 @@ inline std::string match_server_name(const std::vector<std::string>& team_a, con
 		const auto half = room / 2;
 
 		if (first_a.size() <= half) {
-			first_b = ::utf8_prefix(first_b, room - first_a.size());
+			first_b = augs::utf8_prefix_never_cut_inside_a_character(first_b, room - first_a.size());
 		}
 		else if (first_b.size() <= half) {
-			first_a = ::utf8_prefix(first_a, room - first_b.size());
+			first_a = augs::utf8_prefix_never_cut_inside_a_character(first_a, room - first_b.size());
 		}
 		else {
-			first_a = ::utf8_prefix(first_a, half);
-			first_b = ::utf8_prefix(first_b, room - half);
+			first_a = augs::utf8_prefix_never_cut_inside_a_character(first_a, half);
+			first_b = augs::utf8_prefix_never_cut_inside_a_character(first_b, room - half);
 		}
 	}
 

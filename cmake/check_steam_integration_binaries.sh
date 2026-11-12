@@ -87,7 +87,7 @@ check_links_no_visual_cpp_runtime() {
 	local binary_label=$1
 	local dependencies=$2
 
-	if grep -qiE 'VCRUNTIME|MSVCP|api-ms-win-crt|ucrtbase' <<< "$dependencies"; then
+	if grep -qiE 'VCRUNTIME|MSVCP|MSVCR1|api-ms-win-crt|ucrtbase|CONCRT|VCOMP' <<< "$dependencies"; then
 		echo "$binary_label links the Visual C++ runtime dynamically - a fresh Windows does not have it; rebuild it with the static runtime (steambuilders) and commit it." >&2
 		any_check_failed=1
 	fi
@@ -119,4 +119,4 @@ if [ $any_check_failed -eq 1 ]; then
 	exit 1
 fi
 
-echo "Every Steam integration binary exports all $(wc -w <<< "$declared_functions") functions of steam_integration.h and links the Steam API."
+echo "Every Steam integration binary exports all $(wc -w <<< "$declared_functions") functions of steam_integration.h and links the Steam API; the Windows one links no Visual C++ runtime."

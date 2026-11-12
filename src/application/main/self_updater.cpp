@@ -231,6 +231,12 @@ self_update_result check_and_apply_updates(
 		return result;
 	}
 
+	if (!::ssh_keygen_is_installed()) {
+		LOG("ssh-keygen is not installed - the update's signature could not be verified, so it is not downloaded.");
+		result.type = R::FAILED_TO_OPEN_SSH_KEYGEN;
+		return result;
+	}
+
 	const auto archive_path = 
 		is_appimage ? 
 #if HEADLESS
@@ -883,7 +889,12 @@ self_update_result check_and_apply_updates(
 			else if (current_state == state::EXTRACTING) {
 				ensure(!is_appimage);
 
-				if (extractor->has_completed()) {
+				const bool extraction_completed = extractor->has_completed();
+
+				if (extraction_completed && extractor->failed_to_start.load()) {
+					interrupt(R::COULDNT_SAVE_BINARY);
+				}
+				else if (extraction_completed) {
 					auto move_files_around_procedure = [target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
 						const auto paths_from_old_version_to_keep = std::array<augs::path_type, 2> {
 							LOGS_DIR,

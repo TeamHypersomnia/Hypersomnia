@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <future>
 #include <mutex>
 
@@ -26,6 +27,7 @@ struct archive_extractor {
 	}
 
 	std::atomic<bool>& exit_requested;
+	std::atomic<bool> failed_to_start = false;
 
 	void worker(augs::pipe& pipe) {
 		std::string line;
@@ -124,6 +126,7 @@ struct archive_extractor {
 				}
 				catch (const std::runtime_error& err) {
 					LOG("Failed to start the extraction of the update: %x", err.what());
+					failed_to_start.store(true);
 				}
 			}
 		);

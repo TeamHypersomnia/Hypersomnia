@@ -3417,7 +3417,12 @@ void editor_setup::toggle_navmesh() {
 	view.toggle_navmesh();
 
 	if (view.show_navmesh) {
-		recent_message.set("Showing navmesh");
+		if (project.settings.navmesh_enabled) {
+			recent_message.set("Showing navmesh");
+		}
+		else {
+			recent_message.set("Navmesh is disabled in Arena settings");
+		}
 
 		/* Regenerate arena to update navmesh if needed */
 		rebuild_arena(true);
@@ -3427,7 +3432,7 @@ void editor_setup::toggle_navmesh() {
 	}
 }
 
-bool editor_setup::is_navmesh_enabled() const {
+bool editor_setup::is_showing_navmesh() const {
 	return view.show_navmesh;
 }
 

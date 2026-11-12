@@ -4,7 +4,7 @@
 2. MINOR version marks a network protocol-breaking change.
 3. PATCH version marks a backward compatible feature or fix.
 
-## [4.5.0] - 2026-11-11
+## [4.5.0] - 2026-11-12
 
 ### Added
 
@@ -32,6 +32,8 @@
 	- The right arm to the right, the left one to the left (broken in 4.4.0).
 - **Impact particles missing on maps full of ambience.**
 	- Glass shards, for one, appeared only sometimes.
+- **Windows: "VCRUNTIME140.dll was not found" on a fresh system.**
+	- The game from the zip no longer needs the Visual C++ runtime installed.
 
 ## [4.4.0] - 2026-11-01
 

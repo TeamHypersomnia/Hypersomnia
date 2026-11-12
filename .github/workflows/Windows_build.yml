@@ -118,8 +118,10 @@ jobs:
         dumpbin /dependents hypersomnia\steam_integration.dll > stub_imports.txt || exit /b 1
         type exe_imports.txt
         type stub_imports.txt
-        findstr /I "VCRUNTIME MSVCP api-ms-win-crt ucrtbase CONCRT VCOMP libssl libcrypto OpenAL32" exe_imports.txt stub_imports.txt && exit /b 1
+        findstr /I "VCRUNTIME MSVCP MSVCR1 api-ms-win-crt ucrtbase CONCRT VCOMP libssl libcrypto OpenAL32" exe_imports.txt stub_imports.txt && exit /b 1
         findstr /I "steam_api64" stub_imports.txt && exit /b 1
+        mt.exe -nologo -inputresource:hypersomnia\Hypersomnia.exe;#1 -out:embedded_manifest.xml || exit /b 1
+        findstr /I "activeCodePage" embedded_manifest.xml || exit /b 1
         exit /b 0
       shell: cmd
 

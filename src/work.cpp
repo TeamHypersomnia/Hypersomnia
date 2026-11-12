@@ -5787,13 +5787,6 @@ work_result work(
 #endif
 			
 
-				/*
-					A modal - the changelog yields to it.
-				*/
-
-				if (!has_current_setup()) {
-				}
-
 				if (!has_current_setup() && !is_news_window_open()) {
 #if BUILD_NETWORKING
 					perform_start_client_gui();

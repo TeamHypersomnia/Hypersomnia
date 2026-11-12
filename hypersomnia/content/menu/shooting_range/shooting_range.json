@@ -13,7 +13,8 @@
         "brighten_lights": false,
         "sun_shadows": {
             "strength": 0.6019999980926514
-        }
+        },
+        "navmesh_enabled": false
     },
     "playtesting": {
         "mode": "quick_test"

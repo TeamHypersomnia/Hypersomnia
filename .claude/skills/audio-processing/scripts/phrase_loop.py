@@ -81,7 +81,7 @@ def mirrored_around(audio, from_sample, turn_sample, samples, backward_high_pass
 	half_splice = int(MIRROR_SPLICE_SECS / 2 * SR)
 	k = np.arange(samples)
 	forward = audio[np.minimum(from_sample + k, min(turn_sample + half_splice, len(audio) - 1))]
-	backward = audio[np.maximum(0, turn_sample - (k - forward_length))]
+	backward = audio[np.clip(turn_sample - (k - forward_length), 0, len(audio) - 1)]
 
 	if backward_high_pass_hz > 0:
 		backward = high_passed(backward, backward_high_pass_hz)

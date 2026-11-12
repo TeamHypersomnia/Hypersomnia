@@ -1,6 +1,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_status_icons.h"
 #include "augs/network/network_types.h"
+#include "augs/string/utf8_prefix.h"
 #include "application/network/address_utils.h"
 #include "application/gui/unlisted_server_fields.h"
 
@@ -11,17 +12,7 @@ std::optional<connect_target::server_identifiers> unlisted_server_fields::find(c
 		return std::nullopt;
 	}
 
-	/*
-		As long as a server's own name at most - not cut inside a character.
-	*/
-
-	if (auto& n = found->name; n.size() > max_server_name_length_v) {
-		n.resize(max_server_name_length_v);
-
-		while (!n.empty() && (static_cast<unsigned char>(n.back()) & 0x80) != 0) {
-			n.pop_back();
-		}
-	}
+	found->name = augs::utf8_prefix_never_cut_inside_a_character(found->name, max_server_name_length_v);
 
 	return found;
 }

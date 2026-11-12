@@ -217,7 +217,6 @@ bt.txt
 Gemfile.lock
 .ninja_deps
 .ninja_log
-hypersomnia/.Hypersomnia
 hypersomnia/Hypersomnia
 hypersomnia/libsteam_integration.so
 hypersomnia/libsteam_api.so

@@ -14,16 +14,16 @@
 #include "game/components/star_field_component.h"
 #include "view/rendering_scripts/draw_entity_input.h"
 
-inline constexpr std::size_t star_field_types_vec4_count_declared_in_illuminated_vsh = 48;
+inline constexpr std::size_t star_field_types_vec4_count_declared_in_illuminated_vsh_v = 48;
 inline constexpr std::size_t vec4s_per_star_field_type_v = 3;
 
 static_assert(
 	MAX_STAR_FIELD_STAR_TYPES * vec4s_per_star_field_type_v
-	== star_field_types_vec4_count_declared_in_illuminated_vsh
+	== star_field_types_vec4_count_declared_in_illuminated_vsh_v
 );
 
 inline constexpr real32 star_field_cell_size_v = 512.f;
-inline constexpr real32 star_field_offscreen_margin_v = 64.f;
+inline constexpr real32 largest_star_field_coordinate_castable_to_cell_v = 1000000000.f;
 inline constexpr uint32_t max_star_field_quads_v = 400000;
 
 inline real32 calc_star_field_spin_degrees(const invariants::sprite& field_sprite, const double global_time_seconds) {
@@ -73,7 +73,8 @@ inline star_field_view calc_star_field_view(
 	const invariants::star_field& field,
 	const invariants::sprite& field_sprite,
 	const sprite_drawing_input& field_input,
-	const ltrb visible_world
+	const ltrb visible_world,
+	const real32 largest_star_half_diagonal
 ) {
 	auto view = star_field_view();
 
@@ -111,7 +112,7 @@ inline star_field_view calc_star_field_view(
 		visible_rb = vec2(std::max(visible_rb.x, local.x), std::max(visible_rb.y, local.y));
 	}
 
-	const auto margin = star_field_offscreen_margin_v;
+	const auto margin = largest_star_half_diagonal;
 
 	view.drawn_area = ltrb(
 		std::max(visible_lt.x - margin, -field_half_size.x),
@@ -119,6 +120,17 @@ inline star_field_view calc_star_field_view(
 		std::min(visible_rb.x + margin, field_half_size.x),
 		std::min(visible_rb.y + margin, field_half_size.y)
 	);
+
+	const bool area_castable_to_cells =
+		std::abs(view.drawn_area.l) < largest_star_field_coordinate_castable_to_cell_v &&
+		std::abs(view.drawn_area.t) < largest_star_field_coordinate_castable_to_cell_v &&
+		std::abs(view.drawn_area.r) < largest_star_field_coordinate_castable_to_cell_v &&
+		std::abs(view.drawn_area.b) < largest_star_field_coordinate_castable_to_cell_v
+	;
+
+	if (!area_castable_to_cells) {
+		return star_field_view();
+	}
 
 	const auto cell_size = star_field_cell_size_v;
 
@@ -132,7 +144,12 @@ inline star_field_view calc_star_field_view(
 	view.first_cell = cell_of(view.drawn_area.lt());
 	view.last_cell = cell_of(view.drawn_area.rb());
 
-	const auto stars_per_cell = field.stars_per_million_square_units * cell_size * cell_size / 1000000.f;
+	const auto requested_stars_per_cell = field.stars_per_million_square_units * cell_size * cell_size / 1000000.f;
+	const auto stars_per_cell =
+		std::isfinite(requested_stars_per_cell) ?
+		std::clamp(requested_stars_per_cell, 0.f, static_cast<real32>(max_star_field_quads_v)) :
+		0.f
+	;
 	view.whole_stars_per_cell = static_cast<int>(stars_per_cell);
 	view.chance_of_one_more_star = stars_per_cell - static_cast<real32>(view.whole_stars_per_cell);
 	view.total_weight = ::calc_star_field_total_weight(field);
@@ -226,6 +243,20 @@ std::vector<vec4> make_star_field_type_table(const invariants::star_field& field
 }
 
 template <class M>
+real32 calc_largest_star_half_diagonal(const invariants::star_field& field, const M& manager) {
+	auto largest_diagonal = 0.f;
+
+	for (const auto& type : field.star_types) {
+		const auto size = vec2(manager.at(type.image_id).get_original_size());
+		largest_diagonal = std::max(largest_diagonal, size.length());
+	}
+
+	const auto largest_scale = std::max(std::abs(field.min_scale), std::abs(field.max_scale));
+
+	return largest_diagonal * largest_scale / 2;
+}
+
+template <class M>
 void queue_star_field_on_gpu(
 	star_field_gpu_target& target,
 	const invariants::star_field& field,
@@ -237,7 +268,13 @@ void queue_star_field_on_gpu(
 		return;
 	}
 
-	const auto view = ::calc_star_field_view(field, field_sprite, field_input, target.visible_world_unscaled_by_query_mult);
+	const auto view = ::calc_star_field_view(
+		field,
+		field_sprite,
+		field_input,
+		target.visible_world_unscaled_by_query_mult,
+		::calc_largest_star_half_diagonal(field, manager)
+	);
 
 	if (view.is_empty()) {
 		return;

@@ -71,15 +71,8 @@ inline std::vector<editor_recorded_playtest_entry> find_recorded_playtests(const
 	return ::find_all_recorded_playtests(recordings_folder).entries;
 }
 
-inline bool lies_in_playtest_recordings_folder(const augs::path_type& recording_json) {
-	const auto recordings_folder = recording_json.lexically_normal().parent_path();
-	const auto project_folder = ::project_folder_of_recording(recording_json);
-
-	return recordings_folder == ::get_playtest_recordings_folder(project_folder);
-}
-
 inline void remove_recorded_playtest(const editor_playtest_recording_paths& recording_paths) {
-	if (::lies_in_playtest_recordings_folder(recording_paths.meta_json)) {
+	if (::is_in_recordings_folder_of_its_project(recording_paths.meta_json)) {
 		augs::remove_file(recording_paths.meta_json);
 		augs::remove_file(recording_paths.inputs_lz4);
 	}

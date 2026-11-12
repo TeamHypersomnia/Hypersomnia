@@ -27,8 +27,7 @@ if ($exitCode -ne 0) {
 	
 	Write-Host "Error log:" -ForegroundColor red
 	cat $error_log -ErrorAction SilentlyContinue
-	$host.SetShouldExit($exitCode) 
-	exit
+	exit $exitCode
 }
 else {
 	$mesg = "Test " + $configuration + " launch succeeded."

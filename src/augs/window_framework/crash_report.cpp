@@ -1,6 +1,7 @@
 #include <atomic>
 #include <csignal>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <exception>
 
@@ -110,6 +111,10 @@ namespace augs {
 		ClipCursor(nullptr);
 
 		const bool log_saved = save_error_log(crash_reason);
+
+		if (!log_saved) {
+			std::fputs((crash_reason + "\n").c_str(), stderr);
+		}
 
 		if (open_log_in_notepad_after_crash) {
 			if (!log_saved) {

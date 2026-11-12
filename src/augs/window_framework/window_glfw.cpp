@@ -630,7 +630,7 @@ namespace augs {
 					glfwSetWindowMonitor(platform->window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 				}
 				else {
-					const auto rect = last_windowed_rect;
+					const auto rect = ::usable_window_rect(last_windowed_rect);
 					LOG("SETTING WINDOWED MODE.");
 					glfwSetWindowMonitor(platform->window, NULL, rect.x, rect.y, rect.w, rect.h, 0);
 				}

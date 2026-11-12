@@ -36,7 +36,9 @@ def main():
 	if game_is_running():
 		sys.exit('Hypersomnia is running - close it first, the editor would overwrite the project')
 
-	text = open(project_json).read()
+	with open(project_json) as project_file:
+		text = project_file.read()
+
 	resource = next((r for r in json.loads(text).get('external_resources', []) if r.get('id') == resource_id), None)
 
 	if resource is None:
@@ -49,13 +51,15 @@ def main():
 
 	destination = os.path.join(os.path.dirname(os.path.abspath(project_json)), resource['path'])
 
+	new_hash = blake3_of(new_audio)
+	updated = text.replace(old_hash_field, '"file_hash": %s' % json.dumps(new_hash))
+	json.loads(updated)
+
 	if not (os.path.exists(destination) and os.path.samefile(new_audio, destination)):
 		shutil.copyfile(new_audio, destination)
 
-	new_hash = blake3_of(destination)
-	updated = text.replace(old_hash_field, '"file_hash": %s' % json.dumps(new_hash))
-	json.loads(updated)
-	open(project_json, 'w').write(updated)
+	with open(project_json, 'w') as project_file:
+		project_file.write(updated)
 	print('%s -> %s, file_hash %s' % (resource_id, resource['path'], new_hash))
 
 

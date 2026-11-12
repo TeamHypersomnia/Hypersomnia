@@ -11,7 +11,7 @@ void rebuild_keeping_sound_clock(ArenaHandle arena, Rebuild&& rebuild) {
 				return typed_mode.sound_clock;
 			}
 			else {
-				return uint32_t(0);
+				return static_cast<uint32_t>(0);
 			}
 		}
 	);

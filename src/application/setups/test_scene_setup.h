@@ -111,11 +111,6 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	tutorial_state tutorial;
 	uint32_t max_tutorial_level = 0;
 
-	/*
-		So that a restart of the same level doesn't count as reaching it again (CrazyGames' happytime).
-	*/
-
-	std::optional<uint32_t> last_set_up_level;
 	uint32_t arena_rebuilds = 0;
 
 	/*
@@ -459,6 +454,7 @@ public:
 
 	void set_tutorial_level(uint32_t level);
 	void set_tutorial_surfing_challenge();
+	void move_character_to_surfing_challenge_start();
 
 	std::string get_browser_location() const;
 	std::string get_scoreboard_caption() const;

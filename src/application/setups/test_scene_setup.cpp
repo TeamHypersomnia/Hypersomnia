@@ -297,7 +297,19 @@ void test_scene_setup::init(const test_scene_type new_type) {
 }
 
 void test_scene_setup::set_tutorial_surfing_challenge() {
-	set_tutorial_level(max_tutorial_level);
+	tutorial.level = tutorial_advanced_end_level_v;
+	tutorial.challenge = true;
+
+	restart_arena();
+}
+
+void test_scene_setup::move_character_to_surfing_challenge_start() {
+	auto& cosm = scene.world;
+
+	if (const auto challenge_start = find<portal_marker>("hard_surf_start")) {
+		cosm[get_controlled_character_id()].set_logic_transform(challenge_start->editable.pos);
+		snap_interpolated_to_logical(cosm);
+	}
 }
 
 std::string test_scene_setup::get_browser_location() const {
@@ -324,50 +336,18 @@ std::string test_scene_setup::get_browser_location() const {
 }
 
 void test_scene_setup::set_tutorial_level(uint32_t level) {
-	auto& cosm = scene.world;
-
-	auto character = [&]() {
-		return cosm[get_controlled_character_id()];
-	};
-
 	tutorial.level = std::min(max_tutorial_level, level);
-
-	const bool is_challenge = tutorial.level == max_tutorial_level;
-
-	if (is_challenge) {
-		tutorial.level = max_tutorial_level - 1;
-		tutorial.challenge = true;
-	}
+	tutorial.challenge = false;
 
 	restart_arena();
-	
-	if (is_challenge) {
-		if (const auto tp = find<portal_marker>("hard_surf_start")) {
-			character().set_logic_transform(tp->editable.pos);
-		}
-	}
 
-	snap_interpolated_to_logical(cosm);
+	snap_interpolated_to_logical(scene.world);
 }
 
 void test_scene_setup::restart_arena() {
 	LOG("Setting up tutorial level: %x.", tutorial.level);
 
 	range_entry_portal = {};
-
-	/*
-		CrazyGames' happytime: at the end of the basic tutorial (its finish screen) and of the advanced one -
-		once per reaching it, not on its restarts.
-	*/
-
-	const bool restarted_same_level = last_set_up_level == tutorial.level;
-	last_set_up_level = tutorial.level;
-
-	if (const bool completed = is_tutorial_finish_level() || tutorial.level == tutorial_advanced_end_level_v) {
-		if (!restarted_same_level) {
-			web_sdk_happy_time();
-		}
-	}
 
 	auto& cosm = scene.world;
 
@@ -434,6 +414,10 @@ void test_scene_setup::restart_arena() {
 	}
 
 	restart_mode();
+
+	if (is_tutorial() && tutorial.challenge) {
+		move_character_to_surfing_challenge_start();
+	}
 
 	if (is_tutorial()) {
 		if (tutorial.level == 0) { 
@@ -1491,6 +1475,11 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 							);
 
 							tutorial.level = new_level;
+
+							if (is_tutorial_finish_level() || new_level == tutorial_advanced_end_level_v) {
+								web_sdk_happy_time();
+							}
+
 							restart_arena();
 							return true;
 						}

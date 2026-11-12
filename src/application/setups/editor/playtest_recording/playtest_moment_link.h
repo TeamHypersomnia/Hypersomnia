@@ -1,4 +1,5 @@
 #pragma once
+#include <cctype>
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
@@ -60,8 +61,23 @@ inline std::optional<std::string> find_playtest_moment_link_field(const std::str
 	return link.substr(value_start, value_end == std::string::npos ? std::string::npos : value_end - value_start);
 }
 
-inline bool is_network_share_path(const std::string& path) {
-	return begins_with(path, "\\\\") || begins_with(path, "//");
+inline bool is_path_separator(const char character) {
+	return character == '/' || character == '\\';
+}
+
+inline bool starts_on_a_local_disk(const std::string& path) {
+#if PLATFORM_WINDOWS
+	return
+		path.size() >= 3 &&
+		std::isalpha(static_cast<unsigned char>(path[0])) &&
+		path[1] == ':' &&
+		::is_path_separator(path[2])
+	;
+#else
+	const bool starts_with_two_separators = path.size() >= 2 && ::is_path_separator(path[0]) && ::is_path_separator(path[1]);
+
+	return !starts_with_two_separators;
+#endif
 }
 
 inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_link(const std::string& link) {
@@ -76,7 +92,7 @@ inline std::optional<playtest_replay_capture_settings> parse_playtest_moment_lin
 		return std::nullopt;
 	}
 
-	if (::is_network_share_path(*recording)) {
+	if (!::starts_on_a_local_disk(*recording)) {
 		return std::nullopt;
 	}
 

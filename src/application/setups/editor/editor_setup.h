@@ -617,7 +617,7 @@ public:
 	void toggle_navmesh();
 	bool is_grid_enabled() const;
 	bool is_snapping_enabled() const;
-	bool is_navmesh_enabled() const;
+	bool is_showing_navmesh() const;
 
 	void sparser_grid();
 	void denser_grid();
