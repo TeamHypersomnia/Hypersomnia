@@ -56,6 +56,7 @@ struct cosmos_common_significant {
 	bool minimap_tab_shows_all_islands = false;
 
 	default_sound_properties_info default_sound_properties;
+	bool navmesh_enabled = true;
 	cosmos_navmesh navmesh;
 	bot_waypoints_settings bot_waypoints;
 	// END GEN INTROSPECTOR

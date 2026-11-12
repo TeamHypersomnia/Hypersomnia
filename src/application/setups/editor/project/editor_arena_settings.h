@@ -18,6 +18,7 @@ struct editor_arena_settings {
 	sun_shadow_settings sun_shadows;
 	point_light_shadow_settings point_light_shadows;
 	editor_theme warmup_theme;
+	bool navmesh_enabled = true;
 	uint32_t navmesh_cell_size = 128;
 	bot_waypoints_settings bot_waypoints;
 	rgba debug_navmesh_free_color = rgba(0, 255, 255, 60);

@@ -15,7 +15,8 @@
         "brighten_lights": true,
         "sun_shadows": {
             "step": [2.4000000953674316, 2.4000000953674316]
-        }
+        },
+        "navmesh_enabled": false
     },
     "playtesting": {
         "mode": "quick_test"

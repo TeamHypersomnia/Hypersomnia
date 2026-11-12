@@ -2762,6 +2762,12 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	}
 
 	if (section == arena_settings_section::NAVMESH) {
+		PROPERTY("Enable navmesh", navmesh_enabled);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If unticked, the map has no navmesh: nothing is computed when it loads,\nand all bots stand still.\nFor maps without bots, e.g. the tutorial.");
+		}
+
 		{
 			auto& val = insp.navmesh_cell_size;
 			const auto old_val = val;

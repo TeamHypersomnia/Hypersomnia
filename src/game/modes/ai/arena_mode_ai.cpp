@@ -79,6 +79,10 @@ void update_arena_mode_ai_team(
 	const entity_id bomb_entity,
 	pathfinding_context* pathfinding_ctx
 ) {
+	if (!cosm.get_common_significant().navmesh_enabled) {
+		return;
+	}
+
 	/*
 		Resistance: if team has no chosen_bombsite yet, pick one randomly.
 	*/
@@ -369,6 +373,10 @@ arena_ai_result update_arena_mode_ai(
 	const std::optional<real32> zoom_override,
 	const arena_shop_whitelists& shop_whitelists
 ) {
+	if (!cosm.get_common_significant().navmesh_enabled) {
+		return {};
+	}
+
 	auto stable_rng = randomization(stable_round_rng);
 
 	auto scope = augs::scope_guard([&]() {

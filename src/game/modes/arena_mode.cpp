@@ -1329,6 +1329,7 @@ void arena_mode::setup_round(
 	generated_waypoints_seed = static_cast<uint32_t>(get_round_rng_seed(cosm));
 	generated_waypoints_this_round =
 		num_requested_bots > 0
+		&& cosm.get_common_significant().navmesh_enabled
 		&& ::create_random_waypoints(access, cosm, in.rules.is_gun_game(), in.rules.playtest_spawns, generated_waypoints_seed)
 	;
 

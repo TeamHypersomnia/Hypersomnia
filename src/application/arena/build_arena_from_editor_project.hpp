@@ -115,6 +115,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	common.default_zoom = project.settings.default_zoom;
 	common.bot_waypoints = project.settings.bot_waypoints;
 	common.minimap_tab_shows_all_islands = project.settings.minimap_tab_shows_all_islands;
+	common.navmesh_enabled = project.settings.navmesh_enabled;
 
 	/*
 		Navmesh loading/regeneration logic is deferred to the end of this function,
@@ -745,12 +746,12 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 		const bool bots_walk_to_test_navigation_ends = in.for_playtesting && ::has_bot_test_navigation_ends_in_rules(arena_handle.ruleset);
 
-		const bool needs_a_navmesh = 
+		const bool needs_a_navmesh = project.settings.navmesh_enabled && (
 			not_playtesting || 
 			playtesting_with_bots || 
 			want_to_see_up_to_date ||
 			bots_walk_to_test_navigation_ends
-		;
+		);
 
 		const bool allow_loading_cached = not_playtesting;
 
