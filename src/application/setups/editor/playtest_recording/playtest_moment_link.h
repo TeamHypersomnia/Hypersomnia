@@ -74,7 +74,11 @@ inline bool starts_on_a_local_disk(const std::string& path) {
 		::is_path_separator(path[2])
 	;
 #else
-	const bool starts_with_two_separators = path.size() >= 2 && ::is_path_separator(path[0]) && ::is_path_separator(path[1]);
+	const bool starts_with_two_separators =
+		path.size() >= 2 &&
+		::is_path_separator(path[0]) &&
+		::is_path_separator(path[1])
+	;
 
 	return !starts_with_two_separators;
 #endif

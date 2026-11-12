@@ -139,7 +139,7 @@ static std::string quoted_argument(const std::string& argument) {
 	return augs::quoted_for_shell(argument);
 #else
 	auto quoted = std::string("\"");
-	auto pending_backslashes = std::size_t(0);
+	auto pending_backslashes = static_cast<std::size_t>(0);
 
 	for (const auto character : argument) {
 		if (character == '\\') {

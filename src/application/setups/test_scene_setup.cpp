@@ -301,15 +301,8 @@ void test_scene_setup::set_tutorial_surfing_challenge() {
 	tutorial.challenge = true;
 
 	restart_arena();
-}
 
-void test_scene_setup::move_character_to_surfing_challenge_start() {
-	auto& cosm = scene.world;
-
-	if (const auto challenge_start = find<portal_marker>("hard_surf_start")) {
-		cosm[get_controlled_character_id()].set_logic_transform(challenge_start->editable.pos);
-		snap_interpolated_to_logical(cosm);
-	}
+	snap_interpolated_to_logical(scene.world);
 }
 
 std::string test_scene_setup::get_browser_location() const {
@@ -414,10 +407,6 @@ void test_scene_setup::restart_arena() {
 	}
 
 	restart_mode();
-
-	if (is_tutorial() && tutorial.challenge) {
-		move_character_to_surfing_challenge_start();
-	}
 
 	if (is_tutorial()) {
 		if (tutorial.level == 0) { 
@@ -719,7 +708,11 @@ void test_scene_setup::restart_mode() {
 
 	auto& cosm = scene.world;
 
-	const auto current_teleport = typesafe_sprintf("entry%x", tutorial.level);
+	const auto current_teleport =
+		tutorial.challenge ?
+		std::string("hard_surf_start") :
+		typesafe_sprintf("entry%x", tutorial.level)
+	;
 
 	const bool is_akimbo_level = tutorial.level == 5;
 	const bool is_duals_level = tutorial.level == 6;

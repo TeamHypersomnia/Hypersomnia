@@ -454,7 +454,6 @@ public:
 
 	void set_tutorial_level(uint32_t level);
 	void set_tutorial_surfing_challenge();
-	void move_character_to_surfing_challenge_start();
 
 	std::string get_browser_location() const;
 	std::string get_scoreboard_caption() const;

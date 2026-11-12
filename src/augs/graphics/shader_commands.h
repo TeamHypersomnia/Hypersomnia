@@ -1,4 +1,8 @@
 #pragma once
+#include <array>
+#include <variant>
+#include "augs/math/vec2.h"
+#include "augs/graphics/rgba.h"
 
 using GLint = int;
 
