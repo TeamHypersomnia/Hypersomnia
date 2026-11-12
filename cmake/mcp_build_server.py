@@ -61,7 +61,7 @@ TOOLS = [
 		"name": "cmake_debug_fast",
 		"description": (
 			"Generate the 'fast' Debug build configuration (no debug info) using "
-			"BUILD_FOLDER_SUFFIX=fast cmake/build.sh Debug x64 -DGENERATE_DEBUG_INFORMATION=0 -DUSE_GLFW=1 (the GLFW window players get). "
+			"BUILD_FOLDER_SUFFIX=fast cmake/build.sh Debug x64 -DGENERATE_DEBUG_INFORMATION=0. "
 			"Creates build/Debug-x64-clang-fast/ and symlinks build/current to it. "
 			"Run this once on a clean repo before using build or build_file."
 		),
@@ -85,7 +85,7 @@ def run_cmake_debug_fast():
 	env["BUILD_FOLDER_SUFFIX"] = "fast"
 
 	result = subprocess.run(
-		["bash", "cmake/build.sh", "Debug", "x64", "-DGENERATE_DEBUG_INFORMATION=0", "-DUSE_GLFW=1"],
+		["bash", "cmake/build.sh", "Debug", "x64", "-DGENERATE_DEBUG_INFORMATION=0"],
 		stdout=subprocess.PIPE,
 		stderr=subprocess.PIPE,
 		text=True,

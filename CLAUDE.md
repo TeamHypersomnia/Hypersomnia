@@ -6,7 +6,7 @@ A `build` MCP server is available with four tools:
 - `build_file <path>` — compile a single `.cpp` (path relative to repo root) for fast error-checking after edits
 - `build` — full ninja build
 - `build_cmake` — regenerate CMake build files when `CMakeLists.txt` changes
-- `cmake_debug_fast` — generate the fast-building Debug configuration: runs `BUILD_FOLDER_SUFFIX=fast cmake/build.sh Debug x64 -DGENERATE_DEBUG_INFORMATION=0 -DUSE_GLFW=1` (the GLFW window players get), creates `build/Debug-x64-clang-fast/` and symlinks `build/current` to it
+- `cmake_debug_fast` — generate the fast-building Debug configuration: runs `BUILD_FOLDER_SUFFIX=fast cmake/build.sh Debug x64 -DGENERATE_DEBUG_INFORMATION=0`, creates `build/Debug-x64-clang-fast/` and symlinks `build/current` to it
 
 `build`, `build_cmake`, and `build_file` will first run `cmake_debug_fast` if the `build/` folder does not yet exist.
 
@@ -17,6 +17,10 @@ about to run themselves. Anything you build to test goes into a folder of your o
 `.claude/skills/local-testing/scripts/build_claude.sh debug|headless|release|steam [worktree]`;
 several agents at once: each in its own worktree with its own build folder, and only one full build on the machine at
 a time (31 GB, no swap - more freeze the desktop) - `build_claude.sh` waits for it by itself.
+
+Every Linux build with a window is the GLFW one players get - CMake's default. Only `-DUSE_GLFW=0` builds the xcb
+window with its own clipboard and portal parent, which doesn't ship anywhere - a test there proves nothing about
+what players get.
 
 # Running a map
 
