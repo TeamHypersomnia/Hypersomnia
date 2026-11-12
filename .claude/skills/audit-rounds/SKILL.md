@@ -58,6 +58,13 @@ For every finding ask, in this order, and write the answer into the decisions do
 Then fix, test right away (on screen or with the scenario scripts), commit, update the document, and mark the audited
 commits with git notes (the rule in CLAUDE.md).
 
+## Numbering what the user answers to
+
+Every list of findings or questions shown to the user - in a reply or on the status page - is numbered 1, 2, 3, ...
+from 1 in that message, in the order shown. Never the finding numbers of an audit report: they repeat across rounds,
+skip the ones already fixed, and the user does not read the reports. The user answers "2. zostaw" by the number they
+see, so the reply maps their numbers back to the findings.
+
 ## The status page
 
 When the user asks where things stand after an audit ("pokaż mi ustalenia audytu", "w formie html", "czy kręcimy się
