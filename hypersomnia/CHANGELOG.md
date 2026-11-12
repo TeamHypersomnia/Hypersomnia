@@ -9,8 +9,8 @@
 ### Added
 
 - **The tutorial is now a space station.**
-	- Nebulae and stars behind the windows, glass, lights.
-	- Calm ambient music that keeps playing between stages.
+	- Calm ambient music.
+	- Nebulae, stars and planets.
 	- It launches once even if you have completed it before.
 - **Steam achievements for the tutorial.**
 	- First Journey: finish the basic tutorial.
