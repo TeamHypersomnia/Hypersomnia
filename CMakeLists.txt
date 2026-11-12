@@ -2172,6 +2172,10 @@ else()
 endif()
 
 if (BUILD_FOR_WEB)
+	add_custom_command(
+		TARGET Hypersomnia PRE_LINK
+		COMMAND ${Python3_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/refuse_release_web_package_with_uncommitted_files.py" "${HYPERSOMNIA_EXE_RESOURCES_DIR}" "${HYPERSOMNIA_VERSION_FILE_CPP}"
+	)
 	add_custom_command(TARGET Hypersomnia PRE_LINK COMMAND ${WRITE_WEB_PACKAGE_EXCLUDES})
 endif()
 

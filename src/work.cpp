@@ -6795,7 +6795,7 @@ work_result work(
 				}
 			}
 			else {
-				if (::starts_in_tutorial(config)) {
+				if (::starts_in_tutorial(config, params.is_crazygames)) {
 					change_with_save(
 						[&](auto& cfg) {
 							::mark_tutorial_revision_shown(cfg);
