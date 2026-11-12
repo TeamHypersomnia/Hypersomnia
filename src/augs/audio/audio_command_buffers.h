@@ -193,6 +193,13 @@ namespace augs {
 			audio_thread.emplace(make_worker_lambda());
 		}
 
+		~audio_command_buffers() {
+			if (audio_thread->joinable()) {
+				request_quit();
+				audio_thread->join();
+			}
+		}
+
 		void quit() {
 			request_quit();
 			audio_thread->join(); 
