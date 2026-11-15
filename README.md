@@ -95,10 +95,9 @@ Complete server configuration in a few clicks.
 
 #### *📰 Are you a journalist? [Click here!](https://github.com/TeamHypersomnia/PressKit/blob/main/README.md#intro)*
 
-## Latest developer journals
+## Latest developer journal
 
-| <a href="https://www.youtube.com/watch?v=Nlh_dyd_V7w" title="Portals"><img src="https://img.youtube.com/vi/Nlh_dyd_V7w/0.jpg" width="300"></a> | <a href="https://www.youtube.com/watch?v=URWjNtUArDo" title="Wallbangs"><img src="https://img.youtube.com/vi/URWjNtUArDo/0.jpg" width="300"></a> |
-|:--:|:--:|
+<a href="https://www.youtube.com/watch?v=ftnChkC1-8w" title="Hypersomnia Developer Journal #6"><img src="https://img.youtube.com/vi/ftnChkC1-8w/maxresdefault.jpg" width="600"></a>
 
 ## Join the community!
 
